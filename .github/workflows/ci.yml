@@ -75,5 +75,5 @@ jobs:
         # Hack to get around failing "ethereumjs-abi The remote archive doesn't match the expected checksum" error
         run: YARN_CHECKSUM_BEHAVIOR=update yarn
 
-      - name: Lint soliditidy and ts files
+      - name: Create docgen
         run: yarn docgen
