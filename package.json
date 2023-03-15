@@ -1,14 +1,11 @@
 {
-  "name": "@UrAvgDeveloper/governance-contracts",
+  "name": "@venusprotocol/governance-contracts",
   "description": "",
   "version": "1.0.0",
-  "author": {
-    "name": "UrAvgDeveloper",
-    "url": "https://github.com/UrAvgDeveloper"
-  },
+  "author": "",
   "devDependencies": {
-    "@commitlint/cli": "^17.3.0",
-    "@commitlint/config-conventional": "^17.3.0",
+    "@commitlint/cli": "^17.4.4",
+    "@commitlint/config-conventional": "^17.4.4",
     "@defi-wonderland/smock": "^2.3.4",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
@@ -21,6 +18,8 @@
     "@nomiclabs/hardhat-ethers": "^2.2.1",
     "@nomiclabs/hardhat-etherscan": "^3.1.2",
     "@openzeppelin/hardhat-upgrades": "^1.22.1",
+    "@semantic-release/changelog": "^6.0.2",
+    "@semantic-release/git": "^10.0.1",
     "@trivago/prettier-plugin-sort-imports": "^4.0.0",
     "@typechain/ethers-v5": "^10.1.1",
     "@typechain/hardhat": "^6.1.4",
@@ -43,7 +42,7 @@
     "hardhat-deploy": "^0.11.23",
     "hardhat-docgen": "^1.3.0",
     "hardhat-gas-reporter": "^1.0.9",
-    "husky": "^8.0.2",
+    "husky": "^8.0.3",
     "lint-staged": "^13.0.4",
     "lodash": "^4.17.21",
     "mocha": "^10.1.0",
@@ -94,6 +93,7 @@
   "dependencies": {
     "@openzeppelin/contracts": "^4.8.2",
     "@openzeppelin/contracts-upgradeable": "^4.8.2",
-    "bignumber.js": "^9.1.1"
+    "bignumber.js": "^9.1.1",
+    "semantic-release": "^19.0.3"
   }
 }
