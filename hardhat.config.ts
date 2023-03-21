@@ -5,7 +5,6 @@ import "@nomiclabs/hardhat-etherscan";
 import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
 import { ethers } from "ethers";
-import fs from "fs";
 import "hardhat-deploy";
 import { HardhatUserConfig, task } from "hardhat/config";
 import "solidity-docgen";
