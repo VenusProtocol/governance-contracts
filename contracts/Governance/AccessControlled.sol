@@ -6,6 +6,14 @@ import "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 
 import "./IAccessControlManager.sol";
 
+/**
+ * @title Venus Access Control Contract.
+ * @dev The AccessControlled contract is a wrapper around the OpenZeppelin AccessControl contract
+ *      It provides a standardized way to control access to methods within the Venus Smart Contract Ecosystem.
+ *      The contract allows the owner to set an AccessControlManager contract address.
+ *      It can restrict method calls based on the sender's role and the method's signature.
+ */
+
 abstract contract AccessControlled is Initializable, Ownable2StepUpgradeable {
     /// @notice Access control manager contract
     IAccessControlManager private _accessControlManager;

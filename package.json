@@ -1,7 +1,7 @@
 {
   "name": "@venusprotocol/governance-contracts",
   "description": "",
-  "version": "1.0.0",
+  "version": "0.0.1",
   "author": "",
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
@@ -17,6 +17,8 @@
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "@nomiclabs/hardhat-ethers": "^2.2.1",
     "@nomiclabs/hardhat-etherscan": "^3.1.2",
+    "@openzeppelin/contracts": "^4.8.2",
+    "@openzeppelin/contracts-upgradeable": "^4.8.2",
     "@openzeppelin/hardhat-upgrades": "^1.22.1",
     "@semantic-release/changelog": "^6.0.2",
     "@semantic-release/git": "^10.0.1",
@@ -29,6 +31,8 @@
     "@types/node": "^18.11.9",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
+    "@venusprotocol/venus-protocol": "0.4.1",
+    "bignumber.js": "^9.1.1",
     "chai": "^4.3.7",
     "commitizen": "^4.2.5",
     "cross-env": "^7.0.3",
@@ -39,6 +43,7 @@
     "ethers": "^5.7.2",
     "fs-extra": "^10.1.0",
     "hardhat": "^2.12.2",
+    "hardhat-dependency-compiler": "^1.1.3",
     "hardhat-deploy": "^0.11.23",
     "hardhat-docgen": "^1.3.0",
     "hardhat-gas-reporter": "^1.0.9",
@@ -49,6 +54,7 @@
     "pinst": "^3.0.0",
     "prettier": "^2.8.4",
     "prettier-plugin-solidity": "^1.1.2",
+    "semantic-release": "^19.0.3",
     "shx": "^0.3.4",
     "solhint": "^3.4.0",
     "solhint-plugin-prettier": "^0.0.5",
@@ -56,6 +62,7 @@
     "solidity-docgen": "^0.6.0-beta.34",
     "ts-generator": "^0.1.1",
     "ts-node": "^10.9.1",
+    "tsconfig-paths": "^4.1.2",
     "typechain": "^8.1.1",
     "typescript": "^4.9.3"
   },
@@ -89,11 +96,5 @@
     "prettier": "prettier --config ./.prettierrc.yaml --write \"**/*.{js,json,md,ts,yaml,yml,sol}\"",
     "prettier:check": "prettier --check --config ./.prettierrc.yaml \"**/*.{js,json,md,ts,yaml,yml,sol}\"",
     "docgen": "hardhat docgen"
-  },
-  "dependencies": {
-    "@openzeppelin/contracts": "^4.8.2",
-    "@openzeppelin/contracts-upgradeable": "^4.8.2",
-    "bignumber.js": "^9.1.1",
-    "semantic-release": "^19.0.3"
   }
 }

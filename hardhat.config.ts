@@ -23,35 +23,6 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   }
 });
 
-task("run-script", "Runs a hardhard script by name")
-  .addParam("path", "Path within script/hardhat to script")
-  .setAction(async (taskArgs: { path: string }) => {
-    let main;
-    try {
-      main = require(`./script/hardhat/${taskArgs.path}`);
-    } catch (error) {
-      console.log("Make sure you pass an existing script path. Available scripts:");
-      fs.readdirSync("./script/hardhat", { withFileTypes: true }).forEach((file: fs.Dirent) => {
-        // Some directories don't contain files that can be run this way
-        if (file.isDirectory() && file.name !== "simulations" && file.name !== "utils" && file.name !== "vips") {
-          console.log(`${file.name}/`);
-          fs.readdirSync(`./script/hardhat/${file.name}`).forEach((file: string) => {
-            console.log(`  ${file}`);
-          });
-        }
-      });
-    }
-
-    if (main) {
-      await main()
-        .then(() => process.exit(0))
-        .catch((error: Error) => {
-          console.error(error);
-          process.exit(1);
-        });
-    }
-  });
-
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   solidity: {
@@ -129,7 +100,7 @@ const config: HardhatUserConfig = {
   external: {
     contracts: [
       {
-        artifacts: "node_modules/@venusprotocol/isolated-pools/artifacts",
+        artifacts: "./node_modules/@venusprotocol/venus-protocol/artifacts",
       },
     ],
   },
@@ -146,7 +117,7 @@ function isFork() {
         allowUnlimitedContractSize: false,
         loggingEnabled: false,
         forking: {
-          url: `https://wild-blissful-dawn.bsc.discover.quiknode.pro/${process.env.QUICK_NODE_KEY}/`,
+          url: `${process.env.BSC_ARCHIVE_NODE}`,
           blockNumber: 21068448,
         },
         accounts: {
