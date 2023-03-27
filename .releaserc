@@ -6,12 +6,16 @@
         "preset": "conventionalcommits",
         "releaseRules": [
           {
+            "breaking": true,
+            "release": "major"
+          },
+          {
             "type": "build",
-            "release": "minor"
+            "release": false
           },
           {
             "type": "ci",
-            "release": "patch"
+            "release": false
           },
           {
             "type": "feat",
@@ -27,11 +31,7 @@
           },
           {
             "type": "test",
-            "release": "patch"
-          },
-          {
-            "breaking": true,
-            "release": "minor"
+            "release": false
           }
         ],
         "parserOpts": {
@@ -55,18 +55,9 @@
       }
     ],
     [
-      "@semantic-release/github",
+      "@semantic-release/npm",
       {
-        "assets": [
-          {
-            "path": "dist/*.tgz",
-            "label": "Tarball"
-          },
-          {
-            "path": "dist/*.zip",
-            "label": "Zipball"
-          }
-        ]
+        "npmPublish": false
       }
     ],
     [
@@ -82,11 +73,11 @@
   ],
   "branches": [
     {
-      "name": "main"
+      "name": "master"
     },
     {
       "name": "develop",
-      "prerelease": true
+      "prerelease": "dev"
     }
   ]
 }
