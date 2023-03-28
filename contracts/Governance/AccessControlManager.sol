@@ -5,7 +5,7 @@ import "./IAccessControlManager.sol";
 
 /**
  * @title Venus Access Control Contract
- * @author 0xLucian
+ * @author venus
  * @dev This contract is a wrapper of OpenZeppelin AccessControl
  *		extending it in a way to standartize access control
  *		within Venus Smart Contract Ecosystem
