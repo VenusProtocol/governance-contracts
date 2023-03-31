@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.13;
 
-import "../Governance/AccessControlled.sol";
+import "../Governance/AccessControlledV8.sol";
 
-contract MockAccessTest is AccessControlled {
+contract MockAccessTest is AccessControlledV8 {
     /**
      * @param accessControlManager Access control manager contract address
      */

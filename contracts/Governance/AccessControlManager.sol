@@ -1,16 +1,16 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.13;
 import "@openzeppelin/contracts/access/AccessControl.sol";
-import "./IAccessControlManager.sol";
+import "./IAccessControlManagerV8.sol";
 
 /**
  * @title Venus Access Control Contract
- * @author 0xLucian
+ * @author venus
  * @dev This contract is a wrapper of OpenZeppelin AccessControl
  *		extending it in a way to standartize access control
  *		within Venus Smart Contract Ecosystem
  */
-contract AccessControlManager is AccessControl, IAccessControlManager {
+contract AccessControlManager is AccessControl, IAccessControlManagerV8 {
     /// @notice Emitted when an account is given a permission to a certain contract function
     /// @dev If contract address is 0x000..0 this means that the account is a default admin of this function and
     /// can call any contract function with this signature

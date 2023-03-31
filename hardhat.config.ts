@@ -70,7 +70,7 @@ const config: HardhatUserConfig = {
     },
     // currently not used, we are still using saddle to deploy contracts
     bscmainnet: {
-      url: `https://bsc-dataseed.binance.org/`,
+      url: process.env.BSC_TESTNET_NODE || "https://bsc-dataseed.binance.org/",
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
   },

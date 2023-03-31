@@ -1,9 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.13;
+pragma solidity ^0.5.16;
 
-import "@openzeppelin/contracts/access/IAccessControl.sol";
-
-interface IAccessControlManager is IAccessControl {
+interface IAccessControlManagerV5 {
     function giveCallPermission(address contractAddress, string calldata functionSig, address accountToPermit) external;
 
     function revokeCallPermission(

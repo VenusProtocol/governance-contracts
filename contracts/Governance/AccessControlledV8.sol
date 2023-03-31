@@ -4,19 +4,19 @@ pragma solidity 0.8.13;
 import "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 
-import "./IAccessControlManager.sol";
+import "./IAccessControlManagerV8.sol";
 
 /**
  * @title Venus Access Control Contract.
- * @dev The AccessControlled contract is a wrapper around the OpenZeppelin AccessControl contract
+ * @dev The AccessControlledV8 contract is a wrapper around the OpenZeppelin AccessControl contract
  *      It provides a standardized way to control access to methods within the Venus Smart Contract Ecosystem.
  *      The contract allows the owner to set an AccessControlManager contract address.
  *      It can restrict method calls based on the sender's role and the method's signature.
  */
 
-abstract contract AccessControlled is Initializable, Ownable2StepUpgradeable {
+abstract contract AccessControlledV8 is Initializable, Ownable2StepUpgradeable {
     /// @notice Access control manager contract
-    IAccessControlManager private _accessControlManager;
+    IAccessControlManagerV8 private _accessControlManager;
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
@@ -54,7 +54,7 @@ abstract contract AccessControlled is Initializable, Ownable2StepUpgradeable {
     /**
      * @notice Returns the address of the access control manager contract
      */
-    function accessControlManager() external view returns (IAccessControlManager) {
+    function accessControlManager() external view returns (IAccessControlManagerV8) {
         return _accessControlManager;
     }
 
@@ -65,7 +65,7 @@ abstract contract AccessControlled is Initializable, Ownable2StepUpgradeable {
     function _setAccessControlManager(address accessControlManager_) internal {
         require(address(accessControlManager_) != address(0), "invalid acess control manager address");
         address oldAccessControlManager = address(_accessControlManager);
-        _accessControlManager = IAccessControlManager(accessControlManager_);
+        _accessControlManager = IAccessControlManagerV8(accessControlManager_);
         emit NewAccessControlManager(oldAccessControlManager, accessControlManager_);
     }
 
