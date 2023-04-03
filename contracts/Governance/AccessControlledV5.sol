@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity ^0.5.16;
 
-import "contracts/Utils/Initializable.sol";
+import "../Utils/Initializable.sol";
 import "../Utils/Ownable2StepUpgradeable.sol";
 
 import "./IAccessControlManagerV5.sol";
