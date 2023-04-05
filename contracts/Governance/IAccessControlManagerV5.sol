@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity ^0.5.16;
+pragma solidity 0.5.16;
 
 interface IAccessControlManagerV5 {
     function giveCallPermission(address contractAddress, string calldata functionSig, address accountToPermit) external;
