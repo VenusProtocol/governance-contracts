@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.5.16;
 
-import "../Utils/Initializable.sol";
-import "../Utils/Ownable2StepUpgradeable.sol";
+import "../Utils/InitializableV5.sol";
+import "../Utils/Ownable2StepUpgradeableV5.sol";
 
 import "./IAccessControlManagerV5.sol";
 
@@ -14,7 +14,7 @@ import "./IAccessControlManagerV5.sol";
  *      It can restrict method calls based on the sender's role and the method's signature.
  */
 
-contract AccessControlledV5 is Initializable, Ownable2StepUpgradeable {
+contract AccessControlledV5 is InitializableV5, Ownable2StepUpgradeableV5 {
     /// @notice Access control manager contract
     IAccessControlManagerV5 private _accessControlManager;
 

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
-// OpenZeppelin Contracts (last updated v4.8.1) (proxy/utils/Initializable.sol)
+// This is a backport of the v4.8.1 contract in OZ to solidity 0.5.16
 
-pragma solidity ^0.5.16;
+pragma solidity 0.5.16;
 
-import "./AddressUpgradeable.sol";
+import "./AddressUpgradeableV5.sol";
 
 /**
  * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed
@@ -53,7 +53,7 @@ import "./AddressUpgradeable.sol";
  * ```
  * ====
  */
-contract Initializable {
+contract InitializableV5 {
     /**
      * @dev Indicates that the contract has been initialized.
      * @custom:oz-retyped-from bool
@@ -83,7 +83,7 @@ contract Initializable {
         bool isTopLevelCall = !_initializing;
         require(
             (isTopLevelCall && _initialized < 1) ||
-                (!AddressUpgradeable.isContract(address(this)) && _initialized == 1),
+                (!AddressUpgradeableV5.isContract(address(this)) && _initialized == 1),
             "Initializable: contract is already initialized"
         );
         _initialized = 1;
