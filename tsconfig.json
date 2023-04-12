@@ -1,0 +1,31 @@
+{
+  "compilerOptions": {
+    "declaration": true,
+    "declarationMap": true,
+    "emitDecoratorMetadata": true,
+    "esModuleInterop": true,
+    "experimentalDecorators": true,
+    "forceConsistentCasingInFileNames": true,
+    "lib": ["es6"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "noImplicitAny": true,
+    "removeComments": true,
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "strict": true,
+    "target": "es6"
+  },
+  "exclude": ["node_modules"],
+  "files": ["./hardhat.config.ts"],
+  "include": [
+    "./typechain",
+    "./deploy",
+    "./tests",
+    "./script",
+    "./scenario",
+    "jest.config.js",
+    "saddle.config.js",
+    "docgen-templates"
+  ]
+}

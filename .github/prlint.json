@@ -1,0 +1,27 @@
+{
+  "title": [
+    {
+      "pattern": "^\\[VEN-\\d{1,5}\\]:\\s",
+      "message": "Your title needs to be prefixed with a JIRA ticket"
+    }
+  ],
+  "body": [
+    {
+      "pattern": "[VEN-\\d{1,5}",
+      "flags": ["i"],
+      "message": "You need a JIRA ticket in your description"
+    }
+  ],
+  "head.ref": [
+    {
+      "pattern": "^(feat|feature|fix|hotfix)/|\\d+\\.(?:\\d+|x)(?:\\.x)?$",
+      "message": "Branch must be prefixed with (feat|feature|fix|hotfix)/"
+    }
+  ],
+  "assignee.login": [
+    {
+      "pattern": ".+",
+      "message": "You need to assign someone"
+    }
+  ]
+}
