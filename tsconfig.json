@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "baseUrl": ".",
     "declaration": true,
     "declarationMap": true,
     "emitDecoratorMetadata": true,
@@ -14,18 +15,14 @@
     "resolveJsonModule": true,
     "sourceMap": true,
     "strict": true,
-    "target": "es6"
+    "target": "es6",
+    "outDir": "dist",
+    "paths": {
+      "@nomiclabs/hardhat-ethers": ["node_modules/hardhat-deploy-ethers"],
+      "@nomiclabs/hardhat-ethers/types": ["hardhat-deploy-ethers/types"]
+    }
   },
   "exclude": ["node_modules"],
   "files": ["./hardhat.config.ts"],
-  "include": [
-    "./typechain",
-    "./deploy",
-    "./tests",
-    "./script",
-    "./scenario",
-    "jest.config.js",
-    "saddle.config.js",
-    "docgen-templates"
-  ]
+  "include": ["deploy"]
 }
