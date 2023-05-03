@@ -11,6 +11,14 @@
             "release": false
           },
           {
+            "type": "chore",
+            "release": false
+          },
+          {
+            "type": "docs",
+            "release": true
+          },
+          {
             "type": "ci",
             "release": false
           },
@@ -77,3 +85,4 @@
       "prerelease": "dev"
     }
   ]
+}
