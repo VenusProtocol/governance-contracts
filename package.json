@@ -1,10 +1,11 @@
 {
   "name": "@venusprotocol/governance-contracts",
   "description": "",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "author": "",
   "files": [
-    "/contracts"
+    "contracts",
+    "artifacts"
   ],
   "keywords": [
     "blockchain",
