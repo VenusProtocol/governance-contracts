@@ -17,14 +17,20 @@
     "typescript",
     "typechain"
   ],
-  "packageManager": "yarn@3.2.1",
+  "exports": {
+    "deploy": "./dist/deploy",
+    "artifacts": "./artifacts",
+    "contracts": "./contracts",
+    "deployments": "./deployments"
+  },
+  "packageManager": "yarn@3.2.0",
   "publishConfig": {
     "access": "public"
   },
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
-    "build": "rm -rf dist && tsc --declaration && hardhat compile && cp -r ./{package.json,yarn.lock,artifacts,contracts} dist/",
+    "build": "rm -rf dist && tsc --declaration && hardhat compile",
     "publish:dist": "yarn build && cd dist && yarn publish --access public",
     "lint": "yarn lint:ts && yarn lint:sol && yarn prettier:check",
     "lint:ts": "eslint --ignore-path ./.eslintignore --ext .js,.ts .",
@@ -59,7 +65,7 @@
     "@types/chai": "^4.3.4",
     "@types/fs-extra": "^9.0.13",
     "@types/mocha": "^10.0.0",
-    "@types/node": "^18.11.9",
+    "@types/node": "^18.16.3",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
     "@venusprotocol/venus-protocol": "0.4.1",
