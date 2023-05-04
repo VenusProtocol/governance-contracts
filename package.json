@@ -4,7 +4,10 @@
   "version": "1.0.0-dev.1",
   "author": "",
   "files": [
-    "/contracts"
+    "artifacts",
+    "deploy",
+    "deployments",
+    "contracts"
   ],
   "keywords": [
     "blockchain",
