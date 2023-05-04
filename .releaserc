@@ -16,7 +16,7 @@
           },
           {
             "type": "docs",
-            "release": true
+            "release": "patch"
           },
           {
             "type": "ci",
