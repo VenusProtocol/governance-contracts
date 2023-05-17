@@ -41,7 +41,8 @@
     "lint:sol:fix": "prettier --write \"contracts/**/*.sol\"",
     "prettier": "prettier  --write \"**/*.{js,json,md,ts,yaml,yml,sol}\"",
     "prettier:check": "prettier --check \"**/*.{js,json,md,ts,yaml,yml,sol}\"",
-    "docgen": "hardhat docgen"
+    "docgen": "hardhat docgen",
+    "prepare": "husky install"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
