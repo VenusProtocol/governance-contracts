@@ -13,6 +13,7 @@
 **/.coverage_cache
 **/.coverage_contracts
 **/dist
+**/docs
 **/node_modules
 **/types
 **/typechain

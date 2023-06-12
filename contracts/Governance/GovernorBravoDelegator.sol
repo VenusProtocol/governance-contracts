@@ -3,6 +3,11 @@ pragma experimental ABIEncoderV2;
 
 import "./GovernorBravoInterfaces.sol";
 
+/**
+ * @title GovernorBravoDelegator
+ * @author Venus
+ * @notice The `GovernorBravoDelegator` contract.
+ */
 contract GovernorBravoDelegator is GovernorBravoDelegatorStorage, GovernorBravoEvents {
     constructor(
         address timelock_,

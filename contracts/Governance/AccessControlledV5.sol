@@ -4,12 +4,11 @@ pragma solidity 0.5.16;
 import "./IAccessControlManagerV5.sol";
 
 /**
- * @title Venus Access Control Contract.
- * @dev This contract is helper between access control manager and actual contract
- * This contract further inherited by other contract to integrate access controlled mechanism
- * It provides initialise methods and verifying access methods
+ * @title AccessControlledV5
+ * @author Venus
+ * @notice This contract is helper between access control manager and actual contract. This contract further inherited by other contract (using solidity 0.5.16)
+ * to integrate access controlled mechanism. It provides initialise methods and verifying access methods.
  */
-
 contract AccessControlledV5 {
     /// @notice Access control manager contract
     IAccessControlManagerV5 private _accessControlManager;

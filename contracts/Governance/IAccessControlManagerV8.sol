@@ -3,6 +3,11 @@ pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/access/IAccessControl.sol";
 
+/**
+ * @title IAccessControlManagerV8
+ * @author Venus
+ * @notice Interface implemented by the `AccessControlManagerV8` contract.
+ */
 interface IAccessControlManagerV8 is IAccessControl {
     function giveCallPermission(address contractAddress, string calldata functionSig, address accountToPermit) external;
 

@@ -2,6 +2,11 @@ pragma solidity ^0.5.16;
 
 import "../Utils/SafeMath.sol";
 
+/**
+ * @title Timelock
+ * @author Venus
+ * @notice The Timelock contract.
+ */
 contract Timelock {
     using SafeMath for uint;
 

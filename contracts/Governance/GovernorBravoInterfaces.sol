@@ -1,6 +1,11 @@
 pragma solidity ^0.5.16;
 pragma experimental ABIEncoderV2;
 
+/**
+ * @title GovernorBravoEvents
+ * @author Venus
+ * @notice Set of events emitted by the GovernorBravo contracts.
+ */
 contract GovernorBravoEvents {
     /// @notice An event emitted when a new proposal is created
     event ProposalCreated(
@@ -58,6 +63,11 @@ contract GovernorBravoEvents {
     event ProposalMaxOperationsUpdated(uint oldMaxOperations, uint newMaxOperations);
 }
 
+/**
+ * @title GovernorBravoDelegatorStorage
+ * @author Venus
+ * @notice Storage layout of the `GovernorBravoDelegator` contract
+ */
 contract GovernorBravoDelegatorStorage {
     /// @notice Administrator for this contract
     address public admin;
@@ -70,8 +80,8 @@ contract GovernorBravoDelegatorStorage {
 }
 
 /**
- * @title Storage for Governor Bravo Delegate
- * @notice For future upgrades, do not change GovernorBravoDelegateStorageV1. Create a new
+ * @title GovernorBravoDelegateStorageV1
+ * @dev For future upgrades, do not change GovernorBravoDelegateStorageV1. Create a new
  * contract which implements GovernorBravoDelegateStorageV1 and following the naming convention
  * GovernorBravoDelegateStorageVX.
  */
@@ -167,6 +177,12 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
     address public guardian;
 }
 
+/**
+ * @title GovernorBravoDelegateStorageV2
+ * @dev For future upgrades, do not change GovernorBravoDelegateStorageV1. Create a new
+ * contract which implements GovernorBravoDelegateStorageV2 and following the naming convention
+ * GovernorBravoDelegateStorageVX.
+ */
 contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
     enum ProposalType {
         NORMAL,
@@ -190,6 +206,11 @@ contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
     mapping(uint => TimelockInterface) public proposalTimelocks;
 }
 
+/**
+ * @title TimelockInterface
+ * @author Venus
+ * @notice Interface implemented by the Timelock contract.
+ */
 interface TimelockInterface {
     function delay() external view returns (uint);
 
