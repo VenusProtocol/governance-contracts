@@ -104,7 +104,7 @@ const config: HardhatUserConfig = {
     ],
   },
   docgen: {
-    outputDir: "./docgen-docs",
+    outputDir: "./docs",
     pages: "files",
     templates: "docgen-templates",
   },

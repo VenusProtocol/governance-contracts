@@ -7,13 +7,11 @@ import "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import "./IAccessControlManagerV8.sol";
 
 /**
- * @title Venus Access Control Contract.
- * @dev The AccessControlledV8 contract is a wrapper around the OpenZeppelin AccessControl contract
- *      It provides a standardized way to control access to methods within the Venus Smart Contract Ecosystem.
- *      The contract allows the owner to set an AccessControlManager contract address.
- *      It can restrict method calls based on the sender's role and the method's signature.
+ * @title AccessControlledV8
+ * @author Venus
+ * @notice This contract is helper between access control manager and actual contract. This contract further inherited by other contract (using solidity 0.8.13)
+ * to integrate access controlled mechanism. It provides initialise methods and verifying access methods.
  */
-
 abstract contract AccessControlledV8 is Initializable, Ownable2StepUpgradeable {
     /// @notice Access control manager contract
     IAccessControlManagerV8 private _accessControlManager;
