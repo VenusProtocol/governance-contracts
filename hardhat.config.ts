@@ -73,6 +73,13 @@ const config: HardhatUserConfig = {
       url: process.env.BSC_MAINNET_NODE || "https://bsc-dataseed.binance.org/",
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
+    sepolia: {
+      url: "https://rpc.notadegen.com/eth/sepolia",
+      chainId: 11155111,
+      live: true,
+      gasPrice: 20000000000,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
   },
   etherscan: {
     apiKey: BSCSCAN_API_KEY,
