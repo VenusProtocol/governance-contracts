@@ -6,8 +6,8 @@ import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
 import "hardhat-deploy";
 import { HardhatUserConfig, task } from "hardhat/config";
-import "solidity-docgen";
 import "solidity-coverage";
+import "solidity-docgen";
 
 require("dotenv").config();
 
