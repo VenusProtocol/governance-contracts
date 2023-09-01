@@ -1,9 +1,5 @@
 # governance-contracts
 
-### Compound Fork Commit
-
-https://github.com/compound-finance/compound-protocol/tree/a3214f67b73310d547e00fc578e8355911c9d376
-
 ### Prerequisites
 
 - NodeJS - 12.x
