@@ -4,7 +4,6 @@ import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-etherscan";
 import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
-import { ethers } from "ethers";
 import "hardhat-deploy";
 import { HardhatUserConfig, task } from "hardhat/config";
 import "solidity-docgen";
@@ -59,25 +58,25 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: isFork(),
     bsctestnet: {
-      url: process.env.BSC_TESTNET_NODE || "https://data-seed-prebsc-1-s1.binance.org:8545",
+      url: process.env.RPC_URL || "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
       accounts: {
         mnemonic: process.env.MNEMONIC || "",
       },
-      gasPrice: ethers.utils.parseUnits("10", "gwei").toNumber(),
+      gasPrice: 10000000000, // 10 gwei
       gasMultiplier: 10,
       timeout: 12000000,
     },
     // currently not used, we are still using saddle to deploy contracts
     bscmainnet: {
-      url: process.env.BSC_MAINNET_NODE || "https://bsc-dataseed.binance.org/",
+      url: process.env.RPC_URL || "https://bsc-dataseed.binance.org/",
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
     sepolia: {
-      url: "https://rpc.notadegen.com/eth/sepolia",
+      url: process.env.RPC_URL || "https://rpc.notadegen.com/eth/sepolia",
       chainId: 11155111,
       live: true,
-      gasPrice: 20000000000,
+      gasPrice: 20000000000, // 20 gwei
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
   },
