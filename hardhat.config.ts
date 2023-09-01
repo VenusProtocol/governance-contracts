@@ -7,6 +7,7 @@ import "@typechain/hardhat";
 import "hardhat-deploy";
 import { HardhatUserConfig, task } from "hardhat/config";
 import "solidity-docgen";
+import "solidity-coverage";
 
 require("dotenv").config();
 
