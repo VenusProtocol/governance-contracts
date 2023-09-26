@@ -1,3 +1,12 @@
+## [1.0.1-dev.4](https://github.com/VenusProtocol/governance-contracts/compare/v1.0.1-dev.3...v1.0.1-dev.4) (2023-09-26)
+
+
+### Bug Fixes
+
+* lint ([f5b5632](https://github.com/VenusProtocol/governance-contracts/commit/f5b56329d2f48f1142fb3fa22b84c8738e4e35ed))
+* solidity-coverage version update due and import in config due to failing tests ([1dc99c2](https://github.com/VenusProtocol/governance-contracts/commit/1dc99c20488abb2808dff2a85887886423154f41))
+* yarn lock ([9de20ab](https://github.com/VenusProtocol/governance-contracts/commit/9de20ab8dd45d6eef4e82a8c56fee25e50c80f19))
+
 ## [1.0.1-dev.3](https://github.com/VenusProtocol/governance-contracts/compare/v1.0.1-dev.2...v1.0.1-dev.3) (2023-07-11)
 
 ## [1.0.1-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v1.0.1-dev.1...v1.0.1-dev.2) (2023-06-13)
