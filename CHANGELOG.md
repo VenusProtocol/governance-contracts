@@ -1,3 +1,10 @@
+## [1.0.1-dev.5](https://github.com/VenusProtocol/governance-contracts/compare/v1.0.1-dev.4...v1.0.1-dev.5) (2023-09-26)
+
+
+### Bug Fixes
+
+* package built deployment scripts ([9d3e4bc](https://github.com/VenusProtocol/governance-contracts/commit/9d3e4bc42793caba1cf400a884b2a933e3b514dc))
+
 ## [1.0.1-dev.4](https://github.com/VenusProtocol/governance-contracts/compare/v1.0.1-dev.3...v1.0.1-dev.4) (2023-09-26)
 
 
