@@ -29,8 +29,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await acm.renounceRole(acm.DEFAULT_ADMIN_ROLE(), deployer);
   } else {
     const timelockAddress = (await deployments.get("Timelock")).address;
-    const timelock = await ethers.getContractAt("Timelock", timelockAddress);
-    await acm.grantRole(acm.DEFAULT_ADMIN_ROLE(), timelock.address);
+    await acm.grantRole(acm.DEFAULT_ADMIN_ROLE(), timelockAddress);
   }
 };
 
