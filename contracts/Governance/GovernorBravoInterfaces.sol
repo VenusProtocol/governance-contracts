@@ -190,6 +190,19 @@ contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
         CRITICAL
     }
 
+    /// @notice mapping containing configuration for each proposal type
+    mapping(uint => GovernorBravoDelegateInterface.ProposalConfig) public proposalConfigs;
+
+    /// @notice mapping containing Timelock addresses for each proposal type
+    mapping(uint => TimelockInterface) public proposalTimelocks;
+}
+
+/**
+ * @title TimelockInterface
+ * @author Venus
+ * @notice Interface implemented by the GovernorBravoDelegate contract.
+ */
+interface GovernorBravoDelegateInterface {
     struct ProposalConfig {
         /// @notice The delay before voting on a proposal may take place, once proposed, in blocks
         uint256 votingDelay;
@@ -199,11 +212,12 @@ contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
         uint256 proposalThreshold;
     }
 
-    /// @notice mapping containing configuration for each proposal type
-    mapping(uint => ProposalConfig) public proposalConfigs;
-
-    /// @notice mapping containing Timelock addresses for each proposal type
-    mapping(uint => TimelockInterface) public proposalTimelocks;
+    function initialize(
+        address xvsVault_,
+        ProposalConfig[] calldata proposalConfigs_,
+        TimelockInterface[] calldata timelocks,
+        address guardian_
+    ) external;
 }
 
 /**
