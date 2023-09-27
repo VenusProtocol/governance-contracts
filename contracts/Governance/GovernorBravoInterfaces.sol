@@ -69,6 +69,15 @@ contract GovernorBravoEvents {
  * @notice Storage layout of the `GovernorBravoDelegator` contract
  */
 contract GovernorBravoDelegatorStorage {
+    struct ProposalConfig {
+        /// @notice The delay before voting on a proposal may take place, once proposed, in blocks
+        uint256 votingDelay;
+        /// @notice The duration of voting on a proposal, in blocks
+        uint256 votingPeriod;
+        /// @notice The number of votes required in order for a voter to become a proposer
+        uint256 proposalThreshold;
+    }
+
     /// @notice Administrator for this contract
     address public admin;
 
@@ -188,15 +197,6 @@ contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
         NORMAL,
         FASTTRACK,
         CRITICAL
-    }
-
-    struct ProposalConfig {
-        /// @notice The delay before voting on a proposal may take place, once proposed, in blocks
-        uint256 votingDelay;
-        /// @notice The duration of voting on a proposal, in blocks
-        uint256 votingPeriod;
-        /// @notice The number of votes required in order for a voter to become a proposer
-        uint256 proposalThreshold;
     }
 
     /// @notice mapping containing configuration for each proposal type
