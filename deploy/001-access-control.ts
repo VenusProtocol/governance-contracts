@@ -24,10 +24,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     const adminAccount = acmAdminAccount[networkName];
     console.log(`Granting DEFAULT_ADMIN_ROLE to ${adminAccount} for ${networkName} network`);
     await acm.grantRole(acm.DEFAULT_ADMIN_ROLE(), acmAdminAccount[networkName]);
-  }
 
-  console.log(`Renouncing DEFAULT_ADMIN_ROLE from deployer (${deployer}) for ${hre.network.name} network`);
-  await acm.renounceRole(acm.DEFAULT_ADMIN_ROLE(), deployer);
+    console.log(`Renouncing DEFAULT_ADMIN_ROLE from deployer (${deployer}) for ${hre.network.name} network`);
+    await acm.renounceRole(acm.DEFAULT_ADMIN_ROLE(), deployer);
+  } else {
+    const timelock = await ethers.getContract("Timelock");
+    await acm.grantRole(acm.DEFAULT_ADMIN_ROLE(), timelock.address);
+  }
 };
 
 func.tags = ["AccessControl"];
