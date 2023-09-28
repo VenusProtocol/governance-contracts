@@ -1,3 +1,16 @@
+## [1.1.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v1.0.1-dev.6...v1.1.0-dev.1) (2023-09-28)
+
+
+### Features
+
+* add existing governance deployments ([21c242c](https://github.com/VenusProtocol/governance-contracts/commit/21c242ccfbe4e2f523c005bdda3e2fa14f24b528))
+
+
+### Bug Fixes
+
+* types errors ([26b81ff](https://github.com/VenusProtocol/governance-contracts/commit/26b81ffcdefa5414e737964b67f3ea00720e17de))
+* use the updated initialization function in delegator ([a2f0bc8](https://github.com/VenusProtocol/governance-contracts/commit/a2f0bc852854c701e9f48086a7eaeddde208a306))
+
 ## [1.0.1-dev.6](https://github.com/VenusProtocol/governance-contracts/compare/v1.0.1-dev.5...v1.0.1-dev.6) (2023-09-26)
 
 ## [1.0.1-dev.5](https://github.com/VenusProtocol/governance-contracts/compare/v1.0.1-dev.4...v1.0.1-dev.5) (2023-09-26)
