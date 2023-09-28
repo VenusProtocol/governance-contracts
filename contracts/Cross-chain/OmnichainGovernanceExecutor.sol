@@ -3,7 +3,7 @@ pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@layerzerolabs/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
-import { OmnichainController } from "./OmnichainController.sol";
+import { BaseOmnichainControllerDest } from "./BaseOmnichainControllerDest.sol";
 import { TimelockInterface } from "./interfaces/TimelockInterface.sol";
 
 /// @title Omnichain Governance Executor
@@ -11,7 +11,7 @@ import { TimelockInterface } from "./interfaces/TimelockInterface.sol";
 /// @dev The owner of this contract controls LayerZero configuration. When used in production the owner will be OmnichainExecutor
 /// This implementation is non-blocking meaning the failed messages will not block the future messages from the source.
 /// For the blocking behavior derive the contract from LzApp
-contract OmnichainGovernanceExecutor is NonblockingLzApp, ReentrancyGuard, OmnichainController {
+contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainControllerDest {
     using BytesLib for bytes;
     using ExcessivelySafeCall for address;
 
@@ -78,10 +78,9 @@ contract OmnichainGovernanceExecutor is NonblockingLzApp, ReentrancyGuard, Omnic
 
     constructor(
         address endpoint_,
-        address accessControlManager_,
         TimelockInterface[] memory timelocks,
         address guardian_
-    ) NonblockingLzApp(endpoint_) OmnichainController(accessControlManager_) {
+    ) BaseOmnichainControllerDest(endpoint_) {
         require(
             timelocks.length == uint8(ProposalType.CRITICAL) + 1,
             "OmnichainGovernanceExecutor::initialize:number of timelocks should match number of governance routes"
@@ -146,10 +145,6 @@ contract OmnichainGovernanceExecutor is NonblockingLzApp, ReentrancyGuard, Omnic
 
         emit ProposalCanceled(proposalId_);
     }
-
-    /// @notice Empty implementation of renounce ownership to avoid any mishappening.
-
-    function renounceOwnership() public virtual override(OmnichainController, Ownable) {}
 
     // overriding the virtual function in LzReceiver
     function _blockingLzReceive(

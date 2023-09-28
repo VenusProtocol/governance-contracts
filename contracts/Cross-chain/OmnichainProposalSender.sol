@@ -3,12 +3,12 @@ pragma solidity 0.8.13;
 
 import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@layerzerolabs/solidity-examples/contracts/interfaces/ILayerZeroEndpoint.sol";
-import { OmnichainController } from "./OmnichainController.sol";
+import { BaseOmnichainControllerSrc } from "./BaseOmnichainControllerSrc.sol";
 
 /// @title Omnichain Governance Proposal Sender
 /// @notice Sends a proposal's data to remote chains for execution after the proposal passes on the main chain
 /// @dev When used with GovernorBravo the owner of this contract must be set to the Timelock contract
-contract OmnichainProposalSender is ReentrancyGuard, OmnichainController {
+contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc {
     enum ProposalType {
         NORMAL,
         FASTTRACK,
@@ -68,7 +68,7 @@ contract OmnichainProposalSender is ReentrancyGuard, OmnichainController {
     constructor(
         ILayerZeroEndpoint lzEndpoint_,
         address accessControlManager_
-    ) OmnichainController(accessControlManager_) {
+    ) BaseOmnichainControllerSrc(accessControlManager_) {
         require(address(lzEndpoint_) != address(0), "OmnichainProposalSender: invalid endpoint");
         lzEndpoint = lzEndpoint_;
     }
@@ -210,8 +210,4 @@ contract OmnichainProposalSender is ReentrancyGuard, OmnichainController {
     function getConfig(uint16 version_, uint16 chainId_, uint256 configType_) external view returns (bytes memory) {
         return lzEndpoint.getConfig(version_, chainId_, address(this), configType_);
     }
-
-    /// @notice Empty implementation of renounce ownership to avoid any mishappening.
-
-    function renounceOwnership() public override {}
 }

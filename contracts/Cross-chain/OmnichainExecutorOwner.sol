@@ -62,7 +62,8 @@ contract OmnichainProposalExecutorOwner is AccessControlledV8 {
         omnichainGovernanceExecutor.transferOwnership(newOwner_);
     }
 
-    function renounceOwnership() public override {}
+    /// @notice Empty implementation of renounce ownership to avoid any mishappening.
+    function renounceOwnership() public virtual override {}
 
     /// Returns function signature corresponding to its 4 bytes hash
     /// @param signature_ 4 bytes of function signature

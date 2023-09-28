@@ -1,58 +1,40 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.13;
 
+import "@layerzerolabs/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
 import { Pausable } from "@openzeppelin/contracts/security/Pausable.sol";
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
-import { IAccessControlManagerV8 } from "./../Governance/IAccessControlManagerV8.sol";
 
-contract OmnichainController is Ownable, Pausable {
-    /// @notice ACM
-
-    address public accessControlManager;
-
+abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
     /// @notice Maximum daily limit for commands from local chain.
-
     mapping(uint16 => uint256) public chainIdToMaxDailyLimit;
 
     /// @notice Total commands transferred within the last 24-hour window from local chain.
-
     mapping(uint16 => uint256) public chainIdToLast24HourCommandsSent;
 
     /// @notice Timestamp when the last 24-hour window started from local chain.
-
     mapping(uint16 => uint256) public chainIdToLast24HourWindowStart;
 
     /// @notice Maximum daily limit for receiving commands from remote chain.
-
     mapping(uint16 => uint256) public chainIdToMaxDailyReceiveLimit;
 
     /// @notice Total received commands within the last 24-hour window from remote chain.
-
     mapping(uint16 => uint256) public chainIdToLast24HourCommandsReceived;
 
     /// @notice Timestamp when the last 24-hour window started from remote chain.
-
     mapping(uint16 => uint256) public chainIdToLast24HourReceiveWindowStart;
 
     /// @notice Emitted when the maximum daily limit of commands from local chain is modified.
-
     event SetMaxDailyLimit(uint256 oldMaxLimit, uint256 newMaxLimit);
 
     /// @notice Emitted when the maximum daily limit for receiving command from remote chain is modified.
-
     event SetMaxDailyReceiveLimit(uint256 oldMaxLimit, uint256 newMaxLimit);
-    event NewAccessControlManager(address indexed oldAccessControlManager, address indexed newAccessControlManager);
 
-    constructor(address accessControlManager_) {
-        accessControlManager = accessControlManager_;
-    }
+    constructor(address endpoint_) NonblockingLzApp(endpoint_) {}
 
     /// @notice Sets the limit of daily (24 Hour) commands amount.
     /// @param chainId_ Destination chain id.
     /// @param limit_ Amount in USD.
-
-    function setMaxDailyLimit(uint16 chainId_, uint256 limit_) external {
-        _ensureAllowed("setMaxDailyLimit(uint16,uint256)");
+    function setMaxDailyLimit(uint16 chainId_, uint256 limit_) external onlyOwner {
         require(limit_ >= chainIdToMaxDailyLimit[chainId_], "Daily limit < single Command limit");
         emit SetMaxDailyLimit(chainIdToMaxDailyLimit[chainId_], limit_);
         chainIdToMaxDailyLimit[chainId_] = limit_;
@@ -61,9 +43,7 @@ contract OmnichainController is Ownable, Pausable {
     /// @notice Sets the maximum daily limit for receiving Commands.
     /// @param chainId_ The destination chain ID.
     /// @param limit_ The new maximum daily limit in USD.
-
-    function setMaxDailyReceiveLimit(uint16 chainId_, uint256 limit_) external {
-        _ensureAllowed("setMaxDailyReceiveLimit(uint16,uint256)");
+    function setMaxDailyReceiveLimit(uint16 chainId_, uint256 limit_) external onlyOwner {
         emit SetMaxDailyReceiveLimit(chainIdToMaxDailyReceiveLimit[chainId_], limit_);
         chainIdToMaxDailyReceiveLimit[chainId_] = limit_;
     }
@@ -79,19 +59,8 @@ contract OmnichainController is Ownable, Pausable {
         _unpause();
     }
 
-    /**
-     * @dev Internal function to set address of AccessControlManager
-     * @param accessControlManager_ The new address of the AccessControlManager
-     */
-    function setAccessControlManager(address accessControlManager_) external onlyOwner {
-        require(accessControlManager_ != address(0), "invalid acess control manager address");
-        emit NewAccessControlManager(accessControlManager, accessControlManager_);
-        accessControlManager = accessControlManager_;
-    }
-
     /// @notice Empty implementation of renounce ownership to avoid any mishappening.
-
-    function renounceOwnership() public virtual override {}
+    function renounceOwnership() public override {}
 
     /// @notice Verify the commands send in last 24 should not exceed limit
     /// @param dstChainId_  Destination chain id
@@ -142,13 +111,5 @@ contract OmnichainController is Ownable, Pausable {
 
         // Update the received amount for the 24-hour window
         chainIdToLast24HourCommandsReceived[srcChainId_] = receivedInWindow;
-    }
-
-    /// @dev Checks the caller is allowed to call the specified function
-    function _ensureAllowed(string memory functionSig_) internal view {
-        require(
-            IAccessControlManagerV8(accessControlManager).isAllowedToCall(msg.sender, functionSig_),
-            "access denied"
-        );
     }
 }
