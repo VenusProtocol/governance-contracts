@@ -7,7 +7,7 @@ interface IOmnichainGovernanceExecutor {
     function transferOwnership(address addr) external;
 }
 
-contract OmnichainProposalExecutorOwner is AccessControlledV8 {
+contract OmnichainExecutorOwner is AccessControlledV8 {
     // @custom:oz-upgrades-unsafe-allow state-variable-immutable
     IOmnichainGovernanceExecutor public immutable omnichainGovernanceExecutor;
 
