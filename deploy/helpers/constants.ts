@@ -5,4 +5,5 @@ export enum SUPPORTED_NETWORKS {
   ETHERUEM = "ethereum",
 }
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export default () => {};
