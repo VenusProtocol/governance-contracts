@@ -10,4 +10,5 @@ export const acmAdminAccount: Record<SUPPORTED_NETWORKS, string> = {
   ethereum: "", // TODO: add Ethereum MULTISIG once it is deployed
 };
 
+// eslint-disable-next-line @typescript-eslint/no-empty-function
 export default () => {};
