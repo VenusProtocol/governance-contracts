@@ -4,3 +4,5 @@ export enum SUPPORTED_NETWORKS {
   SEPOLIA = "sepolia",
   ETHERUEM = "ethereum",
 }
+
+export default () => {};
