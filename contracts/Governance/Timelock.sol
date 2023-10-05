@@ -2,12 +2,23 @@ pragma solidity ^0.5.16;
 
 import "../Utils/SafeMath.sol";
 
+/**
+ * @title Timelock
+ * @author Venus
+ * @notice The Timelock contract.
+ */
 contract Timelock {
     using SafeMath for uint;
-
+    /// @notice Event emitted when a new admin is accepted
     event NewAdmin(address indexed newAdmin);
+
+    /// @notice Event emitted when a new admin is proposed
     event NewPendingAdmin(address indexed newPendingAdmin);
+
+    /// @notice Event emitted when a new admin is proposed
     event NewDelay(uint indexed newDelay);
+
+    /// @notice Event emitted when a proposal transaction has been cancelled
     event CancelTransaction(
         bytes32 indexed txHash,
         address indexed target,
@@ -16,6 +27,8 @@ contract Timelock {
         bytes data,
         uint eta
     );
+
+    /// @notice Event emitted when a proposal transaction has been executed
     event ExecuteTransaction(
         bytes32 indexed txHash,
         address indexed target,
@@ -24,6 +37,8 @@ contract Timelock {
         bytes data,
         uint eta
     );
+
+    /// @notice Event emitted when a proposal transaction has been queued
     event QueueTransaction(
         bytes32 indexed txHash,
         address indexed target,
@@ -33,14 +48,25 @@ contract Timelock {
         uint eta
     );
 
+    /// @notice Required period to execute a proposal transaction
     uint public constant GRACE_PERIOD = 14 days;
+
+    /// @notice Minimum amount of time a proposal transaction must be queued
     uint public constant MINIMUM_DELAY = 1 hours;
+
+    /// @notice Maximum amount of time a proposal transaction must be queued
     uint public constant MAXIMUM_DELAY = 30 days;
 
+    /// @notice Timelock admin authorized to queue and execute transactions
     address public admin;
+
+    /// @notice Account proposed as the next admin
     address public pendingAdmin;
+
+    /// @notice Period for a proposal transaction to be queued
     uint public delay;
 
+    /// @notice Mapping of queued transactions
     mapping(bytes32 => bool) public queuedTransactions;
 
     constructor(address admin_, uint delay_) public {
@@ -53,6 +79,10 @@ contract Timelock {
 
     function() external payable {}
 
+    /**
+     * @notice Setter for the transaction queue delay
+     * @param delay_ The new delay period for the transaction queue
+     */
     function setDelay(uint delay_) public {
         require(msg.sender == address(this), "Timelock::setDelay: Call must come from Timelock.");
         require(delay_ >= MINIMUM_DELAY, "Timelock::setDelay: Delay must exceed minimum delay.");
@@ -62,6 +92,9 @@ contract Timelock {
         emit NewDelay(delay);
     }
 
+    /**
+     * @notice Method for accepting a proposed admin
+     */
     function acceptAdmin() public {
         require(msg.sender == pendingAdmin, "Timelock::acceptAdmin: Call must come from pendingAdmin.");
         admin = msg.sender;
@@ -70,6 +103,10 @@ contract Timelock {
         emit NewAdmin(admin);
     }
 
+    /**
+     * @notice Method to propose a new admin authorized to call timelock functions. This should be the Governor Contract
+     * @param pendingAdmin_ Address of the proposed admin
+     */
     function setPendingAdmin(address pendingAdmin_) public {
         require(msg.sender == address(this), "Timelock::setPendingAdmin: Call must come from Timelock.");
         pendingAdmin = pendingAdmin_;
@@ -77,6 +114,15 @@ contract Timelock {
         emit NewPendingAdmin(pendingAdmin);
     }
 
+    /**
+     * @notice Called for each action when queuing a proposal
+     * @param target Address of the contract with the method to be called
+     * @param value Native token amount sent with the transaction
+     * @param signature Ssignature of the function to be called
+     * @param data Arguments to be passed to the function when called
+     * @param eta Timestamp after which the transaction can be executed
+     * @return Hash of the queued transaction
+     */
     function queueTransaction(
         address target,
         uint value,
@@ -97,6 +143,14 @@ contract Timelock {
         return txHash;
     }
 
+    /**
+     * @notice Called to cancel a queued transaction
+     * @param target Address of the contract with the method to be called
+     * @param value Native token amount sent with the transaction
+     * @param signature Ssignature of the function to be called
+     * @param data Arguments to be passed to the function when called
+     * @param eta Timestamp after which the transaction can be executed
+     */
     function cancelTransaction(
         address target,
         uint value,
@@ -112,6 +166,14 @@ contract Timelock {
         emit CancelTransaction(txHash, target, value, signature, data, eta);
     }
 
+    /**
+     * @notice Called to execute a queued transaction
+     * @param target Address of the contract with the method to be called
+     * @param value Native token amount sent with the transaction
+     * @param signature Ssignature of the function to be called
+     * @param data Arguments to be passed to the function when called
+     * @param eta Timestamp after which the transaction can be executed
+     */
     function executeTransaction(
         address target,
         uint value,

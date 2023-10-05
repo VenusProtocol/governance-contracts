@@ -1,6 +1,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.5.16;
 
+/**
+ * @title IAccessControlManagerV5
+ * @author Venus
+ * @notice Interface implemented by the `AccessControlManagerV5` contract.
+ */
 interface IAccessControlManagerV5 {
     /**
      * @dev Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole`
