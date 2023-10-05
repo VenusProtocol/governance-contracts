@@ -1,3 +1,17 @@
+## [1.1.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2023-10-05)
+
+
+### Features
+
+* add deployed timelocks ([f786bf2](https://github.com/VenusProtocol/governance-contracts/commit/f786bf2f114c4316cb70fbefc3fdbe31f8f27b44))
+* add deployment export ([dd7b9ce](https://github.com/VenusProtocol/governance-contracts/commit/dd7b9cece42da8d77c09b6292b153cb94b1d1ad1))
+* add legacy GovAlpha contracts ([4f281f8](https://github.com/VenusProtocol/governance-contracts/commit/4f281f8c1303e9a083ac403fd2c719b969a69c9d))
+
+
+### Bug Fixes
+
+* add dummy deploy function in helper files ([a1a1ac4](https://github.com/VenusProtocol/governance-contracts/commit/a1a1ac4c643d9bf7d1083de54c05aadf1b3eb420))
+
 ## [1.1.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v1.0.1-dev.6...v1.1.0-dev.1) (2023-09-28)
 
 
