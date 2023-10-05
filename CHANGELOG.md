@@ -1,3 +1,24 @@
+## [1.1.0](https://github.com/VenusProtocol/governance-contracts/compare/v1.0.0...v1.1.0) (2023-10-05)
+
+
+### Features
+
+* add deployed timelocks ([f786bf2](https://github.com/VenusProtocol/governance-contracts/commit/f786bf2f114c4316cb70fbefc3fdbe31f8f27b44))
+* add deployment export ([dd7b9ce](https://github.com/VenusProtocol/governance-contracts/commit/dd7b9cece42da8d77c09b6292b153cb94b1d1ad1))
+* add existing governance deployments ([21c242c](https://github.com/VenusProtocol/governance-contracts/commit/21c242ccfbe4e2f523c005bdda3e2fa14f24b528))
+* add legacy GovAlpha contracts ([4f281f8](https://github.com/VenusProtocol/governance-contracts/commit/4f281f8c1303e9a083ac403fd2c719b969a69c9d))
+
+
+### Bug Fixes
+
+* add dummy deploy function in helper files ([a1a1ac4](https://github.com/VenusProtocol/governance-contracts/commit/a1a1ac4c643d9bf7d1083de54c05aadf1b3eb420))
+* lint ([f5b5632](https://github.com/VenusProtocol/governance-contracts/commit/f5b56329d2f48f1142fb3fa22b84c8738e4e35ed))
+* package built deployment scripts ([9d3e4bc](https://github.com/VenusProtocol/governance-contracts/commit/9d3e4bc42793caba1cf400a884b2a933e3b514dc))
+* solidity-coverage version update due and import in config due to failing tests ([1dc99c2](https://github.com/VenusProtocol/governance-contracts/commit/1dc99c20488abb2808dff2a85887886423154f41))
+* types errors ([26b81ff](https://github.com/VenusProtocol/governance-contracts/commit/26b81ffcdefa5414e737964b67f3ea00720e17de))
+* use the updated initialization function in delegator ([a2f0bc8](https://github.com/VenusProtocol/governance-contracts/commit/a2f0bc852854c701e9f48086a7eaeddde208a306))
+* yarn lock ([9de20ab](https://github.com/VenusProtocol/governance-contracts/commit/9de20ab8dd45d6eef4e82a8c56fee25e50c80f19))
+
 ## [1.1.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2023-10-05)
 
 
