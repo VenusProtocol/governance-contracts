@@ -1,3 +1,10 @@
+## [1.3.0](https://github.com/VenusProtocol/governance-contracts/compare/v1.2.0...v1.3.0) (2023-10-06)
+
+
+### Features
+
+* import deployed access control manager ([e266abb](https://github.com/VenusProtocol/governance-contracts/commit/e266abb86666a6fcc41449f361f6ad9a4020006b))
+
 ## [1.2.0](https://github.com/VenusProtocol/governance-contracts/compare/v1.1.0...v1.2.0) (2023-10-06)
 
 
