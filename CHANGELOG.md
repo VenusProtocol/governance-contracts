@@ -1,4 +1,11 @@
-## [1.1.0-dev.3](https://github.com/VenusProtocol/governance-contracts/compare/v1.1.0-dev.2...v1.1.0-dev.3) (2023-11-21)
+## [1.2.0](https://github.com/VenusProtocol/governance-contracts/compare/v1.1.0...v1.2.0) (2023-10-06)
+
+
+### Features
+
+* add governor bravo v1 to legacy contracts ([0709a6e](https://github.com/VenusProtocol/governance-contracts/commit/0709a6e869394b06ecd8ce1983684d8c1121c7c9))
+
+## [1.1.0](https://github.com/VenusProtocol/governance-contracts/compare/v1.0.0...v1.1.0) (2023-10-05)
 
 
 ### Features
