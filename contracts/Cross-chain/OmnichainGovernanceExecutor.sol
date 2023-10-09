@@ -56,7 +56,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     mapping(uint256 => TimelockInterface) public proposalTimelocks;
 
     /// @notice Represents queue state of proposal
-    mapping(uint256 => bool) internal queued;
+    mapping(uint256 => bool) public queued;
 
     /// @notice Emitted when proposal executed
     event ProposalExecuted(uint);
@@ -184,9 +184,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             uint256 pId,
             uint8 pType
         ) = abi.decode(payload_, (address[], uint[], string[], bytes[], uint256, uint8));
-
         _isEligibleToReceive(srcChainId_, targets.length);
-
         Proposal memory newProposal = Proposal({
             id: pId,
             proposer: tx.origin,

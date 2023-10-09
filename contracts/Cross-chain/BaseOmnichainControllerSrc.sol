@@ -18,20 +18,8 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
     /// @notice Timestamp when the last 24-hour window started from local chain.
     mapping(uint16 => uint256) public chainIdToLast24HourWindowStart;
 
-    /// @notice Maximum daily limit for receiving commands from remote chain.
-    mapping(uint16 => uint256) public chainIdToMaxDailyReceiveLimit;
-
-    /// @notice Total received commands within the last 24-hour window from remote chain.
-    mapping(uint16 => uint256) public chainIdToLast24HourCommandsReceived;
-
-    /// @notice Timestamp when the last 24-hour window started from remote chain.
-    mapping(uint16 => uint256) public chainIdToLast24HourReceiveWindowStart;
-
     /// @notice Emitted when the maximum daily limit of commands from local chain is modified.
     event SetMaxDailyLimit(uint256 oldMaxLimit, uint256 newMaxLimit);
-
-    /// @notice Emitted when the maximum daily limit for receiving command from remote chain is modified.
-    event SetMaxDailyReceiveLimit(uint256 oldMaxLimit, uint256 newMaxLimit);
 
     /// @notice Emitted when the address of ACM is updated.
     event NewAccessControlManager(address indexed oldAccessControlManager, address indexed newAccessControlManager);
@@ -48,15 +36,6 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
         require(limit_ >= chainIdToMaxDailyLimit[chainId_], "Daily limit < single Command limit");
         emit SetMaxDailyLimit(chainIdToMaxDailyLimit[chainId_], limit_);
         chainIdToMaxDailyLimit[chainId_] = limit_;
-    }
-
-    /// @notice Sets the maximum daily limit for receiving Commands.
-    /// @param chainId_ The destination chain ID.
-    /// @param limit_ The new maximum daily limit in USD.
-    function setMaxDailyReceiveLimit(uint16 chainId_, uint256 limit_) external {
-        _ensureAllowed("setMaxDailyReceiveLimit(uint16,uint256)");
-        emit SetMaxDailyReceiveLimit(chainIdToMaxDailyReceiveLimit[chainId_], limit_);
-        chainIdToMaxDailyReceiveLimit[chainId_] = limit_;
     }
 
     /// @notice Triggers stopped state of the bridge.
@@ -108,32 +87,6 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
 
         // Update the amount for the 24-hour window
         chainIdToLast24HourCommandsSent[dstChainId_] = commandsSentInWindow;
-    }
-
-    /// @notice Verify the commands receive in last 24 should not exceed limit
-    /// @param srcChainId_  Source chain id
-    /// @param noOfCommands_ number of commands currently received
-    function _isEligibleToReceive(uint16 srcChainId_, uint256 noOfCommands_) internal {
-        uint256 currentBlockTimestamp = block.timestamp;
-
-        // Load values for the 24-hour window checks for receiving
-        uint256 lastDayReceiveWindowStart = chainIdToLast24HourReceiveWindowStart[srcChainId_];
-        uint256 receivedInWindow = chainIdToLast24HourCommandsReceived[srcChainId_];
-        uint256 maxDailyReceiveLimit = chainIdToMaxDailyReceiveLimit[srcChainId_];
-
-        // Check if the time window has changed (more than 24 hours have passed)
-        if (currentBlockTimestamp - lastDayReceiveWindowStart > 1 days) {
-            receivedInWindow = noOfCommands_;
-            chainIdToLast24HourReceiveWindowStart[srcChainId_] = currentBlockTimestamp;
-        } else {
-            receivedInWindow += noOfCommands_;
-        }
-
-        // Revert if the received amount exceeds the daily limit and the recipient is not whitelisted
-        require(receivedInWindow <= maxDailyReceiveLimit, "Daily Transaction Limit Exceed");
-
-        // Update the received amount for the 24-hour window
-        chainIdToLast24HourCommandsReceived[srcChainId_] = receivedInWindow;
     }
 
     /// @dev Checks the caller is allowed to call the specified function
