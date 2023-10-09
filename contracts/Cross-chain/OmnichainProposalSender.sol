@@ -42,6 +42,10 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
 
     event SetTrustedRemoteAddress(uint16 remoteChainId, bytes remoteAddress);
 
+    /// @notice Emitted when a remote path is set for remote chain
+
+    event SetTrustedRemote(uint16 remoteChainId, bytes path);
+
     /// @notice Emitted when a proposal execution request sent to the remote chain
 
     event ExecuteRemoteProposal(uint16 indexed remoteChainId, bytes payload);
@@ -162,6 +166,15 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
             adapterParams_
         );
         emit ClearPayload(nonce_, hash);
+    }
+
+    /// @notice Sets the trusted path for the cross-chain communication
+    /// @param _remoteChainId  The LayerZero id of a remote chain
+    /// @param _path = abi.encodePacked(remoteAddress, localAddress)
+    function setTrustedRemote(uint16 _remoteChainId, bytes calldata _path) external {
+        _ensureAllowed("setTrustedRemote(uint16,bytes)");
+        trustedRemoteLookup[_remoteChainId] = _path;
+        emit SetTrustedRemote(_remoteChainId, _path);
     }
 
     /// @notice Sets the remote message receiver address
