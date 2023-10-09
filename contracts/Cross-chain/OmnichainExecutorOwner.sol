@@ -18,15 +18,17 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     event FunctionRegistryChanged(string signature, bool isRemoved);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address omnichainGovernanceExecutor_, address accessControlManager_) {
+    constructor(address omnichainGovernanceExecutor_) {
         require(omnichainGovernanceExecutor_ != address(0), "Address must not be zero");
-        require(accessControlManager_ != address(0), "Address must not be zero");
         omnichainGovernanceExecutor = IOmnichainGovernanceExecutor(omnichainGovernanceExecutor_);
+    }
+
+    function initialize(address accessControlManager_) external initializer {
+        require(address(accessControlManager_) != address(0), "Address must not be zero");
         __AccessControlled_init(accessControlManager_);
     }
 
     ///  @notice Invoked when called function does not exist in the contract
-
     fallback(bytes calldata data_) external payable returns (bytes memory) {
         string memory fun = _getFunctionName(msg.sig);
         require(bytes(fun).length != 0, "Function not found");
