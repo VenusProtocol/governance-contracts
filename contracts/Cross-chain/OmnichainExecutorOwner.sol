@@ -7,14 +7,28 @@ interface IOmnichainGovernanceExecutor {
     function transferOwnership(address addr) external;
 }
 
+/**
+ * @title OmnichainExecutorOwner
+ * @author Venus
+ * @notice OmnichainProposalSender contract acts as a governance and access control mechanism,
+ * allowing owner to upsert signature of OmnichainGovernanceExecutor contract,
+ * also contains function to transfer the ownership of contract as well.
+ */
+
 contract OmnichainExecutorOwner is AccessControlledV8 {
-    // @custom:oz-upgrades-unsafe-allow state-variable-immutable
+    /**
+     *  @custom:oz-upgrades-unsafe-allow state-variable-immutable
+     */
     IOmnichainGovernanceExecutor public immutable omnichainGovernanceExecutor;
 
-    // Stores function signature corresponding to their 4 bytes hash value
+    /**
+     * @notice Stores function signature corresponding to their 4 bytes hash value
+     */
     mapping(bytes4 => string) public functionRegistry;
 
-    // Event emitted when function registry updated
+    /**
+     * @notice Event emitted when function registry updated
+     */
     event FunctionRegistryChanged(string signature, bool isRemoved);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
@@ -23,12 +37,18 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
         omnichainGovernanceExecutor = IOmnichainGovernanceExecutor(omnichainGovernanceExecutor_);
     }
 
+    /**
+     * @notice Initialize the contract
+     * @param accessControlManager_  Address of access control manager
+     */
     function initialize(address accessControlManager_) external initializer {
         require(address(accessControlManager_) != address(0), "Address must not be zero");
         __AccessControlled_init(accessControlManager_);
     }
 
-    ///  @notice Invoked when called function does not exist in the contract
+    /**
+     *  @notice Invoked when called function does not exist in the contract.
+     */
     fallback(bytes calldata data_) external payable returns (bytes memory) {
         string memory fun = _getFunctionName(msg.sig);
         require(bytes(fun).length != 0, "Function not found");
@@ -38,9 +58,11 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
         return res;
     }
 
-    /// Functions will be added or removed
-    /// @param signatures_  Function signature to be added or removed
-    /// @param isRemoved_  bool value , should be true to remove function and vice versa
+    /**
+     * @notice Functions will be added or removed.
+     * @param signatures_  Function signature to be added or removed.
+     * @param isRemoved_  bool value , should be true to remove function.
+     */
     function upsertSignature(string[] calldata signatures_, bool[] calldata isRemoved_) external onlyOwner {
         uint256 signatureLength = signatures_.length;
         require(signatureLength == isRemoved_.length, "Input arrays must have the same length");
@@ -55,8 +77,11 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
         }
     }
 
-    /// @notice This function transfer the ownership of the bridge from this contract to new owner.
-    /// @param newOwner_ New owner of the governanceExecutor Bridge.
+    /**
+     * @notice This function transfer the ownership of the bridge from this contract to new owner.
+     * @param newOwner_ New owner of the governanceExecutor Bridge.
+     * @custom:access Controlled by AccessControlManager.
+     */
 
     function transferBridgeOwnership(address newOwner_) external {
         _checkAccessAllowed("transferBridgeOwnership(address)");
@@ -64,11 +89,11 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
         omnichainGovernanceExecutor.transferOwnership(newOwner_);
     }
 
-    /// @notice Empty implementation of renounce ownership to avoid any mishappening.
+    /**
+     *  @notice Empty implementation of renounce ownership to avoid any mishappening.
+     */
     function renounceOwnership() public virtual override {}
 
-    /// Returns function signature corresponding to its 4 bytes hash
-    /// @param signature_ 4 bytes of function signature
     function _getFunctionName(bytes4 signature_) internal view returns (string memory) {
         return functionRegistry[signature_];
     }
