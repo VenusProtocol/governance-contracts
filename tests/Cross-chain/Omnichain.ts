@@ -120,7 +120,7 @@ describe("OmnichainProposalSender: ", async function () {
 
     Payload = makePayload([timelock1.address], values, ["setDelay(uint256)"], [calldata], proposalId, proposalType);
 
-    adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [1, 300000]);
+    adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [1, 500000]);
 
     let tx = await accessControlManager
       .connect(deployer)
