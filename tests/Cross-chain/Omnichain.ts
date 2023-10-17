@@ -34,13 +34,12 @@ describe("OmnichainProposalSender: ", async function () {
     executor: OmnichainGovernanceExecutor,
     remotePath,
     sender: OmnichainProposalSender,
-    timelock1: Timelock,
-    timelock2: Timelock,
-    timelock3: Timelock,
+    NormalTimelock: Timelock,
+    FasttrackTimelock: Timelock,
+    CriticalTimelock: Timelock,
     adapterParams,
     localEndpoint: LZEndpointMock,
-    localPath,
-    eta;
+    localPath;
 
   function makePayload(targets, values, signatures, calldatas, proposalId, proposalType) {
     const payload = ethers.utils.defaultAbiCoder.encode(
@@ -66,23 +65,12 @@ describe("OmnichainProposalSender: ", async function () {
       "setMinDstGas(uint16,uint16,uint256)",
       "setPayloadSizeLimit(uint16,uint256)",
       "setUseCustomAdapterParams(bool)",
-      "acceptTimelockAdminRole()",
+      "addTimelocks(address[])",
     ];
     const removeArray = new Array(functionregistry.length).fill(false);
     await executorOwner.upsertSignature(functionregistry, removeArray);
   }
-  function toBytes(address) {
-    const uint160 = BigInt(address);
-    const uint256 = uint160.toString(16).padStart(64, "0");
-    return "0x" + uint256;
-  }
 
-  async function setTimelockAdminQueue(timelock, executor, eta) {
-    await timelock.queueTransaction(timelock.address, 0, "setPendingAdmin(address)", toBytes(executor.address), eta);
-  }
-  async function setTimelockAdminExecute(timelock, executor, eta) {
-    await timelock.executeTransaction(timelock.address, 0, "setPendingAdmin(address)", toBytes(executor.address), eta);
-  }
   before(async function () {
     deployer = (await ethers.getSigners())[0];
     alice = (await ethers.getSigners())[1];
@@ -99,15 +87,10 @@ describe("OmnichainProposalSender: ", async function () {
     remoteEndpoint = await LZEndpointMock.deploy(remoteChainId);
     localEndpoint = await LZEndpointMock.deploy(localChainId);
     sender = await OmnichainProposalSender.deploy(localEndpoint.address, accessControlManager.address);
-    timelock1 = await Timelock.deploy(deployer.address, 3600);
-    timelock2 = await Timelock.deploy(deployer.address, 3600);
-    timelock3 = await Timelock.deploy(deployer.address, 3600);
-
-    executor = await OmnichainGovernanceExecutor.deploy(
-      remoteEndpoint.address,
-      [timelock1.address, timelock2.address, timelock3.address],
-      deployer.address,
-    );
+    executor = await OmnichainGovernanceExecutor.deploy(remoteEndpoint.address, deployer.address);
+    NormalTimelock = await Timelock.deploy(executor.address, 3600);
+    FasttrackTimelock = await Timelock.deploy(executor.address, 3600);
+    CriticalTimelock = await Timelock.deploy(executor.address, 3600);
 
     executorOwner = await upgrades.deployProxy(OmnichainProposalExecutorOwner, [accessControlManager.address], {
       constructorArgs: [executor.address],
@@ -118,7 +101,14 @@ describe("OmnichainProposalSender: ", async function () {
     await localEndpoint.setDestLzEndpoint(executor.address, remoteEndpoint.address);
     await remoteEndpoint.setDestLzEndpoint(sender.address, localEndpoint.address);
 
-    Payload = makePayload([timelock1.address], values, ["setDelay(uint256)"], [calldata], proposalId, proposalType);
+    Payload = makePayload(
+      [NormalTimelock.address],
+      values,
+      ["setDelay(uint256)"],
+      [calldata],
+      proposalId,
+      proposalType,
+    );
 
     adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [1, 500000]);
 
@@ -154,7 +144,7 @@ describe("OmnichainProposalSender: ", async function () {
 
     tx = await accessControlManager
       .connect(deployer)
-      .giveCallPermission(executorOwner.address, "acceptTimelockAdminRole()", alice.address);
+      .giveCallPermission(executorOwner.address, "addTimelocks(address[])", alice.address);
     await tx.wait();
 
     tx = await executor.transferOwnership(executorOwner.address);
@@ -252,6 +242,27 @@ describe("OmnichainProposalSender: ", async function () {
         data: data,
       }),
     ).to.reverted;
+
+    data = executor.interface.encodeFunctionData("addTimelocks", [
+      [NormalTimelock.address, FasttrackTimelock.address, CriticalTimelock.address],
+    ]);
+    await expect(
+      deployer.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.reverted;
+  });
+  it("Emit TimelocksAdded event", async function () {
+    const data = executor.interface.encodeFunctionData("addTimelocks", [
+      [NormalTimelock.address, FasttrackTimelock.address, CriticalTimelock.address],
+    ]);
+    expect(
+      await alice.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.emit(executor, "TimelocksAdded");
   });
   it("Emit SetTrustedRemoteAddress event", async function () {
     const data = executor.interface.encodeFunctionData("setTrustedRemoteAddress", [localChainId, localPath]);
@@ -272,28 +283,6 @@ describe("OmnichainProposalSender: ", async function () {
     ).to.emit(executor, "SetMaxDailyReceiveLimit");
   });
 
-  it("should emit AcceptedTimelockAdminRole event", async function () {
-    eta = Math.floor(new Date().getTime() / 1000) + 4000;
-
-    await setTimelockAdminQueue(timelock1, executor, eta);
-    await setTimelockAdminQueue(timelock2, executor, eta);
-    await setTimelockAdminQueue(timelock3, executor, eta);
-
-    await mine(4500);
-
-    await setTimelockAdminExecute(timelock1, executor, eta);
-    await setTimelockAdminExecute(timelock2, executor, eta);
-    await setTimelockAdminExecute(timelock3, executor, eta);
-
-    const data = executor.interface.encodeFunctionData("acceptTimelockAdminRole");
-    expect(
-      await alice.sendTransaction({
-        to: executorOwner.address,
-        data: data,
-      }),
-    ).to.emit(executor, "AcceptedTimelockAdminRole");
-  });
-
   it("Emit ExecuteRemoteProposal event", async function () {
     await expect(
       await sender.connect(alice).execute(remoteChainId, Payload, adapterParams, {
@@ -305,13 +294,13 @@ describe("OmnichainProposalSender: ", async function () {
     expect((await executor.proposals(proposalId))[0]).to.equals(proposalId);
   });
   it("Emit ProposalExecuted event", async function () {
-    mine(4500);
+    await mine(4500);
     expect(await executor.execute(proposalId))
       .to.emit(executor, "ProposalExecuted")
       .withArgs(1);
   });
   it("Should update delay of timelock", async function () {
-    expect(await timelock1.delay()).to.equals(delay);
+    expect(await NormalTimelock.delay()).to.equals(delay);
   });
   it("Revert if same proposal come twice", async function () {
     await expect(
@@ -322,7 +311,14 @@ describe("OmnichainProposalSender: ", async function () {
   });
   it("Reverts when other than guardian call cancel of executor", async function () {
     ++proposalId;
-    Payload = makePayload([timelock1.address], values, ["setDelay(uint256)"], [calldata], proposalId, proposalType);
+    Payload = makePayload(
+      [NormalTimelock.address],
+      values,
+      ["setDelay(uint256)"],
+      [calldata],
+      proposalId,
+      proposalType,
+    );
     await sender.connect(alice).execute(remoteChainId, Payload, adapterParams, {
       value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
     });
@@ -332,7 +328,14 @@ describe("OmnichainProposalSender: ", async function () {
   });
   it("Emit ProposalCanceled event when proposal gets cancelled", async function () {
     ++proposalId;
-    Payload = makePayload([timelock1.address], values, ["setDelay(uint256)"], [calldata], proposalId, proposalType);
+    Payload = makePayload(
+      [NormalTimelock.address],
+      values,
+      ["setDelay(uint256)"],
+      [calldata],
+      proposalId,
+      proposalType,
+    );
 
     await sender.connect(alice).execute(remoteChainId, Payload, adapterParams, {
       value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
@@ -343,7 +346,14 @@ describe("OmnichainProposalSender: ", async function () {
   });
   it("Reverts when cancel is called after execute", async function () {
     ++proposalId;
-    Payload = makePayload([timelock1.address], values, ["setDelay(uint256)"], [calldata], proposalId, proposalType);
+    Payload = makePayload(
+      [NormalTimelock.address],
+      values,
+      ["setDelay(uint256)"],
+      [calldata],
+      proposalId,
+      proposalType,
+    );
     await sender.connect(alice).execute(remoteChainId, Payload, adapterParams, {
       value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
     });
@@ -357,7 +367,7 @@ describe("OmnichainProposalSender: ", async function () {
     ++proposalId;
     const calldata = ethers.utils.defaultAbiCoder.encode(["uint256", "uint256"], [delay, delay - 20]);
     Payload = makePayload(
-      [timelock1.address, timelock2.address],
+      [NormalTimelock.address, FasttrackTimelock.address],
       [0.0],
       ["setDelay(uint256)", "setDelay(uint256)"],
       [calldata],
@@ -373,7 +383,14 @@ describe("OmnichainProposalSender: ", async function () {
     maxDailyTransactionLimit = 0;
     await sender.connect(alice).setMaxDailyLimit(remoteChainId, maxDailyTransactionLimit);
     ++proposalId;
-    Payload = makePayload([timelock1.address], values, ["setDelay(uint256)"], [calldata], proposalId, proposalType);
+    Payload = makePayload(
+      [NormalTimelock.address],
+      values,
+      ["setDelay(uint256)"],
+      [calldata],
+      proposalId,
+      proposalType,
+    );
     await expect(
       sender.connect(alice).execute(remoteChainId, Payload, adapterParams, {
         value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
@@ -390,7 +407,14 @@ describe("OmnichainProposalSender: ", async function () {
       data: data,
     });
     ++proposalId;
-    Payload = makePayload([timelock1.address], values, ["setDelay(uint256)"], [calldata], proposalId, proposalType);
+    Payload = makePayload(
+      [NormalTimelock.address],
+      values,
+      ["setDelay(uint256)"],
+      [calldata],
+      proposalId,
+      proposalType,
+    );
 
     await sender.connect(alice).execute(remoteChainId, Payload, adapterParams, {
       value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
