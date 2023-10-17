@@ -100,21 +100,25 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     event SetExecuteDelay(uint256, uint256);
 
     /**
-     * @notice Emitted when this contract accepts the admin role of all timelocks.
+     * @notice Emitted when all timelocks are added.
      */
-    event AcceptedTimelockAdminRole();
+    event TimelocksAdded(TimelockInterface, TimelockInterface, TimelockInterface);
 
-    constructor(
-        address endpoint_,
-        TimelockInterface[] memory timelocks,
-        address guardian_
-    ) BaseOmnichainControllerDest(endpoint_) {
+    constructor(address endpoint_, address guardian_) BaseOmnichainControllerDest(endpoint_) {
+        guardian = guardian_;
+    }
+
+    /**
+     * @notice Add timelocks to the ProposalTimelocks mapping.
+     * @param timelocks Array of addresses of all 3 timelocks.
+     * @custom:access Only owner.
+     * @custom:event Emits TimelocksAdded with all 3 timelocks.
+     */
+    function addTimelocks(TimelockInterface[] memory timelocks) external onlyOwner {
         require(
             timelocks.length == uint8(ProposalType.CRITICAL) + 1,
             "OmnichainGovernanceExecutor::initialize:number of timelocks should match the number of governance routes"
         );
-
-        guardian = guardian_;
         for (uint256 i; i < uint8(ProposalType.CRITICAL) + 1; ++i) {
             require(
                 address(timelocks[i]) != address(0),
@@ -122,19 +126,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             );
             proposalTimelocks[i] = timelocks[i];
         }
-    }
-
-    /**
-     * @notice Accept admin role of all timelocks.
-     * @custom:access Only owner.
-     * @custom:event Emits NewAccessControlManager.
-     */
-    function acceptTimelockAdminRole() public onlyOwner {
-        uint8 noOfTimelocks = uint8(ProposalType.CRITICAL) + 1;
-        for (uint256 i; i < noOfTimelocks; ++i) {
-            proposalTimelocks[i].acceptAdmin();
-        }
-        emit AcceptedTimelockAdminRole();
+        emit TimelocksAdded(proposalTimelocks[0], proposalTimelocks[1], proposalTimelocks[2]);
     }
 
     /**
@@ -257,6 +249,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 uint8(proposal.proposalType)
             );
         }
+
         proposal.eta = eta;
         queued[proposalId_] = true;
         emit ProposalQueued(proposalId_, eta);
@@ -276,6 +269,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             ),
             "OmnichainGovernanceExecutor::queueOrRevertInternal: identical proposal action already queued at eta"
         );
+
         proposalTimelocks[proposalType_].queueTransaction(target_, value_, signature_, data_, eta_);
     }
 }
