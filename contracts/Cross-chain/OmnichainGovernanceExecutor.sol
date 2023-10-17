@@ -102,7 +102,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice Emitted when all timelocks are added.
      */
-    event TimelocksAdded(TimelockInterface, TimelockInterface, TimelockInterface);
+    event TimelocksAdded(address indexed timelock);
 
     constructor(address endpoint_, address guardian_) BaseOmnichainControllerDest(endpoint_) {
         guardian = guardian_;
@@ -125,8 +125,8 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 "OmnichainGovernanceExecutor::initialize:invalid timelock address"
             );
             proposalTimelocks[i] = timelocks[i];
+            emit TimelocksAdded(address(proposalTimelocks[i]));
         }
-        emit TimelocksAdded(proposalTimelocks[0], proposalTimelocks[1], proposalTimelocks[2]);
     }
 
     /**
