@@ -18,16 +18,41 @@ const preconfiguredAddresses = {
     AccessControlManager: "0x4788629ABc6cFCA10F9f969efdEAa1cF70c23555",
   },
   sepolia: {
-    NormalTimelock: "0x7c95FD25362c3a03F038EBd203C65F92a32C0781",
-    FastTrackTimelock: "0xB53A3A287bc2d5A2e376852F779BeBE3F76e0Ce4",
-    CriticalTimelock: "0x3900c0649a6f404e66E6E2efbe38669056875e56",
     AccessControlManager: "0xbf705C00578d43B6147ab4eaE04DBBEd1ccCdc96",
   },
+  ethereum: {
+    // TODO
+  },
 };
+
+export type Delay = { [key: string]: number };
+
+export type DelayConfig = {
+  [key: string]: Delay;
+};
+
+export const timelockDelays: DelayConfig = {
+  sepolia: {
+    NORMAL: 10800,
+    FAST_TRACK: 7200,
+    CRITICAL: 3600,
+  },
+  ethereum: {
+    NORMAL: 172800,
+    FAST_TRACK: 21600,
+    CRITICAL: 3600,
+  },
+};
+
 export type NetworkConfig = {
   bsctestnet: DeploymentConfig;
   bscmainnet: DeploymentConfig;
   sepolia: DeploymentConfig;
+};
+
+export type timelockNetworkConfig = {
+  sepolia: DelayConfig;
+  ethereum: DelayConfig;
 };
 
 export type AccessControlEntry = {
@@ -89,16 +114,6 @@ export const bridgeConfig: BridgeConfig = {
       { method: "setTrustedRemote(uint16,bytes)", args: [10102, ANY_CONTRACT] },
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint16,uint256)", args: [10102, 100] },
-      {
-        method: "addTimelocks(address[])",
-        args: [
-          [
-            preconfiguredAddresses["sepolia"].NormalTimelock,
-            preconfiguredAddresses["sepolia"].FastTrackTimelock,
-            preconfiguredAddresses["sepolia"].CriticalTimelock,
-          ],
-        ],
-      },
     ],
   },
 };
