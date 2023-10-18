@@ -1,9 +1,11 @@
 import { BigNumberish } from "ethers";
+import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { LZ_ENDPOINTS } from "../constants/LZEndpoints";
 import { getArgTypesFromSignature } from "../helpers/utils";
+import { OmnichainProposalSender } from "../typechain";
 import { OmnichainProposalSenderMethods, bridgeConfig, getConfig } from "./helpers/deploymentConfig";
 import { toAddress } from "./helpers/deploymentUtils";
 
@@ -66,7 +68,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const deploymentConfig = await getConfig(hre.network.name);
   const { preconfiguredAddresses } = deploymentConfig;
 
-  const accessControlManagerAddress = await toAddress(preconfiguredAddresses.AccessControlManager || "", hre);
+  const accessControlManagerAddress = await toAddress(preconfiguredAddresses.AccessControlManager, hre);
 
   const OmnichainProposalSender = await deploy("OmnichainProposalSender", {
     from: deployer,
@@ -74,6 +76,18 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
     autoMine: true,
   });
+
+  const bridge = await ethers.getContractAt<OmnichainProposalSender>(
+    "OmnichainProposalSender",
+    OmnichainProposalSender.address,
+    deployer,
+  );
+
+  const tx = await bridge.transferOwnership(preconfiguredAddresses.NormalTimelock);
+  await tx.wait();
+  console.log(
+    `Bridge owner ${deployer} sucessfully changed to ${preconfiguredAddresses.NormalTimelock}. Please accept the ownership.`,
+  );
 
   const commands = [
     ...(await configureAccessControls(
@@ -102,7 +116,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     {
       contract: OmnichainProposalSender.address,
       signature: "setTrustedRemote(uint16,bytes)",
-      parameters: [10161, "0xDestAddressSrcAddress"],
+      parameters: ["dstChainId", "0xDestAddressSrcAddress"],
       value: 0,
     },
   ];
