@@ -22,6 +22,12 @@ export const convertToBigInt = (amount: string | number, decimals: number) => {
   return BigInt(convertToUnit(amount, decimals));
 };
 
+// Function to get argument types from method signature
+export const getArgTypesFromSignature = (methodSignature: string): string[] => {
+  const [, argumentString] = methodSignature.split("(")[1].split(")");
+  return argumentString.split(",").map(arg => arg.trim());
+};
+
 export const fundAccount = async (address: string) => {
   const [deployer] = await ethers.getSigners();
   await deployer.sendTransaction({
