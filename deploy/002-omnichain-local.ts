@@ -83,12 +83,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ethers.provider.getSigner(deployer),
   );
 
-  const tx = await bridge.transferOwnership(preconfiguredAddresses.NormalTimelock);
-  await tx.wait();
-  console.log(
-    `Bridge owner ${deployer} sucessfully changed to ${preconfiguredAddresses.NormalTimelock}. Please accept the ownership.`,
-  );
-
+  if ((await bridge.owner()) === deployer) {
+    const tx = await bridge.transferOwnership(preconfiguredAddresses.NormalTimelock);
+    await tx.wait();
+    console.log(
+      `Bridge owner ${deployer} sucessfully changed to ${preconfiguredAddresses.NormalTimelock}. Please accept the ownership.`,
+    );
+  }
   const commands = [
     ...(await configureAccessControls(
       OmnichainProposalSenderMethods,
