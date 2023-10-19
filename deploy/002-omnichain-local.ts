@@ -80,7 +80,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const bridge = await ethers.getContractAt<OmnichainProposalSender>(
     "OmnichainProposalSender",
     OmnichainProposalSender.address,
-    deployer,
+    ethers.provider.getSigner(deployer),
   );
 
   const tx = await bridge.transferOwnership(preconfiguredAddresses.NormalTimelock);
