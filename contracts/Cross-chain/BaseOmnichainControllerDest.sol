@@ -4,6 +4,7 @@ pragma solidity 0.8.13;
 
 import "@layerzerolabs/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
 import { Pausable } from "@openzeppelin/contracts/security/Pausable.sol";
+import { ensureNonzeroAddress } from "../lib/validators.sol";
 
 /**
  * @title BaseOmnichainControllerDest
@@ -33,12 +34,14 @@ abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
      */
     event SetMaxDailyReceiveLimit(uint256 oldMaxLimit, uint256 newMaxLimit);
 
-    constructor(address endpoint_) NonblockingLzApp(endpoint_) {}
+    constructor(address endpoint_) NonblockingLzApp(endpoint_) {
+        ensureNonzeroAddress(endpoint_);
+    }
 
     /**
      * @notice Sets the maximum daily limit for receiving commands.
      * @param chainId_ The destination chain ID.
-     * @param limit_ The new maximum daily limit in USD.
+     * @param limit_ The new maximum daily limit in USD(scaled with 18 decimals).
      * @custom:access Only Owner.
      * @custom:event Emits SetMaxDailyReceiveLimit with new limit and its associated chain id
      */
@@ -84,7 +87,7 @@ abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
             receivedInWindow += noOfCommands_;
         }
 
-        // Revert if the received amount exceeds the daily limit and the recipient is not whitelisted
+        // Revert if the received amount exceeds the daily limit
         require(receivedInWindow <= maxDailyReceiveLimit, "Daily Transaction Limit Exceeded");
 
         // Update the received amount for the 24-hour window

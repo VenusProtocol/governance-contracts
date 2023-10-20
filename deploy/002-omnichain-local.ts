@@ -86,9 +86,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   if ((await bridge.owner()) === deployer) {
     const tx = await bridge.transferOwnership(preconfiguredAddresses.NormalTimelock);
     await tx.wait();
-    console.log(
-      `Bridge owner ${deployer} sucessfully changed to ${preconfiguredAddresses.NormalTimelock}. Please accept the ownership.`,
-    );
+    console.log(`Bridge owner ${deployer} sucessfully changed to ${preconfiguredAddresses.NormalTimelock}.`);
   }
   const commands = [
     ...(await configureAccessControls(

@@ -36,8 +36,8 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         string[] signatures;
         /** The ordered list of calldata to be passed to each call */
         bytes[] calldatas;
-        /** Flag marking whether the proposal has been canceled */
-        bool canceled;
+        /** Flag marking whether the proposal has been cancelled */
+        bool cancelled;
         /** Flag marking whether the proposal has been executed */
         bool executed;
         /** The type of the proposal */
@@ -90,9 +90,9 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     event ProposalFailed(uint16 srcChainId, bytes srcAddress, uint64 nonce, bytes reason);
 
     /**
-     * @notice Emitted when proposal is canceled.
+     * @notice Emitted when proposal is cancelled.
      */
-    event ProposalCanceled(uint256);
+    event ProposalCancelled(uint256);
 
     /**
      * @notice Emitted while setting execution delay.
@@ -102,7 +102,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice Emitted when all timelocks are added.
      */
-    event TimelocksAdded(address indexed timelock);
+    event TimelockAdded(address indexed timelock);
 
     constructor(address endpoint_, address guardian_) BaseOmnichainControllerDest(endpoint_) {
         guardian = guardian_;
@@ -112,7 +112,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @notice Add timelocks to the ProposalTimelocks mapping.
      * @param timelocks_ Array of addresses of all 3 timelocks.
      * @custom:access Only owner.
-     * @custom:event Emits TimelocksAdded with all 3 timelocks.
+     * @custom:event Emits TimelockAdded with all 3 timelocks.
      */
     function addTimelocks(TimelockInterface[] memory timelocks_) external onlyOwner {
         require(
@@ -125,7 +125,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 "OmnichainGovernanceExecutor::initialize:invalid timelock address"
             );
             proposalTimelocks[i] = timelocks_[i];
-            emit TimelocksAdded(address(proposalTimelocks[i]));
+            emit TimelockAdded(address(proposalTimelocks[i]));
         }
     }
 
@@ -159,14 +159,14 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @notice Cancels a proposal only if sender is the guardian and proposal is not executed.
      * @param proposalId_ Id of proposal that is to be cancelled.
      * @custom:access Sender must be the guardian.
-     * @custom:event Emits ProposalCanceled with proposal id of the cancelled proposal.
+     * @custom:event Emits ProposalCancelled with proposal id of the cancelled proposal.
      */
     function cancel(uint256 proposalId_) external {
         Proposal storage proposal = proposals[proposalId_];
         require(!proposal.executed, "OmnichainGovernanceExecutor::cancel: cannot cancel executed proposal");
         require(msg.sender == guardian, "OmnichainGovernanceExecutor::cancel: sender must be guardian");
 
-        proposal.canceled = true;
+        proposal.cancelled = true;
         for (uint256 i = 0; i < proposal.targets.length; i++) {
             proposalTimelocks[proposal.proposalType].cancelTransaction(
                 proposal.targets[i],
@@ -177,7 +177,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             );
         }
 
-        emit ProposalCanceled(proposalId_);
+        emit ProposalCancelled(proposalId_);
     }
 
     function _blockingLzReceive(
@@ -226,7 +226,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             values: values,
             signatures: signatures,
             calldatas: calldatas,
-            canceled: false,
+            cancelled: false,
             executed: false,
             proposalType: pType
         });
