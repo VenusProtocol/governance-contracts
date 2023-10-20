@@ -49,7 +49,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     /**
      *  @notice Invoked when called function does not exist in the contract.
      */
-    fallback(bytes calldata data_) external payable returns (bytes memory) {
+    fallback(bytes calldata data_) external returns (bytes memory) {
         string memory fun = _getFunctionName(msg.sig);
         require(bytes(fun).length != 0, "Function not found");
         _checkAccessAllowed(fun);
