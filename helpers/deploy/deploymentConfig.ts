@@ -109,7 +109,6 @@ export const bridgeConfig: BridgeConfig = {
   },
   sepolia: {
     methods: [
-      { method: "setTrustedRemote(uint16,bytes)", args: [10102, ANY_CONTRACT] },
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint16,uint256)", args: [10102, 100] },
     ],

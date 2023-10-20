@@ -52,12 +52,12 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     /**
      * @notice Emitted when a remote message receiver is set for the remote chain
      */
-    event SetTrustedRemoteAddress(uint16 remoteChainId, bytes remoteAddress);
+    event SetTrustedRemoteAddress(uint16 indexed remoteChainId, bytes remoteAddress);
 
     /**
      * @notice Emitted when a remote path is set for the remote chain
      */
-    event SetTrustedRemote(uint16 remoteChainId, bytes path);
+    event SetTrustedRemote(uint16 indexed remoteChainId, bytes path);
 
     /**
      * @notice Emitted when a proposal execution request is sent to the remote chain
