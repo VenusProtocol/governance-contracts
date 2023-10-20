@@ -129,7 +129,7 @@ describe("OmnichainProposalSender: ", async function () {
 
     tx = await accessControlManager
       .connect(deployer)
-      .giveCallPermission(sender.address, "updateValidChainID(uint16,bool)", alice.address);
+      .giveCallPermission(sender.address, "updateValidChainId(uint16,bool)", alice.address);
     await tx.wait();
 
     tx = await accessControlManager
@@ -169,8 +169,8 @@ describe("OmnichainProposalSender: ", async function () {
       "OmnichainProposalSender: Invalid chainId",
     );
   });
-  it("Reverts when EOA call updateValidChainID without grant permission", async function () {
-    await expect(sender.connect(bob).updateValidChainID(remoteChainId, true)).to.be.revertedWith("access denied");
+  it("Reverts when EOA call updateValidChainId without grant permission", async function () {
+    await expect(sender.connect(bob).updateValidChainId(remoteChainId, true)).to.be.revertedWith("access denied");
   });
   it("Emit SetTrustedRemoteAddress event", async function () {
     expect(await sender.connect(alice).setTrustedRemoteAddress(remoteChainId, remotePath))
@@ -180,7 +180,7 @@ describe("OmnichainProposalSender: ", async function () {
     expect(await sender.trustedRemoteLookup(remoteChainId)).to.be.equals(remoteAndLocal);
   });
   it("Emit UpdatedValidChainId", async function () {
-    await expect(sender.connect(alice).updateValidChainID(remoteChainId, true)).to.emit(sender, "UpdatedValidChainId");
+    await expect(sender.connect(alice).updateValidChainId(remoteChainId, true)).to.emit(sender, "UpdatedValidChainId");
     expect(await sender.validChainIds(remoteChainId)).to.be.equals(true);
   });
   it("Reverts with Daily Transaction Limit Exceed", async function () {
