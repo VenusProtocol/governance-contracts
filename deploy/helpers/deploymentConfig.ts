@@ -93,7 +93,7 @@ export async function getConfig(networkName: string): Promise<DeploymentConfig> 
 export const OmnichainProposalSenderMethods: string[] = [
   "setTrustedRemote(uint16,bytes)",
   "setTrustedRemoteAddress(uint16,bytes)",
-  "updateValidChainID(uint16,bool)",
+  "updateValidChainId(uint16,bool)",
   "setMaxDailyLimit(uint16,uint256)",
   "execute(uint16,bytes,bytes)",
   "pause()",

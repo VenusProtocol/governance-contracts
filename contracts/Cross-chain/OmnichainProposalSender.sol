@@ -196,15 +196,15 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
 
     /**
      * @notice Sets the trusted path for the cross-chain communication
-     * @param _remoteChainId  The LayerZero id of a remote chain
-     * @param _path = abi.encodePacked(remoteAddress, localAddress)
+     * @param remoteChainId_  The LayerZero id of a remote chain
+     * @param path_ = abi.encodePacked(remoteAddress, localAddress)
      * @custom:access Controlled by AccessControlManager.
      * @custom:event Emits SetTrustedRemote with remote chain Id and path
      */
-    function setTrustedRemote(uint16 _remoteChainId, bytes calldata _path) external {
+    function setTrustedRemote(uint16 remoteChainId_, bytes calldata path_) external {
         _ensureAllowed("setTrustedRemote(uint16,bytes)");
-        trustedRemoteLookup[_remoteChainId] = _path;
-        emit SetTrustedRemote(_remoteChainId, _path);
+        trustedRemoteLookup[remoteChainId_] = path_;
+        emit SetTrustedRemote(remoteChainId_, path_);
     }
 
     /**
@@ -250,8 +250,8 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @custom:access Controlled by AccessControlManager.
      * @custom:event Emits UpdatedValidChainId with chain id and bool
      */
-    function updateValidChainID(uint16 chainId_, bool isAdded_) external {
-        _ensureAllowed("updateValidChainID(uint16,bool)");
+    function updateValidChainId(uint16 chainId_, bool isAdded_) external {
+        _ensureAllowed("updateValidChainId(uint16,bool)");
         if (!isAdded_) {
             delete validChainIds[chainId_];
         } else {
