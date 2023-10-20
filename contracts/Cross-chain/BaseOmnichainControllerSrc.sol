@@ -5,6 +5,7 @@ pragma solidity 0.8.13;
 import { Pausable } from "@openzeppelin/contracts/security/Pausable.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { IAccessControlManagerV8 } from "./../Governance/IAccessControlManagerV8.sol";
+import { ensureNonzeroAddress } from "../lib/validators.sol";
 
 /**
  * @title BaseOmnichainControllerSrc
@@ -44,13 +45,14 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
     event NewAccessControlManager(address indexed oldAccessControlManager, address indexed newAccessControlManager);
 
     constructor(address accessControlManager_) {
+        ensureNonzeroAddress(accessControlManager_);
         accessControlManager = accessControlManager_;
     }
 
     /**
      * @notice Sets the limit of daily (24 Hour) command amount.
      * @param chainId_ Destination chain ID.
-     * @param limit_ Amount in USD.
+     * @param limit_ Amount in USD(scaled with 18 decimals).).
      * @custom:access Controlled by AccessControlManager.
      * @custom:event Emits SetMaxDailyLimit new limit and its corresponding chain id
      */
@@ -85,7 +87,7 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
      * @custom:event Emits NewAccessControlManager with old and new access control manager addresses
      */
     function setAccessControlManager(address accessControlManager_) external onlyOwner {
-        require(accessControlManager_ != address(0), "invalid access control manager address");
+        ensureNonzeroAddress(accessControlManager_);
         emit NewAccessControlManager(accessControlManager, accessControlManager_);
         accessControlManager = accessControlManager_;
     }
@@ -110,7 +112,7 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
             commandsSentInWindow += noOfCommands_;
         }
 
-        // Revert if the amount exceeds the daily limit and the recipient is not whitelisted
+        // Revert if the amount exceeds the daily limit
         require(commandsSentInWindow <= maxDailyLimit, "Daily Transaction Limit Exceeded");
 
         // Update the amount for the 24-hour window
