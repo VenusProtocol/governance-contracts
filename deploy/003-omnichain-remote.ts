@@ -181,7 +181,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     },
 
     {
-      contract: OmnichainGovernanceExecutor.address,
+      contract: OmnichainExecutorOwner.address,
       signature: "setTrustedRemote(uint16,bytes)",
       parameters: ["dstChainId", "0xDestAddressSrcAddress"],
       value: 0,
