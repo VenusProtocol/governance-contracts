@@ -2,9 +2,11 @@
 
 pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@layerzerolabs/solidity-examples/contracts/lzApp/interfaces/ILayerZeroEndpoint.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import { ILayerZeroEndpoint } from "@layerzerolabs/solidity-examples/contracts/lzApp/interfaces/ILayerZeroEndpoint.sol";
 import { BaseOmnichainControllerSrc } from "./BaseOmnichainControllerSrc.sol";
+import { IGovernanceBravoDelegate } from "./interfaces/IGovernananceBravoDelegate.sol";
+import { ensureNonzeroAddress } from "../lib/validators.sol";
 
 /**
  * @title OmnichainProposalSender
@@ -21,7 +23,19 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         CRITICAL
     }
 
+    /**
+     * @notice Address of Governance bravo
+     */
+    IGovernanceBravoDelegate public governanceBravoDelegate;
+    /**
+     * @notice Stores nonce for failed payload
+     */
     uint64 public lastStoredPayloadNonce;
+
+    /**
+     * @notice  Id of the last received proposal from governance
+     */
+    uint256 public lastProposalId;
 
     /**
      * @notice Execution hashes of failed messages
@@ -33,11 +47,6 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @notice Valid chainIds on remote
      */
     mapping(uint16 => bool) public validChainIds;
-
-    /**
-     * @notice Unique Proposal, should not have multiple proposals with the same chainId at a time
-     */
-    mapping(uint256 => mapping(uint16 => uint256)) public uniqueProposal;
 
     /**
      * @notice LayerZero endpoint for sending messages to remote chains
@@ -88,10 +97,13 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
 
     constructor(
         ILayerZeroEndpoint lzEndpoint_,
-        address accessControlManager_
+        address accessControlManager_,
+        IGovernanceBravoDelegate governanceBravoDelegate_
     ) BaseOmnichainControllerSrc(accessControlManager_) {
-        require(address(lzEndpoint_) != address(0), "OmnichainProposalSender: invalid endpoint");
+        ensureNonzeroAddress(address(lzEndpoint_));
+        ensureNonzeroAddress(address(governanceBravoDelegate_));
         lzEndpoint = lzEndpoint_;
+        governanceBravoDelegate = governanceBravoDelegate_;
     }
 
     /**
@@ -127,23 +139,26 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     ) external payable whenNotPaused {
         _ensureAllowed("execute(uint16,bytes,bytes)");
 
-        (address[] memory targets, , , , uint256 pId, ) = abi.decode(
-            payload_,
-            (address[], uint[], string[], bytes[], uint256, uint8)
-        );
-
         require(validChainIds[remoteChainId_], "OmnichainProposalSender: Invalid chainId");
+
         bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
-        ++uniqueProposal[pId][remoteChainId_];
-        require(uniqueProposal[pId][remoteChainId_] == 1, "OmnichainProposalSender: Invalid proposal");
 
+        //  Same proposal should not contain more than one bridge command
+        uint256 pId = governanceBravoDelegate.proposalCount();
+        require(pId > lastProposalId, "OmnichainProposalSender: Multiple bridging in a proposal");
+        lastProposalId = pId;
+        bytes memory payload;
+        (address[] memory targets, , , , ) = abi.decode(payload_, (address[], uint[], string[], bytes[], uint8));
         _isEligibleToSend(remoteChainId_, targets.length);
+
+        payload = abi.encode(payload_, pId);
+
         try
             lzEndpoint.send{ value: msg.value }(
                 remoteChainId_,
                 trustedRemote,
-                payload_,
+                payload,
                 payable(tx.origin),
                 address(0),
                 adapterParams_
@@ -152,7 +167,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
             emit ExecuteRemoteProposal(remoteChainId_, payload_);
         } catch (bytes memory reason) {
             uint64 _lastStoredPayloadNonce = ++lastStoredPayloadNonce;
-            bytes memory execution = abi.encode(remoteChainId_, payload_, adapterParams_, msg.value);
+            bytes memory execution = abi.encode(remoteChainId_, payload, adapterParams_, msg.value);
             storedExecutionHashes[_lastStoredPayloadNonce] = keccak256(execution);
             emit StorePayload(_lastStoredPayloadNonce, remoteChainId_, payload_, adapterParams_, msg.value, reason);
         }
@@ -195,19 +210,6 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     }
 
     /**
-     * @notice Sets the trusted path for the cross-chain communication
-     * @param remoteChainId_  The LayerZero id of a remote chain
-     * @param path_ = abi.encodePacked(remoteAddress, localAddress)
-     * @custom:access Controlled by AccessControlManager.
-     * @custom:event Emits SetTrustedRemote with remote chain Id and path
-     */
-    function setTrustedRemote(uint16 remoteChainId_, bytes calldata path_) external {
-        _ensureAllowed("setTrustedRemote(uint16,bytes)");
-        trustedRemoteLookup[remoteChainId_] = path_;
-        emit SetTrustedRemote(remoteChainId_, path_);
-    }
-
-    /**
      * @notice Sets the remote message receiver address
      * @param remoteChainId_ The LayerZero id of a remote chain
      * @param remoteAddress_ The address of the contract on the remote chain to receive messages sent by this contract
@@ -216,6 +218,8 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      */
     function setTrustedRemoteAddress(uint16 remoteChainId_, bytes calldata remoteAddress_) external {
         _ensureAllowed("setTrustedRemoteAddress(uint16,bytes)");
+        require(remoteChainId_ != 0, "ChainId must not be zero");
+        ensureNonzeroAddress(address(uint160(bytes20(remoteAddress_))));
         trustedRemoteLookup[remoteChainId_] = abi.encodePacked(remoteAddress_, address(this));
         emit SetTrustedRemoteAddress(remoteChainId_, remoteAddress_);
     }

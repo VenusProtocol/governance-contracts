@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity 0.8.13;
 
-import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import "@layerzerolabs/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
 import { BaseOmnichainControllerDest } from "./BaseOmnichainControllerDest.sol";
-import { TimelockInterface } from "./interfaces/TimelockInterface.sol";
+import { ITimelock } from "./interfaces/ITimelock.sol";
 
 /**
  * @title OmnichainGovernanceExecutor
@@ -208,14 +208,14 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         uint64,
         bytes memory payload_
     ) internal virtual override {
+        (bytes memory payload, uint256 pId) = abi.decode(payload_, (bytes, uint256));
         (
             address[] memory targets,
             uint256[] memory values,
             string[] memory signatures,
             bytes[] memory calldatas,
-            uint256 pId,
             uint8 pType
-        ) = abi.decode(payload_, (address[], uint256[], string[], bytes[], uint256, uint8));
+        ) = abi.decode(payload, (address[], uint256[], string[], bytes[], uint8));
 
         _isEligibleToReceive(srcChainId_, targets.length);
 
