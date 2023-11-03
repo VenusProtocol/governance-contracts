@@ -1,3 +1,4 @@
+import { smock } from "@defi-wonderland/smock";
 import { mine } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { ethers, upgrades } from "hardhat";
@@ -82,11 +83,19 @@ describe("OmnichainProposalSender: ", async function () {
     const Timelock = await ethers.getContractFactory("Timelock");
     const accessControlManagerFactory = await ethers.getContractFactory("AccessControlManager");
     const OmnichainProposalExecutorOwner = await ethers.getContractFactory("OmnichainExecutorOwner");
+    const governorBravoDelegateFactor = await smock.mock("GovernorBravoDelegate");
 
+    const governorBravoDelegate = await governorBravoDelegateFactor.deploy();
+    await governorBravoDelegate.setVariable("proposalCount", 1);
     accessControlManager = await accessControlManagerFactory.deploy();
     remoteEndpoint = await LZEndpointMock.deploy(remoteChainId);
     localEndpoint = await LZEndpointMock.deploy(localChainId);
-    sender = await OmnichainProposalSender.deploy(localEndpoint.address, accessControlManager.address);
+    sender = await OmnichainProposalSender.deploy(
+      localEndpoint.address,
+      accessControlManager.address,
+      governorBravoDelegate.address,
+    );
+
     executor = await OmnichainGovernanceExecutor.deploy(remoteEndpoint.address, deployer.address);
     NormalTimelock = await Timelock.deploy(executor.address, 3600);
     FasttrackTimelock = await Timelock.deploy(executor.address, 3600);
@@ -161,17 +170,21 @@ describe("OmnichainProposalSender: ", async function () {
       "access denied",
     );
   });
+
   it("Reverts if EOA call execute() without grant permission", async function () {
     await expect(sender.connect(bob).execute(remoteChainId, Payload, "0x")).to.be.revertedWith("access denied");
   });
+
   it("Reverts with Invalid chainId", async function () {
     await expect(sender.connect(alice).execute(remoteChainId, Payload, "0x")).to.be.revertedWith(
       "OmnichainProposalSender: Invalid chainId",
     );
   });
+
   it("Reverts when EOA call updateValidChainId without grant permission", async function () {
     await expect(sender.connect(bob).updateValidChainId(remoteChainId, true)).to.be.revertedWith("access denied");
   });
+
   it("Emit SetTrustedRemoteAddress event", async function () {
     expect(await sender.connect(alice).setTrustedRemoteAddress(remoteChainId, remotePath))
       .to.emit(sender, "SetTrustedRemoteAddress")
@@ -179,26 +192,31 @@ describe("OmnichainProposalSender: ", async function () {
     const remoteAndLocal = ethers.utils.solidityPack(["address", "address"], [executor.address, sender.address]);
     expect(await sender.trustedRemoteLookup(remoteChainId)).to.be.equals(remoteAndLocal);
   });
+
   it("Emit UpdatedValidChainId", async function () {
     await expect(sender.connect(alice).updateValidChainId(remoteChainId, true)).to.emit(sender, "UpdatedValidChainId");
     expect(await sender.validChainIds(remoteChainId)).to.be.equals(true);
   });
+
   it("Reverts with Daily Transaction Limit Exceed", async function () {
     await expect(sender.connect(alice).execute(remoteChainId, Payload, "0x")).to.be.revertedWith(
       "Daily Transaction Limit Exceeded",
     );
   });
+
   it("Reverts if EOA call setMaxDailyLimit() without grant permisssion", async function () {
     await expect(sender.connect(bob).setMaxDailyLimit(remoteChainId, maxDailyTransactionLimit)).to.be.revertedWith(
       "access denied",
     );
   });
+
   it("Set daily transaction limit and emit SetMaxDailyLimit event", async function () {
     expect(await sender.connect(alice).setMaxDailyLimit(remoteChainId, maxDailyTransactionLimit))
       .to.emit(sender, "SetMaxDailyLimit")
       .withArgs(0, maxDailyTransactionLimit);
     expect(await sender.connect(alice).chainIdToMaxDailyLimit(remoteChainId)).to.be.equals(maxDailyTransactionLimit);
   });
+
   it("Revert if function in not found in function registry", async function () {
     const data = executor.interface.encodeFunctionData("setTrustedRemoteAddress", [localChainId, localPath]);
     await expect(
@@ -208,17 +226,20 @@ describe("OmnichainProposalSender: ", async function () {
       }),
     ).to.revertedWith("Function not found");
   });
+
   it("Reverts if any user other than owner try to add function in function registry", async function () {
     await expect(
       executorOwner.connect(bob).upsertSignature(["setTrustedRemoteAddress(uint16,bytes"], [false]),
     ).to.be.revertedWith("Ownable: caller is not the owner");
   });
+
   it("Function registry should be updated", async function () {
     updateFunctionRegistry(executorOwner);
     expect(await executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [false]))
       .to.emit(executorOwner, "FunctionRegistryChanged")
       .withArgs("setTrustedRemoteAddress(uint16,bytes)", false);
   });
+
   it("Reverts if EOA called owner function of Executor", async function () {
     let data = executor.interface.encodeFunctionData("setTrustedRemoteAddress", [localChainId, localPath]);
     await expect(
@@ -253,6 +274,7 @@ describe("OmnichainProposalSender: ", async function () {
       }),
     ).to.reverted;
   });
+
   it("Emit TimelocksAdded event", async function () {
     const data = executor.interface.encodeFunctionData("addTimelocks", [
       [NormalTimelock.address, FasttrackTimelock.address, CriticalTimelock.address],
@@ -264,6 +286,7 @@ describe("OmnichainProposalSender: ", async function () {
       }),
     ).to.emit(executor, "TimelocksAdded");
   });
+
   it("Emit SetTrustedRemoteAddress event", async function () {
     const data = executor.interface.encodeFunctionData("setTrustedRemoteAddress", [localChainId, localPath]);
     await expect(
@@ -273,6 +296,7 @@ describe("OmnichainProposalSender: ", async function () {
       }),
     ).to.emit(executor, "SetTrustedRemoteAddress");
   });
+
   it("Set max daily receive limit", async function () {
     const data = executor.interface.encodeFunctionData("setMaxDailyReceiveLimit", [localChainId, maxDailyReceiveLimit]);
     await expect(
@@ -290,18 +314,22 @@ describe("OmnichainProposalSender: ", async function () {
       }),
     ).to.emit(sender, "ExecuteRemoteProposal");
   });
+
   it("Proposal should be update on remote", async function () {
     expect((await executor.proposals(proposalId))[0]).to.equals(proposalId);
   });
+
   it("Emit ProposalExecuted event", async function () {
     await mine(4500);
     expect(await executor.execute(proposalId))
       .to.emit(executor, "ProposalExecuted")
       .withArgs(1);
   });
+
   it("Should update delay of timelock", async function () {
     expect(await NormalTimelock.delay()).to.equals(delay);
   });
+
   it("Revert if same proposal come twice", async function () {
     await expect(
       sender.connect(alice).execute(remoteChainId, Payload, adapterParams, {
@@ -309,6 +337,7 @@ describe("OmnichainProposalSender: ", async function () {
       }),
     ).to.be.revertedWith("OmnichainProposalSender: Invalid proposal");
   });
+
   it("Reverts when other than guardian call cancel of executor", async function () {
     ++proposalId;
     Payload = makePayload(
@@ -326,6 +355,7 @@ describe("OmnichainProposalSender: ", async function () {
       "OmnichainGovernanceExecutor::cancel: sender must be guardian",
     );
   });
+
   it("Emit ProposalCanceled event when proposal gets cancelled", async function () {
     ++proposalId;
     Payload = makePayload(
@@ -344,6 +374,7 @@ describe("OmnichainProposalSender: ", async function () {
       .to.emit(executor, "ProposalCanceled")
       .withArgs(proposalId);
   });
+
   it("Reverts when cancel is called after execute", async function () {
     ++proposalId;
     Payload = makePayload(
@@ -363,6 +394,7 @@ describe("OmnichainProposalSender: ", async function () {
       "OmnichainGovernanceExecutor::cancel: cannot cancel executed proposal",
     );
   });
+
   it("Proposal fails if any number of commands fail on destination", async function () {
     ++proposalId;
     const calldata = ethers.utils.defaultAbiCoder.encode(["uint256", "uint256"], [delay, delay - 20]);
@@ -379,6 +411,7 @@ describe("OmnichainProposalSender: ", async function () {
     });
     expect((await executor.proposals(proposalId))[0]).to.not.equals(proposalId);
   });
+
   it("Reverts when daily limit of sending transaction reached", async function () {
     maxDailyTransactionLimit = 0;
     await sender.connect(alice).setMaxDailyLimit(remoteChainId, maxDailyTransactionLimit);
@@ -397,6 +430,7 @@ describe("OmnichainProposalSender: ", async function () {
       }),
     ).to.be.revertedWith("Daily Transaction Limit Exceeded");
   });
+
   it("Proposal failed when receiving limit reached", async function () {
     maxDailyTransactionLimit = 100;
     await sender.connect(alice).setMaxDailyLimit(remoteChainId, maxDailyTransactionLimit);
