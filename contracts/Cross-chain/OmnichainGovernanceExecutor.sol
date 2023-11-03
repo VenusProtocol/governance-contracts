@@ -62,7 +62,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice Mapping containing Timelock addresses for each proposal type.
      */
-    mapping(uint256 => TimelockInterface) public proposalTimelocks;
+    mapping(uint256 => ITimelock) public proposalTimelocks;
 
     /**
      * @notice Represents queue state of proposal.
@@ -114,7 +114,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @custom:access Only owner.
      * @custom:event Emits TimelockAdded with all 3 timelocks.
      */
-    function addTimelocks(TimelockInterface[] memory timelocks_) external onlyOwner {
+    function addTimelocks(ITimelock[] memory timelocks_) external onlyOwner {
         require(
             timelocks_.length == uint8(ProposalType.CRITICAL) + 1,
             "OmnichainGovernanceExecutor::initialize:number of timelocks _should match the number of governance routes"
