@@ -214,13 +214,13 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             uint256[] memory values,
             string[] memory signatures,
             bytes[] memory calldatas,
+            uint256 pId_,
             uint8 pType
-        ) = abi.decode(payload, (address[], uint256[], string[], bytes[], uint8));
-
+        ) = abi.decode(payload, (address[], uint256[], string[], bytes[], uint256, uint8));
         _isEligibleToReceive(srcChainId_, targets.length);
 
         Proposal memory newProposal = Proposal({
-            id: pId,
+            id: pId_,
             eta: 0,
             targets: targets,
             values: values,
