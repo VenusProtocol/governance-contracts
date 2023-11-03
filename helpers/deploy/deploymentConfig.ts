@@ -85,7 +85,7 @@ export const OmnichainGovernanceExecutorMethods: string[] = [
   "setMinDstGas(uint16,uint16,uint256)",
   "setPayloadSizeLimit(uint16,uint256)",
   "setConfig(uint16,uint16,uint256,bytes)",
-  "addTimelocks(TimelockInterface[])",
+  "addTimelocks(ITimelock[])",
 ];
 
 interface BridgeConfig {
