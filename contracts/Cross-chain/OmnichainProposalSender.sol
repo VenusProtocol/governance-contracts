@@ -66,7 +66,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     /**
      * @notice Emitted when a proposal execution request is sent to the remote chain
      */
-    event ExecuteRemoteProposal(uint16 indexed remoteChainId, bytes payload);
+    event ExecuteRemoteProposal(uint64 indexed lastStoredPayloadNonce, uint16 indexed remoteChainId, bytes payload);
 
     /**
      * @notice Emitted when a previously failed message is successfully sent to the remote chain
@@ -159,7 +159,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
                 adapterParams_
             )
         {
-            emit ExecuteRemoteProposal(remoteChainId_, payload_);
+            emit ExecuteRemoteProposal(lastStoredPayloadNonce, remoteChainId_, payload_);
         } catch (bytes memory reason) {
             uint64 _lastStoredPayloadNonce = ++lastStoredPayloadNonce;
             bytes memory execution = abi.encode(remoteChainId_, payload, adapterParams_, msg.value);
