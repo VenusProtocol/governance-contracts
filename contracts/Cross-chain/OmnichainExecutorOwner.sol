@@ -59,9 +59,9 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     }
 
     /**
-     * @notice Functions will be added or removed.
+     * @notice A registry of functions that are allowed to be executed from proposals
      * @param signatures_  Function signature to be added or removed.
-     * @param isRemoved_  bool value , should be true to remove function.
+     * @param isRemoved_  bool value, should be true to remove function.
      */
     function upsertSignature(string[] calldata signatures_, bool[] calldata isRemoved_) external onlyOwner {
         uint256 signatureLength = signatures_.length;
