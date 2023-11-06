@@ -64,11 +64,6 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     event SetTrustedRemoteAddress(uint16 indexed remoteChainId, bytes remoteAddress);
 
     /**
-     * @notice Emitted when a remote path is set for the remote chain
-     */
-    event SetTrustedRemote(uint16 indexed remoteChainId, bytes path);
-
-    /**
      * @notice Emitted when a proposal execution request is sent to the remote chain
      */
     event ExecuteRemoteProposal(uint16 indexed remoteChainId, bytes payload);
