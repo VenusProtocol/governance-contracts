@@ -67,23 +67,17 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice Emitted when proposal is received.
      */
-    event ProposalReceived(
-        uint256 indexed proposalId,
-        address[] targets,
-        uint256[] values,
-        string[] signatures,
-        bytes[] calldatas,
-        uint8 proposalType
-    );
+    event ProposalReceived(uint256 indexed proposalId, address[] targets, uint256[] values, string[] signatures, bytes[] calldatas, uint8 proposalType);
 
     /**
      * @notice Emitted when proposal is queued.
      */
-    event ProposalQueued(uint256 indexed id, uint256 eta);
+    event ProposalQueued(uint256 indexed id , uint256 eta);
 
     /**
      * Emitted when proposal executed.
      */
+    event ProposalExecuted(uint256 indexed id);
     event ProposalExecuted(uint256 indexed id);
 
     /**
@@ -94,6 +88,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice Emitted when proposal is cancelled.
      */
+    event ProposalCancelled(uint256 indexed id);
     event ProposalCancelled(uint256 indexed id);
 
     /**
@@ -227,6 +222,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         });
 
         proposals[newProposal.id] = newProposal;
+        emit ProposalReceived(newProposal.id, targets, values, signatures, calldatas, pType);
         emit ProposalReceived(newProposal.id, targets, values, signatures, calldatas, pType);
         _queue(pId);
     }
