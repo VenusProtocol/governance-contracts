@@ -60,8 +60,8 @@ describe("OmnichainProposalSender: ", async function () {
       "setUseCustomAdapterParams(bool)",
       "addTimelocks(address[])",
     ];
-    const removeArray = new Array(functionregistry.length).fill(false);
-    await executorOwner.upsertSignature(functionregistry, removeArray);
+    const activeArray = new Array(functionregistry.length).fill(true);
+    await executorOwner.upsertSignature(functionregistry, activeArray);
   }
 
   before(async function () {
@@ -204,7 +204,10 @@ describe("OmnichainProposalSender: ", async function () {
   });
 
   it("Emit UpdatedValidChainId", async function () {
-    await expect(sender.connect(signer1).updateValidChainId(remoteChainId, true)).to.emit(sender, "UpdatedValidChainId");
+    await expect(sender.connect(signer1).updateValidChainId(remoteChainId, true)).to.emit(
+      sender,
+      "UpdatedValidChainId",
+    );
     expect(await sender.validChainIds(remoteChainId)).to.be.equals(true);
   });
 
@@ -246,15 +249,29 @@ describe("OmnichainProposalSender: ", async function () {
 
   it("Reverts if any user other than owner try to add function in function registry", async function () {
     await expect(
-      executorOwner.connect(signer2).upsertSignature(["setTrustedRemoteAddress(uint16,bytes"], [false]),
+      executorOwner.connect(signer2).upsertSignature(["setTrustedRemoteAddress(uint16,bytes"], [true]),
     ).to.be.revertedWith("Ownable: caller is not the owner");
+  });
+
+  it("Function registry should not emit event if nonexistant function is removed", async function () {
+    updateFunctionRegistry(executorOwner);
+    expect(
+      await executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [true]),
+    ).to.not.emit(executorOwner, "FunctionRegistryChanged");
   });
 
   it("Function registry should be updated", async function () {
     updateFunctionRegistry(executorOwner);
-    expect(await executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [false]))
+    expect(await executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [true]))
       .to.emit(executorOwner, "FunctionRegistryChanged")
-      .withArgs("setTrustedRemoteAddress(uint16,bytes)", false);
+      .withArgs("setTrustedRemoteAddress(uint16,bytes)", true);
+  });
+
+  it("Function registry should not emit event if function is added twice", async function () {
+    updateFunctionRegistry(executorOwner);
+    expect(
+      await executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [true]),
+    ).to.not.emit(executorOwner, "FunctionRegistryChanged");
   });
 
   it("Reverts if EOA called owner function of Executor", async function () {
@@ -363,7 +380,7 @@ describe("OmnichainProposalSender: ", async function () {
 
     await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
       value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
-    })
+    });
 
     await expect(
       sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {

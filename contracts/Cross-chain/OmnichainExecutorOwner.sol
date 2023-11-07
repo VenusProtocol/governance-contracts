@@ -29,7 +29,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     /**
      * @notice Event emitted when function registry updated
      */
-    event FunctionRegistryChanged(string signature, bool isRemoved);
+    event FunctionRegistryChanged(string signature, bool active);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address omnichainGovernanceExecutor_) {
@@ -61,19 +61,21 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     /**
      * @notice A registry of functions that are allowed to be executed from proposals
      * @param signatures_  Function signature to be added or removed.
-     * @param isRemoved_  bool value, should be true to remove function.
+     * @param active_ bool value, should be true to add function.
      */
-    function upsertSignature(string[] calldata signatures_, bool[] calldata isRemoved_) external onlyOwner {
+    function upsertSignature(string[] calldata signatures_, bool[] calldata active_) external onlyOwner {
         uint256 signatureLength = signatures_.length;
-        require(signatureLength == isRemoved_.length, "Input arrays must have the same length");
+        require(signatureLength == active_.length, "Input arrays must have the same length");
         for (uint256 i; i < signatureLength; i++) {
             bytes4 sigHash = bytes4(keccak256(bytes(signatures_[i])));
-            if (isRemoved_[i]) {
-                delete functionRegistry[sigHash];
-            } else {
+            bytes memory signature = bytes(functionRegistry[sigHash]);
+            if (active_[i] && signature.length == 0) {
                 functionRegistry[sigHash] = signatures_[i];
+                emit FunctionRegistryChanged(signatures_[i], active_[i]);
+            } else if (!active_[i] && signature.length != 0) {
+                delete functionRegistry[sigHash];
+                emit FunctionRegistryChanged(signatures_[i], active_[i]);
             }
-            emit FunctionRegistryChanged(signatures_[i], isRemoved_[i]);
         }
     }
 
