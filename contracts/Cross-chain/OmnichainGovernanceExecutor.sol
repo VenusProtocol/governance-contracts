@@ -104,7 +104,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice Emitted when all timelocks are added.
      */
-    event TimelockAdded(address indexed timelock);
+    event TimelockAdded(address indexed timelock, uint8 routeType);
 
     constructor(address endpoint_, address guardian_) BaseOmnichainControllerDest(endpoint_) {
         guardian = guardian_;
@@ -121,13 +121,13 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             timelocks_.length == uint8(ProposalType.CRITICAL) + 1,
             "OmnichainGovernanceExecutor::initialize:number of timelocks _should match the number of governance routes"
         );
-        for (uint256 i; i < uint8(ProposalType.CRITICAL) + 1; ++i) {
+        for (uint8 i; i < uint8(ProposalType.CRITICAL) + 1; ++i) {
             require(
                 address(timelocks_[i]) != address(0),
                 "OmnichainGovernanceExecutor::initialize:invalid timelock address"
             );
             proposalTimelocks[i] = timelocks_[i];
-            emit TimelockAdded(address(proposalTimelocks[i]));
+            emit TimelockAdded(address(proposalTimelocks[i]), i);
         }
     }
 
