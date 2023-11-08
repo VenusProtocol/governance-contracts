@@ -50,11 +50,6 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     address public immutable guardian;
 
     /**
-     * @notice Timestamp on which proposal is received.
-     */
-    uint256 public proposalRecievedTimestamp;
-
-    /**
      * @notice The official record of all proposals ever proposed.
      */
     mapping(uint256 => Proposal) public proposals;
@@ -201,7 +196,6 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             failedMessages[srcChainId_][srcAddress_][nonce_] = hashedPayload;
             emit ReceivePayloadFailed(srcChainId_, srcAddress_, nonce_, reason); // Retrieve payload from the src side tx if needed to clear
         }
-        proposalRecievedTimestamp = block.timestamp;
     }
 
     function _nonblockingLzReceive(
