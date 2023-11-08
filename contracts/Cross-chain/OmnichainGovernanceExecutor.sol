@@ -94,7 +94,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice Emitted when proposal failed.
      */
-    event ProposalFailed(uint16 srcChainId, bytes srcAddress, uint64 nonce, bytes reason);
+    event ReceivePayloadFailed(uint16 srcChainId, bytes srcAddress, uint64 nonce, bytes reason);
 
     /**
      * @notice Emitted when proposal is cancelled.
@@ -199,7 +199,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         // try-catch all errors/exceptions
         if (!success) {
             failedMessages[srcChainId_][srcAddress_][nonce_] = hashedPayload;
-            emit ProposalFailed(srcChainId_, srcAddress_, nonce_, reason); // Retrieve payload from the src side tx if needed to clear
+            emit ReceivePayloadFailed(srcChainId_, srcAddress_, nonce_, reason); // Retrieve payload from the src side tx if needed to clear
         }
         proposalRecievedTimestamp = block.timestamp;
     }
