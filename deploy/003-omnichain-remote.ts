@@ -3,11 +3,11 @@ import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { LZ_ENDPOINTS } from "../constants/LZEndpoints";
+import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
+import { OmnichainGovernanceExecutorMethods, bridgeConfig, getConfig } from "../helpers/deploy/deploymentConfig";
+import { timelockDelays } from "../helpers/deploy/deploymentConfig";
+import { toAddress } from "../helpers/deploy/deploymentUtils";
 import { OmnichainGovernanceExecutor } from "../typechain";
-import { OmnichainGovernanceExecutorMethods, bridgeConfig, getConfig } from "./helpers/deploymentConfig";
-import { timelockDelays } from "./helpers/deploymentConfig";
-import { toAddress } from "./helpers/deploymentUtils";
 
 interface GovernanceCommand {
   contract: string;
@@ -54,8 +54,8 @@ const executeBridgeCommands = async (
   for (let i = 0; i < methods.length; i++) {
     const entry = methods[i];
     const { method, args } = entry;
+    // @ts-expect-error interface type doesn't match
     const data = target.interface.encodeFunctionData(method, args);
-    console.log(data);
     await signer.sendTransaction({
       to: target.address,
       data: data,
@@ -67,8 +67,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
-  const deploymentConfig = await getConfig(hre.network.name);
-  const { preconfiguredAddresses } = deploymentConfig;
+  const deploymentConfig = await getConfig(hre.network.name as SUPPORTED_NETWORKS);
 
   const OmnichainGovernanceExecutor = await deploy("OmnichainGovernanceExecutor", {
     from: deployer,
@@ -77,11 +76,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     autoMine: true,
   });
 
-  const bridge = await ethers.getContractAt(
+  const bridge = (await ethers.getContractAt(
     "OmnichainGovernanceExecutor",
     OmnichainGovernanceExecutor.address,
     ethers.provider.getSigner(deployer),
-  );
+  )) as OmnichainGovernanceExecutor;
 
   const timeLockNormal = await deploy("Timelock_Normal", {
     contract: "Timelock",
@@ -133,7 +132,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       proxyContract: "OpenZeppelinTransparentProxy",
       execute: {
         methodName: "initialize",
-        args: [preconfiguredAddresses.AccessControlManager],
+        args: [deploymentConfig.AccessControlManager],
       },
       upgradeIndex: 0,
     },
@@ -153,7 +152,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const tx = await bridgeAdmin.upsertSignature(OmnichainGovernanceExecutorMethods, removeArray);
   await tx.wait();
 
-  if (bridge.owner === deployer) {
+  if ((await bridge.owner()) === deployer) {
     const tx = await bridge.transferOwnership(OmnichainExecutorOwner.address);
     await tx.wait();
   }
@@ -167,7 +166,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const commands = [
     ...(await configureAccessControls(
       OmnichainGovernanceExecutorMethods,
-      preconfiguredAddresses.AccessControlManager,
+      deploymentConfig.AccessControlManager,
       normalTimelock.address,
       OmnichainExecutorOwner.address,
       hre,
@@ -197,5 +196,5 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 func.tags = ["OmnichainExecutor", "omnichainremote"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
-  !(hre.network.name === "sepolia" || hre.network.name === "ethereum");
+  !(hre.network.name === "sepolia" || hre.network.name === "ethereum") && hre.network.name !== "hardhat";
 export default func;
