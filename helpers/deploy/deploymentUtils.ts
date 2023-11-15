@@ -1,5 +1,6 @@
 import bscMainnetDeployments from "@venusprotocol/venus-protocol/networks/mainnet.json";
 import bscTestnetDeployments from "@venusprotocol/venus-protocol/networks/testnet.json";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { getNamedAccounts } from "hardhat";
 
 import { SUPPORTED_NETWORKS } from "./constants";
@@ -15,5 +16,16 @@ export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<s
   }[network];
 };
 
-// eslint-disable-next-line @typescript-eslint/no-empty-function
-export default () => {};
+export const toAddress = async (addressOrAlias: string, hre: HardhatRuntimeEnvironment): Promise<string> => {
+  const { getNamedAccounts } = hre;
+  const { deployments } = hre;
+  if (addressOrAlias.startsWith("0x")) {
+    return addressOrAlias;
+  }
+  if (addressOrAlias.startsWith("account:")) {
+    const namedAccounts = await getNamedAccounts();
+    return namedAccounts[addressOrAlias.slice("account:".length)];
+  }
+  const deployment = await deployments.get(addressOrAlias);
+  return deployment.address;
+};
