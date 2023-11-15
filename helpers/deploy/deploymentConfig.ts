@@ -1,26 +1,4 @@
-import { ethers } from "hardhat";
-
-const ANY_CONTRACT = ethers.constants.AddressZero;
-const preconfiguredAddresses = {
-  bsctestnet: {
-    NormalTimelock: "0xce10739590001705F7FF231611ba4A48B2820327",
-    FastTrackTimelock: "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
-    CriticalTimelock: "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D",
-    AccessControlManager: "0x45f8a08F534f34A97187626E05d4b6648Eeaa9AA",
-  },
-  bscmainnet: {
-    NormalTimelock: "0x939bD8d64c0A9583A7Dcea9933f7b21697ab6396",
-    FastTrackTimelock: "0x555ba73dB1b006F3f2C7dB7126d6e4343aDBce02",
-    CriticalTimelock: "0x213c446ec11e45b15a6E29C1C1b402B8897f606d",
-    AccessControlManager: "0x4788629ABc6cFCA10F9f969efdEAa1cF70c23555",
-  },
-  sepolia: {
-    AccessControlManager: "0xbf705C00578d43B6147ab4eaE04DBBEd1ccCdc96",
-  },
-  ethereum: {
-    // TODO
-  },
-};
+import { AddressConfig, SUPPORTED_NETWORKS } from "./constants";
 
 export type Delay = { [key: string]: number };
 
@@ -29,6 +7,11 @@ export type DelayConfig = {
 };
 
 export const timelockDelays: DelayConfig = {
+  hardhat: {
+    NORMAL: 10800,
+    FAST_TRACK: 7200,
+    CRITICAL: 3600,
+  },
   sepolia: {
     NORMAL: 10800,
     FAST_TRACK: 7200,
@@ -41,11 +24,13 @@ export const timelockDelays: DelayConfig = {
   },
 };
 
-export type NetworkConfig = {
-  bsctestnet: DeploymentConfig;
-  bscmainnet: DeploymentConfig;
-  sepolia: DeploymentConfig;
-};
+export interface PreconfiguredAddresses {
+  NormalTimelock: string;
+  FastTrackTimelock: string;
+  CriticalTimelock: string;
+  AccessControlManager: string;
+  GovernorDelegator?: string;
+}
 
 export type timelockNetworkConfig = {
   sepolia: DelayConfig;
@@ -57,34 +42,17 @@ export type AccessControlEntry = {
   target: string;
   method: string;
 };
-export type PreconfiguredAddresses = { [contract: string]: string };
 
-export type DeploymentConfig = {
-  preconfiguredAddresses: PreconfiguredAddresses;
-};
-
-export const globalConfig: NetworkConfig = {
-  bsctestnet: {
-    preconfiguredAddresses: preconfiguredAddresses.bsctestnet,
-  },
-  bscmainnet: {
-    preconfiguredAddresses: preconfiguredAddresses.bscmainnet,
-  },
-  sepolia: {
-    preconfiguredAddresses: preconfiguredAddresses.sepolia,
-  },
-};
-
-export async function getConfig(networkName: string): Promise<DeploymentConfig> {
+export async function getConfig<N extends SUPPORTED_NETWORKS>(networkName: N): Promise<(typeof AddressConfig)[N]> {
   switch (networkName) {
     case "bscmainnet":
-      return globalConfig.bscmainnet;
+      return AddressConfig.bscmainnet;
     case "bsctestnet":
-      return globalConfig.bsctestnet;
+      return AddressConfig.bsctestnet;
     case "sepolia":
-      return globalConfig.sepolia;
-    case "development":
-      return globalConfig.bsctestnet;
+      return AddressConfig.sepolia;
+    case "hardhat":
+      return AddressConfig.hardhat;
     default:
       throw new Error(`config for network ${networkName} is not available.`);
   }
@@ -139,6 +107,12 @@ export const bridgeConfig: BridgeConfig = {
     ],
   },
   sepolia: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint16,uint256)", args: [10102, 100] },
+    ],
+  },
+  hardhat: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint16,uint256)", args: [10102, 100] },

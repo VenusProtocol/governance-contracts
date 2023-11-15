@@ -3,11 +3,10 @@ import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { LZ_ENDPOINTS } from "../constants/LZEndpoints";
+import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
+import { OmnichainProposalSenderMethods, bridgeConfig, getConfig } from "../helpers/deploy/deploymentConfig";
+import { toAddress } from "../helpers/deploy/deploymentUtils";
 import { getArgTypesFromSignature } from "../helpers/utils";
-import { OmnichainProposalSender } from "../typechain";
-import { OmnichainProposalSenderMethods, bridgeConfig, getConfig } from "./helpers/deploymentConfig";
-import { toAddress } from "./helpers/deploymentUtils";
 
 interface GovernanceCommand {
   contract: string;
@@ -65,48 +64,49 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
-  const deploymentConfig = await getConfig(hre.network.name);
-  const { preconfiguredAddresses } = deploymentConfig;
-
-  const accessControlManagerAddress = await toAddress(preconfiguredAddresses.AccessControlManager, hre);
+  const deploymentConfig = await getConfig(hre.network.name as SUPPORTED_NETWORKS.BSCMAINNET);
 
   const OmnichainProposalSender = await deploy("OmnichainProposalSender", {
     from: deployer,
-    args: [LZ_ENDPOINTS[hre.network.name as keyof typeof LZ_ENDPOINTS], accessControlManagerAddress],
+    args: [
+      LZ_ENDPOINTS[hre.network.name as keyof typeof LZ_ENDPOINTS],
+      deploymentConfig.AccessControlManager,
+      deploymentConfig.GovernorDelegator,
+    ],
     log: true,
     autoMine: true,
   });
 
-  const bridge = await ethers.getContractAt<OmnichainProposalSender>(
+  const bridge = await ethers.getContractAt(
     "OmnichainProposalSender",
     OmnichainProposalSender.address,
     ethers.provider.getSigner(deployer),
   );
 
   if ((await bridge.owner()) === deployer) {
-    const tx = await bridge.transferOwnership(preconfiguredAddresses.NormalTimelock);
+    const tx = await bridge.transferOwnership(deploymentConfig.NormalTimelock);
     await tx.wait();
-    console.log(`Bridge owner ${deployer} sucessfully changed to ${preconfiguredAddresses.NormalTimelock}.`);
+    console.log(`Bridge owner ${deployer} sucessfully changed to ${deploymentConfig.NormalTimelock}.`);
   }
   const commands = [
     ...(await configureAccessControls(
       OmnichainProposalSenderMethods,
-      preconfiguredAddresses.AccessControlManager,
-      preconfiguredAddresses.NormalTimelock,
+      deploymentConfig.AccessControlManager,
+      deploymentConfig.NormalTimelock,
       OmnichainProposalSender.address,
       hre,
     )),
     ...(await configureAccessControls(
       OmnichainProposalSenderMethods,
-      preconfiguredAddresses.AccessControlManager,
-      preconfiguredAddresses.FastTrackTimelock,
+      deploymentConfig.AccessControlManager,
+      deploymentConfig.FastTrackTimelock,
       OmnichainProposalSender.address,
       hre,
     )),
     ...(await configureAccessControls(
       OmnichainProposalSenderMethods,
-      preconfiguredAddresses.AccessControlManager,
-      preconfiguredAddresses.CriticalTimelock,
+      deploymentConfig.AccessControlManager,
+      deploymentConfig.CriticalTimelock,
       OmnichainProposalSender.address,
       hre,
     )),
@@ -129,5 +129,5 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 func.tags = ["OmnichainProposalSender", "omnichainlocal"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
-  !(hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet");
+  !(hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet") && hre.network.name !== "hardhat";
 export default func;
