@@ -3,9 +3,8 @@ import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { OmnichainGovernanceExecutorMethods, bridgeConfig, getConfig } from "../helpers/deploy/deploymentConfig";
-import { timelockDelays } from "../helpers/deploy/deploymentConfig";
+import { LZ_ENDPOINTS } from "../helpers/deploy/constants";
+import { OmnichainGovernanceExecutorMethods, bridgeConfig } from "../helpers/deploy/deploymentConfig";
 import { toAddress } from "../helpers/deploy/deploymentUtils";
 import { OmnichainGovernanceExecutor } from "../typechain";
 
@@ -67,7 +66,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
-  const deploymentConfig = await getConfig(hre.network.name as SUPPORTED_NETWORKS);
+
+  const acmAddress = (await ethers.getContract("AccessControlManager")).address;
 
   const OmnichainGovernanceExecutor = await deploy("OmnichainGovernanceExecutor", {
     from: deployer,
@@ -82,46 +82,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ethers.provider.getSigner(deployer),
   )) as OmnichainGovernanceExecutor;
 
-  const timeLockNormal = await deploy("Timelock_Normal", {
-    contract: "Timelock",
-    from: deployer,
-    args: [bridge.address, timelockDelays[hre.network.name].NORMAL],
-    log: true,
-    autoMine: true,
-  });
+  const normalTimelock = await ethers.getContract("NormalTimelock");
 
-  const timeLockFastTrack = await deploy("Timelock_FastTrack", {
-    contract: "Timelock",
-    from: deployer,
-    args: [bridge.address, timelockDelays[hre.network.name].FAST_TRACK],
-    log: true,
-    autoMine: true,
-  });
-
-  const timeLockCritical = await deploy("Timelock_Critical", {
-    contract: "Timelock",
-    from: deployer,
-    args: [bridge.address, timelockDelays[hre.network.name].CRITICAL],
-    log: true,
-    autoMine: true,
-  });
-
-  const normalTimelock = await ethers.getContractAt(
-    "Timelock",
-    timeLockNormal.address,
-    ethers.provider.getSigner(deployer),
-  );
-
-  const fasttrackTimelock = await ethers.getContractAt(
-    "Timelock",
-    timeLockFastTrack.address,
-    ethers.provider.getSigner(deployer),
-  );
-  const criticalTimelock = await ethers.getContractAt(
-    "Timelock",
-    timeLockCritical.address,
-    ethers.provider.getSigner(deployer),
-  );
+  const fastTrackTimelock = await ethers.getContract("FastTrackTimelock");
+  const criticalTimelock = await ethers.getContract("CriticalTimelock");
 
   const OmnichainExecutorOwner = await deploy("OmnichainExecutorOwner", {
     from: deployer,
@@ -132,7 +96,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       proxyContract: "OpenZeppelinTransparentProxy",
       execute: {
         methodName: "initialize",
-        args: [deploymentConfig.AccessControlManager],
+        args: [acmAddress],
       },
       upgradeIndex: 0,
     },
@@ -166,7 +130,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const commands = [
     ...(await configureAccessControls(
       OmnichainGovernanceExecutorMethods,
-      deploymentConfig.AccessControlManager,
+      acmAddress,
       normalTimelock.address,
       OmnichainExecutorOwner.address,
       hre,
@@ -175,7 +139,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     {
       contract: OmnichainExecutorOwner.address,
       signature: "addTimelocks(address[])",
-      parameters: [normalTimelock.address, fasttrackTimelock.address, criticalTimelock.address],
+      parameters: [normalTimelock.address, fastTrackTimelock.address, criticalTimelock.address],
       value: 0,
     },
 
