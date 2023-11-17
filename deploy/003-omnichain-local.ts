@@ -3,8 +3,8 @@ import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { OmnichainProposalSenderMethods, bridgeConfig, getConfig } from "../helpers/deploy/deploymentConfig";
+import { LZ_ENDPOINTS } from "../helpers/deploy/constants";
+import { OmnichainProposalSenderMethods, bridgeConfig } from "../helpers/deploy/deploymentConfig";
 import { toAddress } from "../helpers/deploy/deploymentUtils";
 import { getArgTypesFromSignature } from "../helpers/utils";
 
@@ -64,15 +64,16 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
-  const deploymentConfig = await getConfig(hre.network.name as SUPPORTED_NETWORKS.BSCMAINNET);
+
+  const acmAddress = (await ethers.getContract("AccessControlManager")).address;
+  const normalTimelockAddress = (await ethers.getContract("NormalTimelock")).address;
+  const fastTrackTimelockAddress = (await ethers.getContract("FastTrackTimelock")).address;
+  const criticalTimelockAddress = (await ethers.getContract("CriticalTimelock")).address;
+  const governorBravoDelegatorAddress = (await ethers.getContract("GovernorBravoDelegator")).address;
 
   const OmnichainProposalSender = await deploy("OmnichainProposalSender", {
     from: deployer,
-    args: [
-      LZ_ENDPOINTS[hre.network.name as keyof typeof LZ_ENDPOINTS],
-      deploymentConfig.AccessControlManager,
-      deploymentConfig.GovernorDelegator,
-    ],
+    args: [LZ_ENDPOINTS[hre.network.name as keyof typeof LZ_ENDPOINTS], acmAddress, governorBravoDelegatorAddress],
     log: true,
     autoMine: true,
   });
@@ -84,29 +85,29 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   );
 
   if ((await bridge.owner()) === deployer) {
-    const tx = await bridge.transferOwnership(deploymentConfig.NormalTimelock);
+    const tx = await bridge.transferOwnership(normalTimelockAddress);
     await tx.wait();
-    console.log(`Bridge owner ${deployer} sucessfully changed to ${deploymentConfig.NormalTimelock}.`);
+    console.log(`Bridge owner ${deployer} sucessfully changed to ${normalTimelockAddress}.`);
   }
   const commands = [
     ...(await configureAccessControls(
       OmnichainProposalSenderMethods,
-      deploymentConfig.AccessControlManager,
-      deploymentConfig.NormalTimelock,
+      acmAddress,
+      normalTimelockAddress,
       OmnichainProposalSender.address,
       hre,
     )),
     ...(await configureAccessControls(
       OmnichainProposalSenderMethods,
-      deploymentConfig.AccessControlManager,
-      deploymentConfig.FastTrackTimelock,
+      acmAddress,
+      fastTrackTimelockAddress,
       OmnichainProposalSender.address,
       hre,
     )),
     ...(await configureAccessControls(
       OmnichainProposalSenderMethods,
-      deploymentConfig.AccessControlManager,
-      deploymentConfig.CriticalTimelock,
+      acmAddress,
+      criticalTimelockAddress,
       OmnichainProposalSender.address,
       hre,
     )),
