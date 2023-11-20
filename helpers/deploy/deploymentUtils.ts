@@ -25,3 +25,6 @@ export const toAddress = async (addressOrAlias: string, hre: HardhatRuntimeEnvir
   const deployment = await deployments.get(addressOrAlias);
   return deployment.address;
 };
+
+// eslint-disable-next-line @typescript-eslint/no-empty-function
+export default () => {};
