@@ -255,8 +255,9 @@ describe("OmnichainProposalSender: ", async function () {
 
   it("Function registry should not emit event if nonexistant function is removed", async function () {
     updateFunctionRegistry(executorOwner);
-    expect(await executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [true]))
-      .to.not.emit(executorOwner, "FunctionRegistryChanged");
+    expect(
+      await executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [true]),
+    ).to.not.emit(executorOwner, "FunctionRegistryChanged");
   });
 
   it("Function registry should be updated", async function () {
@@ -268,8 +269,9 @@ describe("OmnichainProposalSender: ", async function () {
 
   it("Function registry should not emit event if function is added twice", async function () {
     updateFunctionRegistry(executorOwner);
-    expect(await executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [true]))
-      .to.not.emit(executorOwner, "FunctionRegistryChanged");
+    expect(
+      await executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [true]),
+    ).to.not.emit(executorOwner, "FunctionRegistryChanged");
   });
 
   it("Reverts if EOA called owner function of Executor", async function () {

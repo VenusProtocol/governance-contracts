@@ -2,7 +2,8 @@
 pragma solidity 0.8.13;
 
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
-import "@layerzerolabs/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
+import { BytesLib } from "@layerzerolabs/solidity-examples/contracts/libraries/BytesLib.sol";
+import { ExcessivelySafeCall } from "@layerzerolabs/solidity-examples/contracts/libraries/ExcessivelySafeCall.sol";
 import { BaseOmnichainControllerDest } from "./BaseOmnichainControllerDest.sol";
 import { ITimelock } from "./interfaces/ITimelock.sol";
 
@@ -50,6 +51,11 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     address public immutable guardian;
 
     /**
+     * @notice Last proposal count received
+     */
+    uint256 public lastProposalReceived;
+
+    /**
      * @notice The official record of all proposals ever proposed.
      */
     mapping(uint256 => Proposal) public proposals;
@@ -67,17 +73,23 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice Emitted when proposal is received.
      */
-    event ProposalReceived(uint256 indexed proposalId, address[] targets, uint256[] values, string[] signatures, bytes[] calldatas, uint8 proposalType);
+    event ProposalReceived(
+        uint256 indexed proposalId,
+        address[] targets,
+        uint256[] values,
+        string[] signatures,
+        bytes[] calldatas,
+        uint8 proposalType
+    );
 
     /**
      * @notice Emitted when proposal is queued.
      */
-    event ProposalQueued(uint256 indexed id , uint256 eta);
+    event ProposalQueued(uint256 indexed id, uint256 eta);
 
     /**
      * Emitted when proposal executed.
      */
-    event ProposalExecuted(uint256 indexed id);
     event ProposalExecuted(uint256 indexed id);
 
     /**
@@ -89,10 +101,9 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @notice Emitted when proposal is cancelled.
      */
     event ProposalCancelled(uint256 indexed id);
-    event ProposalCancelled(uint256 indexed id);
 
     /**
-     * @notice Emitted when all timelocks are added.
+     * @notice Emitted when timelock added.
      */
     event TimelockAdded(address indexed timelock, uint8 routeType);
 
@@ -222,7 +233,8 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         });
 
         proposals[newProposal.id] = newProposal;
-        emit ProposalReceived(newProposal.id, targets, values, signatures, calldatas, pType);
+        lastProposalReceived = pId;
+
         emit ProposalReceived(newProposal.id, targets, values, signatures, calldatas, pType);
         _queue(pId);
     }
