@@ -1,3 +1,11 @@
+## [1.1.0-dev.4](https://github.com/VenusProtocol/governance-contracts/compare/v1.1.0-dev.3...v1.1.0-dev.4) (2023-11-21)
+
+
+### Features
+
+* add governor bravo v1 to legacy contracts ([61e2155](https://github.com/VenusProtocol/governance-contracts/commit/61e2155425514a4875b90028d9bf7dd280c659f1))
+* import deployed access control manager ([aff744c](https://github.com/VenusProtocol/governance-contracts/commit/aff744c303d3de127c6712c1d89ee1ad7995ab68))
+
 ## [1.3.0](https://github.com/VenusProtocol/governance-contracts/compare/v1.2.0...v1.3.0) (2023-10-06)
 
 
