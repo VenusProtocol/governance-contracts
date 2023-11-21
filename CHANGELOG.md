@@ -1,3 +1,10 @@
+## [1.1.0-dev.3](https://github.com/VenusProtocol/governance-contracts/compare/v1.1.0-dev.2...v1.1.0-dev.3) (2023-11-21)
+
+
+### Features
+
+* add github job to export and commit deployment by network ([da709d2](https://github.com/VenusProtocol/governance-contracts/commit/da709d26fa8db1abbb9bed3b9d85e8d07e26994b))
+
 ## [1.1.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2023-10-05)
 
 
