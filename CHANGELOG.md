@@ -1,3 +1,13 @@
+## [1.4.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v1.3.0...v1.4.0-dev.1) (2023-11-22)
+
+
+### Features
+
+* add github job to export and commit deployment by network ([da709d2](https://github.com/VenusProtocol/governance-contracts/commit/da709d26fa8db1abbb9bed3b9d85e8d07e26994b))
+* add governor bravo v1 to legacy contracts ([61e2155](https://github.com/VenusProtocol/governance-contracts/commit/61e2155425514a4875b90028d9bf7dd280c659f1))
+* import deployed access control manager ([aff744c](https://github.com/VenusProtocol/governance-contracts/commit/aff744c303d3de127c6712c1d89ee1ad7995ab68))
+* updating deployment files ([1bb177c](https://github.com/VenusProtocol/governance-contracts/commit/1bb177cb5c6b8ddc83d2bc877ced2b476fb085ec))
+
 ## [1.1.0-dev.4](https://github.com/VenusProtocol/governance-contracts/compare/v1.1.0-dev.3...v1.1.0-dev.4) (2023-11-21)
 
 
