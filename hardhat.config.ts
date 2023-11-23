@@ -80,6 +80,12 @@ const config: HardhatUserConfig = {
       gasPrice: 20000000000, // 20 gwei
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
+    ethereum: {
+      url: "http://127.0.0.1:1248",
+      chainId: 1,
+      live: true,
+      timeout: 1200000, // 20 minutes
+    },
   },
   etherscan: {
     apiKey: BSCSCAN_API_KEY,
