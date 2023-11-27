@@ -38,6 +38,9 @@
     "docgen": "hardhat docgen",
     "prepare": "husky install"
   },
+  "dependencies": {
+    "@venusprotocol/solidity-utilities": "^1.1.0"
+  },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
     "@commitlint/config-conventional": "^17.4.4",
