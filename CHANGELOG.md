@@ -1,3 +1,16 @@
+## [1.4.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.1...v1.4.0-dev.2) (2023-11-27)
+
+
+### Features
+
+* updating deployment files ([d01b497](https://github.com/VenusProtocol/governance-contracts/commit/d01b497f78f3b81c8ecfaae443c201680de00a0f))
+* updating deployment files ([1afda8c](https://github.com/VenusProtocol/governance-contracts/commit/1afda8cbc441c67ff3b838bf839042051fdbcbc7))
+
+
+### Bug Fixes
+
+* redeploy new ACM with correct Multisig ([468b9c0](https://github.com/VenusProtocol/governance-contracts/commit/468b9c00fcf9a6024d67a09145b30b40bcea9c86))
+
 ## [1.4.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v1.3.0...v1.4.0-dev.1) (2023-11-22)
 
 
