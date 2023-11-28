@@ -6,6 +6,7 @@
   "files": [
     "artifacts",
     "dist",
+    "deploy",
     "deployments",
     "contracts"
   ],
