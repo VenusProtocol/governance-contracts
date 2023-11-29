@@ -59,7 +59,7 @@ const config: HardhatUserConfig = {
   networks: {
     hardhat: isFork(),
     bsctestnet: {
-      url: process.env.RPC_URL || "https://data-seed-prebsc-1-s1.binance.org:8545",
+      url: process.env.ARCHIVE_NODE_bsctestnet || "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
       accounts: {
         mnemonic: process.env.MNEMONIC || "",
@@ -68,21 +68,65 @@ const config: HardhatUserConfig = {
       gasMultiplier: 10,
       timeout: 12000000,
     },
-    // currently not used, we are still using saddle to deploy contracts
     bscmainnet: {
-      url: process.env.RPC_URL || "https://bsc-dataseed.binance.org/",
+      url: process.env.ARCHIVE_NODE_bscmainnet || "https://bsc-dataseed.binance.org/",
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
     sepolia: {
-      url: process.env.RPC_URL || "https://rpc.notadegen.com/eth/sepolia",
+      url: process.env.ARCHIVE_NODE_sepolia || "https://ethereum-sepolia.blockpi.network/v1/rpc/public",
       chainId: 11155111,
       live: true,
       gasPrice: 20000000000, // 20 gwei
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
+    ethereum: {
+      url: process.env.ARCHIVE_NODE_ethereum || "https://ethereum.blockpi.network/v1/rpc/public",
+      chainId: 1,
+      live: true,
+      timeout: 1200000, // 20 minutes
+    },
   },
   etherscan: {
-    apiKey: BSCSCAN_API_KEY,
+    apiKey: {
+      bscmainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      bsctestnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      sepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      ethereum: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+    },
+    customChains: [
+      {
+        network: "bscmainnet",
+        chainId: 56,
+        urls: {
+          apiURL: "https://api.bscscan.com/api",
+          browserURL: "https://bscscan.com",
+        },
+      },
+      {
+        network: "bsctestnet",
+        chainId: 97,
+        urls: {
+          apiURL: "https://api-testnet.bscscan.com/api",
+          browserURL: "https://testnet.bscscan.com",
+        },
+      },
+      {
+        network: "sepolia",
+        chainId: 11155111,
+        urls: {
+          apiURL: "https://api-sepolia.etherscan.io/api",
+          browserURL: "https://sepolia.etherscan.io",
+        },
+      },
+      {
+        network: "ethereum",
+        chainId: 1,
+        urls: {
+          apiURL: "https://api.etherscan.io/api",
+          browserURL: "https://etherscan.io",
+        },
+      },
+    ],
   },
   paths: {
     sources: "./contracts",
@@ -118,12 +162,14 @@ const config: HardhatUserConfig = {
 };
 
 function isFork() {
-  return process.env.FORK_MAINNET === "true"
+  return process.env.FORK === "true"
     ? {
         allowUnlimitedContractSize: false,
         loggingEnabled: false,
         forking: {
-          url: `${process.env.BSC_ARCHIVE_NODE}`,
+          url:
+            process.env[`ARCHIVE_NODE_${process.env.FORKED_NETWORK}`] ||
+            "https://data-seed-prebsc-1-s1.binance.org:8545",
           blockNumber: 21068448,
         },
         accounts: {

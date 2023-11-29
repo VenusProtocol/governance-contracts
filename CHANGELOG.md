@@ -1,3 +1,70 @@
+## [1.4.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.1...v1.4.0-dev.2) (2023-11-27)
+
+
+### Features
+
+* updating deployment files ([d01b497](https://github.com/VenusProtocol/governance-contracts/commit/d01b497f78f3b81c8ecfaae443c201680de00a0f))
+* updating deployment files ([1afda8c](https://github.com/VenusProtocol/governance-contracts/commit/1afda8cbc441c67ff3b838bf839042051fdbcbc7))
+
+
+### Bug Fixes
+
+* redeploy new ACM with correct Multisig ([468b9c0](https://github.com/VenusProtocol/governance-contracts/commit/468b9c00fcf9a6024d67a09145b30b40bcea9c86))
+
+## [1.4.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v1.3.0...v1.4.0-dev.1) (2023-11-22)
+
+
+### Features
+
+* add github job to export and commit deployment by network ([da709d2](https://github.com/VenusProtocol/governance-contracts/commit/da709d26fa8db1abbb9bed3b9d85e8d07e26994b))
+* add governor bravo v1 to legacy contracts ([61e2155](https://github.com/VenusProtocol/governance-contracts/commit/61e2155425514a4875b90028d9bf7dd280c659f1))
+* import deployed access control manager ([aff744c](https://github.com/VenusProtocol/governance-contracts/commit/aff744c303d3de127c6712c1d89ee1ad7995ab68))
+* updating deployment files ([1bb177c](https://github.com/VenusProtocol/governance-contracts/commit/1bb177cb5c6b8ddc83d2bc877ced2b476fb085ec))
+
+## [1.1.0-dev.4](https://github.com/VenusProtocol/governance-contracts/compare/v1.1.0-dev.3...v1.1.0-dev.4) (2023-11-21)
+
+
+### Features
+
+* add governor bravo v1 to legacy contracts ([61e2155](https://github.com/VenusProtocol/governance-contracts/commit/61e2155425514a4875b90028d9bf7dd280c659f1))
+* import deployed access control manager ([aff744c](https://github.com/VenusProtocol/governance-contracts/commit/aff744c303d3de127c6712c1d89ee1ad7995ab68))
+
+## [1.3.0](https://github.com/VenusProtocol/governance-contracts/compare/v1.2.0...v1.3.0) (2023-10-06)
+
+
+### Features
+
+* import deployed access control manager ([e266abb](https://github.com/VenusProtocol/governance-contracts/commit/e266abb86666a6fcc41449f361f6ad9a4020006b))
+
+## [1.2.0](https://github.com/VenusProtocol/governance-contracts/compare/v1.1.0...v1.2.0) (2023-10-06)
+
+
+### Features
+
+* add governor bravo v1 to legacy contracts ([0709a6e](https://github.com/VenusProtocol/governance-contracts/commit/0709a6e869394b06ecd8ce1983684d8c1121c7c9))
+
+## [1.1.0](https://github.com/VenusProtocol/governance-contracts/compare/v1.0.0...v1.1.0) (2023-10-05)
+
+
+### Features
+
+* add github job to export and commit deployment by network ([da709d2](https://github.com/VenusProtocol/governance-contracts/commit/da709d26fa8db1abbb9bed3b9d85e8d07e26994b))
+* add deployed timelocks ([f786bf2](https://github.com/VenusProtocol/governance-contracts/commit/f786bf2f114c4316cb70fbefc3fdbe31f8f27b44))
+* add deployment export ([dd7b9ce](https://github.com/VenusProtocol/governance-contracts/commit/dd7b9cece42da8d77c09b6292b153cb94b1d1ad1))
+* add existing governance deployments ([21c242c](https://github.com/VenusProtocol/governance-contracts/commit/21c242ccfbe4e2f523c005bdda3e2fa14f24b528))
+* add legacy GovAlpha contracts ([4f281f8](https://github.com/VenusProtocol/governance-contracts/commit/4f281f8c1303e9a083ac403fd2c719b969a69c9d))
+
+
+### Bug Fixes
+
+* add dummy deploy function in helper files ([a1a1ac4](https://github.com/VenusProtocol/governance-contracts/commit/a1a1ac4c643d9bf7d1083de54c05aadf1b3eb420))
+* lint ([f5b5632](https://github.com/VenusProtocol/governance-contracts/commit/f5b56329d2f48f1142fb3fa22b84c8738e4e35ed))
+* package built deployment scripts ([9d3e4bc](https://github.com/VenusProtocol/governance-contracts/commit/9d3e4bc42793caba1cf400a884b2a933e3b514dc))
+* solidity-coverage version update due and import in config due to failing tests ([1dc99c2](https://github.com/VenusProtocol/governance-contracts/commit/1dc99c20488abb2808dff2a85887886423154f41))
+* types errors ([26b81ff](https://github.com/VenusProtocol/governance-contracts/commit/26b81ffcdefa5414e737964b67f3ea00720e17de))
+* use the updated initialization function in delegator ([a2f0bc8](https://github.com/VenusProtocol/governance-contracts/commit/a2f0bc852854c701e9f48086a7eaeddde208a306))
+* yarn lock ([9de20ab](https://github.com/VenusProtocol/governance-contracts/commit/9de20ab8dd45d6eef4e82a8c56fee25e50c80f19))
+
 ## [1.1.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v1.1.0-dev.1...v1.1.0-dev.2) (2023-10-05)
 
 
