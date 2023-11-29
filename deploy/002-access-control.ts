@@ -2,8 +2,8 @@ import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { SUPPORTED_NETWORKS } from "./helpers/constants";
-import { acmAdminAccount } from "./helpers/deploymentUtils";
+import { SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
+import { acmAdminAccount } from "../helpers/deploy/deploymentUtils";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
@@ -28,9 +28,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     console.log(`Renouncing DEFAULT_ADMIN_ROLE from deployer (${deployer}) for ${hre.network.name} network`);
     await acm.renounceRole(acm.DEFAULT_ADMIN_ROLE(), deployer);
   } else {
-    const timelockAddress = (await deployments.get("Timelock")).address;
-    const timelock = await ethers.getContractAt("Timelock", timelockAddress);
-    await acm.grantRole(acm.DEFAULT_ADMIN_ROLE(), timelock.address);
+    const timelockAddress = (await ethers.getContract("NormalTimelock")).address;
+
+    await acm.grantRole(acm.DEFAULT_ADMIN_ROLE(), timelockAddress);
   }
 };
 
