@@ -3,8 +3,10 @@ import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
+import Sepolia_OmnichainProposalSender from "../deployments/bsctestnet/OmnichainProposalSender.json";
 import { LZ_ENDPOINTS } from "../helpers/deploy/constants";
 import { OmnichainGovernanceExecutorMethods, bridgeConfig } from "../helpers/deploy/deploymentConfig";
+import { timelockDelays } from "../helpers/deploy/deploymentConfig";
 import { toAddress } from "../helpers/deploy/deploymentUtils";
 import { OmnichainGovernanceExecutor } from "../typechain";
 
@@ -45,6 +47,11 @@ const executeBridgeCommands = async (
   target: OmnichainGovernanceExecutor,
   hre: HardhatRuntimeEnvironment,
   deployer: string,
+  omnichainProposalSenderAddress: string,
+  chainId: number,
+  normalTimelockAddress: string,
+  fastTrackTimelockAddress: string,
+  criticalTimelockAddress: string,
 ) => {
   const signer = await ethers.getSigner(deployer);
   console.log("Executing Bridge commands");
@@ -60,6 +67,13 @@ const executeBridgeCommands = async (
       data: data,
     });
   }
+  let tx = await target.connect(signer).setTrustedRemoteAddress(chainId, omnichainProposalSenderAddress);
+  await tx.wait();
+
+  tx = await target
+    .connect(signer)
+    .addTimelocks([normalTimelockAddress, fastTrackTimelockAddress, criticalTimelockAddress]);
+  await tx.wait();
 };
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -82,10 +96,29 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ethers.provider.getSigner(deployer),
   )) as OmnichainGovernanceExecutor;
 
-  const normalTimelock = await ethers.getContract("NormalTimelock");
+  const normalTimelock = await deploy("Timelock_Normal", {
+    contract: "Timelock",
+    from: deployer,
+    args: [bridge.address, timelockDelays[hre.network.name].NORMAL],
+    log: true,
+    autoMine: true,
+  });
 
-  const fastTrackTimelock = await ethers.getContract("FastTrackTimelock");
-  const criticalTimelock = await ethers.getContract("CriticalTimelock");
+  const fasttrackTimelock = await deploy("Timelock_FastTrack", {
+    contract: "Timelock",
+    from: deployer,
+    args: [bridge.address, timelockDelays[hre.network.name].FAST_TRACK],
+    log: true,
+    autoMine: true,
+  });
+
+  const criticalTimelock = await deploy("Timelock_Critical", {
+    contract: "Timelock",
+    from: deployer,
+    args: [bridge.address, timelockDelays[hre.network.name].CRITICAL],
+    log: true,
+    autoMine: true,
+  });
 
   const OmnichainExecutorOwner = await deploy("OmnichainExecutorOwner", {
     from: deployer,
@@ -110,10 +143,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ethers.provider.getSigner(deployer),
   );
 
-  await executeBridgeCommands(bridge, hre, deployer);
+  await executeBridgeCommands(
+    bridge,
+    hre,
+    deployer,
+    Sepolia_OmnichainProposalSender.address,
+    10102,
+    normalTimelock.address,
+    fasttrackTimelock.address,
+    criticalTimelock.address,
+  );
 
-  const removeArray = new Array(OmnichainGovernanceExecutorMethods.length).fill(false);
-  const tx = await bridgeAdmin.upsertSignature(OmnichainGovernanceExecutorMethods, removeArray);
+  const isAdded = new Array(OmnichainGovernanceExecutorMethods.length).fill(true);
+  const tx = await bridgeAdmin.upsertSignature(OmnichainGovernanceExecutorMethods, isAdded);
   await tx.wait();
 
   if ((await bridge.owner()) === deployer) {
@@ -121,7 +163,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await tx.wait();
   }
 
-  if (bridgeAdmin.owner === deployer) {
+  if ((await bridgeAdmin.owner()) === deployer) {
     const tx = await bridgeAdmin.transferOwnership(normalTimelock.address);
     await tx.wait();
   }
@@ -135,20 +177,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       OmnichainExecutorOwner.address,
       hre,
     )),
-
-    {
-      contract: OmnichainExecutorOwner.address,
-      signature: "addTimelocks(address[])",
-      parameters: [normalTimelock.address, fastTrackTimelock.address, criticalTimelock.address],
-      value: 0,
-    },
-
-    {
-      contract: OmnichainExecutorOwner.address,
-      signature: "setTrustedRemote(uint16,bytes)",
-      parameters: ["dstChainId", "0xDestAddressSrcAddress"],
-      value: 0,
-    },
   ];
   console.log("Please propose a VIP with the following commands:");
   console.log(

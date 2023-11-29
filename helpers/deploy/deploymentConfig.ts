@@ -5,7 +5,6 @@ export type AccessControlEntry = {
 };
 
 export const OmnichainProposalSenderMethods: string[] = [
-  "setTrustedRemote(uint16,bytes)",
   "setTrustedRemoteAddress(uint16,bytes)",
   "updateValidChainId(uint16,bool)",
   "setMaxDailyLimit(uint16,uint256)",
@@ -24,7 +23,6 @@ export const OmnichainGovernanceExecutorMethods: string[] = [
   "setMaxDailyReceiveLimit(uint16,uint256)",
   "pause()",
   "unpause()",
-  "setTrustedRemote(uint16,bytes)",
   "setTrustedRemoteAddress(uint16,bytes)",
   "setPrecrime(address)",
   "setMinDstGas(uint16,uint16,uint256)",
@@ -33,6 +31,29 @@ export const OmnichainGovernanceExecutorMethods: string[] = [
   "addTimelocks(ITimelock[])",
 ];
 
+export type Delay = { [key: string]: number };
+
+export type DelayConfig = {
+  [key: string]: Delay;
+};
+
+export const timelockDelays: DelayConfig = {
+  sepolia: {
+    NORMAL: 10800,
+    FAST_TRACK: 7200,
+    CRITICAL: 3600,
+  },
+  ethereum: {
+    NORMAL: 172800,
+    FAST_TRACK: 21600,
+    CRITICAL: 3600,
+  },
+};
+
+export type timelockNetworkConfig = {
+  sepolia: DelayConfig;
+  ethereum: DelayConfig;
+};
 interface BridgeConfig {
   [networkName: string]: {
     methods: { method: string; args: any[] }[];
