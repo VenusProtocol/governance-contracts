@@ -1,3 +1,10 @@
+## [1.4.0-dev.3](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.2...v1.4.0-dev.3) (2023-11-29)
+
+
+### Features
+
+* add Timelock compatible with solidity 8 ([a9cd309](https://github.com/VenusProtocol/governance-contracts/commit/a9cd309f0558f83d717f6c88b4b485e5f62755e6))
+
 ## [1.4.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.1...v1.4.0-dev.2) (2023-11-27)
 
 
