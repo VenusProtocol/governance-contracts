@@ -1,6 +1,6 @@
+import "module-alias/register";
+
 import "@nomicfoundation/hardhat-chai-matchers";
-import "@nomicfoundation/hardhat-toolbox";
-import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-etherscan";
 import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
@@ -153,6 +153,12 @@ const config: HardhatUserConfig = {
         artifacts: "./node_modules/@venusprotocol/venus-protocol/artifacts",
       },
     ],
+    deployments: {
+      bsctestnet: ["node_modules/@venusprotocol/governance-contracts/deployments/bsctestnet"],
+      bscmainnet: ["node_modules/@venusprotocol/governance-contracts/deployments/bscmainnet"],
+      sepolia: ["node_modules/@venusprotocol/governance-contracts/deployments/sepolia"],
+      ethereum: ["node_modules/@venusprotocol/governance-contracts/deployments/ethereum"],
+    },
   },
   docgen: {
     outputDir: "./docs",
