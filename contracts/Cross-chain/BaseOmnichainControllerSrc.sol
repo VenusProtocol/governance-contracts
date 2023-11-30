@@ -4,8 +4,8 @@ pragma solidity 0.8.13;
 
 import { Pausable } from "@openzeppelin/contracts/security/Pausable.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { IAccessControlManagerV8 } from "./../Governance/IAccessControlManagerV8.sol";
-import { ensureNonzeroAddress } from "../lib/validators.sol";
 
 /**
  * @title BaseOmnichainControllerSrc

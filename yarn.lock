@@ -2940,6 +2940,7 @@ __metadata:
     "@types/node": ^18.16.3
     "@typescript-eslint/eslint-plugin": ^5.44.0
     "@typescript-eslint/parser": ^5.44.0
+    "@venusprotocol/solidity-utilities": ^1.1.0
     "@venusprotocol/venus-protocol": 0.4.1
     bignumber.js: ^9.1.1
     chai: ^4.3.7
@@ -2977,6 +2978,13 @@ __metadata:
     typescript: ^4.9.3
   languageName: unknown
   linkType: soft
+
+"@venusprotocol/solidity-utilities@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@venusprotocol/solidity-utilities@npm:1.1.0"
+  checksum: 3b17ec451cd0ba5aaea76686c7bef35757fb158709214be094f73ebd0d643c79817159f7aa162cc694e1a5ee1f02b20e26211a65929113b985827959aae99fa7
+  languageName: node
+  linkType: hard
 
 "@venusprotocol/venus-protocol@npm:0.4.1":
   version: 0.4.1

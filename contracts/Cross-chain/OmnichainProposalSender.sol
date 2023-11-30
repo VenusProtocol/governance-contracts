@@ -4,9 +4,9 @@ pragma solidity 0.8.13;
 
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { ILayerZeroEndpoint } from "@layerzerolabs/solidity-examples/contracts/lzApp/interfaces/ILayerZeroEndpoint.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { BaseOmnichainControllerSrc } from "./BaseOmnichainControllerSrc.sol";
 import { IGovernanceBravoDelegate } from "./interfaces/IGovernananceBravoDelegate.sol";
-import { ensureNonzeroAddress } from "../lib/validators.sol";
 
 /**
  * @title OmnichainProposalSender
