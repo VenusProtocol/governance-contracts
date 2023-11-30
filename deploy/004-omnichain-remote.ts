@@ -78,6 +78,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
+  const live = hre.network.live;
+
   const acmAddress = (await ethers.getContract("AccessControlManager")).address;
   const normalTimelockAddress = (await ethers.getContract("NormalTimelock")).address;
   const fastTrackTimelockAddress = (await ethers.getContract("FastTrackTimelock")).address;
@@ -102,7 +104,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [OmnichainGovernanceExecutor.address],
     contract: "OmnichainExecutorOwner",
     proxy: {
-      owner: normalTimelockAddress,
+      owner: deployer,
       proxyContract: "OpenZeppelinTransparentProxy",
       execute: {
         methodName: "initialize",
