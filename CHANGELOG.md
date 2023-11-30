@@ -1,3 +1,15 @@
+## [1.4.0-dev.5](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.4...v1.4.0-dev.5) (2023-11-30)
+
+
+### Features
+
+* add legacy delegate ([91b9d04](https://github.com/VenusProtocol/governance-contracts/commit/91b9d04b6300ac1ef94ed8b178bc7c13a8c0cc3a))
+
+
+### Reverts
+
+* Revert "fix: use the updated initialization function in delegator" ([93708ec](https://github.com/VenusProtocol/governance-contracts/commit/93708ece243eb243df77e200cb7fdac7adc6f50e))
+
 ## [1.4.0-dev.4](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.3...v1.4.0-dev.4) (2023-11-30)
 
 
