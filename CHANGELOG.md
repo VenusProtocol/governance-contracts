@@ -1,3 +1,16 @@
+## [1.4.0-dev.4](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.3...v1.4.0-dev.4) (2023-11-30)
+
+
+### Features
+
+* add timelock deploy script ([21e6b6b](https://github.com/VenusProtocol/governance-contracts/commit/21e6b6b6b3c9189fda6e94b11d3c99c7a0922820))
+* package deployment scripts ([b6a179d](https://github.com/VenusProtocol/governance-contracts/commit/b6a179d01f1ec820ec359b95a0184a6c6c0657ff))
+
+
+### Bug Fixes
+
+* fix typescript errors ([a8c413e](https://github.com/VenusProtocol/governance-contracts/commit/a8c413ec4ce360f6543ee0de5f9b4ec52668bdf0))
+
 ## [1.4.0-dev.3](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.2...v1.4.0-dev.3) (2023-11-29)
 
 
