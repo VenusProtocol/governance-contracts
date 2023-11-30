@@ -83,7 +83,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const fastTrackTimelockAddress = (await ethers.getContract("FastTrackTimelock")).address;
   const criticalTimelockAddress = (await ethers.getContract("CriticalTimelock")).address;
   const omnichainProposalSenderAddress = (await ethers.getContract("OmnichainProposalSender")).address;
-  
+
   const OmnichainGovernanceExecutor = await deploy("OmnichainGovernanceExecutor", {
     from: deployer,
     args: [LZ_ENDPOINTS[hre.network.name as keyof typeof LZ_ENDPOINTS], deployer],
