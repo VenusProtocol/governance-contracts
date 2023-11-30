@@ -6,7 +6,7 @@ import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuar
 import { ILayerZeroEndpoint } from "@layerzerolabs/solidity-examples/contracts/lzApp/interfaces/ILayerZeroEndpoint.sol";
 import { BaseOmnichainControllerSrc } from "./BaseOmnichainControllerSrc.sol";
 import { IGovernanceBravoDelegate } from "./interfaces/IGovernananceBravoDelegate.sol";
-import { ensureNonzeroAddress } from "../lib/validators.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
 /**
  * @title OmnichainProposalSender
