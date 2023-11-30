@@ -5,7 +5,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { SUPPORTED_NETWORKS } from "./constants";
 
-export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): string => {
+export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<string> => {
   const { deployer } = await getNamedAccounts();
   return {
     bsctestnet: bscTestnetDeployments.Contracts.Timelock, // NORMAL TIMELOCK
