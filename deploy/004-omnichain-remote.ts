@@ -143,31 +143,29 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ethers.provider.getSigner(deployer),
   );
 
-  await executeBridgeCommands(
-    bridge,
-    hre,
-    deployer,
-    Sepolia_OmnichainProposalSender.address,
-    10102,
-    normalTimelock.address,
-    fasttrackTimelock.address,
-    criticalTimelock.address,
-  );
-
-  const isAdded = new Array(OmnichainGovernanceExecutorMethods.length).fill(true);
-  const tx = await bridgeAdmin.upsertSignature(OmnichainGovernanceExecutorMethods, isAdded);
-  await tx.wait();
-
   if ((await bridge.owner()) === deployer) {
+    await executeBridgeCommands(
+      bridge,
+      hre,
+      deployer,
+      Sepolia_OmnichainProposalSender.address,
+      10102,
+      normalTimelock.address,
+      fasttrackTimelock.address,
+      criticalTimelock.address,
+    );
     const tx = await bridge.transferOwnership(OmnichainExecutorOwner.address);
     await tx.wait();
   }
 
   if ((await bridgeAdmin.owner()) === deployer) {
-    const tx = await bridgeAdmin.transferOwnership(normalTimelock.address);
+    const isAdded = new Array(OmnichainGovernanceExecutorMethods.length).fill(true);
+    let tx = await bridgeAdmin.upsertSignature(OmnichainGovernanceExecutorMethods, isAdded);
     await tx.wait();
+    tx = await bridgeAdmin.transferOwnership(normalTimelock.address);
+    await tx.wait();
+    console.log(`Bridge Admin owner ${deployer} sucessfully changed to ${normalTimelock.address}.`);
   }
-  console.log(`Bridge Admin owner ${deployer} sucessfully changed to ${normalTimelock.address}.`);
 
   const commands = [
     ...(await configureAccessControls(
