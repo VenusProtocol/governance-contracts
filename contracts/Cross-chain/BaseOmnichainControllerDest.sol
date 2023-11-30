@@ -51,7 +51,7 @@ abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
     }
 
     /**
-     * @notice Triggers the paused state of the bridge.
+     * @notice Triggers the paused state of the controller.
      * @custom:access Only owner.
      */
     function pause() external onlyOwner {
@@ -59,7 +59,7 @@ abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
     }
 
     /**
-     * @notice Triggers the resume state of the bridge.
+     * @notice Triggers the resume state of the controller.
      * @custom:access Only owner.
      */
     function unpause() external onlyOwner {

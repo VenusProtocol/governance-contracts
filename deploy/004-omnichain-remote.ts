@@ -4,7 +4,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { OmnichainGovernanceExecutorMethods, bridgeConfig } from "../helpers/deploy/deploymentConfig";
+import { OmnichainGovernanceExecutorMethods, config } from "../helpers/deploy/deploymentConfig";
 import { OmnichainGovernanceExecutor } from "../typechain";
 
 interface GovernanceCommand {
@@ -39,7 +39,7 @@ const configureAccessControls = async (
   return commands.flat();
 };
 
-const executeBridgeCommands = async (
+const executeCommands = async (
   target: OmnichainGovernanceExecutor,
   hre: HardhatRuntimeEnvironment,
   deployer: string,
@@ -51,8 +51,8 @@ const executeBridgeCommands = async (
 ) => {
   const signer = await ethers.getSigner(deployer);
   const networkName = hre.network.name as SUPPORTED_NETWORKS;
-  console.log("Executing Bridge commands");
-  const methods = bridgeConfig[networkName].methods;
+  console.log("Executing commands");
+  const methods = config[networkName].methods;
 
   for (let i = 0; i < methods.length; i++) {
     const entry = methods[i];
@@ -93,7 +93,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     autoMine: true,
   });
 
-  const bridge = (await ethers.getContractAt(
+  const omnichainGovernanceExecutor = (await ethers.getContractAt(
     "OmnichainGovernanceExecutor",
     OmnichainGovernanceExecutor.address,
     ethers.provider.getSigner(deployer),
@@ -116,15 +116,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     autoMine: true,
   });
 
-  const bridgeAdmin = await ethers.getContractAt(
+  const omnichainExecutorOwner = await ethers.getContractAt(
     "OmnichainExecutorOwner",
     OmnichainExecutorOwner.address,
     ethers.provider.getSigner(deployer),
   );
 
-  if ((await bridge.owner()) === deployer) {
-    await executeBridgeCommands(
-      bridge,
+  if ((await omnichainGovernanceExecutor.owner()) === deployer) {
+    await executeCommands(
+      omnichainGovernanceExecutor,
       hre,
       deployer,
       omnichainProposalSenderAddress,
@@ -133,17 +133,17 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       fastTrackTimelockAddress,
       criticalTimelockAddress,
     );
-    const tx = await bridge.transferOwnership(OmnichainExecutorOwner.address);
+    const tx = await omnichainGovernanceExecutor.transferOwnership(OmnichainExecutorOwner.address);
     await tx.wait();
   }
 
-  if ((await bridgeAdmin.owner()) === deployer) {
+  if ((await omnichainExecutorOwner.owner()) === deployer) {
     const isAdded = new Array(OmnichainGovernanceExecutorMethods.length).fill(true);
-    let tx = await bridgeAdmin.upsertSignature(OmnichainGovernanceExecutorMethods, isAdded);
+    let tx = await omnichainExecutorOwner.upsertSignature(OmnichainGovernanceExecutorMethods, isAdded);
     await tx.wait();
-    tx = await bridgeAdmin.transferOwnership(normalTimelockAddress);
+    tx = await omnichainExecutorOwner.transferOwnership(normalTimelockAddress);
     await tx.wait();
-    console.log(`Bridge Admin owner ${deployer} sucessfully changed to ${normalTimelockAddress}.`);
+    console.log(`Omnichain Executor Owner ${deployer} successfully changed to ${normalTimelockAddress}.`);
   }
 
   const commands = [

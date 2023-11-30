@@ -63,7 +63,7 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
     }
 
     /**
-     * @notice Triggers the paused state of the bridge.
+     * @notice Triggers the paused state of the controller.
      * @custom:access Controlled by AccessControlManager.
      */
     function pause() external {
@@ -72,7 +72,7 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
     }
 
     /**
-     * @notice Triggers the resume state of the bridge.
+     * @notice Triggers the resume state of the controller.
      * @custom:access Controlled by AccessControlManager.
      */
     function unpause() external {

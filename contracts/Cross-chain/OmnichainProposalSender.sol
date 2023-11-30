@@ -139,7 +139,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
 
-        //  Same proposal should not contain more than one bridge command
+        //  Same proposal should not contain more than one command
         uint256 pId = governanceBravoDelegate.proposalCount();
         require(pId > lastProposalId, "OmnichainProposalSender: Multiple bridging in a proposal");
         lastProposalId = pId;

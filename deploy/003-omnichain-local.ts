@@ -3,8 +3,8 @@ import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { LZ_ENDPOINTS } from "../helpers/deploy/constants";
-import { OmnichainProposalSenderMethods, bridgeConfig } from "../helpers/deploy/deploymentConfig";
+import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
+import { OmnichainProposalSenderMethods, config } from "../helpers/deploy/deploymentConfig";
 import { toAddress } from "../helpers/deploy/deploymentUtils";
 import { getArgTypesFromSignature } from "../helpers/utils";
 
@@ -16,12 +16,13 @@ interface GovernanceCommand {
   value: BigNumberish;
 }
 
-const configureBridgeCommands = async (
+const configureCommands = async (
   target: string,
   hre: HardhatRuntimeEnvironment,
 ): Promise<GovernanceCommand[]> => {
+  const networkName = hre.network.name as SUPPORTED_NETWORKS;
   const commands = await Promise.all(
-    bridgeConfig[hre.network.name].methods.map(async (entry: { method: string; args: any[] }) => {
+    config[networkName].methods.map(async (entry: { method: string; args: any[] }) => {
       const { method, args } = entry;
       return {
         contract: target,
@@ -78,16 +79,16 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     autoMine: true,
   });
 
-  const bridge = await ethers.getContractAt(
+  const omnichainProposalSender  = await ethers.getContractAt(
     "OmnichainProposalSender",
     OmnichainProposalSender.address,
     ethers.provider.getSigner(deployer),
   );
 
-  if ((await bridge.owner()) === deployer) {
-    const tx = await bridge.transferOwnership(normalTimelockAddress);
+  if ((await omnichainProposalSender.owner()) === deployer) {
+    const tx = await omnichainProposalSender.transferOwnership(normalTimelockAddress);
     await tx.wait();
-    console.log(`Bridge owner ${deployer} sucessfully changed to ${normalTimelockAddress}.`);
+    console.log(`Omnichain Proposal Sender ${deployer} sucessfully changed to ${normalTimelockAddress}.`);
   }
   const commands = [
     ...(await configureAccessControls(
@@ -111,7 +112,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       OmnichainProposalSender.address,
       hre,
     )),
-    ...(await configureBridgeCommands(OmnichainProposalSender.address, hre)),
+    ...(await configureCommands(OmnichainProposalSender.address, hre)),
 
     {
       contract: OmnichainProposalSender.address,

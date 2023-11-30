@@ -32,13 +32,13 @@ export const OmnichainGovernanceExecutorMethods: string[] = [
   "setConfig(uint16,uint16,uint256,bytes)",
   "addTimelocks(ITimelock[])",
 ];
-type BridgeConfig = {
+type Config = {
   [key in SUPPORTED_NETWORKS]: {
     methods: { method: string; args: any[] }[];
   };
 };
 
-export const bridgeConfig: BridgeConfig = {
+export const config: Config = {
   bsctestnet: {
     methods: [
       { method: "setMaxDailyLimit(uint16,uint256)", args: [10161, 100] },
