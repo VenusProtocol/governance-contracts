@@ -70,7 +70,7 @@ import "./GovernorBravoInterfaces.sol";
  * The delegation of votes happens through the `XVSVault` contract by calling the `delegate` or `delegateBySig` functions. These same functions can revert
  * vote delegation by calling the same function with a value of `0`.
  */
-contract GovernorBravoDelegate is GovernorBravoDelegateInterface, GovernorBravoDelegateStorageV2, GovernorBravoEvents {
+contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoEvents {
     /// @notice The name of this contract
     string public constant name = "Venus Governor Bravo";
 
