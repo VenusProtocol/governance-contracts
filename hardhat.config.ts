@@ -4,6 +4,7 @@ import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-etherscan";
 import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
+import "hardhat-dependency-compiler";
 import "hardhat-deploy";
 import { HardhatUserConfig, task } from "hardhat/config";
 import "solidity-coverage";
@@ -147,6 +148,16 @@ const config: HardhatUserConfig = {
       default: 0, // here this will by default take the first account as deployer
     },
   },
+  dependencyCompiler: {
+    paths: [
+      "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVault.sol",
+      "@venusprotocol/venus-protocol/contracts/XVSVault/XVSStore.sol",
+      "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVaultErrorReporter.sol",
+      "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVaultProxy.sol",
+      "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVaultStorage.sol",
+      "@venusprotocol/venus-protocol/contracts/Tokens/XVS/XVS.sol",
+    ],
+  },
   external: {
     contracts: [
       {
@@ -154,12 +165,8 @@ const config: HardhatUserConfig = {
       },
     ],
     deployments: {
-      bsctestnet: [
-        "node_modules/@venusprotocol/venus-protocol/deployments/bsctestnet",
-      ],
-      bscmainnet: [
-        "node_modules/@venusprotocol/venus-protocol/deployments/bscmainnet",
-      ],
+      bsctestnet: ["node_modules/@venusprotocol/venus-protocol/deployments/bsctestnet"],
+      bscmainnet: ["node_modules/@venusprotocol/venus-protocol/deployments/bscmainnet"],
       sepolia: [],
       ethereum: [],
     },
