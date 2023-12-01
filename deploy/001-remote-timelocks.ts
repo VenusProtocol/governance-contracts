@@ -63,6 +63,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 
-func.tags = ["Timelock"];
+func.tags = ["Timelock", "Remote"];
 
+func.skip = async (hre: HardhatRuntimeEnvironment) =>
+  !(hre.network.name === "sepolia" || hre.network.name === "ethereum") && hre.network.name !== "hardhat";
 export default func;
