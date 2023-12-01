@@ -150,7 +150,6 @@ const config: HardhatUserConfig = {
   },
   dependencyCompiler: {
     paths: [
-      "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVault.sol",
       "@venusprotocol/venus-protocol/contracts/XVSVault/XVSStore.sol",
       "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVaultErrorReporter.sol",
       "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVaultProxy.sol",
