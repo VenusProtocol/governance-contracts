@@ -38,6 +38,10 @@
     "docgen": "hardhat docgen",
     "prepare": "husky install"
   },
+  "dependencies": {
+    "@venusprotocol/solidity-utilities": "^1.1.0",
+    "module-alias": "^2.2.2"
+  },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
     "@commitlint/config-conventional": "^17.4.4",
@@ -103,7 +107,7 @@
     "typechain": "^8.1.1",
     "typescript": "^4.9.3"
   },
-  "dependencies": {
-    "@venusprotocol/solidity-utilities": "^1.1.0"
+  "_moduleAliases": {
+    "@nomiclabs/hardhat-ethers": "node_modules/hardhat-deploy-ethers"
   }
 }
