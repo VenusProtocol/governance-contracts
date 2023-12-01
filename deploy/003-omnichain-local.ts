@@ -16,10 +16,7 @@ interface GovernanceCommand {
   value: BigNumberish;
 }
 
-const configureCommands = async (
-  target: string,
-  hre: HardhatRuntimeEnvironment,
-): Promise<GovernanceCommand[]> => {
+const configureCommands = async (target: string, hre: HardhatRuntimeEnvironment): Promise<GovernanceCommand[]> => {
   const networkName = hre.network.name as SUPPORTED_NETWORKS;
   const commands = await Promise.all(
     config[networkName].methods.map(async (entry: { method: string; args: any[] }) => {
@@ -79,7 +76,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     autoMine: true,
   });
 
-  const omnichainProposalSender  = await ethers.getContractAt(
+  const omnichainProposalSender = await ethers.getContractAt(
     "OmnichainProposalSender",
     OmnichainProposalSender.address,
     ethers.provider.getSigner(deployer),

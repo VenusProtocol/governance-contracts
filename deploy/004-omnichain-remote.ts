@@ -1,10 +1,11 @@
 import { BigNumberish } from "ethers";
-import { ethers } from "hardhat";
+import { ethers, network } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
 import { OmnichainGovernanceExecutorMethods, config } from "../helpers/deploy/deploymentConfig";
+import { getOmnichainProposalSender } from "../helpers/deploy/deploymentUtils";
 import { OmnichainGovernanceExecutor } from "../typechain";
 
 interface GovernanceCommand {
@@ -78,17 +79,16 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  const live = hre.network.live;
+  const networkName = hre.network.name as SUPPORTED_NETWORKS;
 
   const acmAddress = (await ethers.getContract("AccessControlManager")).address;
   const normalTimelockAddress = (await ethers.getContract("NormalTimelock")).address;
   const fastTrackTimelockAddress = (await ethers.getContract("FastTrackTimelock")).address;
   const criticalTimelockAddress = (await ethers.getContract("CriticalTimelock")).address;
-  const omnichainProposalSenderAddress = (await ethers.getContract("OmnichainProposalSender")).address;
 
   const OmnichainGovernanceExecutor = await deploy("OmnichainGovernanceExecutor", {
     from: deployer,
-    args: [LZ_ENDPOINTS[hre.network.name as keyof typeof LZ_ENDPOINTS], deployer],
+    args: [LZ_ENDPOINTS[networkName], deployer],
     log: true,
     autoMine: true,
   });
@@ -123,6 +123,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   );
 
   if ((await omnichainGovernanceExecutor.owner()) === deployer) {
+    const omnichainProposalSenderAddress = await getOmnichainProposalSender(networkName);
     await executeCommands(
       omnichainGovernanceExecutor,
       hre,

@@ -153,6 +153,16 @@ const config: HardhatUserConfig = {
         artifacts: "./node_modules/@venusprotocol/venus-protocol/artifacts",
       },
     ],
+    deployments: {
+      bsctestnet: [
+        "node_modules/@venusprotocol/venus-protocol/deployments/bsctestnet",
+      ],
+      bscmainnet: [
+        "node_modules/@venusprotocol/venus-protocol/deployments/bscmainnet",
+      ],
+      sepolia: [],
+      ethereum: [],
+    },
   },
   docgen: {
     outputDir: "./docs",
