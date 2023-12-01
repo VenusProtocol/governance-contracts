@@ -1,5 +1,5 @@
 import { BigNumberish } from "ethers";
-import { ethers, network } from "hardhat";
+import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
@@ -104,7 +104,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [OmnichainGovernanceExecutor.address],
     contract: "OmnichainExecutorOwner",
     proxy: {
-      owner: deployer,
+      owner: normalTimelockAddress,
       proxyContract: "OpenZeppelinTransparentProxy",
       execute: {
         methodName: "initialize",
