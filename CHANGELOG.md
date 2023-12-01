@@ -1,3 +1,11 @@
+## [1.4.0-dev.6](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.5...v1.4.0-dev.6) (2023-12-01)
+
+
+### Features
+
+* generate file only with addresses of deployed contracts ([016c09e](https://github.com/VenusProtocol/governance-contracts/commit/016c09e029e55eac71095c83379ecf2db3014923))
+* updating deployment files ([89395f8](https://github.com/VenusProtocol/governance-contracts/commit/89395f80479edde41f19e2011ede2b2ce009aca7))
+
 ## [1.4.0-dev.5](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.4...v1.4.0-dev.5) (2023-11-30)
 
 
