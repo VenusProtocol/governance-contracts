@@ -1,3 +1,4 @@
+import { ethers } from 'hardhat';
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
@@ -37,11 +38,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       critical: 3600,
     },
   };
+  const omnichainGovernanceExecutorAddress = (await ethers.getContract('OmnichainGovernanceExecutor')).address;
 
   await deploy("NormalTimelock", {
     contract: "Timelock",
     from: deployer,
-    args: [deployer, delayConfig[networkName].normal],
+    args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].normal],
     log: true,
     autoMine: true,
   });
@@ -49,7 +51,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("FastTrackTimelock", {
     contract: "Timelock",
     from: deployer,
-    args: [deployer, delayConfig[networkName].fast],
+    args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].fast],
     log: true,
     autoMine: true,
   });
@@ -57,7 +59,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("CriticalTimelock", {
     contract: "Timelock",
     from: deployer,
-    args: [deployer, delayConfig[networkName].critical],
+    args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].critical],
     log: true,
     autoMine: true,
   });
