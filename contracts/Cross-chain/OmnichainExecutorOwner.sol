@@ -80,8 +80,8 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     }
 
     /**
-     * @notice This function transfer the ownership of the bridge from this contract to new owner.
-     * @param newOwner_ New owner of the governanceExecutor Bridge.
+     * @notice This function transfer the ownership of the executor from this contract to new owner.
+     * @param newOwner_ New owner of the governanceExecutor.
      * @custom:access Controlled by AccessControlManager.
      */
 

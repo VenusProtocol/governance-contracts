@@ -38,6 +38,10 @@
     "docgen": "hardhat docgen",
     "prepare": "husky install"
   },
+  "dependencies": {
+    "@venusprotocol/solidity-utilities": "^1.1.0",
+    "module-alias": "^2.2.2"
+  },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
     "@commitlint/config-conventional": "^17.4.4",
@@ -67,7 +71,7 @@
     "@types/node": "^18.16.3",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
-    "@venusprotocol/venus-protocol": "0.4.1",
+    "@venusprotocol/venus-protocol": "6.1.0-dev.4",
     "bignumber.js": "^9.1.1",
     "chai": "^4.3.7",
     "commitizen": "^4.2.5",
@@ -102,5 +106,8 @@
     "tsconfig-paths": "^4.1.2",
     "typechain": "^8.1.1",
     "typescript": "^4.9.3"
+  },
+  "_moduleAliases": {
+    "@nomiclabs/hardhat-ethers": "node_modules/hardhat-deploy-ethers"
   }
 }

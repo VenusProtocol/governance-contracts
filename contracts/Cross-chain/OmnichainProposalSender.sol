@@ -4,9 +4,9 @@ pragma solidity 0.8.13;
 
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { ILayerZeroEndpoint } from "@layerzerolabs/solidity-examples/contracts/lzApp/interfaces/ILayerZeroEndpoint.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { BaseOmnichainControllerSrc } from "./BaseOmnichainControllerSrc.sol";
 import { IGovernanceBravoDelegate } from "./interfaces/IGovernananceBravoDelegate.sol";
-import { ensureNonzeroAddress } from "../lib/validators.sol";
 
 /**
  * @title OmnichainProposalSender
@@ -139,7 +139,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
 
-        //  Same proposal should not contain more than one bridge command
+        //  Same proposal should not contain more than one command
         uint256 pId = governanceBravoDelegate.proposalCount();
         require(pId > lastProposalId, "OmnichainProposalSender: Multiple bridging in a proposal");
         lastProposalId = pId;

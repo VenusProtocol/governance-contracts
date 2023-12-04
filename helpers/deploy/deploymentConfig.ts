@@ -1,3 +1,5 @@
+import { SUPPORTED_NETWORKS } from "./constants";
+
 export type AccessControlEntry = {
   caller: string;
   target: string;
@@ -30,37 +32,13 @@ export const OmnichainGovernanceExecutorMethods: string[] = [
   "setConfig(uint16,uint16,uint256,bytes)",
   "addTimelocks(ITimelock[])",
 ];
-
-export type Delay = { [key: string]: number };
-
-export type DelayConfig = {
-  [key: string]: Delay;
-};
-
-export const timelockDelays: DelayConfig = {
-  sepolia: {
-    NORMAL: 10800,
-    FAST_TRACK: 7200,
-    CRITICAL: 3600,
-  },
-  ethereum: {
-    NORMAL: 172800,
-    FAST_TRACK: 21600,
-    CRITICAL: 3600,
-  },
-};
-
-export type timelockNetworkConfig = {
-  sepolia: DelayConfig;
-  ethereum: DelayConfig;
-};
-interface BridgeConfig {
-  [networkName: string]: {
+type Config = {
+  [key in SUPPORTED_NETWORKS]: {
     methods: { method: string; args: any[] }[];
   };
-}
+};
 
-export const bridgeConfig: BridgeConfig = {
+export const config: Config = {
   bsctestnet: {
     methods: [
       { method: "setMaxDailyLimit(uint16,uint256)", args: [10161, 100] },
@@ -77,6 +55,12 @@ export const bridgeConfig: BridgeConfig = {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint16,uint256)", args: [10102, 100] },
+    ],
+  },
+  ethereum: {
+    methods: [
+      { method: "setMaxDailyLimit(uint16,uint256)", args: [101, 100] },
+      { method: "updateValidChainId(uint16,bool)", args: [101, true] },
     ],
   },
   hardhat: {
