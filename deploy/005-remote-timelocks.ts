@@ -1,4 +1,4 @@
-import { ethers } from 'hardhat';
+import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
@@ -38,7 +38,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       critical: 3600,
     },
   };
-  const omnichainGovernanceExecutorAddress = (await ethers.getContract('OmnichainGovernanceExecutor')).address;
+  const omnichainGovernanceExecutorAddress = (await ethers.getContract("OmnichainGovernanceExecutor")).address;
 
   await deploy("NormalTimelock", {
     contract: "Timelock",
