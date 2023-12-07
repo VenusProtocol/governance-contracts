@@ -1,3 +1,17 @@
+## [1.4.0-dev.8](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.7...v1.4.0-dev.8) (2023-12-07)
+
+
+### Features
+
+* add ACM deployments of opBNB ([62cc5d2](https://github.com/VenusProtocol/governance-contracts/commit/62cc5d209c5f6cf5940be19e838c61448a36f4bd))
+* add ACM deployments of opBNB ([545fa71](https://github.com/VenusProtocol/governance-contracts/commit/545fa71f503161bf5b2d10c96b3ca2ecda86184c))
+* add opbnbmainnet and verify config ([db4afe6](https://github.com/VenusProtocol/governance-contracts/commit/db4afe6529dbaffe211ecdfa8b79e83ab0d277bb))
+
+
+### Bug Fixes
+
+* release issue ([fcc5093](https://github.com/VenusProtocol/governance-contracts/commit/fcc509351d6390dea89e7d155f6f5d61c80680a7))
+
 ## [1.4.0-dev.7](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.6...v1.4.0-dev.7) (2023-12-05)
 
 ## [1.4.0-dev.6](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.5...v1.4.0-dev.6) (2023-12-01)
