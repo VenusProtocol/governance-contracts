@@ -1,3 +1,10 @@
+## [1.4.0-dev.9](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.8...v1.4.0-dev.9) (2023-12-07)
+
+
+### Bug Fixes
+
+* maintain original interface ([8a3d31f](https://github.com/VenusProtocol/governance-contracts/commit/8a3d31f3dab2f3c8bef82aaf1aa26e297fcddf76))
+
 ## [1.4.0-dev.8](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.7...v1.4.0-dev.8) (2023-12-07)
 
 
