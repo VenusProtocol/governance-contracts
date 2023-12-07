@@ -1,3 +1,4 @@
+import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
@@ -9,6 +10,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
 
   const networkName = hre.network.name as SUPPORTED_NETWORKS;
+  const live = hre.network.live;
+
+  const governorBravoDelegatorAddress = (await ethers.getContract("GovernorBravoDelegator")).address;
+
+  const getAdmin = () => {
+    return live ? governorBravoDelegatorAddress : deployer;
+  };
 
   const delayConfig = {
     hardhat: {
@@ -41,7 +49,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("NormalTimelock", {
     contract: "Timelock",
     from: deployer,
-    args: [deployer, delayConfig[networkName].normal],
+    args: [getAdmin(), delayConfig[networkName].normal],
     log: true,
     autoMine: true,
   });
@@ -49,7 +57,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("FastTrackTimelock", {
     contract: "Timelock",
     from: deployer,
-    args: [deployer, delayConfig[networkName].fast],
+    args: [getAdmin(), delayConfig[networkName].fast],
     log: true,
     autoMine: true,
   });
@@ -57,7 +65,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("CriticalTimelock", {
     contract: "Timelock",
     from: deployer,
-    args: [deployer, delayConfig[networkName].critical],
+    args: [getAdmin(), delayConfig[networkName].critical],
     log: true,
     autoMine: true,
   });
