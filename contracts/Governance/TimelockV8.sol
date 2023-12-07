@@ -71,8 +71,8 @@ contract TimelockV8 {
     mapping(bytes32 => bool) public queuedTransactions;
 
     constructor(address admin_, uint256 delay_) {
-        require(delay_ >= getMinimumDelay(), "Timelock::constructor: Delay must exceed minimum delay.");
-        require(delay_ <= getMaximumDelay(), "Timelock::setDelay: Delay must not exceed maximum delay.");
+        require(delay_ >= MINIMUM_DELAY(), "Timelock::constructor: Delay must exceed minimum delay.");
+        require(delay_ <= MAXIMUM_DELAY(), "Timelock::setDelay: Delay must not exceed maximum delay.");
         ensureNonzeroAddress(admin_);
 
         admin = admin_;
@@ -87,22 +87,22 @@ contract TimelockV8 {
      */
     function setDelay(uint256 delay_) public {
         require(msg.sender == address(this), "Timelock::setDelay: Call must come from Timelock.");
-        require(delay_ >= getMinimumDelay(), "Timelock::setDelay: Delay must exceed minimum delay.");
-        require(delay_ <= getMaximumDelay(), "Timelock::setDelay: Delay must not exceed maximum delay.");
+        require(delay_ >= MINIMUM_DELAY(), "Timelock::setDelay: Delay must exceed minimum delay.");
+        require(delay_ <= MAXIMUM_DELAY(), "Timelock::setDelay: Delay must not exceed maximum delay.");
         delay = delay_;
 
         emit NewDelay(delay);
     }
 
-    function getGracePeriod() public view virtual returns (uint256) {
+    function GRACE_PERIOD() public view virtual returns (uint256) {
         return DEFAULT_GRACE_PERIOD;
     }
 
-    function getMinimumDelay() public view virtual returns (uint256) {
+    function MINIMUM_DELAY() public view virtual returns (uint256) {
         return DEFAULT_MINIMUM_DELAY;
     }
 
-    function getMaximumDelay() public view virtual returns (uint256) {
+    function MAXIMUM_DELAY() public view virtual returns (uint256) {
         return DEFAULT_MAXIMUM_DELAY;
     }
 
@@ -201,7 +201,7 @@ contract TimelockV8 {
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
         require(queuedTransactions[txHash], "Timelock::executeTransaction: Transaction hasn't been queued.");
         require(getBlockTimestamp() >= eta, "Timelock::executeTransaction: Transaction hasn't surpassed time lock.");
-        require(getBlockTimestamp() <= eta + getGracePeriod(), "Timelock::executeTransaction: Transaction is stale.");
+        require(getBlockTimestamp() <= eta + GRACE_PERIOD(), "Timelock::executeTransaction: Transaction is stale.");
 
         queuedTransactions[txHash] = false;
 
