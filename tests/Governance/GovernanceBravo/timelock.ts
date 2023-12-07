@@ -22,9 +22,9 @@ describe("TimelockV8 Tests", () => {
   });
 
   it("Production timelock returns constant values", async () => {
-    expect(await timelock.getGracePeriod()).to.equal("1209600");
-    expect(await timelock.getMinimumDelay()).to.equal("3600");
-    expect(await timelock.getMaximumDelay()).to.equal("2592000");
+    expect(await timelock.GRACE_PERIOD()).to.equal("1209600");
+    expect(await timelock.MINIMUM_DELAY()).to.equal("3600");
+    expect(await timelock.MAXIMUM_DELAY()).to.equal("2592000");
   });
 
   it("Production timelock requires setting appropriate delay", async () => {
@@ -61,9 +61,9 @@ describe("TimelockV8 Tests", () => {
   });
 
   it("Test Timelock returns 1 for constants", async () => {
-    expect(await testTimelock.getGracePeriod()).to.equal("1");
-    expect(await testTimelock.getMinimumDelay()).to.equal("1");
-    expect(await testTimelock.getMaximumDelay()).to.equal("3600");
+    expect(await testTimelock.GRACE_PERIOD()).to.equal("1");
+    expect(await testTimelock.MINIMUM_DELAY()).to.equal("1");
+    expect(await testTimelock.MAXIMUM_DELAY()).to.equal("3600");
   });
 
   it("Test Timelock allows setting low delay", async () => {

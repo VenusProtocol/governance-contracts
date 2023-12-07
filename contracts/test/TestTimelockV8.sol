@@ -5,15 +5,15 @@ import { TimelockV8 } from "../Governance/TimelockV8.sol";
 contract TestTimelockV8 is TimelockV8 {
     constructor(address admin_, uint256 delay_) public TimelockV8(admin_, delay_) {}
 
-    function getGracePeriod() public view override returns (uint256) {
+    function GRACE_PERIOD() public view override returns (uint256) {
         return 1;
     }
 
-    function getMinimumDelay() public view override returns (uint256) {
+    function MINIMUM_DELAY() public view override returns (uint256) {
         return 1;
     }
 
-    function getMaximumDelay() public view override returns (uint256) {
+    function MAXIMUM_DELAY() public view override returns (uint256) {
         return 1 hours;
     }
 }
