@@ -1,0 +1,16 @@
+{
+  "name": "bscmainnet",
+  "chainId": "56",
+  "addresses": {
+    "AccessControlManager": "0x4788629abc6cfca10f9f969efdeaa1cf70c23555",
+    "CriticalTimelock": "0x213c446ec11e45b15a6E29C1C1b402B8897f606d",
+    "FastTrackTimelock": "0x555ba73dB1b006F3f2C7dB7126d6e4343aDBce02",
+    "GovernorAlpha": "0x406f48f47D25E9caa29f17e7Cfbd1dc6878F078f",
+    "GovernorAlpha2": "0x388313BfEFEE8ddfeAD55b585F62812293Cf3A60",
+    "GovernorBravoDelegate": "0x360ac19648efC29d2b7b70baC227C35e909272Fd",
+    "GovernorBravoDelegator": "0x2d56dC077072B53571b8252008C60e945108c75a",
+    "GovernorBravoDelegator_Implementation": "0x360ac19648efc29d2b7b70bac227c35e909272fd",
+    "GovernorBravoDelegator_Proxy": "0x2d56dC077072B53571b8252008C60e945108c75a",
+    "NormalTimelock": "0x939bD8d64c0A9583A7Dcea9933f7b21697ab6396"
+  }
+}

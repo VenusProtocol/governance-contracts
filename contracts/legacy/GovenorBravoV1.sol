@@ -8,7 +8,7 @@ import "./GovernorBravoInterfaces.sol";
  * @author Venus
  * @notice The `GovernorBravoDelegator` contract.
  */
-contract GovernorBravoDelegator is GovernorBravoDelegatorStorage, GovernorBravoEvents {
+contract GovernorBravoDelegatorV1 is GovernorBravoDelegatorStorage, GovernorBravoEventsV1 {
     constructor(
         address timelock_,
         address xvsVault_,

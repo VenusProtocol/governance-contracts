@@ -1,3 +1,66 @@
+## [1.4.0-dev.9](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.8...v1.4.0-dev.9) (2023-12-07)
+
+
+### Bug Fixes
+
+* maintain original interface ([8a3d31f](https://github.com/VenusProtocol/governance-contracts/commit/8a3d31f3dab2f3c8bef82aaf1aa26e297fcddf76))
+
+## [1.4.0-dev.8](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.7...v1.4.0-dev.8) (2023-12-07)
+
+
+### Features
+
+* add ACM deployments of opBNB ([62cc5d2](https://github.com/VenusProtocol/governance-contracts/commit/62cc5d209c5f6cf5940be19e838c61448a36f4bd))
+* add ACM deployments of opBNB ([545fa71](https://github.com/VenusProtocol/governance-contracts/commit/545fa71f503161bf5b2d10c96b3ca2ecda86184c))
+* add opbnbmainnet and verify config ([db4afe6](https://github.com/VenusProtocol/governance-contracts/commit/db4afe6529dbaffe211ecdfa8b79e83ab0d277bb))
+
+
+### Bug Fixes
+
+* release issue ([fcc5093](https://github.com/VenusProtocol/governance-contracts/commit/fcc509351d6390dea89e7d155f6f5d61c80680a7))
+
+## [1.4.0-dev.7](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.6...v1.4.0-dev.7) (2023-12-05)
+
+## [1.4.0-dev.6](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.5...v1.4.0-dev.6) (2023-12-01)
+
+
+### Features
+
+* generate file only with addresses of deployed contracts ([016c09e](https://github.com/VenusProtocol/governance-contracts/commit/016c09e029e55eac71095c83379ecf2db3014923))
+* updating deployment files ([89395f8](https://github.com/VenusProtocol/governance-contracts/commit/89395f80479edde41f19e2011ede2b2ce009aca7))
+
+## [1.4.0-dev.5](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.4...v1.4.0-dev.5) (2023-11-30)
+
+
+### Features
+
+* add legacy delegate ([91b9d04](https://github.com/VenusProtocol/governance-contracts/commit/91b9d04b6300ac1ef94ed8b178bc7c13a8c0cc3a))
+
+
+### Reverts
+
+* Revert "fix: use the updated initialization function in delegator" ([93708ec](https://github.com/VenusProtocol/governance-contracts/commit/93708ece243eb243df77e200cb7fdac7adc6f50e))
+
+## [1.4.0-dev.4](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.3...v1.4.0-dev.4) (2023-11-30)
+
+
+### Features
+
+* add timelock deploy script ([21e6b6b](https://github.com/VenusProtocol/governance-contracts/commit/21e6b6b6b3c9189fda6e94b11d3c99c7a0922820))
+* package deployment scripts ([b6a179d](https://github.com/VenusProtocol/governance-contracts/commit/b6a179d01f1ec820ec359b95a0184a6c6c0657ff))
+
+
+### Bug Fixes
+
+* fix typescript errors ([a8c413e](https://github.com/VenusProtocol/governance-contracts/commit/a8c413ec4ce360f6543ee0de5f9b4ec52668bdf0))
+
+## [1.4.0-dev.3](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.2...v1.4.0-dev.3) (2023-11-29)
+
+
+### Features
+
+* add Timelock compatible with solidity 8 ([a9cd309](https://github.com/VenusProtocol/governance-contracts/commit/a9cd309f0558f83d717f6c88b4b485e5f62755e6))
+
 ## [1.4.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.1...v1.4.0-dev.2) (2023-11-27)
 
 

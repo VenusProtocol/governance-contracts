@@ -5,7 +5,6 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
 import { OmnichainProposalSenderMethods, config } from "../helpers/deploy/deploymentConfig";
-import { toAddress } from "../helpers/deploy/deploymentUtils";
 import { getArgTypesFromSignature } from "../helpers/utils";
 
 interface GovernanceCommand {
@@ -36,14 +35,11 @@ const configureCommands = async (target: string, hre: HardhatRuntimeEnvironment)
 const configureAccessControls = async (
   methods: string[],
   accessControlManagerAddress: string,
-  caller: string,
-  target: string,
-  hre: HardhatRuntimeEnvironment,
+  callerAddress: string,
+  targetAddress: string,
 ): Promise<GovernanceCommand[]> => {
   const commands = await Promise.all(
     methods.map(async method => {
-      const callerAddress = await toAddress(caller, hre);
-      const targetAddress = await toAddress(target, hre);
       return [
         {
           contract: accessControlManagerAddress,
@@ -93,21 +89,18 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       acmAddress,
       normalTimelockAddress,
       OmnichainProposalSender.address,
-      hre,
     )),
     ...(await configureAccessControls(
       OmnichainProposalSenderMethods,
       acmAddress,
       fastTrackTimelockAddress,
       OmnichainProposalSender.address,
-      hre,
     )),
     ...(await configureAccessControls(
       OmnichainProposalSenderMethods,
       acmAddress,
       criticalTimelockAddress,
       OmnichainProposalSender.address,
-      hre,
     )),
     ...(await configureCommands(OmnichainProposalSender.address, hre)),
 

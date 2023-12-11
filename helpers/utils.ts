@@ -1,4 +1,5 @@
 import BigNumber from "bignumber.js";
+import { ethers, network } from "hardhat";
 
 BigNumber.config({
   FORMAT: {
@@ -19,6 +20,30 @@ export const convertToUnit = (amount: string | number, decimals: number) => {
 
 export const convertToBigInt = (amount: string | number, decimals: number) => {
   return BigInt(convertToUnit(amount, decimals));
+};
+
+export const fundAccount = async (address: string) => {
+  const [deployer] = await ethers.getSigners();
+  await deployer.sendTransaction({
+    to: address,
+    value: ethers.utils.parseEther("1.0"),
+  });
+};
+
+export const impersonateSigner = async (address: string) => {
+  await network.provider.request({
+    method: "hardhat_impersonateAccount",
+    params: [address],
+  });
+  const signer = await ethers.getSigner(address);
+  return signer;
+};
+
+export const releaseImpersonation = async (address: string) => {
+  await network.provider.request({
+    method: "hardhat_stopImpersonatingAccount",
+    params: [address],
+  });
 };
 
 // Function to get argument types from method signature

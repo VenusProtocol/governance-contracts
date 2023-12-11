@@ -18,9 +18,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 
   const acm = await ethers.getContractAt("AccessControlManager", acmDeployment.address);
-  const networkName = hre.network.name as SUPPORTED_NETWORKS;
-  const adminAccount = await getAcmAdminAccount(networkName);
   if (hre.network.live) {
+    const networkName = hre.network.name as SUPPORTED_NETWORKS;
+    const adminAccount = await getAcmAdminAccount(networkName);
     console.log(`Granting DEFAULT_ADMIN_ROLE to ${adminAccount} for ${networkName} network`);
     await acm.grantRole(acm.DEFAULT_ADMIN_ROLE(), adminAccount);
 

@@ -1,0 +1,7 @@
+{
+  "name": "sepolia",
+  "chainId": "11155111",
+  "addresses": {
+    "AccessControlManager": "0xbf705C00578d43B6147ab4eaE04DBBEd1ccCdc96"
+  }
+}
