@@ -5,7 +5,8 @@ import "@nomiclabs/hardhat-etherscan";
 import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
 import "hardhat-deploy";
-import { HardhatUserConfig, task } from "hardhat/config";
+import { HardhatUserConfig, extendConfig, task } from "hardhat/config";
+import { HardhatConfig } from "hardhat/types";
 import "solidity-coverage";
 import "solidity-docgen";
 
@@ -13,6 +14,20 @@ require("dotenv").config();
 
 const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY;
 const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
+
+extendConfig((config: HardhatConfig) => {
+  if (process.env.EXPORT !== "true") {
+    config.external = {
+      ...config.external,
+      deployments: {
+        bsctestnet: ["node_modules/@venusprotocol/governance-contracts/deployments/bsctestnet"],
+        bscmainnet: ["node_modules/@venusprotocol/governance-contracts/deployments/bscmainnet"],
+        sepolia: ["node_modules/@venusprotocol/governance-contracts/deployments/sepolia"],
+        ethereum: ["node_modules/@venusprotocol/governance-contracts/deployments/ethereum"],
+      },
+    };
+  }
+});
 
 task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
   const accounts = await hre.ethers.getSigners();
@@ -183,12 +198,7 @@ const config: HardhatUserConfig = {
         artifacts: "./node_modules/@venusprotocol/venus-protocol/artifacts",
       },
     ],
-    deployments: {
-      bsctestnet: ["node_modules/@venusprotocol/governance-contracts/deployments/bsctestnet"],
-      bscmainnet: ["node_modules/@venusprotocol/governance-contracts/deployments/bscmainnet"],
-      sepolia: ["node_modules/@venusprotocol/governance-contracts/deployments/sepolia"],
-      ethereum: ["node_modules/@venusprotocol/governance-contracts/deployments/ethereum"],
-    },
+    deployments: {},
   },
   docgen: {
     outputDir: "./docs",
