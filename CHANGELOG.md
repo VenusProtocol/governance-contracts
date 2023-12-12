@@ -1,3 +1,10 @@
+## [1.4.0-dev.10](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.9...v1.4.0-dev.10) (2023-12-12)
+
+
+### Bug Fixes
+
+* exclude external deployments when exporting ([124d88f](https://github.com/VenusProtocol/governance-contracts/commit/124d88f4051e24402471c8c085cd189187b54650))
+
 ## [1.4.0-dev.9](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.8...v1.4.0-dev.9) (2023-12-07)
 
 
