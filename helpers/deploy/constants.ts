@@ -5,6 +5,7 @@ export enum SUPPORTED_NETWORKS {
   ETHERUEM = "ethereum",
   HARDHAT = "hardhat",
   OPBNBTESTNET = "opbnbtestnet",
+  OPBNBMAINNET = "opbnbmainnet",
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
