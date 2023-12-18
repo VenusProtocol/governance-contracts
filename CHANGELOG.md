@@ -1,3 +1,10 @@
+## [1.4.0-dev.12](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.11...v1.4.0-dev.12) (2023-12-18)
+
+
+### Features
+
+* updating deployment files ([d4e518e](https://github.com/VenusProtocol/governance-contracts/commit/d4e518ef0143b4c8c7de87975a4099684920c555))
+
 ## [1.4.0-dev.11](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.10...v1.4.0-dev.11) (2023-12-12)
 
 ## [1.4.0-dev.10](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.9...v1.4.0-dev.10) (2023-12-12)

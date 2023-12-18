@@ -1,7 +1,7 @@
 {
   "name": "@venusprotocol/governance-contracts",
   "description": "",
-  "version": "1.4.0-dev.11",
+  "version": "1.4.0-dev.12",
   "author": "",
   "files": [
     "artifacts",
