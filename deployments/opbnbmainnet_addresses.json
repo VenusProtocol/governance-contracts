@@ -1,5 +1,7 @@
 {
   "name": "opbnbmainnet",
   "chainId": "204",
-  "addresses": {}
+  "addresses": {
+    "AccessControlManager": "0xA60Deae5344F1152426cA440fb6552eA0e3005D6"
+  }
 }
