@@ -1,3 +1,17 @@
+## [1.4.0-dev.13](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.12...v1.4.0-dev.13) (2023-12-19)
+
+
+### Features
+
+* add ACM deployments for opbnbmainnet ([dee6c6a](https://github.com/VenusProtocol/governance-contracts/commit/dee6c6a8426e7b1806163be858c3696a4b44ff38))
+* export ACM deployments ([362bb41](https://github.com/VenusProtocol/governance-contracts/commit/362bb4124d66efeb8b695949ef73e387631ebb21))
+* updating deployment files ([5be3c41](https://github.com/VenusProtocol/governance-contracts/commit/5be3c418807ae2e01d3b7358ea0c5da86afb85cf))
+
+
+### Bug Fixes
+
+* release ([0ca5157](https://github.com/VenusProtocol/governance-contracts/commit/0ca51579ce900c552660c5964de82fd93ac5dc1e))
+
 ## [1.4.0-dev.12](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0-dev.11...v1.4.0-dev.12) (2023-12-18)
 
 
