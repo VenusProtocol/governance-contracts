@@ -108,7 +108,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         uint16 remoteChainId_,
         bytes calldata payload_,
         bytes calldata adapterParams_
-    ) external view returns (uint256 nativeFee, uint256 zroFee) {
+    ) external view returns (uint256, uint256) {
         return LZ_ENDPOINT.estimateFees(remoteChainId_, address(this), payload_, false, adapterParams_);
     }
 
