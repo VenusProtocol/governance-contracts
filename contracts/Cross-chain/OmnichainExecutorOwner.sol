@@ -19,7 +19,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     /**
      *  @custom:oz-upgrades-unsafe-allow state-variable-immutable
      */
-    IOmnichainGovernanceExecutor public immutable omnichainGovernanceExecutor;
+    IOmnichainGovernanceExecutor public immutable OMNICHAIN_GOVERNANCE_EXECUTOR;
 
     /**
      * @notice Stores function signature corresponding to their 4 bytes hash value
@@ -34,7 +34,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address omnichainGovernanceExecutor_) {
         require(omnichainGovernanceExecutor_ != address(0), "Address must not be zero");
-        omnichainGovernanceExecutor = IOmnichainGovernanceExecutor(omnichainGovernanceExecutor_);
+        OMNICHAIN_GOVERNANCE_EXECUTOR = IOmnichainGovernanceExecutor(omnichainGovernanceExecutor_);
     }
 
     /**
@@ -53,7 +53,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
         string memory fun = functionRegistry[msg.sig];
         require(bytes(fun).length != 0, "Function not found");
         _checkAccessAllowed(fun);
-        (bool ok, bytes memory res) = address(omnichainGovernanceExecutor).call(data_);
+        (bool ok, bytes memory res) = address(OMNICHAIN_GOVERNANCE_EXECUTOR).call(data_);
         require(ok, "call failed");
         return res;
     }
@@ -88,7 +88,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     function transferBridgeOwnership(address newOwner_) external {
         _checkAccessAllowed("transferBridgeOwnership(address)");
         require(newOwner_ != address(0), "Address must not be zero");
-        omnichainGovernanceExecutor.transferOwnership(newOwner_);
+        OMNICHAIN_GOVERNANCE_EXECUTOR.transferOwnership(newOwner_);
     }
 
     /**

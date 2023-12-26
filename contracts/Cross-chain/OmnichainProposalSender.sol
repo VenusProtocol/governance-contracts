@@ -51,7 +51,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     /**
      * @notice LayerZero endpoint for sending messages to remote chains
      */
-    ILayerZeroEndpoint public immutable lzEndpoint;
+    ILayerZeroEndpoint public immutable LZ_ENDPOINT;
 
     /**
      * @notice Specifies the allowed path for sending messages (remote chainId => remote app address + local app address)
@@ -97,7 +97,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     ) BaseOmnichainControllerSrc(accessControlManager_) {
         ensureNonzeroAddress(address(lzEndpoint_));
         ensureNonzeroAddress(address(governanceBravoDelegate_));
-        lzEndpoint = lzEndpoint_;
+        LZ_ENDPOINT = lzEndpoint_;
         governanceBravoDelegate = governanceBravoDelegate_;
     }
 
@@ -115,7 +115,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         bytes calldata payload_,
         bytes calldata adapterParams_
     ) external view returns (uint256 nativeFee, uint256 zroFee) {
-        return lzEndpoint.estimateFees(remoteChainId_, address(this), payload_, false, adapterParams_);
+        return LZ_ENDPOINT.estimateFees(remoteChainId_, address(this), payload_, false, adapterParams_);
     }
 
     /**
@@ -150,7 +150,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         payload = abi.encode(payload_, pId);
 
         try
-            lzEndpoint.send{ value: msg.value }(
+            LZ_ENDPOINT.send{ value: msg.value }(
                 remoteChainId_,
                 trustedRemote,
                 payload,
@@ -195,7 +195,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
 
         delete storedExecutionHashes[nonce_];
 
-        lzEndpoint.send{ value: originalValue_ + msg.value }(
+        LZ_ENDPOINT.send{ value: originalValue_ + msg.value }(
             remoteChainId_,
             trustedRemoteLookup[remoteChainId_],
             payload_,
@@ -231,7 +231,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      */
     function setConfig(uint16 version_, uint16 chainId_, uint256 configType_, bytes calldata config_) external {
         _ensureAllowed("setConfig(uint16,uint16,uint256,bytes)");
-        lzEndpoint.setConfig(version_, chainId_, configType_, config_);
+        LZ_ENDPOINT.setConfig(version_, chainId_, configType_, config_);
     }
 
     /**
@@ -241,7 +241,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      */
     function setSendVersion(uint16 version_) external {
         _ensureAllowed("setSendVersion(uint16)");
-        lzEndpoint.setSendVersion(version_);
+        LZ_ENDPOINT.setSendVersion(version_);
     }
 
     /**
@@ -268,6 +268,6 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @param configType_ Type of configuration. Every messaging library has its own convention.
      */
     function getConfig(uint16 version_, uint16 chainId_, uint256 configType_) external view returns (bytes memory) {
-        return lzEndpoint.getConfig(version_, chainId_, address(this), configType_);
+        return LZ_ENDPOINT.getConfig(version_, chainId_, address(this), configType_);
     }
 }

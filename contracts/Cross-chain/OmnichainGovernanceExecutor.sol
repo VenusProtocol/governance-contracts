@@ -48,7 +48,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice A privileged role that can cancel any proposal.
      */
-    address public immutable guardian;
+    address public immutable GUARDIAN;
 
     /**
      * @notice Last proposal count received
@@ -108,7 +108,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     event TimelockAdded(address indexed timelock, uint8 routeType);
 
     constructor(address endpoint_, address guardian_) BaseOmnichainControllerDest(endpoint_) {
-        guardian = guardian_;
+        GUARDIAN = guardian_;
     }
 
     /**
@@ -168,7 +168,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         require(queued[proposalId_], "OmnichainGovernanceExecutor::cancel: proposal not queued");
         Proposal storage proposal = proposals[proposalId_];
         require(!proposal.executed, "OmnichainGovernanceExecutor::cancel: cannot cancel executed proposal");
-        require(msg.sender == guardian, "OmnichainGovernanceExecutor::cancel: sender must be guardian");
+        require(msg.sender == GUARDIAN, "OmnichainGovernanceExecutor::cancel: sender must be guardian");
 
         proposal.cancelled = true;
         for (uint256 i = 0; i < proposal.targets.length; i++) {
