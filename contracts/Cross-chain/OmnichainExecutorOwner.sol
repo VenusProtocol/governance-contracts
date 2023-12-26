@@ -50,7 +50,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
      *  @notice Invoked when called function does not exist in the contract.
      */
     fallback(bytes calldata data_) external returns (bytes memory) {
-        string memory fun = _getFunctionName(msg.sig);
+        string memory fun = functionRegistry[msg.sig];
         require(bytes(fun).length != 0, "Function not found");
         _checkAccessAllowed(fun);
         (bool ok, bytes memory res) = address(omnichainGovernanceExecutor).call(data_);
@@ -95,8 +95,4 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
      *  @notice Empty implementation of renounce ownership to avoid any mishappening.
      */
     function renounceOwnership() public virtual override {}
-
-    function _getFunctionName(bytes4 signature_) internal view returns (string memory) {
-        return functionRegistry[signature_];
-    }
 }
