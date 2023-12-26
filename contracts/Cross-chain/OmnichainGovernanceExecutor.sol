@@ -165,6 +165,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @custom:event Emits ProposalCancelled with proposal id of the cancelled proposal.
      */
     function cancel(uint256 proposalId_) external {
+        require(queued[proposalId_], "OmnichainGovernanceExecutor::cancel: proposal not queued");
         Proposal storage proposal = proposals[proposalId_];
         require(!proposal.executed, "OmnichainGovernanceExecutor::cancel: cannot cancel executed proposal");
         require(msg.sender == guardian, "OmnichainGovernanceExecutor::cancel: sender must be guardian");

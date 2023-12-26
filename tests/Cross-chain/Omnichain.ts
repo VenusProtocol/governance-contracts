@@ -415,6 +415,10 @@ describe("OmnichainProposalSender: ", async function () {
     );
   });
 
+  it("Revert if proposal is not queued", async function () {
+    expect(await executor.connect(deployer).cancel(proposalId)).to.be.revertedWith("proposal not queued");
+  });
+
   it("Emit ProposalCanceled event when proposal gets cancelled", async function () {
     const payload = await makePayload(
       [NormalTimelock.address],
