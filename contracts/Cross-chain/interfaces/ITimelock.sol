@@ -5,12 +5,12 @@ interface ITimelock {
     /**
      * @notice Delay period for the transaction queue
      */
-    function delay() external view returns (uint);
+    function delay() external view returns (uint256);
 
     /**
      * @notice Required period to execute a proposal transaction
      */
-    function GRACE_PERIOD() external view returns (uint);
+    function GRACE_PERIOD() external view returns (uint256);
 
     /**
      * @notice Method for accepting a proposed admin
@@ -34,10 +34,10 @@ interface ITimelock {
      */
     function queueTransaction(
         address target,
-        uint value,
+        uint256 value,
         string calldata signature,
         bytes calldata data,
-        uint eta
+        uint256 eta
     ) external returns (bytes32);
 
     /**
@@ -50,10 +50,10 @@ interface ITimelock {
      */
     function cancelTransaction(
         address target,
-        uint value,
+        uint256 value,
         string calldata signature,
         bytes calldata data,
-        uint eta
+        uint256 eta
     ) external;
 
     /**
@@ -66,9 +66,9 @@ interface ITimelock {
      */
     function executeTransaction(
         address target,
-        uint value,
+        uint256 value,
         string calldata signature,
         bytes calldata data,
-        uint eta
+        uint256 eta
     ) external payable returns (bytes memory);
 }

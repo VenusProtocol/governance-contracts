@@ -162,7 +162,9 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
             emit ExecuteRemoteProposal(lastStoredPayloadNonce, remoteChainId_, pId, payload_);
         } catch (bytes memory reason) {
             uint64 _lastStoredPayloadNonce = ++lastStoredPayloadNonce;
-            storedExecutionHashes[_lastStoredPayloadNonce] = keccak256(abi.encode(remoteChainId_, payload, adapterParams_, msg.value));
+            storedExecutionHashes[_lastStoredPayloadNonce] = keccak256(
+                abi.encode(remoteChainId_, payload, adapterParams_, msg.value)
+            );
             emit StorePayload(_lastStoredPayloadNonce, remoteChainId_, payload_, adapterParams_, msg.value, reason);
         }
     }
