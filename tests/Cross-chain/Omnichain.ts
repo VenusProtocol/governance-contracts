@@ -369,6 +369,14 @@ describe("OmnichainProposalSender: ", async function () {
     expect(await NormalTimelock.delay()).to.equals(delay);
   });
 
+  it("Revert if empty proposal", async function () {
+    await expect(
+      sender.connect(signer1).execute(remoteChainId, "0x", adapterParams, {
+        value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
+      }),
+    ).to.be.revertedWith("OmnichainProposalSender: Empty payload");
+  });
+
   it("Revert if same proposal come twice", async function () {
     const payload = await makePayload(
       [NormalTimelock.address],

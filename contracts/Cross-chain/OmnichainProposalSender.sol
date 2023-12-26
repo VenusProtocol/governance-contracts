@@ -135,6 +135,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         _ensureAllowed("execute(uint16,bytes,bytes)");
 
         require(validChainIds[remoteChainId_], "OmnichainProposalSender: Invalid chainId");
+        require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
 
         bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
@@ -186,6 +187,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     ) external payable whenNotPaused nonReentrant {
         bytes32 hash = storedExecutionHashes[nonce_];
         require(hash != bytes32(0), "OmnichainProposalSender: no stored payload");
+        require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
 
         bytes memory execution = abi.encode(remoteChainId_, payload_, adapterParams_, originalValue_);
         require(keccak256(execution) == hash, "OmnichainProposalSender: invalid execution params");
