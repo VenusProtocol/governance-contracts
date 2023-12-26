@@ -88,7 +88,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     /**
      * @notice Emitted while updating Valid ChainId mapping
      */
-    event UpdatedValidChainId(uint16 chainId, bool isAdded);
+    event UpdatedValidChainId(uint16 indexed chainId, bool isAdded);
 
     constructor(
         ILayerZeroEndpoint lzEndpoint_,

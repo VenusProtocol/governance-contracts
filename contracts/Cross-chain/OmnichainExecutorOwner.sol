@@ -29,7 +29,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     /**
      * @notice Event emitted when function registry updated
      */
-    event FunctionRegistryChanged(string signature, bool active);
+    event FunctionRegistryChanged(string indexed signature, bool active);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address omnichainGovernanceExecutor_) {

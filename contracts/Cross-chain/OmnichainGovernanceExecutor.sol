@@ -95,7 +95,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice Emitted when proposal failed.
      */
-    event ReceivePayloadFailed(uint16 srcChainId, bytes srcAddress, uint64 nonce, bytes reason);
+    event ReceivePayloadFailed(uint16 indexed srcChainId, bytes indexed srcAddress, uint64 nonce, bytes reason);
 
     /**
      * @notice Emitted when proposal is cancelled.
