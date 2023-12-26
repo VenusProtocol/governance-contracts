@@ -190,7 +190,6 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         uint64 nonce_,
         bytes memory payload_
     ) internal virtual override whenNotPaused {
-        bytes32 hashedPayload = keccak256(payload_);
         uint256 gasToStoreAndEmit = 30000; // enough gas to ensure we can store the payload and emit the event
 
         (bool success, bytes memory reason) = address(this).excessivelySafeCall(
@@ -200,6 +199,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         );
         // try-catch all errors/exceptions
         if (!success) {
+            bytes32 hashedPayload = keccak256(payload_);
             failedMessages[srcChainId_][srcAddress_][nonce_] = hashedPayload;
             emit ReceivePayloadFailed(srcChainId_, srcAddress_, nonce_, reason); // Retrieve payload from the src side tx if needed to clear
         }
