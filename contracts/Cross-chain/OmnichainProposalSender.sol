@@ -122,7 +122,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @notice Sends a message to execute a remote proposal
      * @dev Stores the hash of the execution parameters if sending fails (e.g., due to insufficient fees)
      * @param remoteChainId_ The LayerZero id of the remote chain
-     * @param payload_ The payload to be sent to the remote chain. It's computed as follows: payload = abi.encode(targets, values, signatures, calldatas)
+     * @param payload_ The payload to be sent to the remote chain. It's computed as follows: payload = abi.encode(targets, values, signatures, calldatas, proposalType)
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
      * @custom:event Emits ExecuteRemoteProposal with remote chain id and payload on success
      * @custom:event Emits StorePayload with last stored payload nonce ,remote chain id , payload, adapter params , values and reason for failure
