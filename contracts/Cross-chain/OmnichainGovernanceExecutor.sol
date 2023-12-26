@@ -196,7 +196,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         (bool success, bytes memory reason) = address(this).excessivelySafeCall(
             gasleft() - gasToStoreAndEmit,
             150,
-            abi.encodeWithSelector(this.nonblockingLzReceive.selector, srcChainId_, srcAddress_, nonce_, payload_)
+            abi.encodeCall(this.nonblockingLzReceive, (srcChainId_, srcAddress_, nonce_, payload_))
         );
         // try-catch all errors/exceptions
         if (!success) {
