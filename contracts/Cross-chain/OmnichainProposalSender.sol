@@ -141,7 +141,6 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
 
         //  Same proposal should not contain more than one command
         uint256 pId = governanceBravoDelegate.proposalCount();
-        require(pId > lastProposalId, "OmnichainProposalSender: Multiple bridging in a proposal");
         lastProposalId = pId;
         bytes memory payload;
         (address[] memory targets, , , , ) = abi.decode(payload_, (address[], uint[], string[], bytes[], uint8));

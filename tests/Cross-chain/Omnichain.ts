@@ -1,7 +1,7 @@
 import { smock } from "@defi-wonderland/smock";
 import { mine } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
-import { ethers, upgrades } from "hardhat";
+import { ethers, network, upgrades } from "hardhat";
 import { SignerWithAddress } from "hardhat-deploy-ethers/signers";
 
 import {
@@ -381,12 +381,13 @@ describe("OmnichainProposalSender: ", async function () {
     await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
       value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
     });
-
-    await expect(
-      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
-        value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
-      }),
-    ).to.be.revertedWith("OmnichainProposalSender: Multiple bridging in a proposal");
+    await network.provider.send("evm_setAutomine", [false]);
+    const tx = await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+      value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
+    });
+    await network.provider.send("evm_mine");
+    expect(tx).to.be.revertedWith("Multiple bridging in a proposal");
+    await network.provider.send("evm_setAutomine", [true]);
   });
 
   it("Reverts when other than guardian call cancel of executor", async function () {
