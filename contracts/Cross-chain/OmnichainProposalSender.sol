@@ -17,12 +17,6 @@ import { IGovernanceBravoDelegate } from "./interfaces/IGovernanceBravoDelegate.
  */
 
 contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc {
-    enum ProposalType {
-        NORMAL,
-        FASTTRACK,
-        CRITICAL
-    }
-
     /**
      * @notice Address of Governance bravo
      */
