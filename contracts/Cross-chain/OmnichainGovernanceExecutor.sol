@@ -242,7 +242,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
 
     function _queue(uint256 proposalId_) internal {
         Proposal storage proposal = proposals[proposalId_];
-        uint256 eta = block.timestamp + proposalTimelocks[uint8(proposal.proposalType)].delay();
+        uint256 eta = block.timestamp + proposalTimelocks[proposal.proposalType].delay();
         for (uint256 i; i < proposal.targets.length; ++i) {
             _queueOrRevertInternal(
                 proposal.targets[i],
@@ -250,7 +250,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 proposal.signatures[i],
                 proposal.calldatas[i],
                 eta,
-                uint8(proposal.proposalType)
+                proposal.proposalType
             );
         }
 

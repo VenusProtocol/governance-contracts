@@ -42,7 +42,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
      * @param accessControlManager_  Address of access control manager
      */
     function initialize(address accessControlManager_) external initializer {
-        require(address(accessControlManager_) != address(0), "Address must not be zero");
+        require(accessControlManager_ != address(0), "Address must not be zero");
         __AccessControlled_init(accessControlManager_);
     }
 
@@ -87,7 +87,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
 
     function transferBridgeOwnership(address newOwner_) external {
         _checkAccessAllowed("transferBridgeOwnership(address)");
-        require(address(newOwner_) != address(0), "Address must not be zero");
+        require(newOwner_ != address(0), "Address must not be zero");
         omnichainGovernanceExecutor.transferOwnership(newOwner_);
     }
 
