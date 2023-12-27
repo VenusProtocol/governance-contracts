@@ -1,0 +1,7 @@
+{
+  "name": "opbnbtestnet",
+  "chainId": "5611",
+  "addresses": {
+    "AccessControlManager": "0x049f77F7046266d27C3bC96376f53C17Ef09c986"
+  }
+}
