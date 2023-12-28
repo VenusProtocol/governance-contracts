@@ -213,6 +213,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @param payload_ The payload to be sent to the remote chain. It's computed as follows: payload = abi.encode(targets, values, signatures, calldatas)
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
      * @param originalValue_ The msg.value passed when execute() function was called
+     * @custom:access Only owner
      * @custom:event Emits ClearPayload with nonce and hash
      * @custom:event Emits FallbackWithdraw with receiver and amount
      */
@@ -227,10 +228,10 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         ensureNonzeroAddress(to_);
         require(originalValue_ > 0, "OmnichainProposalSender: invalid native amount");
         require(address(this).balance >= originalValue_, "OmnichainProposalSender: insufficient native balance");
+        require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
 
         bytes32 hash = storedExecutionHashes[nonce_];
         require(hash != bytes32(0), "OmnichainProposalSender: no stored payload");
-        require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
 
         bytes memory execution = abi.encode(remoteChainId_, payload_, adapterParams_, originalValue_);
         require(keccak256(execution) == hash, "OmnichainProposalSender: invalid execution params");

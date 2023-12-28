@@ -62,6 +62,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
      * @notice A registry of functions that are allowed to be executed from proposals
      * @param signatures_  Function signature to be added or removed.
      * @param active_ bool value, should be true to add function.
+     * @custom:access Only owner
      */
     function upsertSignature(string[] calldata signatures_, bool[] calldata active_) external onlyOwner {
         uint256 signatureLength = signatures_.length;
