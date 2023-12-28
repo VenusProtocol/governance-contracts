@@ -237,7 +237,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
 
         delete storedExecutionHashes[nonce_];
 
-        // Transfer the native to the `to_` addresss
+        // Transfer the native to the `to_` address
         (bool sent, ) = to_.call{ value: originalValue_ }("");
         require(sent, "Call failed");
 
