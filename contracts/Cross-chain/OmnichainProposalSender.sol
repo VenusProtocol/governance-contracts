@@ -84,6 +84,11 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      */
     event UpdatedValidChainId(uint16 indexed chainId, bool isAdded);
 
+    /**
+     * @notice Emitted while fallback withdraw
+     */
+    event FallbackWithdraw(address indexed receiver, uint256 value);
+
     constructor(
         ILayerZeroEndpoint lzEndpoint_,
         address accessControlManager_,
@@ -197,6 +202,46 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
             address(0),
             adapterParams_
         );
+        emit ClearPayload(nonce_, hash);
+    }
+
+    /**
+     * @notice Clear previously failed message
+     * @param to_ Address of the receiver
+     * @param nonce_ The nonce to identify a failed message
+     * @param remoteChainId_ The LayerZero id of the remote chain
+     * @param payload_ The payload to be sent to the remote chain. It's computed as follows: payload = abi.encode(targets, values, signatures, calldatas)
+     * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
+     * @param originalValue_ The msg.value passed when execute() function was called
+     * @custom:event Emits ClearPayload with nonce and hash
+     * @custom:event Emits FallbackWithdraw with receiver and amount
+     */
+    function fallbackWithdraw(
+        address to_,
+        uint64 nonce_,
+        uint16 remoteChainId_,
+        bytes calldata payload_,
+        bytes calldata adapterParams_,
+        uint256 originalValue_
+    ) external payable onlyOwner nonReentrant {
+        ensureNonzeroAddress(to_);
+        require(originalValue_ > 0, "OmnichainProposalSender: invalid native amount");
+        require(address(this).balance >= originalValue_, "OmnichainProposalSender: insufficient native balance");
+
+        bytes32 hash = storedExecutionHashes[nonce_];
+        require(hash != bytes32(0), "OmnichainProposalSender: no stored payload");
+        require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
+
+        bytes memory execution = abi.encode(remoteChainId_, payload_, adapterParams_, originalValue_);
+        require(keccak256(execution) == hash, "OmnichainProposalSender: invalid execution params");
+
+        delete storedExecutionHashes[nonce_];
+
+        // Transfer the native to the `to_` addresss
+        (bool sent, ) = to_.call{ value: originalValue_ }("");
+        require(sent, "Call failed");
+
+        emit FallbackWithdraw(to_, originalValue_);
         emit ClearPayload(nonce_, hash);
     }
 
