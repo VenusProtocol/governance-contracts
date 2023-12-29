@@ -42,6 +42,26 @@ describe("OmnichainProposalSender: ", async function () {
     localEndpoint: LZEndpointMock,
     localPath;
 
+  async function storePayload(payload, adapterParams) {
+    await expect(
+      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+        value: nativeFee,
+      }),
+    ).to.emit(sender, "StorePayload");
+    const nonce = await sender.lastStoredPayloadNonce();
+    expect(await sender.storedExecutionHashes(nonce)).to.not.equals(ethers.constants.HashZero);
+  }
+
+  async function payloadWithId(payload) {
+    const proposalId = await sender.lastProposalId();
+    const payloadWithIdEncoded = ethers.utils.defaultAbiCoder.encode(["bytes", "uint256"], [payload, proposalId]);
+    return payloadWithIdEncoded;
+  }
+
+  async function getPayload(normalTimelockAddress) {
+    const payload = await makePayload([normalTimelockAddress], values, ["setDelay(uint256)"], [calldata], proposalType);
+    return payload;
+  }
   async function updateFunctionRegistry(executorOwner) {
     const functionregistry = [
       "setOracle(address)",
@@ -468,9 +488,111 @@ describe("OmnichainProposalSender: ", async function () {
     });
     expect((await executor.proposals(proposalId))[0]).to.not.equals(proposalId);
   });
+  it("Refund stucked gas in contract, to given address", async function () {
+    // Failed due to minDest is 0
+    const adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [remoteChainId, 0]);
+    const payload = await getPayload(NormalTimelock.address);
+
+    await storePayload(payload, adapterParams);
+
+    const balanceBefore = await ethers.provider.getBalance(signer2.address);
+    const nonce = await sender.lastStoredPayloadNonce();
+
+    await expect(
+      sender.fallbackWithdraw(signer2.address, nonce, remoteChainId, payloadWithId(payload), adapterParams, nativeFee),
+    )
+      .to.emit(sender, "FallbackWithdraw")
+      .and.to.emit(sender, "ClearPayload");
+
+    const balanceAfter = await ethers.provider.getBalance(signer2.address);
+    expect(balanceBefore.add(nativeFee)).to.equals(balanceAfter);
+  });
+
+  it("Reverts on passing zero values in parameters in fallback withdraw", async function () {
+    const adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [remoteChainId, 0]);
+    const payload = await getPayload(NormalTimelock.address);
+
+    await storePayload(payload, adapterParams);
+
+    const nonce = await sender.lastStoredPayloadNonce();
+
+    await expect(
+      sender.fallbackWithdraw(
+        ethers.constants.AddressZero,
+        nonce,
+        remoteChainId,
+        payloadWithId(payload),
+        adapterParams,
+        nativeFee,
+      ),
+    ).to.be.revertedWithCustomError(sender, "ZeroAddressNotAllowed");
+
+    await expect(
+      sender.fallbackWithdraw(signer2.address, nonce, remoteChainId, "0x", adapterParams, nativeFee),
+    ).to.be.revertedWith("OmnichainProposalSender: Empty payload");
+  });
+
+  it("Reverts when value exceeds contract's balance in fallback withdraw", async function () {
+    const adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [remoteChainId, 0]);
+    const payload = await getPayload(NormalTimelock.address);
+
+    await storePayload(payload, adapterParams);
+
+    const nonce = await sender.lastStoredPayloadNonce();
+
+    await expect(
+      sender.fallbackWithdraw(
+        signer2.address,
+        nonce,
+        remoteChainId,
+        payloadWithId(payload),
+        adapterParams,
+        nativeFee.mul(10),
+      ),
+    ).to.be.revertedWith("OmnichainProposalSender: insufficient native balance");
+  });
+
+  it("Reverts when different parameters passed in fallback withdraw", async function () {
+    const adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [remoteChainId, 0]);
+    const payload = await getPayload(NormalTimelock.address);
+
+    await storePayload(payload, adapterParams);
+
+    const nonce = await sender.lastStoredPayloadNonce();
+
+    await expect(
+      sender.fallbackWithdraw(
+        signer2.address,
+        nonce,
+        localChainId, // Different chain ID passed
+        payloadWithId(payload),
+        adapterParams,
+        nativeFee,
+      ),
+    ).to.be.revertedWith("OmnichainProposalSender: invalid execution params");
+
+    // Wrong nonce passed
+    await expect(
+      sender.fallbackWithdraw(signer2.address, nonce.add(1), remoteChainId, payload, adapterParams, nativeFee),
+    ).to.be.revertedWith("OmnichainProposalSender: no stored payload");
+  });
+
+  it("Reverts when receiver is unable to receive in fallback withdraw", async function () {
+    const adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [remoteChainId, 0]);
+    const payload = await getPayload(NormalTimelock.address);
+
+    await storePayload(payload, adapterParams);
+
+    const nonce = await sender.lastStoredPayloadNonce();
+
+    // Passed address has no receive method
+    await expect(
+      sender.fallbackWithdraw(sender.address, nonce, remoteChainId, payloadWithId(payload), adapterParams, nativeFee),
+    ).to.be.revertedWith("Call failed");
+  });
 
   it("Reverts when daily limit of sending transaction reached", async function () {
-    maxDailyTransactionLimit = 0;
+    const maxDailyTransactionLimit = 0;
     await sender.connect(signer1).setMaxDailyLimit(remoteChainId, maxDailyTransactionLimit);
     const payload = await makePayload(
       [NormalTimelock.address],
