@@ -24,7 +24,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
 
     /**
      * @notice Execution hashes of failed messages
-     * @dev [proposalID] -> [executionHash]
+     * @dev [proposalId] -> [executionHash]
      */
     mapping(uint64 => bytes32) public storedExecutionHashes;
 
@@ -56,13 +56,13 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     /**
      * @notice Emitted when a previously failed message is successfully sent to the remote chain
      */
-    event ClearPayload(uint64 indexed proposalID, bytes32 executionHash);
+    event ClearPayload(uint64 indexed proposalId, bytes32 executionHash);
 
     /**
      * @notice Emitted when an execution hash of a failed message is saved
      */
     event StorePayload(
-        uint64 indexed proposalID,
+        uint64 indexed proposalId,
         uint16 indexed remoteChainId,
         bytes payload,
         bytes adapterParams,
