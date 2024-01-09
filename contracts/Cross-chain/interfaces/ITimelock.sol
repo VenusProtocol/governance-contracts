@@ -1,6 +1,12 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.13;
 
+/**
+ * @title ITimelock
+ * @author Venus
+ * @dev Interface for Timelock contract
+ * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
+ */
 interface ITimelock {
     /**
      * @notice Delay period for the transaction queue

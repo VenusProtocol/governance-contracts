@@ -13,6 +13,7 @@ import { BaseOmnichainControllerSrc } from "./BaseOmnichainControllerSrc.sol";
  * @notice OmnichainProposalSender contract builds upon the functionality of its parent contract , BaseOmnichainControllerSrc
  * It sends a proposal's data to remote chains for execution after the proposal passes on the main chain
  * when used with GovernorBravo, the owner of this contract must be set to the Timelock contract
+ * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 
 contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc {

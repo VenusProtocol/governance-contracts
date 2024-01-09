@@ -11,6 +11,7 @@ import { IAccessControlManagerV8 } from "./../Governance/IAccessControlManagerV8
  * @title BaseOmnichainControllerSrc
  * @dev This contract is the base for the Omnichain controller source contracts.
  * It provides functionality related to daily command limits and pausability.
+ *  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 
 contract BaseOmnichainControllerSrc is Ownable, Pausable {

@@ -13,6 +13,7 @@ interface IOmnichainGovernanceExecutor {
  * @notice OmnichainProposalSender contract acts as a governance and access control mechanism,
  * allowing owner to upsert signature of OmnichainGovernanceExecutor contract,
  * also contains function to transfer the ownership of contract as well.
+ * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 
 contract OmnichainExecutorOwner is AccessControlledV8 {

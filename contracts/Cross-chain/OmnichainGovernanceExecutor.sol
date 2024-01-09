@@ -13,6 +13,7 @@ import { ITimelock } from "./interfaces/ITimelock.sol";
  * @dev The owner of this contract controls LayerZero configuration. When used in production the owner will be OmnichainExecutor
  * This implementation is non-blocking, meaning the failed messages will not block the future messages from the source.
  * For the blocking behavior, derive the contract from LzApp.
+ * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainControllerDest {
     using BytesLib for bytes;
