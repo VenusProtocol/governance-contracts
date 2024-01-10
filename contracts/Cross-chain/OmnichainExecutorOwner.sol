@@ -13,13 +13,14 @@ interface IOmnichainGovernanceExecutor {
  * @notice OmnichainProposalSender contract acts as a governance and access control mechanism,
  * allowing owner to upsert signature of OmnichainGovernanceExecutor contract,
  * also contains function to transfer the ownership of contract as well.
+ * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 
 contract OmnichainExecutorOwner is AccessControlledV8 {
     /**
      *  @custom:oz-upgrades-unsafe-allow state-variable-immutable
      */
-    IOmnichainGovernanceExecutor public immutable omnichainGovernanceExecutor;
+    IOmnichainGovernanceExecutor public immutable OMNICHAIN_GOVERNANCE_EXECUTOR;
 
     /**
      * @notice Stores function signature corresponding to their 4 bytes hash value
@@ -29,12 +30,12 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     /**
      * @notice Event emitted when function registry updated
      */
-    event FunctionRegistryChanged(string signature, bool active);
+    event FunctionRegistryChanged(string indexed signature, bool active);
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address omnichainGovernanceExecutor_) {
         require(omnichainGovernanceExecutor_ != address(0), "Address must not be zero");
-        omnichainGovernanceExecutor = IOmnichainGovernanceExecutor(omnichainGovernanceExecutor_);
+        OMNICHAIN_GOVERNANCE_EXECUTOR = IOmnichainGovernanceExecutor(omnichainGovernanceExecutor_);
     }
 
     /**
@@ -42,7 +43,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
      * @param accessControlManager_  Address of access control manager
      */
     function initialize(address accessControlManager_) external initializer {
-        require(address(accessControlManager_) != address(0), "Address must not be zero");
+        require(accessControlManager_ != address(0), "Address must not be zero");
         __AccessControlled_init(accessControlManager_);
     }
 
@@ -50,10 +51,10 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
      *  @notice Invoked when called function does not exist in the contract.
      */
     fallback(bytes calldata data_) external returns (bytes memory) {
-        string memory fun = _getFunctionName(msg.sig);
+        string memory fun = functionRegistry[msg.sig];
         require(bytes(fun).length != 0, "Function not found");
         _checkAccessAllowed(fun);
-        (bool ok, bytes memory res) = address(omnichainGovernanceExecutor).call(data_);
+        (bool ok, bytes memory res) = address(OMNICHAIN_GOVERNANCE_EXECUTOR).call(data_);
         require(ok, "call failed");
         return res;
     }
@@ -62,6 +63,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
      * @notice A registry of functions that are allowed to be executed from proposals
      * @param signatures_  Function signature to be added or removed.
      * @param active_ bool value, should be true to add function.
+     * @custom:access Only owner
      */
     function upsertSignature(string[] calldata signatures_, bool[] calldata active_) external onlyOwner {
         uint256 signatureLength = signatures_.length;
@@ -87,16 +89,12 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
 
     function transferBridgeOwnership(address newOwner_) external {
         _checkAccessAllowed("transferBridgeOwnership(address)");
-        require(address(newOwner_) != address(0), "Address must not be zero");
-        omnichainGovernanceExecutor.transferOwnership(newOwner_);
+        require(newOwner_ != address(0), "Address must not be zero");
+        OMNICHAIN_GOVERNANCE_EXECUTOR.transferOwnership(newOwner_);
     }
 
     /**
      *  @notice Empty implementation of renounce ownership to avoid any mishappening.
      */
     function renounceOwnership() public virtual override {}
-
-    function _getFunctionName(bytes4 signature_) internal view returns (string memory) {
-        return functionRegistry[signature_];
-    }
 }

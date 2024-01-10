@@ -1,16 +1,22 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.13;
 
+/**
+ * @title ITimelock
+ * @author Venus
+ * @dev Interface for Timelock contract
+ * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
+ */
 interface ITimelock {
     /**
      * @notice Delay period for the transaction queue
      */
-    function delay() external view returns (uint);
+    function delay() external view returns (uint256);
 
     /**
      * @notice Required period to execute a proposal transaction
      */
-    function GRACE_PERIOD() external view returns (uint);
+    function GRACE_PERIOD() external view returns (uint256);
 
     /**
      * @notice Method for accepting a proposed admin
@@ -34,10 +40,10 @@ interface ITimelock {
      */
     function queueTransaction(
         address target,
-        uint value,
+        uint256 value,
         string calldata signature,
         bytes calldata data,
-        uint eta
+        uint256 eta
     ) external returns (bytes32);
 
     /**
@@ -50,10 +56,10 @@ interface ITimelock {
      */
     function cancelTransaction(
         address target,
-        uint value,
+        uint256 value,
         string calldata signature,
         bytes calldata data,
-        uint eta
+        uint256 eta
     ) external;
 
     /**
@@ -66,9 +72,9 @@ interface ITimelock {
      */
     function executeTransaction(
         address target,
-        uint value,
+        uint256 value,
         string calldata signature,
         bytes calldata data,
-        uint eta
+        uint256 eta
     ) external payable returns (bytes memory);
 }

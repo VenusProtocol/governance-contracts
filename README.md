@@ -78,3 +78,9 @@ Deployed contract abis and addresses are exported in the `deployments` directory
 ```
 $ yarn hardhat export --network <network-name> --export ./deployments/<network-name>.json
 ```
+
+### Discussion
+
+For any concerns with the protocol, open an issue or visit us on [Telegram](https://t.me/venusprotocol) to discuss.
+
+For security concerns, please contact the administrators of our telegram chat.

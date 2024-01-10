@@ -13,6 +13,7 @@ import { ITimelock } from "./interfaces/ITimelock.sol";
  * @dev The owner of this contract controls LayerZero configuration. When used in production the owner will be OmnichainExecutor
  * This implementation is non-blocking, meaning the failed messages will not block the future messages from the source.
  * For the blocking behavior, derive the contract from LzApp.
+ * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainControllerDest {
     using BytesLib for bytes;
@@ -48,7 +49,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice A privileged role that can cancel any proposal.
      */
-    address public immutable guardian;
+    address public immutable GUARDIAN;
 
     /**
      * @notice Last proposal count received
@@ -95,7 +96,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice Emitted when proposal failed.
      */
-    event ReceivePayloadFailed(uint16 srcChainId, bytes srcAddress, uint64 nonce, bytes reason);
+    event ReceivePayloadFailed(uint16 indexed srcChainId, bytes indexed srcAddress, uint64 nonce, bytes reason);
 
     /**
      * @notice Emitted when proposal is cancelled.
@@ -108,7 +109,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     event TimelockAdded(address indexed timelock, uint8 routeType);
 
     constructor(address endpoint_, address guardian_) BaseOmnichainControllerDest(endpoint_) {
-        guardian = guardian_;
+        GUARDIAN = guardian_;
     }
 
     /**
@@ -165,9 +166,10 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @custom:event Emits ProposalCancelled with proposal id of the cancelled proposal.
      */
     function cancel(uint256 proposalId_) external {
+        require(queued[proposalId_], "OmnichainGovernanceExecutor::cancel: proposal not queued");
         Proposal storage proposal = proposals[proposalId_];
         require(!proposal.executed, "OmnichainGovernanceExecutor::cancel: cannot cancel executed proposal");
-        require(msg.sender == guardian, "OmnichainGovernanceExecutor::cancel: sender must be guardian");
+        require(msg.sender == GUARDIAN, "OmnichainGovernanceExecutor::cancel: sender must be guardian");
 
         proposal.cancelled = true;
         for (uint256 i = 0; i < proposal.targets.length; i++) {
@@ -189,16 +191,16 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         uint64 nonce_,
         bytes memory payload_
     ) internal virtual override whenNotPaused {
-        bytes32 hashedPayload = keccak256(payload_);
         uint256 gasToStoreAndEmit = 30000; // enough gas to ensure we can store the payload and emit the event
 
         (bool success, bytes memory reason) = address(this).excessivelySafeCall(
             gasleft() - gasToStoreAndEmit,
             150,
-            abi.encodeWithSelector(this.nonblockingLzReceive.selector, srcChainId_, srcAddress_, nonce_, payload_)
+            abi.encodeCall(this.nonblockingLzReceive, (srcChainId_, srcAddress_, nonce_, payload_))
         );
         // try-catch all errors/exceptions
         if (!success) {
+            bytes32 hashedPayload = keccak256(payload_);
             failedMessages[srcChainId_][srcAddress_][nonce_] = hashedPayload;
             emit ReceivePayloadFailed(srcChainId_, srcAddress_, nonce_, reason); // Retrieve payload from the src side tx if needed to clear
         }
@@ -241,7 +243,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
 
     function _queue(uint256 proposalId_) internal {
         Proposal storage proposal = proposals[proposalId_];
-        uint256 eta = block.timestamp + proposalTimelocks[uint8(proposal.proposalType)].delay();
+        uint256 eta = block.timestamp + proposalTimelocks[proposal.proposalType].delay();
         for (uint256 i; i < proposal.targets.length; ++i) {
             _queueOrRevertInternal(
                 proposal.targets[i],
@@ -249,7 +251,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 proposal.signatures[i],
                 proposal.calldatas[i],
                 eta,
-                uint8(proposal.proposalType)
+                proposal.proposalType
             );
         }
 

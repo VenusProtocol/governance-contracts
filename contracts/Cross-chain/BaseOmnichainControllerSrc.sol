@@ -11,6 +11,7 @@ import { IAccessControlManagerV8 } from "./../Governance/IAccessControlManagerV8
  * @title BaseOmnichainControllerSrc
  * @dev This contract is the base for the Omnichain controller source contracts.
  * It provides functionality related to daily command limits and pausability.
+ *  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 
 contract BaseOmnichainControllerSrc is Ownable, Pausable {
@@ -33,6 +34,10 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
      * @notice Timestamp when the last 24-hour window started from the local chain.
      */
     mapping(uint16 => uint256) public chainIdToLast24HourWindowStart;
+    /**
+     * @notice Timestamp when the last proposal sent from the local chain to dest chain.
+     */
+    mapping(uint16 => uint256) public chainIdToLastProposalSentTimestamp;
 
     /**
      * @notice Emitted when the maximum daily limit of commands from the local chain is modified.
@@ -103,6 +108,7 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
         uint256 lastDayWindowStart = chainIdToLast24HourWindowStart[dstChainId_];
         uint256 commandsSentInWindow = chainIdToLast24HourCommandsSent[dstChainId_];
         uint256 maxDailyLimit = chainIdToMaxDailyLimit[dstChainId_];
+        uint256 lastProposalSentTimestamp = chainIdToLastProposalSentTimestamp[dstChainId_];
 
         // Check if the time window has changed (more than 24 hours have passed)
         if (currentBlockTimestamp - lastDayWindowStart > 1 days) {
@@ -114,9 +120,13 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
 
         // Revert if the amount exceeds the daily limit
         require(commandsSentInWindow <= maxDailyLimit, "Daily Transaction Limit Exceeded");
+        // Revert if the last proposal is already sent in current block i.e multiple commands for a dstChainId_ in a proposal
+        require(lastProposalSentTimestamp != currentBlockTimestamp, "Multiple bridging in a proposal");
 
         // Update the amount for the 24-hour window
         chainIdToLast24HourCommandsSent[dstChainId_] = commandsSentInWindow;
+        // Update the last sent proposal timestamp
+        chainIdToLastProposalSentTimestamp[dstChainId_] = currentBlockTimestamp;
     }
 
     function _ensureAllowed(string memory functionSig_) internal view {

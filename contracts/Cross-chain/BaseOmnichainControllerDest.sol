@@ -11,6 +11,7 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * @author Venus
  * @dev This contract is the base for the Omnichain controller destination contract.
  * It provides functionality related to daily command limits and pausability.
+ * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 
 abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
