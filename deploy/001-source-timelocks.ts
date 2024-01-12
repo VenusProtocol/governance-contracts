@@ -3,6 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
+import { delayConfig } from "../helpers/deploy/deploymentConfig";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
@@ -18,38 +19,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     return live ? governorBravoDelegatorAddress : deployer;
   };
 
-  const delayConfig = {
-    hardhat: {
-      normal: 600,
-      fast: 300,
-      critical: 100,
-    },
-    bscmainnet: {
-      normal: 172800,
-      fast: 21600,
-      critical: 3600,
-    },
-    bsctestnet: {
-      normal: 600,
-      fast: 300,
-      critical: 100,
-    },
-    sepolia: {
-      normal: 600,
-      fast: 300,
-      critical: 100,
-    },
-    ethereum: {
-      normal: 172800,
-      fast: 21600,
-      critical: 3600,
-    },
-  };
-
   await deploy("NormalTimelock", {
     contract: "Timelock",
     from: deployer,
-    args: [getAdmin(), delayConfig[networkName].normal],
+    args: [getAdmin(), (delayConfig as any)[networkName].normal],
     log: true,
     autoMine: true,
   });
@@ -57,7 +30,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("FastTrackTimelock", {
     contract: "Timelock",
     from: deployer,
-    args: [getAdmin(), delayConfig[networkName].fast],
+    args: [getAdmin(), (delayConfig as any)[networkName].fast],
     log: true,
     autoMine: true,
   });
@@ -65,7 +38,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("CriticalTimelock", {
     contract: "Timelock",
     from: deployer,
-    args: [getAdmin(), delayConfig[networkName].critical],
+    args: [getAdmin(), (delayConfig as any)[networkName].critical],
     log: true,
     autoMine: true,
   });

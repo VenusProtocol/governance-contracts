@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
+import { LZ_CHAINID, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
 import { OmnichainGovernanceExecutorMethods, config } from "../helpers/deploy/deploymentConfig";
 import { getOmnichainProposalSender } from "../helpers/deploy/deploymentUtils";
 import { OmnichainGovernanceExecutor } from "../typechain";
@@ -86,22 +86,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const fastTrackTimelockAddress = (await ethers.getContract("FastTrackTimelock")).address;
   const criticalTimelockAddress = (await ethers.getContract("CriticalTimelock")).address;
 
-  const OmnichainGovernanceExecutor = await deploy("OmnichainGovernanceExecutor", {
-    from: deployer,
-    args: [LZ_ENDPOINTS[networkName], deployer],
-    log: true,
-    autoMine: true,
-  });
-
-  const omnichainGovernanceExecutor = (await ethers.getContractAt(
-    "OmnichainGovernanceExecutor",
-    OmnichainGovernanceExecutor.address,
-    ethers.provider.getSigner(deployer),
-  )) as OmnichainGovernanceExecutor;
-
+  const omnichainGovernanceExecutorAddress = (await ethers.getContract("OmnichainGovernanceExecutor")).address;
   const OmnichainExecutorOwner = await deploy("OmnichainExecutorOwner", {
     from: deployer,
-    args: [OmnichainGovernanceExecutor.address],
+    args: [omnichainGovernanceExecutorAddress],
     contract: "OmnichainExecutorOwner",
     proxy: {
       owner: normalTimelockAddress,
@@ -115,26 +103,37 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
     autoMine: true,
   });
-
   const omnichainExecutorOwner = await ethers.getContractAt(
     "OmnichainExecutorOwner",
     OmnichainExecutorOwner.address,
     ethers.provider.getSigner(deployer),
   );
+  const omnichainGovernanceExecutor = (await ethers.getContractAt(
+    "OmnichainGovernanceExecutor",
+    omnichainGovernanceExecutorAddress,
+    ethers.provider.getSigner(deployer),
+  )) as OmnichainGovernanceExecutor;
 
   if ((await omnichainGovernanceExecutor.owner()) === deployer) {
+    let tx = await omnichainGovernanceExecutor.addTimelocks([
+      normalTimelockAddress,
+      fastTrackTimelockAddress,
+      criticalTimelockAddress,
+    ]);
+    await tx.wait();
+
     const omnichainProposalSenderAddress = await getOmnichainProposalSender(networkName);
     await executeCommands(
       omnichainGovernanceExecutor,
       hre,
       deployer,
-      omnichainProposalSenderAddress,
-      10102,
+      omnichainProposalSenderAddress as any,
+      LZ_CHAINID["bsctestnet"],
       normalTimelockAddress,
       fastTrackTimelockAddress,
       criticalTimelockAddress,
     );
-    const tx = await omnichainGovernanceExecutor.transferOwnership(OmnichainExecutorOwner.address);
+    tx = await omnichainGovernanceExecutor.transferOwnership(OmnichainExecutorOwner.address);
     await tx.wait();
   }
 
@@ -162,8 +161,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ),
   );
 };
-func.tags = ["OmnichainExecutor", "omnichainremote"];
+func.tags = ["OmnichainExecutorOwner", "Remote"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
-  !(hre.network.name === "sepolia" || hre.network.name === "ethereum") && hre.network.name !== "hardhat";
+  hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet" || hre.network.name === "hardhat";
 export default func;

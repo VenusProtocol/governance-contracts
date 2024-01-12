@@ -3,6 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
+import { delayConfig } from "../helpers/deploy/deploymentConfig";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
@@ -10,63 +11,37 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
 
   const networkName = hre.network.name as SUPPORTED_NETWORKS;
+  const live = hre.network.live;
 
-  const delayConfig = {
-    hardhat: {
-      normal: 600,
-      fast: 300,
-      critical: 100,
-    },
-    bscmainnet: {
-      normal: 172800,
-      fast: 21600,
-      critical: 3600,
-    },
-    bsctestnet: {
-      normal: 600,
-      fast: 300,
-      critical: 100,
-    },
-    sepolia: {
-      normal: 600,
-      fast: 300,
-      critical: 100,
-    },
-    ethereum: {
-      normal: 172800,
-      fast: 21600,
-      critical: 3600,
-    },
-  };
   const omnichainGovernanceExecutorAddress = (await ethers.getContract("OmnichainGovernanceExecutor")).address;
 
   await deploy("NormalTimelock", {
-    contract: "Timelock",
+    contract: live ? "TimelockV8" : "TestTimelockV8",
     from: deployer,
-    args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].normal],
+    args: [omnichainGovernanceExecutorAddress, (delayConfig as any)[networkName].normal],
     log: true,
     autoMine: true,
   });
 
   await deploy("FastTrackTimelock", {
-    contract: "Timelock",
+    contract: live ? "TimelockV8" : "TestTimelockV8",
     from: deployer,
-    args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].fast],
+    args: [omnichainGovernanceExecutorAddress, (delayConfig as any)[networkName].fast],
     log: true,
     autoMine: true,
   });
 
   await deploy("CriticalTimelock", {
-    contract: "Timelock",
+    contract: live ? "TimelockV8" : "TestTimelockV8",
     from: deployer,
-    args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].critical],
+    args: [omnichainGovernanceExecutorAddress, (delayConfig as any)[networkName].critical],
     log: true,
     autoMine: true,
   });
 };
 
 func.tags = ["Timelock", "Remote"];
-
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
-  !(hre.network.name === "sepolia" || hre.network.name === "ethereum") && hre.network.name !== "hardhat";
+  hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet" || hre.network.name === "hardhat";
+
 export default func;

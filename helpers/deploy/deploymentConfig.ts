@@ -32,12 +32,39 @@ export const OmnichainGovernanceExecutorMethods: string[] = [
   "setConfig(uint16,uint16,uint256,bytes)",
   "addTimelocks(ITimelock[])",
 ];
+
 type Config = {
   [key in SUPPORTED_NETWORKS]: {
     methods: { method: string; args: any[] }[];
   };
 };
-
+export const delayConfig = {
+  hardhat: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  bscmainnet: {
+    normal: 172800,
+    fast: 21600,
+    critical: 3600,
+  },
+  bsctestnet: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  sepolia: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  ethereum: {
+    normal: 172800,
+    fast: 21600,
+    critical: 3600,
+  },
+};
 export const config: Config = {
   bsctestnet: {
     methods: [
@@ -61,6 +88,18 @@ export const config: Config = {
     methods: [
       { method: "setMaxDailyLimit(uint16,uint256)", args: [101, 100] },
       { method: "updateValidChainId(uint16,bool)", args: [101, true] },
+    ],
+  },
+  opbnbtestnet: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint16,uint256)", args: [10102, 100] },
+    ],
+  },
+  opbnbmainnet: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [101, 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint16,uint256)", args: [101, 100] },
     ],
   },
   hardhat: {
