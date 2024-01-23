@@ -11,7 +11,7 @@ import { IAccessControlManagerV8 } from "./../Governance/IAccessControlManagerV8
  * @title BaseOmnichainControllerSrc
  * @dev This contract is the base for the Omnichain controller source contracts.
  * It provides functionality related to daily command limits and pausability.
- *  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
+ * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 
 contract BaseOmnichainControllerSrc is Ownable, Pausable {
@@ -57,7 +57,7 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
     /**
      * @notice Sets the limit of daily (24 Hour) command amount.
      * @param chainId_ Destination chain ID.
-     * @param limit_ Amount in USD(scaled with 18 decimals).).
+     * @param limit_ Number of commands.
      * @custom:access Controlled by AccessControlManager.
      * @custom:event Emits SetMaxDailyLimit new limit and its corresponding chain id
      */
@@ -120,7 +120,7 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
 
         // Revert if the amount exceeds the daily limit
         require(commandsSentInWindow <= maxDailyLimit, "Daily Transaction Limit Exceeded");
-        // Revert if the last proposal is already sent in current block i.e multiple commands for a dstChainId_ in a proposal
+        // Revert if the last proposal is already sent in current block i.e multiple proposals cannot be sent within the same block.timestamp
         require(lastProposalSentTimestamp != currentBlockTimestamp, "Multiple bridging in a proposal");
 
         // Update the amount for the 24-hour window
