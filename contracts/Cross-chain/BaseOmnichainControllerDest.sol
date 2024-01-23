@@ -33,7 +33,7 @@ abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
     /**
      * @notice Emitted when the maximum daily limit for receiving command from remote chain is modified.
      */
-    event SetMaxDailyReceiveLimit(uint256 oldMaxLimit, uint256 newMaxLimit);
+    event SetMaxDailyReceiveLimit(uint16 indexed chainId, uint256 oldMaxLimit, uint256 newMaxLimit);
 
     constructor(address endpoint_) NonblockingLzApp(endpoint_) {
         ensureNonzeroAddress(endpoint_);
@@ -44,10 +44,10 @@ abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
      * @param chainId_ The source chain ID.
      * @param limit_ Number of commands.
      * @custom:access Only Owner.
-     * @custom:event Emits SetMaxDailyReceiveLimit with new limit and its associated chain id
+     * @custom:event Emits SetMaxDailyReceiveLimit with old and new limit and its associated chain id
      */
     function setMaxDailyReceiveLimit(uint16 chainId_, uint256 limit_) external onlyOwner {
-        emit SetMaxDailyReceiveLimit(chainIdToMaxDailyReceiveLimit[chainId_], limit_);
+        emit SetMaxDailyReceiveLimit(chainId_, chainIdToMaxDailyReceiveLimit[chainId_], limit_);
         chainIdToMaxDailyReceiveLimit[chainId_] = limit_;
     }
 

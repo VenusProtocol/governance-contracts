@@ -42,7 +42,7 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
     /**
      * @notice Emitted when the maximum daily limit of commands from the local chain is modified.
      */
-    event SetMaxDailyLimit(uint256 oldMaxLimit, uint256 newMaxLimit);
+    event SetMaxDailyLimit(uint16 indexed chainId, uint256 oldMaxLimit, uint256 newMaxLimit);
 
     /**
      * @notice Emitted when the address of ACM is updated.
@@ -59,11 +59,11 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
      * @param chainId_ Destination chain ID.
      * @param limit_ Number of commands.
      * @custom:access Controlled by AccessControlManager.
-     * @custom:event Emits SetMaxDailyLimit new limit and its corresponding chain id
+     * @custom:event Emits SetMaxDailyLimit with old and new limit and its corresponding chain id
      */
     function setMaxDailyLimit(uint16 chainId_, uint256 limit_) external {
         _ensureAllowed("setMaxDailyLimit(uint16,uint256)");
-        emit SetMaxDailyLimit(chainIdToMaxDailyLimit[chainId_], limit_);
+        emit SetMaxDailyLimit(chainId_, chainIdToMaxDailyLimit[chainId_], limit_);
         chainIdToMaxDailyLimit[chainId_] = limit_;
     }
 
