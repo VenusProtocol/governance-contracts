@@ -220,7 +220,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         bytes calldata payload_,
         bytes calldata adapterParams_,
         uint256 originalValue_
-    ) external payable onlyOwner nonReentrant {
+    ) external onlyOwner nonReentrant {
         ensureNonzeroAddress(to_);
         require(originalValue_ > 0, "OmnichainProposalSender: invalid native amount");
         require(address(this).balance >= originalValue_, "OmnichainProposalSender: insufficient native balance");
