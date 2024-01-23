@@ -121,6 +121,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     ) external payable whenNotPaused {
         _ensureAllowed("execute(uint16,bytes,bytes)");
 
+        require(msg.value > 0, "OmnichainProposalSender: value cannot be zero");
         require(validChainIds[remoteChainId_], "OmnichainProposalSender: Invalid chainId");
         require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
 
@@ -138,7 +139,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
             targets.length == values.length &&
                 targets.length == signatures.length &&
                 targets.length == calldatas.length,
-            "OmnichainProposalSender::execute: proposal function information arity mismatch"
+            "OmnichainProposalSender: proposal function information arity mismatch"
         );
 
         _isEligibleToSend(remoteChainId_, targets.length);
