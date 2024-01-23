@@ -127,7 +127,20 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
 
-        (address[] memory targets, , , , ) = abi.decode(payload_, (address[], uint[], string[], bytes[], uint8));
+        (
+            address[] memory targets,
+            uint256[] memory values,
+            string[] memory signatures,
+            bytes[] memory calldatas,
+
+        ) = abi.decode(payload_, (address[], uint[], string[], bytes[], uint8));
+        require(
+            targets.length == values.length &&
+                targets.length == signatures.length &&
+                targets.length == calldatas.length,
+            "OmnichainProposalSender::execute: proposal function information arity mismatch"
+        );
+
         _isEligibleToSend(remoteChainId_, targets.length);
 
         uint64 _pId = ++proposalCount;
