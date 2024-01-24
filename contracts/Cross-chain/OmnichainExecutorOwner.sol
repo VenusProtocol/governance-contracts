@@ -74,10 +74,10 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
             bytes memory signature = bytes(functionRegistry[sigHash]);
             if (active_[i] && signature.length == 0) {
                 functionRegistry[sigHash] = signatures_[i];
-                emit FunctionRegistryChanged(signatures_[i], active_[i]);
+                emit FunctionRegistryChanged(signatures_[i], true);
             } else if (!active_[i] && signature.length != 0) {
                 delete functionRegistry[sigHash];
-                emit FunctionRegistryChanged(signatures_[i], active_[i]);
+                emit FunctionRegistryChanged(signatures_[i], false);
             }
             unchecked {
                 ++i;
