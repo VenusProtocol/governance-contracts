@@ -113,6 +113,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
      * @custom:event Emits ExecuteRemoteProposal with remote chain id and payload on success
      * @custom:event Emits StorePayload with last stored payload proposal ID ,remote chain id , payload, adapter params , values and reason for failure
+     * @custom:access Controlled by Access Control Manager
      */
     function execute(
         uint16 remoteChainId_,

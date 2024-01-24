@@ -46,7 +46,10 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     }
 
     /**
-     *  @notice Invoked when called function does not exist in the contract.
+     * @notice Invoked when called function does not exist in the contract.
+     * @param data_ Calldata containing the encoded function call.
+     * @return Result of function call.
+     * @custom:access Controlled by Access Control Manager.
      */
     fallback(bytes calldata data_) external returns (bytes memory) {
         string memory fun = functionRegistry[msg.sig];

@@ -69,6 +69,7 @@ interface ITimelock {
      * @param signature signature of the function to be called
      * @param data Arguments to be passed to the function when called
      * @param eta Timestamp after which the transaction can be executed
+     * @return Result of function call
      */
     function executeTransaction(
         address target,

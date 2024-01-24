@@ -84,6 +84,7 @@ contract TimelockV8 {
     /**
      * @notice Setter for the transaction queue delay
      * @param delay_ The new delay period for the transaction queue
+     * @custom:event Emit NewDelay with old and new delay
      */
     function setDelay(uint256 delay_) public {
         require(msg.sender == address(this), "Timelock::setDelay: Call must come from Timelock.");
@@ -93,20 +94,34 @@ contract TimelockV8 {
         delay = delay_;
     }
 
+    /**
+     * @notice Return grace period
+     * @return The duration of the grace period, specified as a uint256 value.
+     */
     function GRACE_PERIOD() public view virtual returns (uint256) {
         return DEFAULT_GRACE_PERIOD;
     }
 
+    /**
+     * @notice Return required minimum delay
+     * @return Minimum delay
+     */
     function MINIMUM_DELAY() public view virtual returns (uint256) {
         return DEFAULT_MINIMUM_DELAY;
     }
 
+    /**
+     * @notice Return required maximum delay
+     * @return Maximum delay
+     */
     function MAXIMUM_DELAY() public view virtual returns (uint256) {
         return DEFAULT_MAXIMUM_DELAY;
     }
 
     /**
      * @notice Method for accepting a proposed admin
+     * @custom:access Sender must be pending admin
+     * @custom:event Emit NewAdmin with old and new admin
      */
     function acceptAdmin() public {
         require(msg.sender == pendingAdmin, "Timelock::acceptAdmin: Call must come from pendingAdmin.");
@@ -118,6 +133,8 @@ contract TimelockV8 {
     /**
      * @notice Method to propose a new admin authorized to call timelock functions. This should be the Governor Contract
      * @param pendingAdmin_ Address of the proposed admin
+     * @custom:access Sender must be Timelock contract itself
+     * @custom:event Emit NewPendingAdmin with new pending admin
      */
     function setPendingAdmin(address pendingAdmin_) public {
         require(msg.sender == address(this), "Timelock::setPendingAdmin: Call must come from Timelock.");
@@ -135,6 +152,8 @@ contract TimelockV8 {
      * @param data Arguments to be passed to the function when called
      * @param eta Timestamp after which the transaction can be executed
      * @return Hash of the queued transaction
+     * @custom:access Sender must be admin
+     * @custom:event Emit QueueTransaction
      */
     function queueTransaction(
         address target,
@@ -163,6 +182,8 @@ contract TimelockV8 {
      * @param signature Ssignature of the function to be called
      * @param data Arguments to be passed to the function when called
      * @param eta Timestamp after which the transaction can be executed
+     * @custom:access Sender must be admin
+     * @custom:event Emit CancelTransaction
      */
     function cancelTransaction(
         address target,
@@ -186,6 +207,9 @@ contract TimelockV8 {
      * @param signature Ssignature of the function to be called
      * @param data Arguments to be passed to the function when called
      * @param eta Timestamp after which the transaction can be executed
+     * @return Result of function call.
+     * @custom:access Sender must be admin
+     * @custom:event Emit ExecuteTransaction
      */
     function executeTransaction(
         address target,
