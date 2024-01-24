@@ -156,7 +156,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         proposal.executed = true;
 
         for (uint256 i; i < proposal.targets.length; ) {
-            proposalTimelocks[uint8(proposal.proposalType)].executeTransaction(
+            proposalTimelocks[proposal.proposalType].executeTransaction(
                 proposal.targets[i],
                 proposal.values[i],
                 proposal.signatures[i],
