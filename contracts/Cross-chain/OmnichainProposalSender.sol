@@ -158,7 +158,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
                 remoteChainId_,
                 trustedRemote,
                 payload,
-                payable(tx.origin),
+                payable(msg.sender),
                 address(0),
                 adapterParams_
             )
@@ -179,6 +179,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
      * @param originalValue_ The msg.value passed when execute() function was called
      * @custom:event Emits ClearPayload with proposal ID and hash
+     * @custom:access Controlled by Access Control Manager
      */
     function retryExecute(
         uint64 pId_,
@@ -187,6 +188,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         bytes calldata adapterParams_,
         uint256 originalValue_
     ) external payable whenNotPaused nonReentrant {
+        _ensureAllowed("retryExecute(uint64,uint16,bytes,bytes,uint256)");
         bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
         bytes32 hash = storedExecutionHashes[pId_];
