@@ -36,6 +36,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     constructor(address omnichainGovernanceExecutor_) {
         require(omnichainGovernanceExecutor_ != address(0), "Address must not be zero");
         OMNICHAIN_GOVERNANCE_EXECUTOR = IOmnichainGovernanceExecutor(omnichainGovernanceExecutor_);
+        _disableInitializers();
     }
 
     /**
