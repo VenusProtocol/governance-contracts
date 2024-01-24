@@ -2,10 +2,7 @@
 pragma solidity 0.8.13;
 
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
-
-interface IOmnichainGovernanceExecutor {
-    function transferOwnership(address addr) external;
-}
+import { IOmnichainGovernanceExecutor } from "./interfaces/IOmnichainGovernanceExecutor.sol";
 
 /**
  * @title OmnichainExecutorOwner
