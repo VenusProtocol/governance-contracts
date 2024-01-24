@@ -233,7 +233,6 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     ) external onlyOwner nonReentrant {
         ensureNonzeroAddress(to_);
         require(originalValue_ > 0, "OmnichainProposalSender: invalid native amount");
-        require(address(this).balance >= originalValue_, "OmnichainProposalSender: insufficient native balance");
         require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
 
         bytes32 hash = storedExecutionHashes[pId_];

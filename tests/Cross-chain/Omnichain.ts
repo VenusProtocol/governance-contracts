@@ -570,7 +570,7 @@ describe("OmnichainProposalSender: ", async function () {
         adapterParams,
         nativeFee.mul(10),
       ),
-    ).to.be.revertedWith("OmnichainProposalSender: insufficient native balance");
+    ).to.be.revertedWith("OmnichainProposalSender: invalid execution params");
   });
 
   it("Reverts when different parameters passed in fallback withdraw", async function () {
@@ -653,26 +653,6 @@ describe("OmnichainProposalSender: ", async function () {
     await expect(
       sender.fallbackWithdraw(signer2.address, nonce, remoteChainId, "0x", adapterParams, nativeFee),
     ).to.be.revertedWith("OmnichainProposalSender: Empty payload");
-  });
-
-  it("Reverts when value exceeds contract's balance in fallback withdraw", async function () {
-    const adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [remoteChainId, 0]);
-    const payload = await getPayload(NormalTimelock.address);
-
-    await storePayload(payload, adapterParams);
-
-    const nonce = await sender.proposalCount();
-
-    await expect(
-      sender.fallbackWithdraw(
-        signer2.address,
-        nonce,
-        remoteChainId,
-        payloadWithId(payload),
-        adapterParams,
-        nativeFee.mul(10),
-      ),
-    ).to.be.revertedWith("OmnichainProposalSender: insufficient native balance");
   });
 
   it("Reverts when different parameters passed in fallback withdraw", async function () {
