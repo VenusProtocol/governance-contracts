@@ -194,7 +194,7 @@ describe("OmnichainProposalSender: ", async function () {
     await expect(sender.connect(signer2).execute(remoteChainId, payload, "0x")).to.be.revertedWith("access denied");
   });
 
-  it("Reverts with Invalid chainId", async function () {
+  it("Reverts when zero value passed", async function () {
     const payload = await makePayload(
       [NormalTimelock.address],
       values,
@@ -203,8 +203,22 @@ describe("OmnichainProposalSender: ", async function () {
       proposalType,
     );
     await expect(sender.connect(signer1).execute(remoteChainId, payload, "0x")).to.be.revertedWith(
-      "OmnichainProposalSender: Invalid chainId",
+      "OmnichainProposalSender: value cannot be zero",
     );
+  });
+  it("Reverts with Invalid chainId", async function () {
+    const payload = await makePayload(
+      [NormalTimelock.address],
+      values,
+      ["setDelay(uint256)"],
+      [calldata],
+      proposalType,
+    );
+    await expect(
+      sender.connect(signer1).execute(remoteChainId, payload, "0x", {
+        value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
+      }),
+    ).to.be.revertedWith("OmnichainProposalSender: Invalid chainId");
   });
 
   it("Reverts when EOA call updateValidChainId without grant permission", async function () {
@@ -235,9 +249,11 @@ describe("OmnichainProposalSender: ", async function () {
       [calldata],
       proposalType,
     );
-    await expect(sender.connect(signer1).execute(remoteChainId, payload, "0x")).to.be.revertedWith(
-      "Daily Transaction Limit Exceeded",
-    );
+    await expect(
+      sender.connect(signer1).execute(remoteChainId, payload, "0x", {
+        value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
+      }),
+    ).to.be.revertedWith("Daily Transaction Limit Exceeded");
   });
 
   it("Reverts if EOA call setMaxDailyLimit() without grant permisssion", async function () {
@@ -490,7 +506,7 @@ describe("OmnichainProposalSender: ", async function () {
     const proposalIdSource = await getLastSourceProposalId();
     expect((await executor.proposals(proposalIdRemote))[0]).to.not.equals(proposalIdSource);
   });
-  it("Revert when number of parameters mismatch", async function () {
+  it("Reverts when number of parameters mismatch", async function () {
     const calldata = ethers.utils.defaultAbiCoder.encode(["uint256", "uint256"], [delay, delay - 20]);
     const payload = await makePayload(
       [NormalTimelock.address, FasttrackTimelock.address],
