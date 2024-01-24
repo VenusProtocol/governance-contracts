@@ -138,13 +138,14 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @param proposalId_ Id of proposal that is to be executed.
      * @custom:event Emits ProposalExecuted with proposal id of executed proposal.
      */
-    function execute(uint256 proposalId_) external {
+    function execute(uint256 proposalId_) external nonReentrant {
         require(
             queued[proposalId_],
             "OmnichainGovernanceExecutor::execute: proposal can only be executed if it is queued"
         );
 
         Proposal storage proposal = proposals[proposalId_];
+        proposal.executed = true;
 
         for (uint256 i; i < proposal.targets.length; ++i) {
             proposalTimelocks[uint8(proposal.proposalType)].executeTransaction(
@@ -155,7 +156,6 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 proposal.eta
             );
         }
-        proposal.executed = true;
         emit ProposalExecuted(proposalId_);
     }
 
