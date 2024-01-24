@@ -11,13 +11,13 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  */
 contract TimelockV8 {
     /// @notice Event emitted when a new admin is accepted
-    event NewAdmin(address indexed newAdmin);
+    event NewAdmin(address indexed oldAdmin, address indexed newAdmin);
 
     /// @notice Event emitted when a new admin is proposed
     event NewPendingAdmin(address indexed newPendingAdmin);
 
-    /// @notice Event emitted when a new admin is proposed
-    event NewDelay(uint256 indexed newDelay);
+    /// @notice Event emitted when a new delay is proposed
+    event NewDelay(uint256 indexed oldDelay, uint256 indexed newDelay);
 
     /// @notice Event emitted when a proposal transaction has been cancelled
     event CancelTransaction(
@@ -89,9 +89,8 @@ contract TimelockV8 {
         require(msg.sender == address(this), "Timelock::setDelay: Call must come from Timelock.");
         require(delay_ >= MINIMUM_DELAY(), "Timelock::setDelay: Delay must exceed minimum delay.");
         require(delay_ <= MAXIMUM_DELAY(), "Timelock::setDelay: Delay must not exceed maximum delay.");
+        emit NewDelay(delay, delay_);
         delay = delay_;
-
-        emit NewDelay(delay);
     }
 
     function GRACE_PERIOD() public view virtual returns (uint256) {
@@ -111,10 +110,9 @@ contract TimelockV8 {
      */
     function acceptAdmin() public {
         require(msg.sender == pendingAdmin, "Timelock::acceptAdmin: Call must come from pendingAdmin.");
+        emit NewAdmin(admin, msg.sender);
         admin = msg.sender;
         pendingAdmin = address(0);
-
-        emit NewAdmin(admin);
     }
 
     /**

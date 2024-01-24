@@ -107,7 +107,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice Emitted when timelock added.
      */
-    event TimelockAdded(address indexed timelock, uint8 routeType);
+    event TimelockAdded(uint8 routeType, address indexed oldTimelock, address indexed newTimelock);
 
     constructor(address endpoint_, address guardian_) BaseOmnichainControllerDest(endpoint_) {
         ensureNonzeroAddress(guardian_);
@@ -118,7 +118,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @notice Add timelocks to the ProposalTimelocks mapping.
      * @param timelocks_ Array of addresses of all 3 timelocks.
      * @custom:access Only owner.
-     * @custom:event Emits TimelockAdded with all 3 timelocks.
+     * @custom:event Emits TimelockAdded with old and new timelock and route type.
      */
     function addTimelocks(ITimelock[] memory timelocks_) external onlyOwner {
         require(
@@ -133,8 +133,8 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                     "OmnichainGovernanceExecutor::initialize:duplicate timelock"
                 );
             }
+            emit TimelockAdded(i, address(proposalTimelocks[i]), address(timelocks_[i]));
             proposalTimelocks[i] = timelocks_[i];
-            emit TimelockAdded(address(proposalTimelocks[i]), i);
         }
     }
 

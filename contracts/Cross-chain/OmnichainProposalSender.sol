@@ -46,7 +46,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     /**
      * @notice Emitted when a remote message receiver is set for the remote chain
      */
-    event SetTrustedRemoteAddress(uint16 indexed remoteChainId, bytes remoteAddress);
+    event SetTrustedRemoteAddress(uint16 indexed remoteChainId, bytes oldRemoteAddress, bytes newRemoteAddress);
 
     /**
      * @notice Emitted when a proposal execution request is sent to the remote chain
@@ -246,16 +246,17 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     /**
      * @notice Sets the remote message receiver address
      * @param remoteChainId_ The LayerZero id of a remote chain
-     * @param remoteAddress_ The address of the contract on the remote chain to receive messages sent by this contract
+     * @param newRemoteAddress_ The address of the contract on the remote chain to receive messages sent by this contract
      * @custom:access Controlled by AccessControlManager.
      * @custom:event Emits SetTrustedRemoteAddress with remote chain Id and remote address
      */
-    function setTrustedRemoteAddress(uint16 remoteChainId_, bytes calldata remoteAddress_) external {
+    function setTrustedRemoteAddress(uint16 remoteChainId_, bytes calldata newRemoteAddress_) external {
         _ensureAllowed("setTrustedRemoteAddress(uint16,bytes)");
         require(remoteChainId_ != 0, "ChainId must not be zero");
-        ensureNonzeroAddress(address(uint160(bytes20(remoteAddress_))));
-        trustedRemoteLookup[remoteChainId_] = abi.encodePacked(remoteAddress_, address(this));
-        emit SetTrustedRemoteAddress(remoteChainId_, remoteAddress_);
+        ensureNonzeroAddress(address(uint160(bytes20(newRemoteAddress_))));
+        bytes memory oldRemoteAddress = trustedRemoteLookup[remoteChainId_];
+        trustedRemoteLookup[remoteChainId_] = abi.encodePacked(newRemoteAddress_, address(this));
+        emit SetTrustedRemoteAddress(remoteChainId_, oldRemoteAddress, trustedRemoteLookup[remoteChainId_]);
     }
 
     /**
