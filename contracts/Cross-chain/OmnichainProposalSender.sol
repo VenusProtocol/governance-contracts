@@ -29,11 +29,6 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     mapping(uint64 => bytes32) public storedExecutionHashes;
 
     /**
-     * @notice Valid chainIds on remote
-     */
-    mapping(uint16 => bool) public validChainIds;
-
-    /**
      * @notice LayerZero endpoint for sending messages to remote chains
      */
     ILayerZeroEndpoint public immutable LZ_ENDPOINT;
@@ -47,6 +42,11 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @notice Emitted when a remote message receiver is set for the remote chain
      */
     event SetTrustedRemoteAddress(uint16 indexed remoteChainId, bytes oldRemoteAddress, bytes newRemoteAddress);
+
+    /**
+     * @notice Event emitted when trusted remote sets to empty.
+     */
+    event TrustedRemoteRemoved(uint16 indexed chainId);
 
     /**
      * @notice Emitted when a proposal execution request is sent to the remote chain
@@ -69,12 +69,6 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         uint256 value,
         bytes reason
     );
-
-    /**
-     * @notice Emitted while updating Valid ChainId mapping
-     */
-    event UpdatedValidChainId(uint16 indexed chainId, bool isAdded);
-
     /**
      * @notice Emitted while fallback withdraw
      */
@@ -106,6 +100,17 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     }
 
     /**
+     * @notice Remove trusted remote from storage.
+     * @param remoteChainId_ The chain's id corresponds to setting the trusted remote to empty.
+     * @custom:access Only owner.
+     * @custom:event Emit TrustedRemoteRemoved with remote chain id.
+     */
+    function removeTrustedRemote(uint16 remoteChainId_) external onlyOwner {
+        delete trustedRemoteLookup[remoteChainId_];
+        emit TrustedRemoteRemoved(remoteChainId_);
+    }
+
+    /**
      * @notice Sends a message to execute a remote proposal
      * @dev Stores the hash of the execution parameters if sending fails (e.g., due to insufficient fees)
      * @param remoteChainId_ The LayerZero id of the remote chain
@@ -123,7 +128,6 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         _ensureAllowed("execute(uint16,bytes,bytes)");
 
         require(msg.value > 0, "OmnichainProposalSender: value cannot be zero");
-        require(validChainIds[remoteChainId_], "OmnichainProposalSender: Invalid chainId");
         require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
 
         bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
@@ -183,6 +187,8 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         bytes calldata adapterParams_,
         uint256 originalValue_
     ) external payable whenNotPaused nonReentrant {
+        bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
+        require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
         bytes32 hash = storedExecutionHashes[pId_];
         require(hash != bytes32(0), "OmnichainProposalSender: no stored payload");
         require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
@@ -281,23 +287,6 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     function setSendVersion(uint16 version_) external {
         _ensureAllowed("setSendVersion(uint16)");
         LZ_ENDPOINT.setSendVersion(version_);
-    }
-
-    /**
-     * @notice Update the list of valid chain Ids.
-     * @param chainId_ chainId to be added or removed.
-     * @param isAdded_  should be true to add chainId.
-     * @custom:access Controlled by AccessControlManager.
-     * @custom:event Emits UpdatedValidChainId with chain id and bool
-     */
-    function updateValidChainId(uint16 chainId_, bool isAdded_) external {
-        _ensureAllowed("updateValidChainId(uint16,bool)");
-        if (!isAdded_) {
-            delete validChainIds[chainId_];
-        } else {
-            validChainIds[chainId_] = isAdded_;
-        }
-        emit UpdatedValidChainId(chainId_, isAdded_);
     }
 
     /**

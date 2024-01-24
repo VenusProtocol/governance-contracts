@@ -206,7 +206,7 @@ describe("OmnichainProposalSender: ", async function () {
       "OmnichainProposalSender: value cannot be zero",
     );
   });
-  it("Reverts with Invalid chainId", async function () {
+  it("Reverts when trusted remote is not set", async function () {
     const payload = await makePayload(
       [NormalTimelock.address],
       values,
@@ -218,11 +218,7 @@ describe("OmnichainProposalSender: ", async function () {
       sender.connect(signer1).execute(remoteChainId, payload, "0x", {
         value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
       }),
-    ).to.be.revertedWith("OmnichainProposalSender: Invalid chainId");
-  });
-
-  it("Reverts when EOA call updateValidChainId without grant permission", async function () {
-    await expect(sender.connect(signer2).updateValidChainId(remoteChainId, true)).to.be.revertedWith("access denied");
+    ).to.be.revertedWith("OmnichainProposalSender: destination chain is not a trusted source");
   });
 
   it("Emit SetTrustedRemoteAddress event", async function () {
@@ -231,14 +227,6 @@ describe("OmnichainProposalSender: ", async function () {
       .withArgs(remoteChainId, remotePath);
     const remoteAndLocal = ethers.utils.solidityPack(["address", "address"], [executor.address, sender.address]);
     expect(await sender.trustedRemoteLookup(remoteChainId)).to.be.equals(remoteAndLocal);
-  });
-
-  it("Emit UpdatedValidChainId", async function () {
-    await expect(sender.connect(signer1).updateValidChainId(remoteChainId, true)).to.emit(
-      sender,
-      "UpdatedValidChainId",
-    );
-    expect(await sender.validChainIds(remoteChainId)).to.be.equals(true);
   });
 
   it("Reverts with Daily Transaction Limit Exceed", async function () {
@@ -767,5 +755,11 @@ describe("OmnichainProposalSender: ", async function () {
     const proposalIdRemote = await getLastRemoteProposalId();
     const proposalIdSource = await getLastSourceProposalId();
     expect((await executor.proposals(proposalIdRemote))[0]).to.not.equals(proposalIdSource);
+  });
+
+  it("Emit TrustedRemoteRemoved event", async function () {
+    expect(await sender.removeTrustedRemote(remoteChainId))
+      .to.emit(sender, "TrustedRemoteRemoved")
+      .withArgs(remoteChainId);
   });
 });
