@@ -125,7 +125,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             timelocks_.length == uint8(ProposalType.CRITICAL) + 1,
             "OmnichainGovernanceExecutor::initialize:number of timelocks _should match the number of governance routes"
         );
-        for (uint8 i; i < uint8(ProposalType.CRITICAL) + 1; ++i) {
+        for (uint8 i; i < uint8(ProposalType.CRITICAL) + 1; ) {
             ensureNonzeroAddress(address(timelocks_[i]));
             if (i > 0) {
                 require(
@@ -135,6 +135,9 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             }
             emit TimelockAdded(i, address(proposalTimelocks[i]), address(timelocks_[i]));
             proposalTimelocks[i] = timelocks_[i];
+            unchecked {
+                ++i;
+            }
         }
     }
 
@@ -152,7 +155,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         Proposal storage proposal = proposals[proposalId_];
         proposal.executed = true;
 
-        for (uint256 i; i < proposal.targets.length; ++i) {
+        for (uint256 i; i < proposal.targets.length; ) {
             proposalTimelocks[uint8(proposal.proposalType)].executeTransaction(
                 proposal.targets[i],
                 proposal.values[i],
@@ -160,6 +163,9 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 proposal.calldatas[i],
                 proposal.eta
             );
+            unchecked {
+                ++i;
+            }
         }
         emit ProposalExecuted(proposalId_);
     }
@@ -177,7 +183,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         require(msg.sender == GUARDIAN, "OmnichainGovernanceExecutor::cancel: sender must be guardian");
 
         proposal.cancelled = true;
-        for (uint256 i = 0; i < proposal.targets.length; i++) {
+        for (uint256 i; i < proposal.targets.length; ) {
             proposalTimelocks[proposal.proposalType].cancelTransaction(
                 proposal.targets[i],
                 proposal.values[i],
@@ -185,6 +191,9 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 proposal.calldatas[i],
                 proposal.eta
             );
+            unchecked {
+                ++i;
+            }
         }
 
         emit ProposalCancelled(proposalId_);
@@ -277,7 +286,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         proposal.eta = eta;
         queued[proposalId_] = true;
 
-        for (uint256 i; i < proposal.targets.length; ++i) {
+        for (uint256 i; i < proposal.targets.length; ) {
             _queueOrRevertInternal(
                 proposal.targets[i],
                 proposal.values[i],
@@ -286,6 +295,9 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 eta,
                 proposal.proposalType
             );
+            unchecked {
+                ++i;
+            }
         }
 
         emit ProposalQueued(proposalId_, eta);
