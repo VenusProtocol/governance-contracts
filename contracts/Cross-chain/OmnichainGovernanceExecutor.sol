@@ -4,6 +4,7 @@ pragma solidity 0.8.13;
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { BytesLib } from "@layerzerolabs/solidity-examples/contracts/libraries/BytesLib.sol";
 import { ExcessivelySafeCall } from "@layerzerolabs/solidity-examples/contracts/libraries/ExcessivelySafeCall.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { BaseOmnichainControllerDest } from "./BaseOmnichainControllerDest.sol";
 import { ITimelock } from "./interfaces/ITimelock.sol";
 
@@ -109,6 +110,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     event TimelockAdded(address indexed timelock, uint8 routeType);
 
     constructor(address endpoint_, address guardian_) BaseOmnichainControllerDest(endpoint_) {
+        ensureNonzeroAddress(guardian_);
         GUARDIAN = guardian_;
     }
 
@@ -124,10 +126,13 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             "OmnichainGovernanceExecutor::initialize:number of timelocks _should match the number of governance routes"
         );
         for (uint8 i; i < uint8(ProposalType.CRITICAL) + 1; ++i) {
-            require(
-                address(timelocks_[i]) != address(0),
-                "OmnichainGovernanceExecutor::initialize:invalid timelock address"
-            );
+            ensureNonzeroAddress(address(timelocks_[i]));
+            if (i > 0) {
+                require(
+                    timelocks_[i] != timelocks_[i - 1],
+                    "OmnichainGovernanceExecutor::initialize:duplicate timelock"
+                );
+            }
             proposalTimelocks[i] = timelocks_[i];
             emit TimelockAdded(address(proposalTimelocks[i]), i);
         }
@@ -220,6 +225,12 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             bytes[] memory calldatas,
             uint8 pType
         ) = abi.decode(payload, (address[], uint256[], string[], bytes[], uint8));
+        require(
+            targets.length == values.length &&
+                targets.length == signatures.length &&
+                targets.length == calldatas.length,
+            "OmnichainGovernanceExecutor::_nonblockingLzReceive: proposal function information arity mismatch"
+        );
         _isEligibleToReceive(srcChainId_, targets.length);
 
         Proposal memory newProposal = Proposal({

@@ -478,9 +478,9 @@ describe("OmnichainProposalSender: ", async function () {
     const calldata = ethers.utils.defaultAbiCoder.encode(["uint256", "uint256"], [delay, delay - 20]);
     const payload = await makePayload(
       [NormalTimelock.address, FasttrackTimelock.address],
-      [0.0],
+      [0, 0],
       ["setDelay(uint256)", "setDelay(uint256)"],
-      [calldata],
+      [calldata, calldata],
       proposalType,
     );
     await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
@@ -489,6 +489,21 @@ describe("OmnichainProposalSender: ", async function () {
     const proposalIdRemote = await getLastRemoteProposalId();
     const proposalIdSource = await getLastSourceProposalId();
     expect((await executor.proposals(proposalIdRemote))[0]).to.not.equals(proposalIdSource);
+  });
+  it("Revert when number of parameters mismatch", async function () {
+    const calldata = ethers.utils.defaultAbiCoder.encode(["uint256", "uint256"], [delay, delay - 20]);
+    const payload = await makePayload(
+      [NormalTimelock.address, FasttrackTimelock.address],
+      [0, 0],
+      ["setDelay(uint256)", "setDelay(uint256)"],
+      [calldata],
+      proposalType,
+    );
+    await expect(
+      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+        value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
+      }),
+    ).to.be.revertedWith("OmnichainProposalSender: proposal function information arity mismatch");
   });
   it("Refund stucked gas in contract, to given address", async function () {
     // Failed due to minDest is 0
