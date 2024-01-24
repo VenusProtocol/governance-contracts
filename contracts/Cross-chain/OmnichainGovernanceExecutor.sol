@@ -268,7 +268,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             proposalType: pType
         });
 
-        proposals[newProposal.id] = newProposal;
+        proposals[pId] = newProposal;
         lastProposalReceived = pId;
 
         emit ProposalReceived(newProposal.id, targets, values, signatures, calldatas, pType);
