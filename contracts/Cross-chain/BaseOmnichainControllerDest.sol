@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.13;
 
-import "@layerzerolabs/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
+import { NonblockingLzApp } from "@layerzerolabs/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
 import { Pausable } from "@openzeppelin/contracts/security/Pausable.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
