@@ -72,6 +72,11 @@ abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
      */
     function renounceOwnership() public override {}
 
+    /**
+     * @notice Check eligibility to receive commands.
+     * @param srcChainId_ Source chain id.
+     * @param noOfCommands_ Number of commands to be received.
+     */
     function _isEligibleToReceive(uint16 srcChainId_, uint256 noOfCommands_) internal {
         uint256 currentBlockTimestamp = block.timestamp;
 

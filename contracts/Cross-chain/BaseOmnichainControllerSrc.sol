@@ -101,6 +101,11 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
      */
     function renounceOwnership() public override {}
 
+    /**
+     * @notice Check eligibility to send commands.
+     * @param dstChainId_ Destination chain id.
+     * @param noOfCommands_ Number of commands to send.
+     */
     function _isEligibleToSend(uint16 dstChainId_, uint256 noOfCommands_) internal {
         // Load values for the 24-hour window checks
         uint256 currentBlockTimestamp = block.timestamp;
@@ -128,6 +133,10 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
         chainIdToLastProposalSentTimestamp[dstChainId_] = currentBlockTimestamp;
     }
 
+    /**
+     * @notice Ensure that the caller has permission to execute a specific function.
+     * @param functionSig_ Function signature to be checked for permission.
+     */
     function _ensureAllowed(string memory functionSig_) internal view {
         require(
             IAccessControlManagerV8(accessControlManager).isAllowedToCall(msg.sender, functionSig_),

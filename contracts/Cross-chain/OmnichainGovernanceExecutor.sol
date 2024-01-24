@@ -190,6 +190,14 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         emit ProposalCancelled(proposalId_);
     }
 
+    /**
+     * @notice Process blocking LayerZero receive request.
+     * @param srcChainId_ Source chain Id.
+     * @param srcAddress_ Source address from which payload is received.
+     * @param nonce_ Nonce associated with the payload to prevent replay attacks.
+     * @param payload_ Encoded payload containing proposal information.
+     * @custom:event Emit ReceivePayloadFailed if call fails.
+     */
     function _blockingLzReceive(
         uint16 srcChainId_,
         bytes memory srcAddress_,
@@ -211,6 +219,12 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         }
     }
 
+    /**
+     * @notice Process non blocking LayerZero receive request.
+     * @param srcChainId_ Source chain Id.
+     * @param payload_ Encoded payload containing proposal information.
+     * @custom:event Emit ProposalReceived
+     */
     function _nonblockingLzReceive(
         uint16 srcChainId_,
         bytes memory,
@@ -252,6 +266,11 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         _queue(pId);
     }
 
+    /**
+     * @notice Queue proposal for execution.
+     * @param proposalId_ Proposal to be queued.
+     * @custom:event Emit ProposalQueued with proposal id and eta.
+     */
     function _queue(uint256 proposalId_) internal {
         Proposal storage proposal = proposals[proposalId_];
         uint256 eta = block.timestamp + proposalTimelocks[proposal.proposalType].delay();
@@ -272,6 +291,15 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         emit ProposalQueued(proposalId_, eta);
     }
 
+    /**
+     * @notice Check for unique proposal.
+     * @param target_ Address of the contract with the method to be called.
+     * @param value_ Native token amount sent with the transaction.
+     * @param signature_ Signature of the function to be called.
+     * @param data_ Arguments to be passed to the function when called.
+     * @param eta_ Timestamp after which the transaction can be executed.
+     * @param proposalType_ Type of proposal.
+     */
     function _queueOrRevertInternal(
         address target_,
         uint256 value_,

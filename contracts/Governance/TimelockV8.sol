@@ -148,7 +148,7 @@ contract TimelockV8 {
      * @notice Called for each action when queuing a proposal
      * @param target Address of the contract with the method to be called
      * @param value Native token amount sent with the transaction
-     * @param signature Ssignature of the function to be called
+     * @param signature Signature of the function to be called
      * @param data Arguments to be passed to the function when called
      * @param eta Timestamp after which the transaction can be executed
      * @return Hash of the queued transaction
@@ -179,7 +179,7 @@ contract TimelockV8 {
      * @notice Called to cancel a queued transaction
      * @param target Address of the contract with the method to be called
      * @param value Native token amount sent with the transaction
-     * @param signature Ssignature of the function to be called
+     * @param signature Signature of the function to be called
      * @param data Arguments to be passed to the function when called
      * @param eta Timestamp after which the transaction can be executed
      * @custom:access Sender must be admin
@@ -204,7 +204,7 @@ contract TimelockV8 {
      * @notice Called to execute a queued transaction
      * @param target Address of the contract with the method to be called
      * @param value Native token amount sent with the transaction
-     * @param signature Ssignature of the function to be called
+     * @param signature Signature of the function to be called
      * @param data Arguments to be passed to the function when called
      * @param eta Timestamp after which the transaction can be executed
      * @return Result of function call.
