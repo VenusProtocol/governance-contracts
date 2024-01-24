@@ -41,8 +41,8 @@ abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
 
     /**
      * @notice Sets the maximum daily limit for receiving commands.
-     * @param chainId_ The destination chain ID.
-     * @param limit_ The new maximum daily limit in USD(scaled with 18 decimals).
+     * @param chainId_ The source chain ID.
+     * @param limit_ Number of commands.
      * @custom:access Only Owner.
      * @custom:event Emits SetMaxDailyReceiveLimit with new limit and its associated chain id
      */
