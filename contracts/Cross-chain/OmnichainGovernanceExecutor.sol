@@ -154,14 +154,17 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
 
         Proposal storage proposal = proposals[proposalId_];
         proposal.executed = true;
+        ITimelock timelock = proposalTimelocks[proposal.proposalType];
+        uint256 eta = proposal.eta;
+        uint256 length = proposal.targets.length;
 
-        for (uint256 i; i < proposal.targets.length; ) {
-            proposalTimelocks[proposal.proposalType].executeTransaction(
+        for (uint256 i; i < length; ) {
+            timelock.executeTransaction(
                 proposal.targets[i],
                 proposal.values[i],
                 proposal.signatures[i],
                 proposal.calldatas[i],
-                proposal.eta
+                eta
             );
             unchecked {
                 ++i;
@@ -183,13 +186,17 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         require(msg.sender == GUARDIAN, "OmnichainGovernanceExecutor::cancel: sender must be guardian");
 
         proposal.cancelled = true;
-        for (uint256 i; i < proposal.targets.length; ) {
-            proposalTimelocks[proposal.proposalType].cancelTransaction(
+        ITimelock timelock = proposalTimelocks[proposal.proposalType];
+        uint256 eta = proposal.eta;
+        uint256 length = proposal.targets.length;
+
+        for (uint256 i; i < length; ) {
+            timelock.cancelTransaction(
                 proposal.targets[i],
                 proposal.values[i],
                 proposal.signatures[i],
                 proposal.calldatas[i],
-                proposal.eta
+                eta
             );
             unchecked {
                 ++i;
@@ -283,17 +290,20 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     function _queue(uint256 proposalId_) internal {
         Proposal storage proposal = proposals[proposalId_];
         uint256 eta = block.timestamp + proposalTimelocks[proposal.proposalType].delay();
+
         proposal.eta = eta;
         queued[proposalId_] = true;
+        uint8 proposalType = proposal.proposalType;
+        uint256 length = proposal.targets.length;
 
-        for (uint256 i; i < proposal.targets.length; ) {
+        for (uint256 i; i < length; ) {
             _queueOrRevertInternal(
                 proposal.targets[i],
                 proposal.values[i],
                 proposal.signatures[i],
                 proposal.calldatas[i],
                 eta,
-                proposal.proposalType
+                proposalType
             );
             unchecked {
                 ++i;
