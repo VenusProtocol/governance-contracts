@@ -176,7 +176,7 @@ contract TimelockV8 {
         require(msg.sender == admin, "Timelock::cancelTransaction: Call must come from admin.");
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
-        queuedTransactions[txHash] = false;
+        delete (queuedTransactions[txHash]);
 
         emit CancelTransaction(txHash, target, value, signature, data, eta);
     }
@@ -203,7 +203,7 @@ contract TimelockV8 {
         require(getBlockTimestamp() >= eta, "Timelock::executeTransaction: Transaction hasn't surpassed time lock.");
         require(getBlockTimestamp() <= eta + GRACE_PERIOD(), "Timelock::executeTransaction: Transaction is stale.");
 
-        queuedTransactions[txHash] = false;
+        delete (queuedTransactions[txHash]);
 
         bytes memory callData;
 
