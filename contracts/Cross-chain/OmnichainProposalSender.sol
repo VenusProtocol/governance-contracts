@@ -132,23 +132,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
 
         bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
-        // to avoid stack too deep
-        {
-            (
-                address[] memory targets,
-                uint256[] memory values,
-                string[] memory signatures,
-                bytes[] memory calldatas,
-
-            ) = abi.decode(payload_, (address[], uint[], string[], bytes[], uint8));
-            require(
-                targets.length == values.length &&
-                    targets.length == signatures.length &&
-                    targets.length == calldatas.length,
-                "OmnichainProposalSender: proposal function information arity mismatch"
-            );
-            _isEligibleToSend(remoteChainId_, targets.length);
-        }
+        _validateProposal(remoteChainId_, payload_);
         uint64 _pId = ++proposalCount;
         bytes memory payload;
         payload = abi.encode(payload_, _pId);
@@ -298,5 +282,22 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      */
     function getConfig(uint16 version_, uint16 chainId_, uint256 configType_) external view returns (bytes memory) {
         return LZ_ENDPOINT.getConfig(version_, chainId_, address(this), configType_);
+    }
+
+    function _validateProposal(uint16 remoteChainId_, bytes calldata payload_) internal {
+        (
+            address[] memory targets,
+            uint256[] memory values,
+            string[] memory signatures,
+            bytes[] memory calldatas,
+
+        ) = abi.decode(payload_, (address[], uint[], string[], bytes[], uint8));
+        require(
+            targets.length == values.length &&
+                targets.length == signatures.length &&
+                targets.length == calldatas.length,
+            "OmnichainProposalSender: proposal function information arity mismatch"
+        );
+        _isEligibleToSend(remoteChainId_, targets.length);
     }
 }
