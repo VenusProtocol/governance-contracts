@@ -274,7 +274,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         uint64,
         bytes memory payload_
     ) internal virtual override {
-        (bytes memory payload, uint256 pId) = abi.decode(payload_, (bytes, uint256));
+        (bytes memory payload, uint64 pId) = abi.decode(payload_, (bytes, uint64));
         (
             address[] memory targets,
             uint256[] memory values,

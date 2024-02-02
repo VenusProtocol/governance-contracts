@@ -86,7 +86,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @notice Estimates LayerZero fees for cross-chain message delivery to the remote chain
      * @dev The estimated fees are the minimum required; it's recommended to increase the fees amount when sending a message. The unused amount will be refunded
      * @param remoteChainId_ The LayerZero id of a remote chain
-     * @param payload_ The payload to be sent to the remote chain. It's computed as follows: payload = abi.encode(targets, values, signatures, calldatas, pId)
+     * @param payload_ The payload to be sent to the remote chain. It's computed as follows: payload = abi.encode(abi.encode(targets, values, signatures, calldatas), pId)
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
      * @return nativeFee The amount of fee in the native gas token (e.g. ETH)
      * @return zroFee The amount of fee in ZRO token
@@ -127,6 +127,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     ) external payable whenNotPaused {
         _ensureAllowed("execute(uint16,bytes,bytes)");
 
+        // A zero value will result in a failed message; therefore, a positive value is required to send a message across the chain.
         require(msg.value > 0, "OmnichainProposalSender: value cannot be zero");
         require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
 
@@ -134,8 +135,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
         _validateProposal(remoteChainId_, payload_);
         uint64 _pId = ++proposalCount;
-        bytes memory payload;
-        payload = abi.encode(payload_, _pId);
+        bytes memory payload = abi.encode(payload_, _pId);
 
         try
             LZ_ENDPOINT.send{ value: msg.value }(
@@ -147,10 +147,10 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
                 adapterParams_
             )
         {
-            emit ExecuteRemoteProposal(remoteChainId_, _pId, payload_);
+            emit ExecuteRemoteProposal(remoteChainId_, _pId, payload);
         } catch (bytes memory reason) {
             storedExecutionHashes[_pId] = keccak256(abi.encode(remoteChainId_, payload, adapterParams_, msg.value));
-            emit StorePayload(_pId, remoteChainId_, payload_, adapterParams_, msg.value, reason);
+            emit StorePayload(_pId, remoteChainId_, payload, adapterParams_, msg.value, reason);
         }
     }
 
@@ -159,7 +159,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @dev Allows providing more fees if needed. The extra fees will be refunded to the caller
      * @param pId_ The proposal ID to identify a failed message
      * @param remoteChainId_ The LayerZero id of the remote chain
-     * @param payload_ The payload to be sent to the remote chain. It's computed as follows: payload = abi.encode(targets, values, signatures, calldatas, pId)
+     * @param payload_ The payload to be sent to the remote chain. It's computed as follows: payload = abi.encode(abi.encode(targets, values, signatures, calldatas), pId)
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
      * @param originalValue_ The msg.value passed when execute() function was called
      * @custom:event Emits ClearPayload with proposal ID and hash
@@ -200,7 +200,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @param to_ Address of the receiver
      * @param pId_ The proposal ID to identify a failed message
      * @param remoteChainId_ The LayerZero id of the remote chain
-     * @param payload_ The payload to be sent to the remote chain. It's computed as follows: payload = abi.encode(targets, values, signatures, calldatas, pId)
+     * @param payload_ The payload to be sent to the remote chain. It's computed as follows: payload = abi.encode(abi.encode(targets, values, signatures, calldatas), pId)
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
      * @param originalValue_ The msg.value passed when execute() function was called
      * @custom:access Only owner
