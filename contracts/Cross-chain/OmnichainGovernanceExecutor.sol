@@ -129,18 +129,13 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @custom:event Emits TimelockAdded with old and new timelock and route type.
      */
     function addTimelocks(ITimelock[] memory timelocks_) external onlyOwner {
+        uint8 length = uint8(type(ProposalType).max) + 1;
         require(
-            timelocks_.length == uint8(ProposalType.CRITICAL) + 1,
+            timelocks_.length == length,
             "OmnichainGovernanceExecutor::initialize:number of timelocks _should match the number of governance routes"
         );
-        for (uint8 i; i < uint8(ProposalType.CRITICAL) + 1; ) {
+        for (uint8 i; i < length; ) {
             ensureNonzeroAddress(address(timelocks_[i]));
-            if (i > 0) {
-                require(
-                    timelocks_[i] != timelocks_[i - 1],
-                    "OmnichainGovernanceExecutor::initialize:duplicate timelock"
-                );
-            }
             emit TimelockAdded(i, address(proposalTimelocks[i]), address(timelocks_[i]));
             proposalTimelocks[i] = timelocks_[i];
             unchecked {
@@ -287,6 +282,10 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 targets.length == signatures.length &&
                 targets.length == calldatas.length,
             "OmnichainGovernanceExecutor::_nonblockingLzReceive: proposal function information arity mismatch"
+        );
+        require(
+            pType < uint8(type(ProposalType).max) + 1,
+            "OmnichainGovernanceExecutor::_nonblockingLzReceive: invalid proposal type"
         );
         _isEligibleToReceive(srcChainId_, targets.length);
 

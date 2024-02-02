@@ -396,6 +396,15 @@ describe("Omnichain: ", async function () {
     ).to.be.revertedWith("OmnichainProposalSender: Empty payload");
   });
 
+  it("Revert on invalid proposal type", async function () {
+    const payload = await makePayload([NormalTimelock.address], values, ["setDelay(uint256)"], [calldata], 3);
+    const lastProposal = await executor.lastProposalReceived();
+    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+      value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
+    });
+    expect(await executor.lastProposalReceived()).not.to.equals(lastProposal.add(1));
+  });
+
   it("Revert if same proposal come twice", async function () {
     const payload = await makePayload(
       [NormalTimelock.address],
