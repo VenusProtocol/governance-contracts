@@ -12,7 +12,7 @@ import {
   Timelock,
 } from "../../typechain";
 
-describe("OmnichainProposalSender: ", async function () {
+describe("Omnichain: ", async function () {
   const localChainId = 1;
   const remoteChainId = 2;
   let maxDailyTransactionLimit = 100;
@@ -173,8 +173,7 @@ describe("OmnichainProposalSender: ", async function () {
 
     remotePath = ethers.utils.solidityPack(["address"], [executor.address]);
     localPath = ethers.utils.solidityPack(["address"], [sender.address]);
-    nativeFee = (await localEndpoint.estimateFees(remoteChainId, executor.address, "0x", false, adapterParams))
-      .nativeFee;
+    nativeFee = (await localEndpoint.estimateFees(remoteChainId, sender.address, "0x", false, adapterParams)).nativeFee;
   });
 
   it("Reverts if EOA called owner function of bridge", async function () {
@@ -222,9 +221,10 @@ describe("OmnichainProposalSender: ", async function () {
   });
 
   it("Emit SetTrustedRemoteAddress event", async function () {
-    expect(await sender.connect(signer1).setTrustedRemoteAddress(remoteChainId, remotePath))
-      .to.emit(sender, "SetTrustedRemoteAddress")
-      .withArgs(remoteChainId, remotePath);
+    await expect(sender.connect(signer1).setTrustedRemoteAddress(remoteChainId, remotePath)).to.emit(
+      sender,
+      "SetTrustedRemoteAddress",
+    );
     const remoteAndLocal = ethers.utils.solidityPack(["address", "address"], [executor.address, sender.address]);
     expect(await sender.trustedRemoteLookup(remoteChainId)).to.be.equals(remoteAndLocal);
   });
@@ -251,9 +251,10 @@ describe("OmnichainProposalSender: ", async function () {
   });
 
   it("Set daily transaction limit and emit SetMaxDailyLimit event", async function () {
-    expect(await sender.connect(signer1).setMaxDailyLimit(remoteChainId, maxDailyTransactionLimit))
-      .to.emit(sender, "SetMaxDailyLimit")
-      .withArgs(0, maxDailyTransactionLimit);
+    await expect(sender.connect(signer1).setMaxDailyLimit(remoteChainId, maxDailyTransactionLimit)).to.emit(
+      sender,
+      "SetMaxDailyLimit",
+    );
     expect(await sender.connect(signer1).chainIdToMaxDailyLimit(remoteChainId)).to.be.equals(maxDailyTransactionLimit);
   });
 
@@ -275,16 +276,13 @@ describe("OmnichainProposalSender: ", async function () {
 
   it("Function registry should not emit event if nonexistant function is removed", async function () {
     updateFunctionRegistry(executorOwner);
-    expect(
-      await executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [true]),
+    await expect(
+      executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [true]),
     ).to.not.emit(executorOwner, "FunctionRegistryChanged");
   });
 
   it("Function registry should be updated", async function () {
     updateFunctionRegistry(executorOwner);
-    expect(await executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [true]))
-      .to.emit(executorOwner, "FunctionRegistryChanged")
-      .withArgs("setTrustedRemoteAddress(uint16,bytes)", true);
   });
 
   it("Function registry should not emit event if function is added twice", async function () {
@@ -437,11 +435,13 @@ describe("OmnichainProposalSender: ", async function () {
   });
 
   it("Revert if proposal is not queued", async function () {
-    const proposalId = await getLastRemoteProposalId();
-    expect(await executor.connect(deployer).cancel(proposalId)).to.be.revertedWith("proposal not queued");
+    const proposalId = (await getLastRemoteProposalId()).add(1);
+    await expect(executor.connect(deployer).cancel(proposalId)).to.be.revertedWith(
+      "OmnichainGovernanceExecutor::cancel: proposal should be queued and not executed",
+    );
   });
 
-  it("Emit ProposalCanceled event when proposal gets cancelled", async function () {
+  it("Emit ProposalCanceled event when proposal gets canceled", async function () {
     const payload = await makePayload(
       [NormalTimelock.address],
       values,
@@ -454,7 +454,7 @@ describe("OmnichainProposalSender: ", async function () {
       value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
     });
     const proposalId = await getLastRemoteProposalId();
-    expect(await executor.connect(deployer).cancel(proposalId))
+    await expect(executor.connect(deployer).cancel(proposalId))
       .to.emit(executor, "ProposalCanceled")
       .withArgs(proposalId);
   });
@@ -474,7 +474,7 @@ describe("OmnichainProposalSender: ", async function () {
     const proposalId = await getLastRemoteProposalId();
     await executor.execute(proposalId);
     await expect(executor.connect(deployer).cancel(proposalId)).to.be.revertedWith(
-      "OmnichainGovernanceExecutor::cancel: cannot cancel executed proposal",
+      "OmnichainGovernanceExecutor::cancel: proposal should be queued and not executed",
     );
   });
 

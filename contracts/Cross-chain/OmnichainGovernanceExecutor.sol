@@ -39,12 +39,20 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         string[] signatures;
         /** The ordered list of calldata to be passed to each call */
         bytes[] calldatas;
-        /** Flag marking whether the proposal has been cancelled */
-        bool cancelled;
+        /** Flag marking whether the proposal has been canceled */
+        bool canceled;
         /** Flag marking whether the proposal has been executed */
         bool executed;
         /** The type of the proposal */
         uint8 proposalType;
+    }
+    /*
+     * @notice Possible states that a proposal may be in
+     */
+    enum ProposalState {
+        Canceled,
+        Queued,
+        Executed
     }
 
     /**
@@ -100,9 +108,9 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     event ReceivePayloadFailed(uint16 indexed srcChainId, bytes indexed srcAddress, uint64 nonce, bytes reason);
 
     /**
-     * @notice Emitted when proposal is cancelled.
+     * @notice Emitted when proposal is canceled.
      */
-    event ProposalCancelled(uint256 indexed id);
+    event ProposalCanceled(uint256 indexed id);
 
     /**
      * @notice Emitted when timelock added.
@@ -148,7 +156,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      */
     function execute(uint256 proposalId_) external nonReentrant {
         require(
-            queued[proposalId_],
+            state(proposalId_) == ProposalState.Queued,
             "OmnichainGovernanceExecutor::execute: proposal can only be executed if it is queued"
         );
 
@@ -175,17 +183,19 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
 
     /**
      * @notice Cancels a proposal only if sender is the guardian and proposal is not executed.
-     * @param proposalId_ Id of proposal that is to be cancelled.
+     * @param proposalId_ Id of proposal that is to be canceled.
      * @custom:access Sender must be the guardian.
-     * @custom:event Emits ProposalCancelled with proposal id of the cancelled proposal.
+     * @custom:event Emits ProposalCanceled with proposal id of the canceled proposal.
      */
     function cancel(uint256 proposalId_) external {
-        require(queued[proposalId_], "OmnichainGovernanceExecutor::cancel: proposal not queued");
+        require(
+            state(proposalId_) == ProposalState.Queued,
+            "OmnichainGovernanceExecutor::cancel: proposal should be queued and not executed"
+        );
         Proposal storage proposal = proposals[proposalId_];
-        require(!proposal.executed, "OmnichainGovernanceExecutor::cancel: cannot cancel executed proposal");
         require(msg.sender == GUARDIAN, "OmnichainGovernanceExecutor::cancel: sender must be guardian");
 
-        proposal.cancelled = true;
+        proposal.canceled = true;
         ITimelock timelock = proposalTimelocks[proposal.proposalType];
         uint256 eta = proposal.eta;
         uint256 length = proposal.targets.length;
@@ -203,7 +213,24 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             }
         }
 
-        emit ProposalCancelled(proposalId_);
+        emit ProposalCanceled(proposalId_);
+    }
+
+    /**
+     * @notice Gets the state of a proposal
+     * @param proposalId_ The id of the proposal
+     * @return Proposal state
+     */
+    function state(uint proposalId_) public view returns (ProposalState) {
+        Proposal storage proposal = proposals[proposalId_];
+        if (proposal.canceled) {
+            return ProposalState.Canceled;
+        } else if (proposal.executed) {
+            return ProposalState.Executed;
+        } else if (queued[proposalId_]) {
+            // queued only when proposal is received
+            return ProposalState.Queued;
+        }
     }
 
     /**
@@ -270,7 +297,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             values: values,
             signatures: signatures,
             calldatas: calldatas,
-            cancelled: false,
+            canceled: false,
             executed: false,
             proposalType: pType
         });
