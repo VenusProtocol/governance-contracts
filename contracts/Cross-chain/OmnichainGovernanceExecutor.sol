@@ -136,6 +136,8 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice Update source layerzero endpoint id.
      * @param srcChainId_ The new source chain id to be set.
+     * @custom:event Emit SetSrcChainId with old and new source id.
+     * @custom:access Only owner.
      */
     function setSrcChainId(uint16 srcChainId_) external onlyOwner {
         emit SetSrcChainId(srcChainId, srcChainId_);
@@ -293,6 +295,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             bytes[] memory calldatas,
             uint8 pType
         ) = abi.decode(payload, (address[], uint256[], string[], bytes[], uint8));
+        require(proposals[pId].id == 0, "OmnichainGovernanceExecutor::_nonblockingLzReceive: duplicate proposal");
         require(
             targets.length == values.length &&
                 targets.length == signatures.length &&
