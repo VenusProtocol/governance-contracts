@@ -72,7 +72,7 @@ describe("Omnichain: ", async function () {
   async function updateFunctionRegistry(executorOwner) {
     const functionregistry = [
       "setOracle(address)",
-      "setMaxDailyReceiveLimit(uint16,uint256)",
+      "setMaxDailyReceiveLimit(uint256)",
       "pause()",
       "unpause()",
       "setConfig(uint16,uint16,uint256,bytes)",
@@ -116,7 +116,7 @@ describe("Omnichain: ", async function () {
       return payload;
     };
 
-    executor = await OmnichainGovernanceExecutor.deploy(remoteEndpoint.address, deployer.address);
+    executor = await OmnichainGovernanceExecutor.deploy(remoteEndpoint.address, deployer.address, localChainId);
 
     NormalTimelock = await Timelock.deploy(executor.address, delay);
     FasttrackTimelock = await Timelock.deploy(executor.address, delay);
@@ -160,7 +160,7 @@ describe("Omnichain: ", async function () {
 
     tx = await accessControlManager
       .connect(deployer)
-      .giveCallPermission(executorOwner.address, "setMaxDailyReceiveLimit(uint16,uint256)", signer1.address);
+      .giveCallPermission(executorOwner.address, "setMaxDailyReceiveLimit(uint256)", signer1.address);
     await tx.wait();
 
     tx = await accessControlManager
@@ -308,7 +308,7 @@ describe("Omnichain: ", async function () {
       }),
     ).to.reverted;
 
-    data = executor.interface.encodeFunctionData("setMaxDailyReceiveLimit", [localChainId, maxDailyReceiveLimit]);
+    data = executor.interface.encodeFunctionData("setMaxDailyReceiveLimit", [maxDailyReceiveLimit]);
     await expect(
       deployer.sendTransaction({
         to: executorOwner.address,
@@ -350,7 +350,7 @@ describe("Omnichain: ", async function () {
   });
 
   it("Set max daily receive limit", async function () {
-    const data = executor.interface.encodeFunctionData("setMaxDailyReceiveLimit", [localChainId, maxDailyReceiveLimit]);
+    const data = executor.interface.encodeFunctionData("setMaxDailyReceiveLimit", [maxDailyReceiveLimit]);
     await expect(
       await signer1.sendTransaction({
         to: executorOwner.address,
@@ -724,7 +724,7 @@ describe("Omnichain: ", async function () {
     maxDailyTransactionLimit = 100;
     await sender.connect(signer1).setMaxDailyLimit(remoteChainId, maxDailyTransactionLimit);
     maxDailyReceiveLimit = 0;
-    const data = executor.interface.encodeFunctionData("setMaxDailyReceiveLimit", [localChainId, maxDailyReceiveLimit]);
+    const data = executor.interface.encodeFunctionData("setMaxDailyReceiveLimit", [maxDailyReceiveLimit]);
     await signer1.sendTransaction({
       to: executorOwner.address,
       data: data,

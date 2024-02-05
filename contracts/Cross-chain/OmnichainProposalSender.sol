@@ -20,13 +20,13 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     /**
      * @notice Stores the total number of remote proposals
      */
-    uint64 public proposalCount;
+    uint256 public proposalCount;
 
     /**
      * @notice Execution hashes of failed messages
      * @dev [proposalId] -> [executionHash]
      */
-    mapping(uint64 => bytes32) public storedExecutionHashes;
+    mapping(uint256 => bytes32) public storedExecutionHashes;
 
     /**
      * @notice LayerZero endpoint for sending messages to remote chains
@@ -56,13 +56,13 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     /**
      * @notice Emitted when a previously failed message is successfully sent to the remote chain
      */
-    event ClearPayload(uint64 indexed proposalId, bytes32 executionHash);
+    event ClearPayload(uint256 indexed proposalId, bytes32 executionHash);
 
     /**
      * @notice Emitted when an execution hash of a failed message is saved
      */
     event StorePayload(
-        uint64 indexed proposalId,
+        uint256 indexed proposalId,
         uint16 indexed remoteChainId,
         bytes payload,
         bytes adapterParams,
@@ -134,7 +134,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
         _validateProposal(remoteChainId_, payload_);
-        uint64 _pId = ++proposalCount;
+        uint256 _pId = ++proposalCount;
         bytes memory payload = abi.encode(payload_, _pId);
 
         try
@@ -166,13 +166,13 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @custom:access Controlled by Access Control Manager
      */
     function retryExecute(
-        uint64 pId_,
+        uint256 pId_,
         uint16 remoteChainId_,
         bytes calldata payload_,
         bytes calldata adapterParams_,
         uint256 originalValue_
     ) external payable whenNotPaused nonReentrant {
-        _ensureAllowed("retryExecute(uint64,uint16,bytes,bytes,uint256)");
+        _ensureAllowed("retryExecute(uint256,uint16,bytes,bytes,uint256)");
         bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
         bytes32 hash = storedExecutionHashes[pId_];
@@ -209,7 +209,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      */
     function fallbackWithdraw(
         address to_,
-        uint64 pId_,
+        uint256 pId_,
         uint16 remoteChainId_,
         bytes calldata payload_,
         bytes calldata adapterParams_,

@@ -61,7 +61,12 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     address public immutable GUARDIAN;
 
     /**
-     * @notice Last proposal count received
+     * @notice Stores Binance layerzero endpoint id
+     */
+    uint16 public srcChainId;
+
+    /**
+     * @notice Last proposal count received.
      */
     uint256 public lastProposalReceived;
 
@@ -117,9 +122,24 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      */
     event TimelockAdded(uint8 routeType, address indexed oldTimelock, address indexed newTimelock);
 
-    constructor(address endpoint_, address guardian_) BaseOmnichainControllerDest(endpoint_) {
+    /**
+     * @notice Emitted when source layerzero endpoint id is updated.
+     */
+    event SetSrcChainId(uint16 indexed oldSrcChainId, uint16 indexed newSrcChainId);
+
+    constructor(address endpoint_, address guardian_, uint16 srcChainId_) BaseOmnichainControllerDest(endpoint_) {
         ensureNonzeroAddress(guardian_);
         GUARDIAN = guardian_;
+        srcChainId = srcChainId_;
+    }
+
+    /**
+     * @notice Update source layerzero endpoint id.
+     * @param srcChainId_ The new source chain id to be set.
+     */
+    function setSrcChainId(uint16 srcChainId_) external onlyOwner {
+        emit SetSrcChainId(srcChainId, srcChainId_);
+        srcChainId = srcChainId_;
     }
 
     /**
@@ -216,7 +236,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @param proposalId_ The id of the proposal
      * @return Proposal state
      */
-    function state(uint proposalId_) public view returns (ProposalState) {
+    function state(uint256 proposalId_) public view returns (ProposalState) {
         Proposal storage proposal = proposals[proposalId_];
         if (proposal.canceled) {
             return ProposalState.Canceled;
@@ -244,6 +264,8 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     ) internal virtual override whenNotPaused {
         uint256 gasToStoreAndEmit = 30000; // enough gas to ensure we can store the payload and emit the event
 
+        require(srcChainId_ == srcChainId, "OmnichainGovernanceExecutor::_blockingLzReceive: invalid source chain id");
+
         (bool success, bytes memory reason) = address(this).excessivelySafeCall(
             gasleft() - gasToStoreAndEmit,
             150,
@@ -259,17 +281,11 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
 
     /**
      * @notice Process non blocking LayerZero receive request.
-     * @param srcChainId_ Source chain Id.
      * @param payload_ Encoded payload containing proposal information.
      * @custom:event Emit ProposalReceived
      */
-    function _nonblockingLzReceive(
-        uint16 srcChainId_,
-        bytes memory,
-        uint64,
-        bytes memory payload_
-    ) internal virtual override {
-        (bytes memory payload, uint64 pId) = abi.decode(payload_, (bytes, uint64));
+    function _nonblockingLzReceive(uint16, bytes memory, uint64, bytes memory payload_) internal virtual override {
+        (bytes memory payload, uint256 pId) = abi.decode(payload_, (bytes, uint256));
         (
             address[] memory targets,
             uint256[] memory values,
@@ -287,7 +303,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             pType < uint8(type(ProposalType).max) + 1,
             "OmnichainGovernanceExecutor::_nonblockingLzReceive: invalid proposal type"
         );
-        _isEligibleToReceive(srcChainId_, targets.length);
+        _isEligibleToReceive(targets.length);
 
         Proposal memory newProposal = Proposal({
             id: pId,
