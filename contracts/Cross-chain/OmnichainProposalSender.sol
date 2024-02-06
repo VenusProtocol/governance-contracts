@@ -178,6 +178,8 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         bytes32 hash = storedExecutionHashes[pId_];
         require(hash != bytes32(0), "OmnichainProposalSender: no stored payload");
         require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
+        (bytes memory payload, ) = abi.decode(payload_, (bytes, uint256));
+        _validateProposal(remoteChainId_, payload);
 
         bytes memory execution = abi.encode(remoteChainId_, payload_, adapterParams_, originalValue_);
         require(keccak256(execution) == hash, "OmnichainProposalSender: invalid execution params");
@@ -284,7 +286,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         return LZ_ENDPOINT.getConfig(version_, chainId_, address(this), configType_);
     }
 
-    function _validateProposal(uint16 remoteChainId_, bytes calldata payload_) internal {
+    function _validateProposal(uint16 remoteChainId_, bytes memory payload_) internal {
         (
             address[] memory targets,
             uint256[] memory values,
