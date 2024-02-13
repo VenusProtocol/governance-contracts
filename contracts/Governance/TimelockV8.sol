@@ -84,6 +84,7 @@ contract TimelockV8 {
     /**
      * @notice Setter for the transaction queue delay
      * @param delay_ The new delay period for the transaction queue
+     * @custom:access Sender must be Timelock itself
      * @custom:event Emit NewDelay with old and new delay
      */
     function setDelay(uint256 delay_) public {
@@ -207,7 +208,7 @@ contract TimelockV8 {
      * @param signature Signature of the function to be called
      * @param data Arguments to be passed to the function when called
      * @param eta Timestamp after which the transaction can be executed
-     * @return Result of function call.
+     * @return Result of function call
      * @custom:access Sender must be admin
      * @custom:event Emit ExecuteTransaction
      */
@@ -244,6 +245,10 @@ contract TimelockV8 {
         return returnData;
     }
 
+    /**
+     * @notice Returns the current block timestamp
+     * @return The current block timestamp
+     */
     function getBlockTimestamp() internal view returns (uint256) {
         // solium-disable-next-line security/no-block-members
         return block.timestamp;
