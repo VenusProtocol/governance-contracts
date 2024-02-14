@@ -471,6 +471,9 @@ describe("Omnichain: ", async function () {
       "OmnichainGovernanceExecutor::cancel: proposal should be queued and not executed",
     );
   });
+  it("Return Pending state when proposal is not queued", async function () {
+    expect(await executor.state(1000)).to.equals(3);
+  });
 
   it("Emit ProposalCanceled event when proposal gets canceled", async function () {
     const payload = await getPayload(NormalTimelock.address);

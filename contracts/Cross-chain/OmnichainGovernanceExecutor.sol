@@ -52,7 +52,8 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     enum ProposalState {
         Canceled,
         Queued,
-        Executed
+        Executed,
+        Pending
     }
 
     /**
@@ -247,6 +248,8 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         } else if (queued[proposalId_]) {
             // queued only when proposal is received
             return ProposalState.Queued;
+        } else {
+            return ProposalState.Pending;
         }
     }
 
