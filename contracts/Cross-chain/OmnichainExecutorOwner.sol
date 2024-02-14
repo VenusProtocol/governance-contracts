@@ -2,10 +2,7 @@
 pragma solidity 0.8.13;
 
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
-
-interface IOmnichainGovernanceExecutor {
-    function transferOwnership(address addr) external;
-}
+import { IOmnichainGovernanceExecutor } from "./interfaces/IOmnichainGovernanceExecutor.sol";
 
 /**
  * @title OmnichainExecutorOwner
@@ -36,6 +33,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     constructor(address omnichainGovernanceExecutor_) {
         require(omnichainGovernanceExecutor_ != address(0), "Address must not be zero");
         OMNICHAIN_GOVERNANCE_EXECUTOR = IOmnichainGovernanceExecutor(omnichainGovernanceExecutor_);
+        _disableInitializers();
     }
 
     /**
@@ -48,7 +46,10 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     }
 
     /**
-     *  @notice Invoked when called function does not exist in the contract.
+     * @notice Invoked when called function does not exist in the contract.
+     * @param data_ Calldata containing the encoded function call.
+     * @return Result of function call.
+     * @custom:access Controlled by Access Control Manager.
      */
     fallback(bytes calldata data_) external returns (bytes memory) {
         string memory fun = functionRegistry[msg.sig];
@@ -68,15 +69,18 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     function upsertSignature(string[] calldata signatures_, bool[] calldata active_) external onlyOwner {
         uint256 signatureLength = signatures_.length;
         require(signatureLength == active_.length, "Input arrays must have the same length");
-        for (uint256 i; i < signatureLength; i++) {
+        for (uint256 i; i < signatureLength; ) {
             bytes4 sigHash = bytes4(keccak256(bytes(signatures_[i])));
             bytes memory signature = bytes(functionRegistry[sigHash]);
             if (active_[i] && signature.length == 0) {
                 functionRegistry[sigHash] = signatures_[i];
-                emit FunctionRegistryChanged(signatures_[i], active_[i]);
+                emit FunctionRegistryChanged(signatures_[i], true);
             } else if (!active_[i] && signature.length != 0) {
                 delete functionRegistry[sigHash];
-                emit FunctionRegistryChanged(signatures_[i], active_[i]);
+                emit FunctionRegistryChanged(signatures_[i], false);
+            }
+            unchecked {
+                ++i;
             }
         }
     }

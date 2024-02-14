@@ -4,6 +4,7 @@ pragma solidity 0.8.13;
 import { ReentrancyGuard } from "@openzeppelin/contracts/security/ReentrancyGuard.sol";
 import { BytesLib } from "@layerzerolabs/solidity-examples/contracts/libraries/BytesLib.sol";
 import { ExcessivelySafeCall } from "@layerzerolabs/solidity-examples/contracts/libraries/ExcessivelySafeCall.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { BaseOmnichainControllerDest } from "./BaseOmnichainControllerDest.sol";
 import { ITimelock } from "./interfaces/ITimelock.sol";
 
@@ -38,12 +39,20 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         string[] signatures;
         /** The ordered list of calldata to be passed to each call */
         bytes[] calldatas;
-        /** Flag marking whether the proposal has been cancelled */
-        bool cancelled;
+        /** Flag marking whether the proposal has been canceled */
+        bool canceled;
         /** Flag marking whether the proposal has been executed */
         bool executed;
         /** The type of the proposal */
         uint8 proposalType;
+    }
+    /*
+     * @notice Possible states that a proposal may be in
+     */
+    enum ProposalState {
+        Canceled,
+        Queued,
+        Executed
     }
 
     /**
@@ -52,7 +61,12 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     address public immutable GUARDIAN;
 
     /**
-     * @notice Last proposal count received
+     * @notice Stores Binance layerzero endpoint id
+     */
+    uint16 public srcChainId;
+
+    /**
+     * @notice Last proposal count received.
      */
     uint256 public lastProposalReceived;
 
@@ -99,37 +113,61 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     event ReceivePayloadFailed(uint16 indexed srcChainId, bytes indexed srcAddress, uint64 nonce, bytes reason);
 
     /**
-     * @notice Emitted when proposal is cancelled.
+     * @notice Emitted when proposal is canceled.
      */
-    event ProposalCancelled(uint256 indexed id);
+    event ProposalCanceled(uint256 indexed id);
 
     /**
      * @notice Emitted when timelock added.
      */
-    event TimelockAdded(address indexed timelock, uint8 routeType);
+    event TimelockAdded(uint8 routeType, address indexed oldTimelock, address indexed newTimelock);
 
-    constructor(address endpoint_, address guardian_) BaseOmnichainControllerDest(endpoint_) {
+    /**
+     * @notice Emitted when source layerzero endpoint id is updated.
+     */
+    event SetSrcChainId(uint16 indexed oldSrcChainId, uint16 indexed newSrcChainId);
+
+    /**
+     * @notice Thrown when proposal ID is invalid.
+     */
+    error InvalidProposalId();
+
+    constructor(address endpoint_, address guardian_, uint16 srcChainId_) BaseOmnichainControllerDest(endpoint_) {
+        ensureNonzeroAddress(guardian_);
         GUARDIAN = guardian_;
+        srcChainId = srcChainId_;
+    }
+
+    /**
+     * @notice Update source layerzero endpoint id.
+     * @param srcChainId_ The new source chain id to be set.
+     * @custom:event Emit SetSrcChainId with old and new source id.
+     * @custom:access Only owner.
+     */
+    function setSrcChainId(uint16 srcChainId_) external onlyOwner {
+        emit SetSrcChainId(srcChainId, srcChainId_);
+        srcChainId = srcChainId_;
     }
 
     /**
      * @notice Add timelocks to the ProposalTimelocks mapping.
      * @param timelocks_ Array of addresses of all 3 timelocks.
      * @custom:access Only owner.
-     * @custom:event Emits TimelockAdded with all 3 timelocks.
+     * @custom:event Emits TimelockAdded with old and new timelock and route type.
      */
     function addTimelocks(ITimelock[] memory timelocks_) external onlyOwner {
+        uint8 length = uint8(type(ProposalType).max) + 1;
         require(
-            timelocks_.length == uint8(ProposalType.CRITICAL) + 1,
+            timelocks_.length == length,
             "OmnichainGovernanceExecutor::initialize:number of timelocks _should match the number of governance routes"
         );
-        for (uint8 i; i < uint8(ProposalType.CRITICAL) + 1; ++i) {
-            require(
-                address(timelocks_[i]) != address(0),
-                "OmnichainGovernanceExecutor::initialize:invalid timelock address"
-            );
+        for (uint8 i; i < length; ) {
+            ensureNonzeroAddress(address(timelocks_[i]));
+            emit TimelockAdded(i, address(proposalTimelocks[i]), address(timelocks_[i]));
             proposalTimelocks[i] = timelocks_[i];
-            emit TimelockAdded(address(proposalTimelocks[i]), i);
+            unchecked {
+                ++i;
+            }
         }
     }
 
@@ -138,53 +176,96 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @param proposalId_ Id of proposal that is to be executed.
      * @custom:event Emits ProposalExecuted with proposal id of executed proposal.
      */
-    function execute(uint256 proposalId_) external {
+    function execute(uint256 proposalId_) external nonReentrant {
         require(
-            queued[proposalId_],
+            state(proposalId_) == ProposalState.Queued,
             "OmnichainGovernanceExecutor::execute: proposal can only be executed if it is queued"
         );
 
         Proposal storage proposal = proposals[proposalId_];
+        proposal.executed = true;
+        ITimelock timelock = proposalTimelocks[proposal.proposalType];
+        uint256 eta = proposal.eta;
+        uint256 length = proposal.targets.length;
 
-        for (uint256 i; i < proposal.targets.length; ++i) {
-            proposalTimelocks[uint8(proposal.proposalType)].executeTransaction(
+        emit ProposalExecuted(proposalId_);
+
+        for (uint256 i; i < length; ) {
+            timelock.executeTransaction(
                 proposal.targets[i],
                 proposal.values[i],
                 proposal.signatures[i],
                 proposal.calldatas[i],
-                proposal.eta
+                eta
             );
+            unchecked {
+                ++i;
+            }
         }
-        proposal.executed = true;
-        emit ProposalExecuted(proposalId_);
     }
 
     /**
      * @notice Cancels a proposal only if sender is the guardian and proposal is not executed.
-     * @param proposalId_ Id of proposal that is to be cancelled.
+     * @param proposalId_ Id of proposal that is to be canceled.
      * @custom:access Sender must be the guardian.
-     * @custom:event Emits ProposalCancelled with proposal id of the cancelled proposal.
+     * @custom:event Emits ProposalCanceled with proposal id of the canceled proposal.
      */
     function cancel(uint256 proposalId_) external {
-        require(queued[proposalId_], "OmnichainGovernanceExecutor::cancel: proposal not queued");
+        require(
+            state(proposalId_) == ProposalState.Queued,
+            "OmnichainGovernanceExecutor::cancel: proposal should be queued and not executed"
+        );
         Proposal storage proposal = proposals[proposalId_];
-        require(!proposal.executed, "OmnichainGovernanceExecutor::cancel: cannot cancel executed proposal");
         require(msg.sender == GUARDIAN, "OmnichainGovernanceExecutor::cancel: sender must be guardian");
 
-        proposal.cancelled = true;
-        for (uint256 i = 0; i < proposal.targets.length; i++) {
-            proposalTimelocks[proposal.proposalType].cancelTransaction(
+        proposal.canceled = true;
+        ITimelock timelock = proposalTimelocks[proposal.proposalType];
+        uint256 eta = proposal.eta;
+        uint256 length = proposal.targets.length;
+
+        emit ProposalCanceled(proposalId_);
+
+        for (uint256 i; i < length; ) {
+            timelock.cancelTransaction(
                 proposal.targets[i],
                 proposal.values[i],
                 proposal.signatures[i],
                 proposal.calldatas[i],
-                proposal.eta
+                eta
             );
+            unchecked {
+                ++i;
+            }
         }
-
-        emit ProposalCancelled(proposalId_);
     }
 
+    /**
+     * @notice Gets the state of a proposal
+     * @param proposalId_ The id of the proposal
+     * @return Proposal state
+     */
+    function state(uint256 proposalId_) public view returns (ProposalState) {
+        Proposal storage proposal = proposals[proposalId_];
+        if (proposal.canceled) {
+            return ProposalState.Canceled;
+        } else if (proposal.executed) {
+            return ProposalState.Executed;
+        } else if (queued[proposalId_]) {
+            // queued only when proposal is received
+            return ProposalState.Queued;
+        } else {
+            revert InvalidProposalId();
+        }
+    }
+
+    /**
+     * @notice Process blocking LayerZero receive request.
+     * @param srcChainId_ Source chain Id.
+     * @param srcAddress_ Source address from which payload is received.
+     * @param nonce_ Nonce associated with the payload to prevent replay attacks.
+     * @param payload_ Encoded payload containing proposal information.
+     * @custom:event Emit ReceivePayloadFailed if call fails.
+     */
     function _blockingLzReceive(
         uint16 srcChainId_,
         bytes memory srcAddress_,
@@ -192,6 +273,8 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         bytes memory payload_
     ) internal virtual override whenNotPaused {
         uint256 gasToStoreAndEmit = 30000; // enough gas to ensure we can store the payload and emit the event
+
+        require(srcChainId_ == srcChainId, "OmnichainGovernanceExecutor::_blockingLzReceive: invalid source chain id");
 
         (bool success, bytes memory reason) = address(this).excessivelySafeCall(
             gasleft() - gasToStoreAndEmit,
@@ -206,12 +289,12 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         }
     }
 
-    function _nonblockingLzReceive(
-        uint16 srcChainId_,
-        bytes memory,
-        uint64,
-        bytes memory payload_
-    ) internal virtual override {
+    /**
+     * @notice Process non blocking LayerZero receive request.
+     * @param payload_ Encoded payload containing proposal information.
+     * @custom:event Emit ProposalReceived
+     */
+    function _nonblockingLzReceive(uint16, bytes memory, uint64, bytes memory payload_) internal virtual override {
         (bytes memory payload, uint256 pId) = abi.decode(payload_, (bytes, uint256));
         (
             address[] memory targets,
@@ -220,7 +303,18 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             bytes[] memory calldatas,
             uint8 pType
         ) = abi.decode(payload, (address[], uint256[], string[], bytes[], uint8));
-        _isEligibleToReceive(srcChainId_, targets.length);
+        require(proposals[pId].id == 0, "OmnichainGovernanceExecutor::_nonblockingLzReceive: duplicate proposal");
+        require(
+            targets.length == values.length &&
+                targets.length == signatures.length &&
+                targets.length == calldatas.length,
+            "OmnichainGovernanceExecutor::_nonblockingLzReceive: proposal function information arity mismatch"
+        );
+        require(
+            pType < uint8(type(ProposalType).max) + 1,
+            "OmnichainGovernanceExecutor::_nonblockingLzReceive: invalid proposal type"
+        );
+        _isEligibleToReceive(targets.length);
 
         Proposal memory newProposal = Proposal({
             id: pId,
@@ -229,37 +323,57 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             values: values,
             signatures: signatures,
             calldatas: calldatas,
-            cancelled: false,
+            canceled: false,
             executed: false,
             proposalType: pType
         });
 
-        proposals[newProposal.id] = newProposal;
+        proposals[pId] = newProposal;
         lastProposalReceived = pId;
 
         emit ProposalReceived(newProposal.id, targets, values, signatures, calldatas, pType);
         _queue(pId);
     }
 
+    /**
+     * @notice Queue proposal for execution.
+     * @param proposalId_ Proposal to be queued.
+     * @custom:event Emit ProposalQueued with proposal id and eta.
+     */
     function _queue(uint256 proposalId_) internal {
         Proposal storage proposal = proposals[proposalId_];
         uint256 eta = block.timestamp + proposalTimelocks[proposal.proposalType].delay();
-        for (uint256 i; i < proposal.targets.length; ++i) {
+
+        proposal.eta = eta;
+        queued[proposalId_] = true;
+        uint8 proposalType = proposal.proposalType;
+        uint256 length = proposal.targets.length;
+        emit ProposalQueued(proposalId_, eta);
+
+        for (uint256 i; i < length; ) {
             _queueOrRevertInternal(
                 proposal.targets[i],
                 proposal.values[i],
                 proposal.signatures[i],
                 proposal.calldatas[i],
                 eta,
-                proposal.proposalType
+                proposalType
             );
+            unchecked {
+                ++i;
+            }
         }
-
-        proposal.eta = eta;
-        queued[proposalId_] = true;
-        emit ProposalQueued(proposalId_, eta);
     }
 
+    /**
+     * @notice Check for unique proposal.
+     * @param target_ Address of the contract with the method to be called.
+     * @param value_ Native token amount sent with the transaction.
+     * @param signature_ Signature of the function to be called.
+     * @param data_ Arguments to be passed to the function when called.
+     * @param eta_ Timestamp after which the transaction can be executed.
+     * @param proposalType_ Type of proposal.
+     */
     function _queueOrRevertInternal(
         address target_,
         uint256 value_,
