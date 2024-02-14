@@ -184,6 +184,8 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         uint256 eta = proposal.eta;
         uint256 length = proposal.targets.length;
 
+        emit ProposalExecuted(proposalId_);
+
         for (uint256 i; i < length; ) {
             timelock.executeTransaction(
                 proposal.targets[i],
@@ -196,7 +198,6 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 ++i;
             }
         }
-        emit ProposalExecuted(proposalId_);
     }
 
     /**
@@ -218,6 +219,8 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         uint256 eta = proposal.eta;
         uint256 length = proposal.targets.length;
 
+        emit ProposalCanceled(proposalId_);
+
         for (uint256 i; i < length; ) {
             timelock.cancelTransaction(
                 proposal.targets[i],
@@ -230,8 +233,6 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 ++i;
             }
         }
-
-        emit ProposalCanceled(proposalId_);
     }
 
     /**
@@ -343,6 +344,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         queued[proposalId_] = true;
         uint8 proposalType = proposal.proposalType;
         uint256 length = proposal.targets.length;
+        emit ProposalQueued(proposalId_, eta);
 
         for (uint256 i; i < length; ) {
             _queueOrRevertInternal(
@@ -357,8 +359,6 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 ++i;
             }
         }
-
-        emit ProposalQueued(proposalId_, eta);
     }
 
     /**

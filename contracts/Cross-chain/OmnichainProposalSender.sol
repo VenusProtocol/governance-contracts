@@ -186,6 +186,8 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
 
         delete storedExecutionHashes[pId_];
 
+        emit ClearPayload(pId_, hash);
+
         LZ_ENDPOINT.send{ value: originalValue_ + msg.value }(
             remoteChainId_,
             trustedRemoteLookup[remoteChainId_],
@@ -194,7 +196,6 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
             address(0),
             adapterParams_
         );
-        emit ClearPayload(pId_, hash);
     }
 
     /**
@@ -229,12 +230,12 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
 
         delete storedExecutionHashes[pId_];
 
+        emit FallbackWithdraw(to_, originalValue_);
+        emit ClearPayload(pId_, hash);
+
         // Transfer the native to the `to_` address
         (bool sent, ) = to_.call{ value: originalValue_ }("");
         require(sent, "Call failed");
-
-        emit FallbackWithdraw(to_, originalValue_);
-        emit ClearPayload(pId_, hash);
     }
 
     /**
