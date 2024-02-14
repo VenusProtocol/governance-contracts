@@ -52,8 +52,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     enum ProposalState {
         Canceled,
         Queued,
-        Executed,
-        Pending
+        Executed
     }
 
     /**
@@ -127,6 +126,11 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @notice Emitted when source layerzero endpoint id is updated.
      */
     event SetSrcChainId(uint16 indexed oldSrcChainId, uint16 indexed newSrcChainId);
+
+    /**
+     * @notice Thrown when proposal ID is invalid.
+     */
+    error InvalidProposalId();
 
     constructor(address endpoint_, address guardian_, uint16 srcChainId_) BaseOmnichainControllerDest(endpoint_) {
         ensureNonzeroAddress(guardian_);
@@ -250,7 +254,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             // queued only when proposal is received
             return ProposalState.Queued;
         } else {
-            return ProposalState.Pending;
+            revert InvalidProposalId();
         }
     }
 

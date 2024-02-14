@@ -467,12 +467,13 @@ describe("Omnichain: ", async function () {
 
   it("Revert if proposal is not queued", async function () {
     const proposalId = (await getLastRemoteProposalId()).add(1);
-    await expect(executor.connect(deployer).cancel(proposalId)).to.be.revertedWith(
-      "OmnichainGovernanceExecutor::cancel: proposal should be queued and not executed",
+    await expect(executor.connect(deployer).cancel(proposalId)).to.be.revertedWithCustomError(
+      executor,
+      "InvalidProposalId",
     );
   });
-  it("Return Pending state when proposal is not queued", async function () {
-    expect(await executor.state(1000)).to.equals(3);
+  it("Revert when proposal is not queued", async function () {
+    await expect(executor.state(1000)).to.be.revertedWithCustomError(executor, "InvalidProposalId");
   });
 
   it("Emit ProposalCanceled event when proposal gets canceled", async function () {
