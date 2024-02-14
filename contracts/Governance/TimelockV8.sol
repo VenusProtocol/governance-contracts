@@ -197,7 +197,7 @@ contract TimelockV8 {
         require(msg.sender == admin, "Timelock::cancelTransaction: Call must come from admin.");
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
-        require(queuedTransactions[txHash], "Timelock::queueTransaction: transaction is not queued yet.");
+        require(queuedTransactions[txHash], "Timelock::cancelTransaction: transaction is not queued yet.");
         delete (queuedTransactions[txHash]);
 
         emit CancelTransaction(txHash, target, value, signature, data, eta);
