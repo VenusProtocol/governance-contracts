@@ -51,9 +51,7 @@ export const getOmnichainProposalSender = async (network: Omit<SUPPORTED_NETWORK
 };
 
 export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {
-  if (network === "hardhat") {
-    return 1;
-  } else if (network === "sepolia" || network === "opbnbtestnet") {
+  if (network === "sepolia" || network === "opbnbtestnet") {
     return 10102;
   } else if (network === "ethereum" || network === "opbnbmainnet") {
     return 102;
