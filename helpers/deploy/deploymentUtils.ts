@@ -18,8 +18,7 @@ export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<s
   } else if (network === "opbnbmainnet") {
     return "0xC46796a21a3A9FAB6546aF3434F2eBfFd0604207"; // OPBNBMAINNET MULTISIG
   }
-
-  const normalTimelock = await ethers.getContract("NormalTimeLock");
+  const normalTimelock = await ethers.getContract("NormalTimelock");
   return normalTimelock.address;
 };
 
@@ -49,6 +48,17 @@ export const getOmnichainProposalSender = async (network: Omit<SUPPORTED_NETWORK
 
   // It will be replaced by mainnet OmnichainProposalSender address once its mainnet deployment is done
   return ADDRESS_ONE;
+};
+
+export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {
+  if (network === "hardhat") {
+    return 1;
+  } else if (network === "sepolia" || network === "opbnbtestnet") {
+    return 10102;
+  } else if (network === "ethereum" || network === "opbnbmainnet") {
+    return 102;
+  }
+  return 1;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function

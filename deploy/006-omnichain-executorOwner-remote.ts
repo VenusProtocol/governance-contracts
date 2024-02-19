@@ -5,7 +5,10 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { LZ_CHAINID, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
 import { OmnichainGovernanceExecutorMethods, config } from "../helpers/deploy/deploymentConfig";
-import { getOmnichainProposalSender } from "../helpers/deploy/deploymentUtils";
+import {
+  getOmnichainGovernanceExecutorAdminAccount,
+  getOmnichainProposalSender,
+} from "../helpers/deploy/deploymentUtils";
 import { OmnichainGovernanceExecutor } from "../typechain";
 
 interface GovernanceCommand {
@@ -92,7 +95,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [omnichainGovernanceExecutorAddress],
     contract: "OmnichainExecutorOwner",
     proxy: {
-      owner: normalTimelockAddress,
+      owner: hre.network.live ? await getOmnichainGovernanceExecutorAdminAccount(networkName) : deployer,
       proxyContract: "OpenZeppelinTransparentProxy",
       execute: {
         methodName: "initialize",

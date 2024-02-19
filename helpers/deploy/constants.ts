@@ -27,5 +27,6 @@ export const LZ_CHAINID: Record<SUPPORTED_NETWORKS, number> = {
   opbnbtestnet: 10202,
   hardhat: 10102,
 };
+
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export default () => {};

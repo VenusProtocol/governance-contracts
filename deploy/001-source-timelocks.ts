@@ -44,7 +44,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 
-func.tags = ["Local", "Timelock"];
+func.tags = ["Local", "Timelock", "LocalTimelock"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
   !(hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet") && hre.network.name !== "hardhat";

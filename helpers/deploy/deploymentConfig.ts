@@ -64,6 +64,16 @@ export const delayConfig = {
     fast: 21600,
     critical: 3600,
   },
+  opbnbtestnet: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  opbnbmainnet: {
+    normal: 172800,
+    fast: 21600,
+    critical: 3600,
+  },
 };
 export const config: Config = {
   bsctestnet: {
@@ -81,7 +91,7 @@ export const config: Config = {
   sepolia: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
-      { method: "setMaxDailyReceiveLimit(uint16,uint256)", args: [10102, 100] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
     ],
   },
   ethereum: {
@@ -93,19 +103,19 @@ export const config: Config = {
   opbnbtestnet: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
-      { method: "setMaxDailyReceiveLimit(uint16,uint256)", args: [10102, 100] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
     ],
   },
   opbnbmainnet: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [101, 0, 200000] },
-      { method: "setMaxDailyReceiveLimit(uint16,uint256)", args: [101, 100] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
     ],
   },
   hardhat: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
-      { method: "setMaxDailyReceiveLimit(uint16,uint256)", args: [10102, 100] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
     ],
   },
 };
