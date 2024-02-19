@@ -2,6 +2,7 @@
   "name": "sepolia",
   "chainId": "11155111",
   "addresses": {
-    "AccessControlManager": "0xbf705C00578d43B6147ab4eaE04DBBEd1ccCdc96"
+    "AccessControlManager": "0xbf705C00578d43B6147ab4eaE04DBBEd1ccCdc96",
+    "DefaultProxyAdmin": "0x01435866babd91311b1355cf3af488cca36db68e"
   }
 }
