@@ -11,7 +11,7 @@ import { IAccessControlManagerV8 } from "./../Governance/IAccessControlManagerV8
  * @title BaseOmnichainControllerSrc
  * @dev This contract is the base for the Omnichain controller source contracts.
  * It provides functionality related to daily command limits and pausability.
- *  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
+ * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 
 contract BaseOmnichainControllerSrc is Ownable, Pausable {
@@ -42,8 +42,7 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
     /**
      * @notice Emitted when the maximum daily limit of commands from the local chain is modified.
      */
-    event SetMaxDailyLimit(uint256 oldMaxLimit, uint256 newMaxLimit);
-
+    event SetMaxDailyLimit(uint16 indexed chainId, uint256 oldMaxLimit, uint256 newMaxLimit);
     /**
      * @notice Emitted when the address of ACM is updated.
      */
@@ -57,13 +56,13 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
     /**
      * @notice Sets the limit of daily (24 Hour) command amount.
      * @param chainId_ Destination chain ID.
-     * @param limit_ Amount in USD(scaled with 18 decimals).).
+     * @param limit_ Number of commands.
      * @custom:access Controlled by AccessControlManager.
-     * @custom:event Emits SetMaxDailyLimit new limit and its corresponding chain id
+     * @custom:event Emits SetMaxDailyLimit with old and new limit and its corresponding chain id
      */
     function setMaxDailyLimit(uint16 chainId_, uint256 limit_) external {
         _ensureAllowed("setMaxDailyLimit(uint16,uint256)");
-        emit SetMaxDailyLimit(chainIdToMaxDailyLimit[chainId_], limit_);
+        emit SetMaxDailyLimit(chainId_, chainIdToMaxDailyLimit[chainId_], limit_);
         chainIdToMaxDailyLimit[chainId_] = limit_;
     }
 
@@ -102,6 +101,11 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
      */
     function renounceOwnership() public override {}
 
+    /**
+     * @notice Check eligibility to send commands.
+     * @param dstChainId_ Destination chain id.
+     * @param noOfCommands_ Number of commands to send.
+     */
     function _isEligibleToSend(uint16 dstChainId_, uint256 noOfCommands_) internal {
         // Load values for the 24-hour window checks
         uint256 currentBlockTimestamp = block.timestamp;
@@ -120,7 +124,7 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
 
         // Revert if the amount exceeds the daily limit
         require(commandsSentInWindow <= maxDailyLimit, "Daily Transaction Limit Exceeded");
-        // Revert if the last proposal is already sent in current block i.e multiple commands for a dstChainId_ in a proposal
+        // Revert if the last proposal is already sent in current block i.e multiple proposals cannot be sent within the same block.timestamp
         require(lastProposalSentTimestamp != currentBlockTimestamp, "Multiple bridging in a proposal");
 
         // Update the amount for the 24-hour window
@@ -129,6 +133,10 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
         chainIdToLastProposalSentTimestamp[dstChainId_] = currentBlockTimestamp;
     }
 
+    /**
+     * @notice Ensure that the caller has permission to execute a specific function.
+     * @param functionSig_ Function signature to be checked for permission.
+     */
     function _ensureAllowed(string memory functionSig_) internal view {
         require(
             IAccessControlManagerV8(accessControlManager).isAllowedToCall(msg.sender, functionSig_),
