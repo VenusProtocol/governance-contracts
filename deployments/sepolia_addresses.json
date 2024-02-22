@@ -3,6 +3,13 @@
   "chainId": "11155111",
   "addresses": {
     "AccessControlManager": "0xbf705C00578d43B6147ab4eaE04DBBEd1ccCdc96",
-    "DefaultProxyAdmin": "0x01435866babd91311b1355cf3af488cca36db68e"
+    "CriticalTimelock": "0x4a2C82Da46B7e0b2f44D1Fd781c4289E909FF427",
+    "DefaultProxyAdmin": "0x01435866babd91311b1355cf3af488cca36db68e",
+    "FastTrackTimelock": "0x033F00dFA336B240bbBBb8316cc9dBf3aa71Fb74",
+    "NormalTimelock": "0x51f560a018b89A470f8fcE6BF22f3a9F3a4789e5",
+    "OmnichainExecutorOwner": "0x2b9CbD9e28322ac6e46c52B592680e2D829B702C",
+    "OmnichainExecutorOwner_Implementation": "0x6C2E49b036eBD1a08Ec20214939F82F8A45cB661",
+    "OmnichainExecutorOwner_Proxy": "0x2b9CbD9e28322ac6e46c52B592680e2D829B702C",
+    "OmnichainGovernanceExecutor": "0xE09E4784C2Dd7B0f2Db5bf9B00E101a4dC8CC9EB"
   }
 }
