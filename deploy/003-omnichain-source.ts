@@ -63,11 +63,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const normalTimelockAddress = (await ethers.getContract("NormalTimelock")).address;
   const fastTrackTimelockAddress = (await ethers.getContract("FastTrackTimelock")).address;
   const criticalTimelockAddress = (await ethers.getContract("CriticalTimelock")).address;
-  const governorBravoDelegatorAddress = (await ethers.getContract("GovernorBravoDelegator")).address;
 
   const OmnichainProposalSender = await deploy("OmnichainProposalSender", {
     from: deployer,
-    args: [LZ_ENDPOINTS[hre.network.name as keyof typeof LZ_ENDPOINTS], acmAddress, governorBravoDelegatorAddress],
+    args: [LZ_ENDPOINTS[hre.network.name as keyof typeof LZ_ENDPOINTS], acmAddress],
     log: true,
     autoMine: true,
   });
@@ -118,7 +117,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ),
   );
 };
-func.tags = ["OmnichainProposalSender", "omnichainlocal"];
+func.tags = ["OmnichainProposalSender", "OmnichainLocal"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
   !(hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet") && hre.network.name !== "hardhat";
