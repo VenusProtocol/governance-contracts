@@ -102,10 +102,11 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     /**
      * @notice Remove trusted remote from storage.
      * @param remoteChainId_ The chain's id corresponds to setting the trusted remote to empty.
-     * @custom:access Only owner.
+     * @custom:access Controlled by Access Control Manager.
      * @custom:event Emit TrustedRemoteRemoved with remote chain id.
      */
-    function removeTrustedRemote(uint16 remoteChainId_) external onlyOwner {
+    function removeTrustedRemote(uint16 remoteChainId_) external {
+        _ensureAllowed("removeTrustedRemote(uint16)");
         delete trustedRemoteLookup[remoteChainId_];
         emit TrustedRemoteRemoved(remoteChainId_);
     }

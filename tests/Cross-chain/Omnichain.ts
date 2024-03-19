@@ -161,6 +161,11 @@ describe("Omnichain: ", async function () {
 
     tx = await accessControlManager
       .connect(deployer)
+      .giveCallPermission(sender.address, "removeTrustedRemote(uint16)", signer1.address);
+    await tx.wait();
+
+    tx = await accessControlManager
+      .connect(deployer)
       .giveCallPermission(executorOwner.address, "setTrustedRemoteAddress(uint16,bytes)", signer1.address);
     await tx.wait();
 
@@ -216,9 +221,7 @@ describe("Omnichain: ", async function () {
     );
   });
   it("Revert if trusted remote is removed by non owner", async function () {
-    await expect(sender.connect(signer1).removeTrustedRemote(remoteChainId)).to.be.revertedWith(
-      "Ownable: caller is not the owner",
-    );
+    await expect(sender.connect(signer2).removeTrustedRemote(remoteChainId)).to.be.revertedWith("access denied");
   });
 
   it("Reverts when trusted remote is not set", async function () {
@@ -229,7 +232,7 @@ describe("Omnichain: ", async function () {
       [calldata],
       proposalType,
     );
-    expect(await sender.removeTrustedRemote(remoteChainId))
+    expect(await sender.connect(signer1).removeTrustedRemote(remoteChainId))
       .to.emit(sender, "TrustedRemoteRemoved")
       .withArgs(remoteChainId);
 
