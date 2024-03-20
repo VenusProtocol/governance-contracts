@@ -40,7 +40,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@venusprotocol/solidity-utilities": "^1.1.0",
+    "@venusprotocol/solidity-utilities": "1.3.0",
     "hardhat-deploy-ethers": "^0.3.0-beta.13",
     "module-alias": "^2.2.2"
   },
@@ -73,7 +73,7 @@
     "@types/node": "^18.16.3",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
-    "@venusprotocol/venus-protocol": "6.1.0-dev.4",
+    "@venusprotocol/venus-protocol": "7.4.0",
     "bignumber.js": "^9.1.1",
     "chai": "^4.3.7",
     "commitizen": "^4.2.5",
