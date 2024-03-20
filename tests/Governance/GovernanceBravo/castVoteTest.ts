@@ -51,7 +51,7 @@ const proposalConfigs = {
 async function governorBravoFixture(): Promise<GovernorBravoDelegateFixture> {
   const GovernorBravoDelegateFactory = await smock.mock<GovernorBravoDelegate__factory>("GovernorBravoDelegate");
   const governorBravoDelegate = await GovernorBravoDelegateFactory.deploy();
-  const xvsVault = await smock.fake<XVSVault>("XVSVault");
+  const xvsVault = await smock.fake<XVSVault>("MockXVSVault");
   const xvsStore = await smock.fake<XVSStore>("XVSStore");
   const xvsToken = await smock.fake<XVS>("XVS");
   return { governorBravoDelegate, xvsVault, xvsStore, xvsToken };

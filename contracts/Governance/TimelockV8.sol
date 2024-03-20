@@ -11,13 +11,13 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  */
 contract TimelockV8 {
     /// @notice Event emitted when a new admin is accepted
-    event NewAdmin(address indexed newAdmin);
+    event NewAdmin(address indexed oldAdmin, address indexed newAdmin);
 
     /// @notice Event emitted when a new admin is proposed
     event NewPendingAdmin(address indexed newPendingAdmin);
 
-    /// @notice Event emitted when a new admin is proposed
-    event NewDelay(uint256 indexed newDelay);
+    /// @notice Event emitted when a new delay is proposed
+    event NewDelay(uint256 indexed oldDelay, uint256 indexed newDelay);
 
     /// @notice Event emitted when a proposal transaction has been cancelled
     event CancelTransaction(
@@ -84,42 +84,58 @@ contract TimelockV8 {
     /**
      * @notice Setter for the transaction queue delay
      * @param delay_ The new delay period for the transaction queue
+     * @custom:access Sender must be Timelock itself
+     * @custom:event Emit NewDelay with old and new delay
      */
     function setDelay(uint256 delay_) public {
         require(msg.sender == address(this), "Timelock::setDelay: Call must come from Timelock.");
         require(delay_ >= MINIMUM_DELAY(), "Timelock::setDelay: Delay must exceed minimum delay.");
         require(delay_ <= MAXIMUM_DELAY(), "Timelock::setDelay: Delay must not exceed maximum delay.");
+        emit NewDelay(delay, delay_);
         delay = delay_;
-
-        emit NewDelay(delay);
     }
 
+    /**
+     * @notice Return grace period
+     * @return The duration of the grace period, specified as a uint256 value.
+     */
     function GRACE_PERIOD() public view virtual returns (uint256) {
         return DEFAULT_GRACE_PERIOD;
     }
 
+    /**
+     * @notice Return required minimum delay
+     * @return Minimum delay
+     */
     function MINIMUM_DELAY() public view virtual returns (uint256) {
         return DEFAULT_MINIMUM_DELAY;
     }
 
+    /**
+     * @notice Return required maximum delay
+     * @return Maximum delay
+     */
     function MAXIMUM_DELAY() public view virtual returns (uint256) {
         return DEFAULT_MAXIMUM_DELAY;
     }
 
     /**
      * @notice Method for accepting a proposed admin
+     * @custom:access Sender must be pending admin
+     * @custom:event Emit NewAdmin with old and new admin
      */
     function acceptAdmin() public {
         require(msg.sender == pendingAdmin, "Timelock::acceptAdmin: Call must come from pendingAdmin.");
+        emit NewAdmin(admin, msg.sender);
         admin = msg.sender;
         pendingAdmin = address(0);
-
-        emit NewAdmin(admin);
     }
 
     /**
      * @notice Method to propose a new admin authorized to call timelock functions. This should be the Governor Contract
      * @param pendingAdmin_ Address of the proposed admin
+     * @custom:access Sender must be Timelock contract itself
+     * @custom:event Emit NewPendingAdmin with new pending admin
      */
     function setPendingAdmin(address pendingAdmin_) public {
         require(msg.sender == address(this), "Timelock::setPendingAdmin: Call must come from Timelock.");
@@ -133,16 +149,18 @@ contract TimelockV8 {
      * @notice Called for each action when queuing a proposal
      * @param target Address of the contract with the method to be called
      * @param value Native token amount sent with the transaction
-     * @param signature Ssignature of the function to be called
+     * @param signature Signature of the function to be called
      * @param data Arguments to be passed to the function when called
      * @param eta Timestamp after which the transaction can be executed
      * @return Hash of the queued transaction
+     * @custom:access Sender must be admin
+     * @custom:event Emit QueueTransaction
      */
     function queueTransaction(
         address target,
         uint256 value,
-        string memory signature,
-        bytes memory data,
+        string calldata signature,
+        bytes calldata data,
         uint256 eta
     ) public returns (bytes32) {
         require(msg.sender == admin, "Timelock::queueTransaction: Call must come from admin.");
@@ -152,6 +170,7 @@ contract TimelockV8 {
         );
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
+        require(!queuedTransactions[txHash], "Timelock::queueTransaction: transaction already queued.");
         queuedTransactions[txHash] = true;
 
         emit QueueTransaction(txHash, target, value, signature, data, eta);
@@ -162,21 +181,24 @@ contract TimelockV8 {
      * @notice Called to cancel a queued transaction
      * @param target Address of the contract with the method to be called
      * @param value Native token amount sent with the transaction
-     * @param signature Ssignature of the function to be called
+     * @param signature Signature of the function to be called
      * @param data Arguments to be passed to the function when called
      * @param eta Timestamp after which the transaction can be executed
+     * @custom:access Sender must be admin
+     * @custom:event Emit CancelTransaction
      */
     function cancelTransaction(
         address target,
         uint256 value,
-        string memory signature,
-        bytes memory data,
+        string calldata signature,
+        bytes calldata data,
         uint256 eta
     ) public {
         require(msg.sender == admin, "Timelock::cancelTransaction: Call must come from admin.");
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
-        queuedTransactions[txHash] = false;
+        require(queuedTransactions[txHash], "Timelock::cancelTransaction: transaction is not queued yet.");
+        delete (queuedTransactions[txHash]);
 
         emit CancelTransaction(txHash, target, value, signature, data, eta);
     }
@@ -185,15 +207,18 @@ contract TimelockV8 {
      * @notice Called to execute a queued transaction
      * @param target Address of the contract with the method to be called
      * @param value Native token amount sent with the transaction
-     * @param signature Ssignature of the function to be called
+     * @param signature Signature of the function to be called
      * @param data Arguments to be passed to the function when called
      * @param eta Timestamp after which the transaction can be executed
+     * @return Result of function call
+     * @custom:access Sender must be admin
+     * @custom:event Emit ExecuteTransaction
      */
     function executeTransaction(
         address target,
         uint256 value,
-        string memory signature,
-        bytes memory data,
+        string calldata signature,
+        bytes calldata data,
         uint256 eta
     ) public payable returns (bytes memory) {
         require(msg.sender == admin, "Timelock::executeTransaction: Call must come from admin.");
@@ -203,7 +228,7 @@ contract TimelockV8 {
         require(getBlockTimestamp() >= eta, "Timelock::executeTransaction: Transaction hasn't surpassed time lock.");
         require(getBlockTimestamp() <= eta + GRACE_PERIOD(), "Timelock::executeTransaction: Transaction is stale.");
 
-        queuedTransactions[txHash] = false;
+        delete (queuedTransactions[txHash]);
 
         bytes memory callData;
 
@@ -222,6 +247,10 @@ contract TimelockV8 {
         return returnData;
     }
 
+    /**
+     * @notice Returns the current block timestamp
+     * @return The current block timestamp
+     */
     function getBlockTimestamp() internal view returns (uint256) {
         // solium-disable-next-line security/no-block-members
         return block.timestamp;

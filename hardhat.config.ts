@@ -4,6 +4,7 @@ import "@nomicfoundation/hardhat-chai-matchers";
 import "@nomiclabs/hardhat-etherscan";
 import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
+import "hardhat-dependency-compiler";
 import "hardhat-deploy";
 import { HardhatUserConfig, extendConfig, task } from "hardhat/config";
 import { HardhatConfig } from "hardhat/types";
@@ -192,6 +193,15 @@ const config: HardhatUserConfig = {
     deployer: {
       default: 0, // here this will by default take the first account as deployer
     },
+  },
+  dependencyCompiler: {
+    paths: [
+      "@venusprotocol/venus-protocol/contracts/XVSVault/XVSStore.sol",
+      "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVaultErrorReporter.sol",
+      "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVaultProxy.sol",
+      "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVaultStorage.sol",
+      "@venusprotocol/venus-protocol/contracts/Tokens/XVS/XVS.sol",
+    ],
   },
   external: {
     contracts: [

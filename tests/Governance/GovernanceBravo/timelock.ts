@@ -31,8 +31,10 @@ describe("TimelockV8 Tests", () => {
     await fundAccount(timelock.address);
 
     const timelockSigner = await impersonateSigner(timelock.address);
-
-    await expect(timelock.connect(timelockSigner).setDelay("5000")).to.emit(timelock, "NewDelay").withArgs("5000");
+    const oldDelay = await timelock.delay();
+    await expect(timelock.connect(timelockSigner).setDelay("5000"))
+      .to.emit(timelock, "NewDelay")
+      .withArgs(oldDelay, "5000");
 
     await expect(timelock.connect(timelockSigner).setDelay("1000")).to.be.revertedWith(
       "Timelock::setDelay: Delay must exceed minimum delay.",
