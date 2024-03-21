@@ -6,6 +6,8 @@ export enum SUPPORTED_NETWORKS {
   HARDHAT = "hardhat",
   OPBNBTESTNET = "opbnbtestnet",
   OPBNBMAINNET = "opbnbmainnet",
+  ARBITRUM_SEPOLIA = "arbitrumSepolia",
+  ARBITRUM_ONE = "arbitrumOne",
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
