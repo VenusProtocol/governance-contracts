@@ -113,14 +113,14 @@ const config: HardhatUserConfig = {
       gasPrice: 10000000000, // 10 gwei
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
-    arbitrumSepolia: {
-      url: process.env.ARCHIVE_NODE_arbitrumSepolia || "https://sepolia-rollup.arbitrum.io/rpc",
+    arbitrumsepolia: {
+      url: process.env.ARCHIVE_NODE_arbitrumsepolia || "https://sepolia-rollup.arbitrum.io/rpc",
       chainId: 421614,
       live: true,
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
-    arbitrumOne: {
-      url: process.env.ARCHIVE_NODE_arbitrumOne || "https://arb1.arbitrum.io/rpc",
+    arbitrumone: {
+      url: process.env.ARCHIVE_NODE_arbitrumone || "https://arb1.arbitrum.io/rpc",
       chainId: 42161,
       live: true,
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
@@ -134,8 +134,8 @@ const config: HardhatUserConfig = {
       ethereum: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
       opbnbtestnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
       opbnbmainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
-      arbitrumSepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
-      arbitrumOne: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      arbitrumsepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      arbitrumone: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
     },
     customChains: [
       {
@@ -187,7 +187,7 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        network: "arbitrumSepolia",
+        network: "arbitrumsepolia",
         chainId: 421614,
         urls: {
           apiURL: `https://api-sepolia.arbiscan.io/api`,
@@ -195,7 +195,7 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        network: "arbitrumOne",
+        network: "arbitrumone",
         chainId: 42161,
         urls: {
           apiURL: `https://api.arbiscan.io/api/`,

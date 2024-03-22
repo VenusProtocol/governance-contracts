@@ -1,5 +1,5 @@
 {
-  "name": "arbitrumSepolia",
+  "name": "arbitrumsepolia",
   "chainId": "421614",
   "addresses": {
     "AccessControlManager": "0xa36AD96441cB931D8dFEAAaC97D3FaB4B39E590F"
