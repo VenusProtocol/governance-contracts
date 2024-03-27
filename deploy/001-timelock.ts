@@ -43,6 +43,16 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       critical: 100,
     },
     opbnbmainnet: { normal: 172800, fast: 21600, critical: 3600 },
+    arbitrumsepolia: {
+      normal: 600,
+      fast: 300,
+      critical: 100,
+    },
+    arbitrumone: {
+      normal: 172800,
+      fast: 21600,
+      critical: 3600,
+    },
   };
 
   await deploy("NormalTimelock", {
