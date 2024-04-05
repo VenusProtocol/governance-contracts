@@ -119,6 +119,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @param payload_ The payload to be sent to the remote chain.
      * It's computed as follows: payload = abi.encode(targets, values, signatures, calldatas, proposalType)
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
+     * @param zroPaymentAddress_ The address of the ZRO token holder who would pay for the transaction.
      * @custom:event Emits ExecuteRemoteProposal with remote chain id and payload on success
      * @custom:event Emits StorePayload with last stored payload proposal ID ,remote chain id , payload, adapter params , values and reason for failure
      * @custom:access Controlled by Access Control Manager
@@ -126,9 +127,10 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     function execute(
         uint16 remoteChainId_,
         bytes calldata payload_,
-        bytes calldata adapterParams_
+        bytes calldata adapterParams_,
+        address zroPaymentAddress_
     ) external payable whenNotPaused {
-        _ensureAllowed("execute(uint16,bytes,bytes)");
+        _ensureAllowed("execute(uint16,bytes,bytes,address)");
 
         // A zero value will result in a failed message; therefore, a positive value is required to send a message across the chain.
         require(msg.value > 0, "OmnichainProposalSender: value cannot be zero");
@@ -146,7 +148,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
                 trustedRemote,
                 payload,
                 payable(msg.sender),
-                address(0),
+                zroPaymentAddress_,
                 adapterParams_
             )
         {
@@ -165,6 +167,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @param payload_ The payload to be sent to the remote chain.
      * It's computed as follows: payload = abi.encode(abi.encode(targets, values, signatures, calldatas, proposalType), pId)
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
+     * @param zroPaymentAddress_ The address of the ZRO token holder who would pay for the transaction.
      * @param originalValue_ The msg.value passed when execute() function was called
      * @custom:event Emits ClearPayload with proposal ID and hash
      * @custom:access Controlled by Access Control Manager
@@ -174,9 +177,10 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         uint16 remoteChainId_,
         bytes calldata payload_,
         bytes calldata adapterParams_,
+        address zroPaymentAddress_,
         uint256 originalValue_
     ) external payable whenNotPaused nonReentrant {
-        _ensureAllowed("retryExecute(uint256,uint16,bytes,bytes,uint256)");
+        _ensureAllowed("retryExecute(uint256,uint16,bytes,bytes,address,uint256)");
         bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
         bytes32 hash = storedExecutionHashes[pId_];
@@ -185,8 +189,10 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         (bytes memory payload, ) = abi.decode(payload_, (bytes, uint256));
         _validateProposal(remoteChainId_, payload);
 
-        bytes memory execution = abi.encode(remoteChainId_, payload_, adapterParams_, originalValue_);
-        require(keccak256(execution) == hash, "OmnichainProposalSender: invalid execution params");
+        require(
+            keccak256(abi.encode(remoteChainId_, payload_, adapterParams_, originalValue_)) == hash,
+            "OmnichainProposalSender: invalid execution params"
+        );
 
         delete storedExecutionHashes[pId_];
 
@@ -194,10 +200,10 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
 
         LZ_ENDPOINT.send{ value: originalValue_ + msg.value }(
             remoteChainId_,
-            trustedRemoteLookup[remoteChainId_],
+            trustedRemote,
             payload_,
             payable(msg.sender),
-            address(0),
+            zroPaymentAddress_,
             adapterParams_
         );
     }

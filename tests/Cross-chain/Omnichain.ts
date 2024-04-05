@@ -44,7 +44,7 @@ describe("Omnichain: ", async function () {
 
   async function storePayload(payload: string, adapterParams: string) {
     await expect(
-      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
         value: nativeFee,
       }),
     ).to.emit(sender, "StorePayload");
@@ -146,12 +146,12 @@ describe("Omnichain: ", async function () {
 
     tx = await accessControlManager
       .connect(deployer)
-      .giveCallPermission(sender.address, "execute(uint16,bytes,bytes)", signer1.address);
+      .giveCallPermission(sender.address, "execute(uint16,bytes,bytes,address)", signer1.address);
     await tx.wait();
 
     tx = await accessControlManager
       .connect(deployer)
-      .giveCallPermission(sender.address, "retryExecute(uint256,uint16,bytes,bytes,uint256)", signer1.address);
+      .giveCallPermission(sender.address, "retryExecute(uint256,uint16,bytes,bytes,address,uint256)", signer1.address);
     await tx.wait();
 
     tx = await accessControlManager
@@ -211,14 +211,16 @@ describe("Omnichain: ", async function () {
 
   it("Reverts if EOA call execute() without grant permission", async function () {
     const payload = await getPayload(NormalTimelock.address);
-    await expect(sender.connect(signer2).execute(remoteChainId, payload, "0x")).to.be.revertedWith("access denied");
+    await expect(
+      sender.connect(signer2).execute(remoteChainId, payload, "0x", ethers.constants.AddressZero),
+    ).to.be.revertedWith("access denied");
   });
 
   it("Reverts when zero value passed", async function () {
     const payload = await getPayload(NormalTimelock.address);
-    await expect(sender.connect(signer1).execute(remoteChainId, payload, "0x")).to.be.revertedWith(
-      "OmnichainProposalSender: value cannot be zero",
-    );
+    await expect(
+      sender.connect(signer1).execute(remoteChainId, payload, "0x", ethers.constants.AddressZero),
+    ).to.be.revertedWith("OmnichainProposalSender: value cannot be zero");
   });
   it("Revert if trusted remote is removed by non owner", async function () {
     await expect(sender.connect(signer2).removeTrustedRemote(remoteChainId)).to.be.revertedWith("access denied");
@@ -237,7 +239,7 @@ describe("Omnichain: ", async function () {
       .withArgs(remoteChainId);
 
     await expect(
-      sender.connect(signer1).execute(remoteChainId, payload, "0x", {
+      sender.connect(signer1).execute(remoteChainId, payload, "0x", ethers.constants.AddressZero, {
         value: ethers.utils.parseEther((nativeFee / 1e18 + 0.00001).toString()),
       }),
     ).to.be.revertedWith("OmnichainProposalSender: destination chain is not a trusted source");
@@ -248,7 +250,7 @@ describe("Omnichain: ", async function () {
     const payload = await getPayload(NormalTimelock.address);
 
     await expect(
-      sender.connect(signer1).execute(remoteChainId, payload, "0x", {
+      sender.connect(signer1).execute(remoteChainId, payload, "0x", ethers.constants.AddressZero, {
         value: nativeFee,
       }),
     ).to.be.revertedWith("Daily Transaction Limit Exceeded");
@@ -348,7 +350,7 @@ describe("Omnichain: ", async function () {
   it("Emit ExecuteRemoteProposal event", async function () {
     const payload = await getPayload(NormalTimelock.address);
     await expect(
-      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
         value: nativeFee,
       }),
     ).to.emit(sender, "ExecuteRemoteProposal");
@@ -358,7 +360,7 @@ describe("Omnichain: ", async function () {
   it("Revert initially, success on retry", async () => {
     const payload = await getPayload(NormalTimelock.address);
     await expect(
-      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
         value: ethers.utils.parseEther("0.0000001"),
       }),
     ).to.emit(sender, "StorePayload");
@@ -367,9 +369,17 @@ describe("Omnichain: ", async function () {
     await expect(
       sender
         .connect(signer1)
-        .retryExecute(pId, remoteChainId, payloadWithId(payload), adapterParams, ethers.utils.parseEther("0.0000001"), {
-          value: nativeFee,
-        }),
+        .retryExecute(
+          pId,
+          remoteChainId,
+          payloadWithId(payload),
+          adapterParams,
+          ethers.constants.AddressZero,
+          ethers.utils.parseEther("0.0000001"),
+          {
+            value: nativeFee,
+          },
+        ),
     ).to.emit(sender, "ClearPayload");
     expect(await sender.storedExecutionHashes(pId)).to.equals(ethers.constants.HashZero);
   });
@@ -377,7 +387,7 @@ describe("Omnichain: ", async function () {
   it("Revert when daily limit exceeds in retry", async () => {
     const payload = await getPayload(NormalTimelock.address);
     await expect(
-      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
         value: ethers.utils.parseEther("0.0000001"),
       }),
     ).to.emit(sender, "StorePayload");
@@ -386,16 +396,24 @@ describe("Omnichain: ", async function () {
     await expect(
       sender
         .connect(signer1)
-        .retryExecute(pId, remoteChainId, payloadWithId(payload), adapterParams, ethers.utils.parseEther("0.0000001"), {
-          value: ethers.utils.parseEther("1"),
-        }),
+        .retryExecute(
+          pId,
+          remoteChainId,
+          payloadWithId(payload),
+          adapterParams,
+          ethers.constants.AddressZero,
+          ethers.utils.parseEther("0.0000001"),
+          {
+            value: ethers.utils.parseEther("1"),
+          },
+        ),
     ).to.be.revertedWith("Daily Transaction Limit Exceeded");
   });
 
   it("Emit ProposalExecuted event", async function () {
     const payload = await getPayload(NormalTimelock.address);
     await expect(
-      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
         value: nativeFee,
       }),
     ).to.emit(sender, "ExecuteRemoteProposal");
@@ -409,7 +427,7 @@ describe("Omnichain: ", async function () {
     const calldata = ethers.utils.defaultAbiCoder.encode(["uint256"], [newDelay]);
     const payload = await makePayload([NormalTimelock.address], [0], ["setDelay(uint256)"], [calldata], proposalType);
     await expect(
-      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
         value: nativeFee,
       }),
     ).to.emit(sender, "ExecuteRemoteProposal");
@@ -421,7 +439,7 @@ describe("Omnichain: ", async function () {
 
   it("Revert if empty proposal", async function () {
     await expect(
-      sender.connect(signer1).execute(remoteChainId, "0x", adapterParams, {
+      sender.connect(signer1).execute(remoteChainId, "0x", adapterParams, ethers.constants.AddressZero, {
         value: nativeFee,
       }),
     ).to.be.revertedWith("OmnichainProposalSender: Empty payload");
@@ -436,7 +454,7 @@ describe("Omnichain: ", async function () {
       proposalType + 3,
     );
     const lastProposal = await getLastRemoteProposalId();
-    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
       value: nativeFee,
     });
     expect(await executor.lastProposalReceived()).not.to.equals(lastProposal.add(1));
@@ -445,13 +463,15 @@ describe("Omnichain: ", async function () {
   it("Revert if same proposal come twice", async function () {
     const payload = await getPayload(NormalTimelock.address);
 
-    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
       value: nativeFee,
     });
     await network.provider.send("evm_setAutomine", [false]);
-    const tx = await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
-      value: nativeFee,
-    });
+    const tx = await sender
+      .connect(signer1)
+      .execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
+        value: nativeFee,
+      });
     await network.provider.send("evm_mine");
     expect(tx).to.be.revertedWith("Multiple bridging in a proposal");
     await network.provider.send("evm_setAutomine", [true]);
@@ -459,7 +479,7 @@ describe("Omnichain: ", async function () {
 
   it("Reverts when other than guardian call cancel of executor", async function () {
     const payload = await getPayload(NormalTimelock.address);
-    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
       value: nativeFee,
     });
     const proposalId = await getLastRemoteProposalId();
@@ -481,7 +501,7 @@ describe("Omnichain: ", async function () {
 
   it("Emit ProposalCanceled event when proposal gets canceled", async function () {
     const payload = await getPayload(NormalTimelock.address);
-    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
       value: nativeFee,
     });
     const proposalId = await getLastRemoteProposalId();
@@ -492,7 +512,7 @@ describe("Omnichain: ", async function () {
 
   it("Reverts when cancel is called after execute", async function () {
     const payload = await getPayload(NormalTimelock.address);
-    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
       value: nativeFee,
     });
     mine(4500);
@@ -512,7 +532,7 @@ describe("Omnichain: ", async function () {
       [calldata, calldata],
       proposalType,
     );
-    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
       value: nativeFee,
     });
     const proposalIdRemote = await getLastRemoteProposalId();
@@ -529,7 +549,7 @@ describe("Omnichain: ", async function () {
       proposalType,
     );
     await expect(
-      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
         value: nativeFee,
       }),
     ).to.be.revertedWith("OmnichainProposalSender: proposal function information arity mismatch");
@@ -724,7 +744,7 @@ describe("Omnichain: ", async function () {
     await sender.connect(signer1).setMaxDailyLimit(remoteChainId, maxDailyTransactionLimit);
     const payload = await getPayload(NormalTimelock.address);
     await expect(
-      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
         value: nativeFee,
       }),
     ).to.be.revertedWith("Daily Transaction Limit Exceeded");
@@ -742,7 +762,7 @@ describe("Omnichain: ", async function () {
 
     const payload = await getPayload(NormalTimelock.address);
 
-    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, {
+    await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
       value: nativeFee,
     });
     const proposalIdRemote = await getLastRemoteProposalId();
