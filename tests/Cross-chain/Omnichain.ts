@@ -225,6 +225,11 @@ describe("Omnichain: ", async function () {
   it("Revert if trusted remote is removed by non owner", async function () {
     await expect(sender.connect(signer2).removeTrustedRemote(remoteChainId)).to.be.revertedWith("access denied");
   });
+  it("Revert if non trusted remote is removed", async function () {
+    await expect(sender.connect(signer1).removeTrustedRemote(18)).to.be.revertedWith(
+      "OmnichainProposalSender: trusted remote not found",
+    );
+  });
 
   it("Reverts when trusted remote is not set", async function () {
     const payload = await makePayload(
@@ -442,7 +447,7 @@ describe("Omnichain: ", async function () {
       sender.connect(signer1).execute(remoteChainId, "0x", adapterParams, ethers.constants.AddressZero, {
         value: nativeFee,
       }),
-    ).to.be.revertedWith("OmnichainProposalSender: Empty payload");
+    ).to.be.revertedWith("OmnichainProposalSender: empty payload");
   });
 
   it("Revert on invalid proposal type", async function () {
@@ -595,7 +600,7 @@ describe("Omnichain: ", async function () {
 
     await expect(
       sender.fallbackWithdraw(signer2.address, nonce, remoteChainId, "0x", adapterParams, nativeFee),
-    ).to.be.revertedWith("OmnichainProposalSender: Empty payload");
+    ).to.be.revertedWith("OmnichainProposalSender: empty payload");
   });
 
   it("Reverts when value exceeds contract's balance in fallback withdraw", async function () {
@@ -697,7 +702,7 @@ describe("Omnichain: ", async function () {
 
     await expect(
       sender.fallbackWithdraw(signer2.address, nonce, remoteChainId, "0x", adapterParams, nativeFee),
-    ).to.be.revertedWith("OmnichainProposalSender: Empty payload");
+    ).to.be.revertedWith("OmnichainProposalSender: empty payload");
   });
 
   it("Reverts when different parameters passed in fallback withdraw", async function () {

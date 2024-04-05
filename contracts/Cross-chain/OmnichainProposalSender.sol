@@ -108,6 +108,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      */
     function removeTrustedRemote(uint16 remoteChainId_) external {
         _ensureAllowed("removeTrustedRemote(uint16)");
+        require(trustedRemoteLookup[remoteChainId_].length != 0, "OmnichainProposalSender: trusted remote not found");
         delete trustedRemoteLookup[remoteChainId_];
         emit TrustedRemoteRemoved(remoteChainId_);
     }
@@ -134,7 +135,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
 
         // A zero value will result in a failed message; therefore, a positive value is required to send a message across the chain.
         require(msg.value > 0, "OmnichainProposalSender: value cannot be zero");
-        require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
+        require(payload_.length != 0, "OmnichainProposalSender: empty payload");
 
         bytes memory trustedRemote = trustedRemoteLookup[remoteChainId_];
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
@@ -185,7 +186,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         require(trustedRemote.length != 0, "OmnichainProposalSender: destination chain is not a trusted source");
         bytes32 hash = storedExecutionHashes[pId_];
         require(hash != bytes32(0), "OmnichainProposalSender: no stored payload");
-        require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
+        require(payload_.length != 0, "OmnichainProposalSender: empty payload");
         (bytes memory payload, ) = abi.decode(payload_, (bytes, uint256));
         _validateProposal(remoteChainId_, payload);
 
@@ -231,7 +232,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     ) external onlyOwner nonReentrant {
         ensureNonzeroAddress(to_);
         require(originalValue_ > 0, "OmnichainProposalSender: invalid native amount");
-        require(payload_.length != 0, "OmnichainProposalSender: Empty payload");
+        require(payload_.length != 0, "OmnichainProposalSender: empty payload");
 
         bytes32 hash = storedExecutionHashes[pId_];
         require(hash != bytes32(0), "OmnichainProposalSender: no stored payload");
@@ -258,7 +259,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      */
     function setTrustedRemoteAddress(uint16 remoteChainId_, bytes calldata newRemoteAddress_) external {
         _ensureAllowed("setTrustedRemoteAddress(uint16,bytes)");
-        require(remoteChainId_ != 0, "ChainId must not be zero");
+        require(remoteChainId_ != 0, "OmnichainProposalSender: chainId must not be zero");
         ensureNonzeroAddress(address(uint160(bytes20(newRemoteAddress_))));
         bytes memory oldRemoteAddress = trustedRemoteLookup[remoteChainId_];
         trustedRemoteLookup[remoteChainId_] = abi.encodePacked(newRemoteAddress_, address(this));
