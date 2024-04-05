@@ -240,6 +240,23 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     }
 
     /**
+     * @notice Resends a previously failed message.
+     * @param srcChainId_ Source chain Id.
+     * @param srcAddress_ Source address => local app address + remote app address.
+     * @param nonce_ Nonce to identify failed message
+     * @param payload_ The payload of the message to be retried.
+     * @custom:access Only owner.
+     */
+    function retryMessage(
+        uint16 srcChainId_,
+        bytes calldata srcAddress_,
+        uint64 nonce_,
+        bytes calldata payload_
+    ) public payable override onlyOwner nonReentrant {
+        super.retryMessage(srcChainId_, srcAddress_, nonce_, payload_);
+    }
+
+    /**
      * @notice Gets the state of a proposal
      * @param proposalId_ The id of the proposal
      * @return Proposal state
@@ -271,7 +288,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         bytes memory srcAddress_,
         uint64 nonce_,
         bytes memory payload_
-    ) internal virtual override whenNotPaused {
+    ) internal virtual override {
         uint256 gasToStoreAndEmit = 30000; // enough gas to ensure we can store the payload and emit the event
 
         require(srcChainId_ == srcChainId, "OmnichainGovernanceExecutor::_blockingLzReceive: invalid source chain id");
@@ -294,7 +311,12 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @param payload_ Encoded payload containing proposal information.
      * @custom:event Emit ProposalReceived
      */
-    function _nonblockingLzReceive(uint16, bytes memory, uint64, bytes memory payload_) internal virtual override {
+    function _nonblockingLzReceive(
+        uint16,
+        bytes memory,
+        uint64,
+        bytes memory payload_
+    ) internal virtual override whenNotPaused {
         (bytes memory payload, uint256 pId) = abi.decode(payload_, (bytes, uint256));
         (
             address[] memory targets,
