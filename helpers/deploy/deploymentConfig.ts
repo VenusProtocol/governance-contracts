@@ -32,6 +32,14 @@ export const OmnichainGovernanceExecutorMethods: string[] = [
   "setConfig(uint16,uint16,uint256,bytes)",
   "addTimelocks(ITimelock[])",
 ];
+export const OmnichainGovernanceExecutorMethodsForGuardian: string[] = [
+  "forceResumeReceive(uint16,bytes)",
+  "setMaxDailyReceiveLimit(uint16,uint256)",
+  "pause()",
+  "unpause()",
+  "setTrustedRemoteAddress(uint16,bytes)",
+  "addTimelocks(ITimelock[])",
+];
 
 type Config = {
   [key in SUPPORTED_NETWORKS]: {
@@ -80,42 +88,49 @@ export const config: Config = {
     methods: [
       { method: "setMaxDailyLimit(uint16,uint256)", args: [10161, 100] },
       { method: "updateValidChainId(uint16,bool)", args: [10161, true] },
+      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
   bscmainnet: {
     methods: [
       { method: "setMaxDailyLimit(uint16,uint256)", args: [101, 100] },
       { method: "updateValidChainId(uint16,bool)", args: [101, true] },
+      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
   sepolia: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
   ethereum: {
     methods: [
       { method: "setMaxDailyLimit(uint16,uint256)", args: [101, 100] },
       { method: "updateValidChainId(uint16,bool)", args: [101, true] },
+      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
   opbnbtestnet: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
   opbnbmainnet: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [101, 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
   hardhat: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
 };

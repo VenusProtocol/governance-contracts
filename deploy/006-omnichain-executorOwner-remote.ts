@@ -4,11 +4,12 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { LZ_CHAINID, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { OmnichainGovernanceExecutorMethods, config } from "../helpers/deploy/deploymentConfig";
 import {
-  getOmnichainGovernanceExecutorAdminAccount,
-  getOmnichainProposalSender,
-} from "../helpers/deploy/deploymentUtils";
+  OmnichainGovernanceExecutorMethods,
+  OmnichainGovernanceExecutorMethodsForGuardian,
+  config,
+} from "../helpers/deploy/deploymentConfig";
+import { getOmnichainProposalSender, guardian } from "../helpers/deploy/deploymentUtils";
 import { OmnichainGovernanceExecutor } from "../typechain";
 
 interface GovernanceCommand {
@@ -95,7 +96,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [omnichainGovernanceExecutorAddress],
     contract: "OmnichainExecutorOwner",
     proxy: {
-      owner: hre.network.live ? await getOmnichainGovernanceExecutorAdminAccount(networkName) : deployer,
+      owner: hre.network.live ? normalTimelockAddress : deployer,
       proxyContract: "OpenZeppelinTransparentProxy",
       execute: {
         methodName: "initialize",
@@ -154,6 +155,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       OmnichainGovernanceExecutorMethods,
       acmAddress,
       normalTimelockAddress,
+      OmnichainExecutorOwner.address,
+    )),
+    ...(await configureAccessControls(
+      OmnichainGovernanceExecutorMethodsForGuardian,
+      acmAddress,
+      await guardian(hre.network.name as SUPPORTED_NETWORKS),
       OmnichainExecutorOwner.address,
     )),
   ];

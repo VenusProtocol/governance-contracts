@@ -102,13 +102,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       OmnichainProposalSender.address,
     )),
     ...(await configureCommands(OmnichainProposalSender.address, hre)),
-
-    {
-      contract: OmnichainProposalSender.address,
-      signature: "setTrustedRemote(uint16,bytes)",
-      parameters: ["dstChainId", "0xDestAddressSrcAddress"],
-      value: 0,
-    },
   ];
   console.log("Please propose a VIP with the following commands:");
   console.log(

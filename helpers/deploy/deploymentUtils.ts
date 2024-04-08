@@ -22,7 +22,7 @@ export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<s
   return normalTimelock.address;
 };
 
-export const getOmnichainGovernanceExecutorAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<string> => {
+export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => {
   const { deployer } = await getNamedAccounts();
   if (network === "hardhat") {
     return deployer;

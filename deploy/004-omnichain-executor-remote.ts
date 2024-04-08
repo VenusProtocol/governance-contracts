@@ -2,7 +2,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { getOmnichainGovernanceExecutorAdminAccount, getSourceChainId } from "../helpers/deploy/deploymentUtils";
+import { getSourceChainId, guardian } from "../helpers/deploy/deploymentUtils";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
@@ -10,11 +10,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployer } = await getNamedAccounts();
 
   const networkName = hre.network.name as SUPPORTED_NETWORKS;
-  const guardian = await getOmnichainGovernanceExecutorAdminAccount(networkName);
 
   await deploy("OmnichainGovernanceExecutor", {
     from: deployer,
-    args: [LZ_ENDPOINTS[networkName], guardian, await getSourceChainId(networkName)],
+    args: [LZ_ENDPOINTS[networkName], await guardian(networkName), await getSourceChainId(networkName)],
     log: true,
     autoMine: true,
   });
