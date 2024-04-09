@@ -202,6 +202,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 ++i;
             }
         }
+        delete queued[proposalId_];
     }
 
     /**
@@ -237,6 +238,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 ++i;
             }
         }
+        delete queued[proposalId_];
     }
 
     /**
