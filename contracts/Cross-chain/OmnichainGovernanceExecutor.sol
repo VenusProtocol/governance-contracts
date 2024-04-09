@@ -262,7 +262,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @return Proposal state
      */
     function state(uint256 proposalId_) public view returns (ProposalState) {
-        Proposal storage proposal = proposals[proposalId_];
+        Proposal memory proposal = proposals[proposalId_];
         if (proposal.canceled) {
             return ProposalState.Canceled;
         } else if (proposal.executed) {

@@ -425,6 +425,7 @@ describe("Omnichain: ", async function () {
     await mine(4500);
     const proposalId = await getLastRemoteProposalId();
     await expect(executor.execute(proposalId)).to.emit(executor, "ProposalExecuted").withArgs(proposalId);
+    expect(await executor.state(proposalId)).equals(2);
   });
 
   it("Should update delay of timelock on destination", async function () {
@@ -513,6 +514,7 @@ describe("Omnichain: ", async function () {
     await expect(executor.connect(deployer).cancel(proposalId))
       .to.emit(executor, "ProposalCanceled")
       .withArgs(proposalId);
+    expect(await executor.state(proposalId)).equals(0);
   });
 
   it("Reverts when cancel is called after execute", async function () {
