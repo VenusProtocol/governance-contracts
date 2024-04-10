@@ -10,6 +10,27 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * and allow test deployments to override the value.
  */
 contract TimelockV8 {
+    /// @notice Required period to execute a proposal transaction
+    uint256 private constant DEFAULT_GRACE_PERIOD = 14 days;
+
+    /// @notice Minimum amount of time a proposal transaction must be queued
+    uint256 private constant DEFAULT_MINIMUM_DELAY = 1 hours;
+
+    /// @notice Maximum amount of time a proposal transaction must be queued
+    uint256 private constant DEFAULT_MAXIMUM_DELAY = 30 days;
+
+    /// @notice Timelock admin authorized to queue and execute transactions
+    address public admin;
+
+    /// @notice Account proposed as the next admin
+    address public pendingAdmin;
+
+    /// @notice Period for a proposal transaction to be queued
+    uint256 public delay;
+
+    /// @notice Mapping of queued transactions
+    mapping(bytes32 => bool) public queuedTransactions;
+
     /// @notice Event emitted when a new admin is accepted
     event NewAdmin(address indexed oldAdmin, address indexed newAdmin);
 
@@ -48,27 +69,6 @@ contract TimelockV8 {
         bytes data,
         uint256 eta
     );
-
-    /// @notice Required period to execute a proposal transaction
-    uint256 private constant DEFAULT_GRACE_PERIOD = 14 days;
-
-    /// @notice Minimum amount of time a proposal transaction must be queued
-    uint256 private constant DEFAULT_MINIMUM_DELAY = 1 hours;
-
-    /// @notice Maximum amount of time a proposal transaction must be queued
-    uint256 private constant DEFAULT_MAXIMUM_DELAY = 30 days;
-
-    /// @notice Timelock admin authorized to queue and execute transactions
-    address public admin;
-
-    /// @notice Account proposed as the next admin
-    address public pendingAdmin;
-
-    /// @notice Period for a proposal transaction to be queued
-    uint256 public delay;
-
-    /// @notice Mapping of queued transactions
-    mapping(bytes32 => bool) public queuedTransactions;
 
     constructor(address admin_, uint256 delay_) {
         require(delay_ >= MINIMUM_DELAY(), "Timelock::constructor: Delay must exceed minimum delay.");
