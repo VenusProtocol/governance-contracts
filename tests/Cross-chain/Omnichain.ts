@@ -196,7 +196,7 @@ describe("Omnichain: ", async function () {
     updateFunctionRegistry(executorOwner);
 
     const payload = await getPayload(NormalTimelock.address);
-    nativeFee = (await sender.estimateFees(remoteChainId, payloadWithId(payload), adapterParams))[0];
+    nativeFee = (await sender.estimateFees(remoteChainId, payloadWithId(payload), false, adapterParams))[0];
   };
 
   beforeEach(async function () {

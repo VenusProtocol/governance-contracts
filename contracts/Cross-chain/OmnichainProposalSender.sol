@@ -88,6 +88,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @param remoteChainId_ The LayerZero id of a remote chain
      * @param payload_ The payload to be sent to the remote chain. It's computed as follows:
      * payload = abi.encode(abi.encode(targets, values, signatures, calldatas, proposalType), pId)
+     * @param useZro_ Bool that indicates whether to pay in ZRO tokens or not
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
      * @return nativeFee The amount of fee in the native gas token (e.g. ETH)
      * @return zroFee The amount of fee in ZRO token
@@ -95,9 +96,10 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     function estimateFees(
         uint16 remoteChainId_,
         bytes calldata payload_,
+        bool useZro_,
         bytes calldata adapterParams_
     ) external view returns (uint256, uint256) {
-        return LZ_ENDPOINT.estimateFees(remoteChainId_, address(this), payload_, false, adapterParams_);
+        return LZ_ENDPOINT.estimateFees(remoteChainId_, address(this), payload_, useZro_, adapterParams_);
     }
 
     /**

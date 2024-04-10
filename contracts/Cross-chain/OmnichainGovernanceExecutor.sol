@@ -159,7 +159,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         uint8 length = uint8(type(ProposalType).max) + 1;
         require(
             timelocks_.length == length,
-            "OmnichainGovernanceExecutor::initialize:number of timelocks _should match the number of governance routes"
+            "OmnichainGovernanceExecutor::initialize:number of timelocks should match the number of governance routes"
         );
         for (uint8 i; i < length; ) {
             ensureNonzeroAddress(address(timelocks_[i]));
