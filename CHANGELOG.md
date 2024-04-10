@@ -1,3 +1,27 @@
+## [2.0.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v1.5.0-dev.1...v2.0.0-dev.1) (2024-04-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* migrate to 0.8.25
+
+### Features
+
+* migrate to 0.8.25 ([128da5e](https://github.com/VenusProtocol/governance-contracts/commit/128da5e462c6308801be5433a79cddeb8369b927))
+
+## [1.5.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0...v1.5.0-dev.1) (2024-03-27)
+
+
+### Features
+
+* add deployment for ACM on arbitrum sepolia ([ef92dc8](https://github.com/VenusProtocol/governance-contracts/commit/ef92dc8fc8402e2c6e187ed043d73c573102511b))
+* updating deployment files ([fd23839](https://github.com/VenusProtocol/governance-contracts/commit/fd23839ea4f11f2a8200df81438acd89250c57a3))
+
+
+### Bug Fixes
+
+* add delayConfig for arbitrum ([a12a8d1](https://github.com/VenusProtocol/governance-contracts/commit/a12a8d1fd2be9ce796edbb37e47b79f8f24f02fc))
+
 ## [1.4.0](https://github.com/VenusProtocol/governance-contracts/compare/v1.3.0...v1.4.0) (2023-12-27)
 
 

@@ -1,7 +1,7 @@
 {
   "name": "@venusprotocol/governance-contracts",
   "description": "",
-  "version": "1.4.0",
+  "version": "2.0.0-dev.1",
   "author": "",
   "files": [
     "artifacts",
@@ -40,7 +40,7 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@venusprotocol/solidity-utilities": "^1.1.0",
+    "@venusprotocol/solidity-utilities": "2.0.0",
     "hardhat-deploy-ethers": "^0.3.0-beta.13",
     "module-alias": "^2.2.2"
   },
