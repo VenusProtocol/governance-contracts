@@ -134,11 +134,14 @@ contract TimelockV8 {
     /**
      * @notice Method to propose a new admin authorized to call timelock functions. This should be the Governor Contract
      * @param pendingAdmin_ Address of the proposed admin
-     * @custom:access Sender must be Timelock contract itself
+     * @custom:access Sender must be Timelock contract itself or admin
      * @custom:event Emit NewPendingAdmin with new pending admin
      */
     function setPendingAdmin(address pendingAdmin_) public {
-        require(msg.sender == address(this), "Timelock::setPendingAdmin: Call must come from Timelock.");
+        require(
+            msg.sender == address(this) || msg.sender == admin,
+            "Timelock::setPendingAdmin: Call must come from Timelock."
+        );
         ensureNonzeroAddress(pendingAdmin_);
         pendingAdmin = pendingAdmin_;
 

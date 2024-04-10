@@ -11,7 +11,7 @@ import {
   OmnichainExecutorOwner,
   OmnichainGovernanceExecutor,
   OmnichainProposalSender,
-  Timelock,
+  TimelockV8,
 } from "../../typechain";
 
 describe("Omnichain: ", async function () {
@@ -35,9 +35,9 @@ describe("Omnichain: ", async function () {
     executor: OmnichainGovernanceExecutor,
     remotePath: string,
     sender: OmnichainProposalSender,
-    NormalTimelock: Timelock,
-    FasttrackTimelock: Timelock,
-    CriticalTimelock: Timelock,
+    NormalTimelock: TimelockV8,
+    FasttrackTimelock: TimelockV8,
+    CriticalTimelock: TimelockV8,
     adapterParams: string,
     localEndpoint: LZEndpointMock,
     localPath: string;
@@ -87,6 +87,7 @@ describe("Omnichain: ", async function () {
       "setPayloadSizeLimit(uint16,uint256)",
       "setUseCustomAdapterParams(bool)",
       "addTimelocks(address[])",
+      "setTimelockPendingAdmin(address,uint8)",
     ];
     const activeArray = new Array(functionregistry.length).fill(true);
     await executorOwner.upsertSignature(functionregistry, activeArray);
@@ -100,7 +101,7 @@ describe("Omnichain: ", async function () {
     const LZEndpointMock = await ethers.getContractFactory("LZEndpointMock");
     const OmnichainGovernanceExecutor = await ethers.getContractFactory("OmnichainGovernanceExecutor");
     const OmnichainProposalSender = await ethers.getContractFactory("OmnichainProposalSender");
-    const Timelock = await ethers.getContractFactory("Timelock");
+    const Timelock = await ethers.getContractFactory("TimelockV8");
     const accessControlManagerFactory = await ethers.getContractFactory("AccessControlManager");
     const OmnichainProposalExecutorOwner = await ethers.getContractFactory("OmnichainExecutorOwner");
 
@@ -173,10 +174,13 @@ describe("Omnichain: ", async function () {
       .connect(deployer)
       .giveCallPermission(executorOwner.address, "setMaxDailyReceiveLimit(uint256)", signer1.address);
     await tx.wait();
-
     tx = await accessControlManager
       .connect(deployer)
       .giveCallPermission(executorOwner.address, "addTimelocks(address[])", signer1.address);
+    await tx.wait();
+    tx = await accessControlManager
+      .connect(deployer)
+      .giveCallPermission(executorOwner.address, "setTimelockPendingAdmin(address,uint8)", signer1.address);
     await tx.wait();
 
     remotePath = ethers.utils.solidityPack(["address"], [executor.address]);
@@ -230,7 +234,6 @@ describe("Omnichain: ", async function () {
       "OmnichainProposalSender: trusted remote not found",
     );
   });
-
   it("Reverts when trusted remote is not set", async function () {
     const payload = await makePayload(
       [NormalTimelock.address],
@@ -443,6 +446,74 @@ describe("Omnichain: ", async function () {
     await executor.execute(proposalId);
     expect(await executor.queued(proposalId)).equals(false);
     expect(await NormalTimelock.delay()).to.equals(newDelay);
+  });
+  it("Admin can set the new pending admin of Timelock", async () => {
+    const OmnichainGovernanceExecutor = await ethers.getContractFactory("OmnichainGovernanceExecutor");
+    const executor2 = await OmnichainGovernanceExecutor.deploy(remoteEndpoint.address, deployer.address, localChainId);
+    const data = executor.interface.encodeFunctionData("setTimelockPendingAdmin", [executor2.address, 0]);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.emit(executor, "SetTimelockPendingAdmin");
+    expect(await NormalTimelock.pendingAdmin()).to.equals(executor2.address);
+  });
+  it("Set new pending admin of Timelock through proposal", async () => {
+    const OmnichainGovernanceExecutor = await ethers.getContractFactory("OmnichainGovernanceExecutor");
+    const executor2 = await OmnichainGovernanceExecutor.deploy(remoteEndpoint.address, deployer.address, localChainId);
+    const calldata = ethers.utils.defaultAbiCoder.encode(["address"], [executor2.address]);
+    const payload = await makePayload(
+      [NormalTimelock.address],
+      [0],
+      ["setPendingAdmin(address)"],
+      [calldata],
+      proposalType,
+    );
+    await expect(
+      sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
+        value: nativeFee,
+      }),
+    ).to.emit(sender, "ExecuteRemoteProposal");
+    mine(4500);
+    const proposalId = await getLastRemoteProposalId();
+    expect(await NormalTimelock.pendingAdmin()).to.equals(ethers.constants.AddressZero);
+
+    await executor.execute(proposalId);
+    expect(await executor.queued(proposalId)).equals(false);
+    expect(await NormalTimelock.pendingAdmin()).to.equals(executor2.address);
+  });
+  it("should revert when invalid proposalType is passed", async function () {
+    const OmnichainGovernanceExecutor = await ethers.getContractFactory("OmnichainGovernanceExecutor");
+    const executor2 = await OmnichainGovernanceExecutor.deploy(remoteEndpoint.address, deployer.address, localChainId);
+    const data = executor.interface.encodeFunctionData("setTimelockPendingAdmin", [executor2.address, 3]);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.be.reverted;
+  });
+  it("Revert when zero address passed as pending admin", async function () {
+    const data = executor.interface.encodeFunctionData("setTimelockPendingAdmin", [ethers.constants.AddressZero, 1]);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.be.reverted;
+  });
+
+  it("Revert when non owner sets the pending admin of Timelock", async function () {
+    const OmnichainGovernanceExecutor = await ethers.getContractFactory("OmnichainGovernanceExecutor");
+    const executor2 = await OmnichainGovernanceExecutor.deploy(remoteEndpoint.address, deployer.address, localChainId);
+    const data = executor.interface.encodeFunctionData("setTimelockPendingAdmin", [executor2.address, 1]);
+    await expect(
+      signer2.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.be.reverted;
   });
 
   it("Revert if empty proposal", async function () {

@@ -132,6 +132,11 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      */
     error InvalidProposalId();
 
+    /**
+     * @notice Emitted when pending admin of Timelock is updated.
+     */
+    event SetTimelockPendingAdmin(address, uint8);
+
     constructor(address endpoint_, address guardian_, uint16 srcChainId_) BaseOmnichainControllerDest(endpoint_) {
         ensureNonzeroAddress(guardian_);
         GUARDIAN = guardian_;
@@ -242,10 +247,28 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     }
 
     /**
+     * @notice Sets the new pending admin of the Timelock.
+     * @param pendingAdmin_ Address of new pending admin.
+     * @param proposalType_ Type of proposal.
+     * @custom:access Only owner.
+     * @custom:event Emits SetTimelockPendingAdmin with new pending admin and proposal type.
+     */
+    function setTimelockPendingAdmin(address pendingAdmin_, uint8 proposalType_) external onlyOwner {
+        uint8 proposalTypeLength = uint8(type(ProposalType).max) + 1;
+        require(
+            proposalType_ < proposalTypeLength,
+            "OmnichainGovernanceExecutor::setTimelockPendingAdmin: invalid proposal type"
+        );
+
+        proposalTimelocks[proposalType_].setPendingAdmin(pendingAdmin_);
+        emit SetTimelockPendingAdmin(pendingAdmin_, proposalType_);
+    }
+
+    /**
      * @notice Resends a previously failed message.
      * @param srcChainId_ Source chain Id.
      * @param srcAddress_ Source address => local app address + remote app address.
-     * @param nonce_ Nonce to identify failed message
+     * @param nonce_ Nonce to identify failed message.
      * @param payload_ The payload of the message to be retried.
      * @custom:access Only owner.
      */
