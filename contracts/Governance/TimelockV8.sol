@@ -220,7 +220,7 @@ contract TimelockV8 {
         string calldata signature,
         bytes calldata data,
         uint256 eta
-    ) public payable returns (bytes memory) {
+    ) public returns (bytes memory) {
         require(msg.sender == admin, "Timelock::executeTransaction: Call must come from admin.");
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));
