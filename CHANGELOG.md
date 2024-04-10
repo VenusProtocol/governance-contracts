@@ -1,3 +1,14 @@
+## [2.0.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v1.5.0-dev.1...v2.0.0-dev.1) (2024-04-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* migrate to 0.8.25
+
+### Features
+
+* migrate to 0.8.25 ([128da5e](https://github.com/VenusProtocol/governance-contracts/commit/128da5e462c6308801be5433a79cddeb8369b927))
+
 ## [1.5.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0...v1.5.0-dev.1) (2024-03-27)
 
 
