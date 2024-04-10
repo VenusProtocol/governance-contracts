@@ -123,7 +123,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * It's computed as follows: payload = abi.encode(targets, values, signatures, calldatas, proposalType)
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
      * @param zroPaymentAddress_ The address of the ZRO token holder who would pay for the transaction.
-     * @custom:event Emits ExecuteRemoteProposal with remote chain id and payload on success
+     * @custom:event Emits ExecuteRemoteProposal with remote chain id, proposal ID and payload on success
      * @custom:event Emits StorePayload with last stored payload proposal ID ,remote chain id , payload, adapter params , values and reason for failure
      * @custom:access Controlled by Access Control Manager
      */

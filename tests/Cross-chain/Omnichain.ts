@@ -88,6 +88,7 @@ describe("Omnichain: ", async function () {
       "setUseCustomAdapterParams(bool)",
       "addTimelocks(address[])",
       "setTimelockPendingAdmin(address,uint8)",
+      "retryMessage(uint16,bytes,uint64,bytes)",
     ];
     const activeArray = new Array(functionregistry.length).fill(true);
     await executorOwner.upsertSignature(functionregistry, activeArray);
@@ -164,7 +165,15 @@ describe("Omnichain: ", async function () {
       .connect(deployer)
       .giveCallPermission(sender.address, "removeTrustedRemote(uint16)", signer1.address);
     await tx.wait();
+    tx = await accessControlManager
+      .connect(deployer)
+      .giveCallPermission(executorOwner.address, "pause()", signer1.address);
+    await tx.wait();
 
+    tx = await accessControlManager
+      .connect(deployer)
+      .giveCallPermission(executorOwner.address, "unpause()", signer1.address);
+    await tx.wait();
     tx = await accessControlManager
       .connect(deployer)
       .giveCallPermission(executorOwner.address, "setTrustedRemoteAddress(uint16,bytes)", signer1.address);
@@ -181,6 +190,10 @@ describe("Omnichain: ", async function () {
     tx = await accessControlManager
       .connect(deployer)
       .giveCallPermission(executorOwner.address, "setTimelockPendingAdmin(address,uint8)", signer1.address);
+    await tx.wait();
+    tx = await accessControlManager
+      .connect(deployer)
+      .giveCallPermission(executorOwner.address, "retryMessage(uint16,bytes,uint64,bytes)", signer1.address);
     await tx.wait();
 
     remotePath = ethers.utils.solidityPack(["address"], [executor.address]);
@@ -554,6 +567,77 @@ describe("Omnichain: ", async function () {
     await network.provider.send("evm_mine");
     expect(tx).to.be.revertedWith("Multiple bridging in a proposal");
     await network.provider.send("evm_setAutomine", [true]);
+  });
+
+  it("Retry message on destination on failure", async function () {
+    let data = executor.interface.encodeFunctionData("pause", []);
+    const srcAddress = ethers.utils.solidityPack(["address", "address"], [sender.address, executor.address]);
+    // Pause the Executor
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.emit(executor, "Paused");
+    const payload = await getPayload(NormalTimelock.address);
+    expect(
+      await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
+        value: nativeFee,
+      }),
+    ).to.emit(sender, "ExecuteRemoteProposal");
+    expect(await executor.failedMessages(localChainId, srcAddress, 1)).not.equals(ethers.constants.HashZero);
+
+    // Unpause the Executor
+    data = executor.interface.encodeFunctionData("unpause", []);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.emit(executor, "Unpaused");
+
+    // Retry message on destination
+    data = executor.interface.encodeFunctionData("retryMessage", [
+      localChainId,
+      srcAddress,
+      1,
+      await payloadWithId(payload),
+    ]);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.emit(executor, "RetryMessageSuccess");
+    expect(await executor.failedMessages(localChainId, srcAddress, 1)).equals(ethers.constants.HashZero);
+  });
+  it("Retry message failed due to low destination gas", async function () {
+    // low destination gas
+    const adapterParamsLocal = ethers.utils.solidityPack(["uint16", "uint256"], [remoteChainId, 100000]);
+    const srcAddress = ethers.utils.solidityPack(["address", "address"], [sender.address, executor.address]);
+    const payload = await getPayload(NormalTimelock.address);
+    expect(
+      await sender.connect(signer1).execute(remoteChainId, payload, adapterParamsLocal, ethers.constants.AddressZero, {
+        value: nativeFee,
+      }),
+    ).to.emit(sender, "ExecuteRemoteProposal");
+
+    expect(await executor.failedMessages(localChainId, srcAddress, 1)).not.equals(ethers.constants.HashZero);
+
+    // Retry message on destination
+    const data = executor.interface.encodeFunctionData("retryMessage", [
+      localChainId,
+      srcAddress,
+      1,
+      await payloadWithId(payload),
+    ]);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.emit(executor, "RetryMessageSuccess");
+    expect(await executor.failedMessages(localChainId, srcAddress, 1)).equals(ethers.constants.HashZero);
   });
 
   it("Reverts when other than guardian call cancel of executor", async function () {
