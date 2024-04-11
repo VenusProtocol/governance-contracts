@@ -472,6 +472,7 @@ describe("Omnichain: ", async function () {
     ).to.emit(executor, "SetTimelockPendingAdmin");
     expect(await NormalTimelock.pendingAdmin()).to.equals(executor2.address);
   });
+
   it("Set new pending admin of Timelock through proposal", async () => {
     const OmnichainGovernanceExecutor = await ethers.getContractFactory("OmnichainGovernanceExecutor");
     const executor2 = await OmnichainGovernanceExecutor.deploy(remoteEndpoint.address, deployer.address, localChainId);
@@ -611,9 +612,10 @@ describe("Omnichain: ", async function () {
     ).to.emit(executor, "RetryMessageSuccess");
     expect(await executor.failedMessages(localChainId, srcAddress, 1)).equals(ethers.constants.HashZero);
   });
-  it("Retry message failed due to low destination gas", async function () {
+
+  it("Retry messages that failed due to low gas at the destination using the Endpoint.", async function () {
     // low destination gas
-    const adapterParamsLocal = ethers.utils.solidityPack(["uint16", "uint256"], [remoteChainId, 100000]);
+    const adapterParamsLocal = ethers.utils.solidityPack(["uint16", "uint256"], [remoteChainId, 10000]);
     const srcAddress = ethers.utils.solidityPack(["address", "address"], [sender.address, executor.address]);
     const payload = await getPayload(NormalTimelock.address);
     expect(
@@ -621,23 +623,16 @@ describe("Omnichain: ", async function () {
         value: nativeFee,
       }),
     ).to.emit(sender, "ExecuteRemoteProposal");
+    const lastProposalReceived = await executor.lastProposalReceived();
+    expect(await remoteEndpoint.hasStoredPayload(localChainId, srcAddress)).equals(true);
 
-    expect(await executor.failedMessages(localChainId, srcAddress, 1)).not.equals(ethers.constants.HashZero);
-
-    // Retry message on destination
-    const data = executor.interface.encodeFunctionData("retryMessage", [
-      localChainId,
-      srcAddress,
-      1,
-      await payloadWithId(payload),
-    ]);
-    await expect(
-      signer1.sendTransaction({
-        to: executorOwner.address,
-        data: data,
-      }),
-    ).to.emit(executor, "RetryMessageSuccess");
-    expect(await executor.failedMessages(localChainId, srcAddress, 1)).equals(ethers.constants.HashZero);
+    // Retry message on destination Endpoint
+    await expect(remoteEndpoint.retryPayload(localChainId, srcAddress, await payloadWithId(payload))).to.emit(
+      remoteEndpoint,
+      "PayloadCleared",
+    );
+    expect(await executor.lastProposalReceived()).equals(lastProposalReceived.add(1));
+    expect(await remoteEndpoint.hasStoredPayload(localChainId, srcAddress)).equals(false);
   });
 
   it("Reverts when other than guardian call cancel of executor", async function () {
