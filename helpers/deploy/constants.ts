@@ -4,6 +4,10 @@ export enum SUPPORTED_NETWORKS {
   SEPOLIA = "sepolia",
   ETHERUEM = "ethereum",
   HARDHAT = "hardhat",
+  OPBNBTESTNET = "opbnbtestnet",
+  OPBNBMAINNET = "opbnbmainnet",
+  ARBITRUM_SEPOLIA = "arbitrumsepolia",
+  ARBITRUM_ONE = "arbitrumone",
 }
 
 export const LZ_ENDPOINTS: Record<SUPPORTED_NETWORKS, string> = {
