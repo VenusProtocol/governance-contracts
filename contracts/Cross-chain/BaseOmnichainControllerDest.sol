@@ -9,29 +9,29 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
 /**
  * @title BaseOmnichainControllerDest
  * @author Venus
- * @dev This contract is the base for the Omnichain controller destination contract.
- * It provides functionality related to daily command limits and pausability.
+ * @dev This contract is the base for the Omnichain controller destination contract
+ * It provides functionality related to daily command limits and pausability
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 
 abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
     /**
-     * @notice Maximum daily limit for receiving commands from Binance chain.
+     * @notice Maximum daily limit for receiving commands from Binance chain
      */
     uint256 public maxDailyReceiveLimit;
 
     /**
-     * @notice Total received commands within the last 24-hour window from Binance chain.
+     * @notice Total received commands within the last 24-hour window from Binance chain
      */
     uint256 public last24HourCommandsReceived;
 
     /**
-     * @notice Timestamp when the last 24-hour window started from Binance chain.
+     * @notice Timestamp when the last 24-hour window started from Binance chain
      */
     uint256 public last24HourReceiveWindowStart;
 
     /**
-     * @notice Emitted when the maximum daily limit for receiving command from Binance chain is modified.
+     * @notice Emitted when the maximum daily limit for receiving command from Binance chain is modified
      */
     event SetMaxDailyReceiveLimit(uint256 oldMaxLimit, uint256 newMaxLimit);
 
@@ -40,9 +40,9 @@ abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
     }
 
     /**
-     * @notice Sets the maximum daily limit for receiving commands.
-     * @param limit_ Number of commands.
-     * @custom:access Only Owner.
+     * @notice Sets the maximum daily limit for receiving commands
+     * @param limit_ Number of commands
+     * @custom:access Only Owner
      * @custom:event Emits SetMaxDailyReceiveLimit with old and new limit
      */
     function setMaxDailyReceiveLimit(uint256 limit_) external onlyOwner {
@@ -51,29 +51,29 @@ abstract contract BaseOmnichainControllerDest is NonblockingLzApp, Pausable {
     }
 
     /**
-     * @notice Triggers the paused state of the controller.
-     * @custom:access Only owner.
+     * @notice Triggers the paused state of the controller
+     * @custom:access Only owner
      */
     function pause() external onlyOwner {
         _pause();
     }
 
     /**
-     * @notice Triggers the resume state of the controller.
-     * @custom:access Only owner.
+     * @notice Triggers the resume state of the controller
+     * @custom:access Only owner
      */
     function unpause() external onlyOwner {
         _unpause();
     }
 
     /**
-     * @notice Empty implementation of renounce ownership to avoid any mishappening.
+     * @notice Empty implementation of renounce ownership to avoid any mishappening
      */
     function renounceOwnership() public override {}
 
     /**
-     * @notice Check eligibility to receive commands.
-     * @param noOfCommands_ Number of commands to be received.
+     * @notice Check eligibility to receive commands
+     * @param noOfCommands_ Number of commands to be received
      */
     function _isEligibleToReceive(uint256 noOfCommands_) internal {
         uint256 currentBlockTimestamp = block.timestamp;

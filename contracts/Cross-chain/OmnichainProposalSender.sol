@@ -44,7 +44,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     event SetTrustedRemoteAddress(uint16 indexed remoteChainId, bytes oldRemoteAddress, bytes newRemoteAddress);
 
     /**
-     * @notice Event emitted when trusted remote sets to empty.
+     * @notice Event emitted when trusted remote sets to empty
      */
     event TrustedRemoteRemoved(uint16 indexed chainId);
 
@@ -103,10 +103,10 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     }
 
     /**
-     * @notice Remove trusted remote from storage.
-     * @param remoteChainId_ The chain's id corresponds to setting the trusted remote to empty.
-     * @custom:access Controlled by Access Control Manager.
-     * @custom:event Emit TrustedRemoteRemoved with remote chain id.
+     * @notice Remove trusted remote from storage
+     * @param remoteChainId_ The chain's id corresponds to setting the trusted remote to empty
+     * @custom:access Controlled by Access Control Manager
+     * @custom:event Emit TrustedRemoteRemoved with remote chain id
      */
     function removeTrustedRemote(uint16 remoteChainId_) external {
         _ensureAllowed("removeTrustedRemote(uint16)");
@@ -119,10 +119,10 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @notice Sends a message to execute a remote proposal
      * @dev Stores the hash of the execution parameters if sending fails (e.g., due to insufficient fees)
      * @param remoteChainId_ The LayerZero id of the remote chain
-     * @param payload_ The payload to be sent to the remote chain.
+     * @param payload_ The payload to be sent to the remote chain
      * It's computed as follows: payload = abi.encode(targets, values, signatures, calldatas, proposalType)
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
-     * @param zroPaymentAddress_ The address of the ZRO token holder who would pay for the transaction.
+     * @param zroPaymentAddress_ The address of the ZRO token holder who would pay for the transaction
      * @custom:event Emits ExecuteRemoteProposal with remote chain id, proposal ID and payload on success
      * @custom:event Emits StorePayload with last stored payload proposal ID ,remote chain id , payload, adapter params , values and reason for failure
      * @custom:access Controlled by Access Control Manager
@@ -167,7 +167,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @dev Allows providing more fees if needed. The extra fees will be refunded to the caller
      * @param pId_ The proposal ID to identify a failed message
      * @param remoteChainId_ The LayerZero id of the remote chain
-     * @param payload_ The payload to be sent to the remote chain.
+     * @param payload_ The payload to be sent to the remote chain
      * It's computed as follows: payload = abi.encode(abi.encode(targets, values, signatures, calldatas, proposalType), pId)
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
      * @param zroPaymentAddress_ The address of the ZRO token holder who would pay for the transaction.
@@ -216,7 +216,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @param to_ Address of the receiver
      * @param pId_ The proposal ID to identify a failed message
      * @param remoteChainId_ The LayerZero id of the remote chain
-     * @param payload_ The payload to be sent to the remote chain.
+     * @param payload_ The payload to be sent to the remote chain
      * It's computed as follows: payload = abi.encode(abi.encode(targets, values, signatures, calldatas, proposalType), pId)
      * @param adapterParams_ The params used to specify the custom amount of gas required for the execution on the destination
      * @param originalValue_ The msg.value passed when execute() function was called
@@ -256,7 +256,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @notice Sets the remote message receiver address
      * @param remoteChainId_ The LayerZero id of a remote chain
      * @param newRemoteAddress_ The address of the contract on the remote chain to receive messages sent by this contract
-     * @custom:access Controlled by AccessControlManager.
+     * @custom:access Controlled by AccessControlManager
      * @custom:event Emits SetTrustedRemoteAddress with remote chain Id and remote address
      */
     function setTrustedRemoteAddress(uint16 remoteChainId_, bytes calldata newRemoteAddress_) external {
@@ -274,7 +274,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @param chainId_ The LayerZero chainId for the pending config change
      * @param configType_ The type of configuration. Every messaging library has its own convention
      * @param config_ The configuration in bytes. It can encode arbitrary content
-     * @custom:access Controlled by AccessControlManager.
+     * @custom:access Controlled by AccessControlManager
      */
     function setConfig(uint16 version_, uint16 chainId_, uint256 configType_, bytes calldata config_) external {
         _ensureAllowed("setConfig(uint16,uint16,uint256,bytes)");
@@ -284,7 +284,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
     /**
      * @notice Sets the configuration of the LayerZero messaging library of the specified version
      * @param version_ New messaging library version
-     * @custom:access Controlled by AccessControlManager.
+     * @custom:access Controlled by AccessControlManager
      */
     function setSendVersion(uint16 version_) external {
         _ensureAllowed("setSendVersion(uint16)");
@@ -295,7 +295,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
      * @notice Gets the configuration of the LayerZero messaging library of the specified version
      * @param version_ Messaging library version
      * @param chainId_ The LayerZero chainId
-     * @param configType_ Type of configuration. Every messaging library has its own convention.
+     * @param configType_ Type of configuration. Every messaging library has its own convention
      */
     function getConfig(uint16 version_, uint16 chainId_, uint256 configType_) external view returns (bytes memory) {
         return LZ_ENDPOINT.getConfig(version_, chainId_, address(this), configType_);

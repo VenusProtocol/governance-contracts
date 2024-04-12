@@ -46,10 +46,10 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     }
 
     /**
-     * @notice Invoked when called function does not exist in the contract.
-     * @param data_ Calldata containing the encoded function call.
-     * @return Result of function call.
-     * @custom:access Controlled by Access Control Manager.
+     * @notice Invoked when called function does not exist in the contract
+     * @param data_ Calldata containing the encoded function call
+     * @return Result of function call
+     * @custom:access Controlled by Access Control Manager
      */
     fallback(bytes calldata data_) external returns (bytes memory) {
         string memory fun = functionRegistry[msg.sig];
@@ -62,8 +62,8 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
 
     /**
      * @notice A registry of functions that are allowed to be executed from proposals
-     * @param signatures_  Function signature to be added or removed.
-     * @param active_ bool value, should be true to add function.
+     * @param signatures_  Function signature to be added or removed
+     * @param active_ bool value, should be true to add function
      * @custom:access Only owner
      */
     function upsertSignature(string[] calldata signatures_, bool[] calldata active_) external onlyOwner {
@@ -86,9 +86,9 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     }
 
     /**
-     * @notice This function transfer the ownership of the executor from this contract to new owner.
-     * @param newOwner_ New owner of the governanceExecutor.
-     * @custom:access Controlled by AccessControlManager.
+     * @notice This function transfer the ownership of the executor from this contract to new owner
+     * @param newOwner_ New owner of the governanceExecutor
+     * @custom:access Controlled by AccessControlManager
      */
 
     function transferBridgeOwnership(address newOwner_) external {
@@ -98,7 +98,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     }
 
     /**
-     *  @notice Empty implementation of renounce ownership to avoid any mishappening.
+     *  @notice Empty implementation of renounce ownership to avoid any mishappening
      */
     function renounceOwnership() public virtual override {}
 }
