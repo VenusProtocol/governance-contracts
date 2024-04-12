@@ -314,16 +314,11 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         uint64 nonce_,
         bytes memory payload_
     ) internal virtual override {
-        uint256 gasToStoreAndEmit = 30000; // enough gas to ensure we can store the payload and emit the event
-
         require(srcChainId_ == srcChainId, "OmnichainGovernanceExecutor::_blockingLzReceive: invalid source chain id");
         bytes32 hashedPayload = keccak256(payload_);
+        bytes memory callData = abi.encodeCall(this.nonblockingLzReceive, (srcChainId_, srcAddress_, nonce_, payload_));
 
-        (bool success, bytes memory reason) = address(this).excessivelySafeCall(
-            gasleft() - gasToStoreAndEmit,
-            150,
-            abi.encodeCall(this.nonblockingLzReceive, (srcChainId_, srcAddress_, nonce_, payload_))
-        );
+        (bool success, bytes memory reason) = address(this).excessivelySafeCall(gasleft() - 30000, 150, callData);
         // try-catch all errors/exceptions
         if (!success) {
             failedMessages[srcChainId_][srcAddress_][nonce_] = hashedPayload;
