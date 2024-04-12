@@ -24,6 +24,11 @@ interface ITimelock {
     function acceptAdmin() external;
 
     /**
+     * @notice Method to propose a new admin authorized to call timelock functions. This should be the Governor Contract.
+     */
+    function setPendingAdmin(address pendingAdmin) external;
+
+    /**
      * @notice Show mapping of queued transactions
      * @param hash Transaction hash
      */

@@ -56,7 +56,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     }
 
     /**
-     * @notice A privileged role that can cancel any proposal.
+     * @notice A privileged role that can cancel any proposal
      */
     address public immutable GUARDIAN;
 
@@ -66,27 +66,27 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     uint16 public srcChainId;
 
     /**
-     * @notice Last proposal count received.
+     * @notice Last proposal count received
      */
     uint256 public lastProposalReceived;
 
     /**
-     * @notice The official record of all proposals ever proposed.
+     * @notice The official record of all proposals ever proposed
      */
     mapping(uint256 => Proposal) public proposals;
 
     /**
-     * @notice Mapping containing Timelock addresses for each proposal type.
+     * @notice Mapping containing Timelock addresses for each proposal type
      */
     mapping(uint256 => ITimelock) public proposalTimelocks;
 
     /**
-     * @notice Represents queue state of proposal.
+     * @notice Represents queue state of proposal
      */
     mapping(uint256 => bool) public queued;
 
     /**
-     * @notice Emitted when proposal is received.
+     * @notice Emitted when proposal is received
      */
     event ProposalReceived(
         uint256 indexed proposalId,
@@ -98,39 +98,44 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     );
 
     /**
-     * @notice Emitted when proposal is queued.
+     * @notice Emitted when proposal is queued
      */
     event ProposalQueued(uint256 indexed id, uint256 eta);
 
     /**
-     * Emitted when proposal executed.
+     * Emitted when proposal executed
      */
     event ProposalExecuted(uint256 indexed id);
 
     /**
-     * @notice Emitted when proposal failed.
+     * @notice Emitted when proposal failed
      */
     event ReceivePayloadFailed(uint16 indexed srcChainId, bytes indexed srcAddress, uint64 nonce, bytes reason);
 
     /**
-     * @notice Emitted when proposal is canceled.
+     * @notice Emitted when proposal is canceled
      */
     event ProposalCanceled(uint256 indexed id);
 
     /**
-     * @notice Emitted when timelock added.
+     * @notice Emitted when timelock added
      */
     event TimelockAdded(uint8 routeType, address indexed oldTimelock, address indexed newTimelock);
 
     /**
-     * @notice Emitted when source layerzero endpoint id is updated.
+     * @notice Emitted when source layerzero endpoint id is updated
      */
     event SetSrcChainId(uint16 indexed oldSrcChainId, uint16 indexed newSrcChainId);
 
     /**
-     * @notice Thrown when proposal ID is invalid.
+     * @notice Thrown when proposal ID is invalid
      */
     error InvalidProposalId();
+
+    /**
+     * @notice Emitted when pending admin of Timelock is updated
+     */
+    event SetTimelockPendingAdmin(address, uint8);
 
     constructor(address endpoint_, address guardian_, uint16 srcChainId_) BaseOmnichainControllerDest(endpoint_) {
         ensureNonzeroAddress(guardian_);
@@ -139,10 +144,10 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     }
 
     /**
-     * @notice Update source layerzero endpoint id.
-     * @param srcChainId_ The new source chain id to be set.
-     * @custom:event Emit SetSrcChainId with old and new source id.
-     * @custom:access Only owner.
+     * @notice Update source layerzero endpoint id
+     * @param srcChainId_ The new source chain id to be set
+     * @custom:event Emit SetSrcChainId with old and new source id
+     * @custom:access Only owner
      */
     function setSrcChainId(uint16 srcChainId_) external onlyOwner {
         emit SetSrcChainId(srcChainId, srcChainId_);
@@ -150,16 +155,16 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     }
 
     /**
-     * @notice Add timelocks to the ProposalTimelocks mapping.
-     * @param timelocks_ Array of addresses of all 3 timelocks.
-     * @custom:access Only owner.
-     * @custom:event Emits TimelockAdded with old and new timelock and route type.
+     * @notice Add timelocks to the ProposalTimelocks mapping
+     * @param timelocks_ Array of addresses of all 3 timelocks
+     * @custom:access Only owner
+     * @custom:event Emits TimelockAdded with old and new timelock and route type
      */
     function addTimelocks(ITimelock[] memory timelocks_) external onlyOwner {
         uint8 length = uint8(type(ProposalType).max) + 1;
         require(
             timelocks_.length == length,
-            "OmnichainGovernanceExecutor::initialize:number of timelocks _should match the number of governance routes"
+            "OmnichainGovernanceExecutor::initialize:number of timelocks should match the number of governance routes"
         );
         for (uint8 i; i < length; ) {
             ensureNonzeroAddress(address(timelocks_[i]));
@@ -172,9 +177,9 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     }
 
     /**
-     * @notice Executes a queued proposal if eta has passed.
-     * @param proposalId_ Id of proposal that is to be executed.
-     * @custom:event Emits ProposalExecuted with proposal id of executed proposal.
+     * @notice Executes a queued proposal if eta has passed
+     * @param proposalId_ Id of proposal that is to be executed
+     * @custom:event Emits ProposalExecuted with proposal id of executed proposal
      */
     function execute(uint256 proposalId_) external nonReentrant {
         require(
@@ -202,13 +207,14 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 ++i;
             }
         }
+        delete queued[proposalId_];
     }
 
     /**
-     * @notice Cancels a proposal only if sender is the guardian and proposal is not executed.
-     * @param proposalId_ Id of proposal that is to be canceled.
-     * @custom:access Sender must be the guardian.
-     * @custom:event Emits ProposalCanceled with proposal id of the canceled proposal.
+     * @notice Cancels a proposal only if sender is the guardian and proposal is not executed
+     * @param proposalId_ Id of proposal that is to be canceled
+     * @custom:access Sender must be the guardian
+     * @custom:event Emits ProposalCanceled with proposal id of the canceled proposal
      */
     function cancel(uint256 proposalId_) external {
         require(
@@ -237,6 +243,42 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
                 ++i;
             }
         }
+        delete queued[proposalId_];
+    }
+
+    /**
+     * @notice Sets the new pending admin of the Timelock
+     * @param pendingAdmin_ Address of new pending admin
+     * @param proposalType_ Type of proposal
+     * @custom:access Only owner
+     * @custom:event Emits SetTimelockPendingAdmin with new pending admin and proposal type
+     */
+    function setTimelockPendingAdmin(address pendingAdmin_, uint8 proposalType_) external onlyOwner {
+        uint8 proposalTypeLength = uint8(type(ProposalType).max) + 1;
+        require(
+            proposalType_ < proposalTypeLength,
+            "OmnichainGovernanceExecutor::setTimelockPendingAdmin: invalid proposal type"
+        );
+
+        proposalTimelocks[proposalType_].setPendingAdmin(pendingAdmin_);
+        emit SetTimelockPendingAdmin(pendingAdmin_, proposalType_);
+    }
+
+    /**
+     * @notice Resends a previously failed message
+     * @param srcChainId_ Source chain Id
+     * @param srcAddress_ Source address => local app address + remote app address
+     * @param nonce_ Nonce to identify failed message
+     * @param payload_ The payload of the message to be retried
+     * @custom:access Only owner
+     */
+    function retryMessage(
+        uint16 srcChainId_,
+        bytes calldata srcAddress_,
+        uint64 nonce_,
+        bytes calldata payload_
+    ) public payable override onlyOwner nonReentrant {
+        super.retryMessage(srcChainId_, srcAddress_, nonce_, payload_);
     }
 
     /**
@@ -245,7 +287,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
      * @return Proposal state
      */
     function state(uint256 proposalId_) public view returns (ProposalState) {
-        Proposal storage proposal = proposals[proposalId_];
+        Proposal memory proposal = proposals[proposalId_];
         if (proposal.canceled) {
             return ProposalState.Canceled;
         } else if (proposal.executed) {
@@ -259,42 +301,42 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     }
 
     /**
-     * @notice Process blocking LayerZero receive request.
-     * @param srcChainId_ Source chain Id.
-     * @param srcAddress_ Source address from which payload is received.
-     * @param nonce_ Nonce associated with the payload to prevent replay attacks.
-     * @param payload_ Encoded payload containing proposal information.
-     * @custom:event Emit ReceivePayloadFailed if call fails.
+     * @notice Process blocking LayerZero receive request
+     * @param srcChainId_ Source chain Id
+     * @param srcAddress_ Source address from which payload is received
+     * @param nonce_ Nonce associated with the payload to prevent replay attacks
+     * @param payload_ Encoded payload containing proposal information
+     * @custom:event Emit ReceivePayloadFailed if call fails
      */
     function _blockingLzReceive(
         uint16 srcChainId_,
         bytes memory srcAddress_,
         uint64 nonce_,
         bytes memory payload_
-    ) internal virtual override whenNotPaused {
-        uint256 gasToStoreAndEmit = 30000; // enough gas to ensure we can store the payload and emit the event
-
+    ) internal virtual override {
         require(srcChainId_ == srcChainId, "OmnichainGovernanceExecutor::_blockingLzReceive: invalid source chain id");
+        bytes32 hashedPayload = keccak256(payload_);
+        bytes memory callData = abi.encodeCall(this.nonblockingLzReceive, (srcChainId_, srcAddress_, nonce_, payload_));
 
-        (bool success, bytes memory reason) = address(this).excessivelySafeCall(
-            gasleft() - gasToStoreAndEmit,
-            150,
-            abi.encodeCall(this.nonblockingLzReceive, (srcChainId_, srcAddress_, nonce_, payload_))
-        );
+        (bool success, bytes memory reason) = address(this).excessivelySafeCall(gasleft() - 30000, 150, callData);
         // try-catch all errors/exceptions
         if (!success) {
-            bytes32 hashedPayload = keccak256(payload_);
             failedMessages[srcChainId_][srcAddress_][nonce_] = hashedPayload;
             emit ReceivePayloadFailed(srcChainId_, srcAddress_, nonce_, reason); // Retrieve payload from the src side tx if needed to clear
         }
     }
 
     /**
-     * @notice Process non blocking LayerZero receive request.
-     * @param payload_ Encoded payload containing proposal information.
+     * @notice Process non blocking LayerZero receive request
+     * @param payload_ Encoded payload containing proposal information
      * @custom:event Emit ProposalReceived
      */
-    function _nonblockingLzReceive(uint16, bytes memory, uint64, bytes memory payload_) internal virtual override {
+    function _nonblockingLzReceive(
+        uint16,
+        bytes memory,
+        uint64,
+        bytes memory payload_
+    ) internal virtual override whenNotPaused {
         (bytes memory payload, uint256 pId) = abi.decode(payload_, (bytes, uint256));
         (
             address[] memory targets,
@@ -336,9 +378,9 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     }
 
     /**
-     * @notice Queue proposal for execution.
-     * @param proposalId_ Proposal to be queued.
-     * @custom:event Emit ProposalQueued with proposal id and eta.
+     * @notice Queue proposal for execution
+     * @param proposalId_ Proposal to be queued
+     * @custom:event Emit ProposalQueued with proposal id and eta
      */
     function _queue(uint256 proposalId_) internal {
         Proposal storage proposal = proposals[proposalId_];
@@ -366,13 +408,13 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     }
 
     /**
-     * @notice Check for unique proposal.
-     * @param target_ Address of the contract with the method to be called.
-     * @param value_ Native token amount sent with the transaction.
-     * @param signature_ Signature of the function to be called.
-     * @param data_ Arguments to be passed to the function when called.
-     * @param eta_ Timestamp after which the transaction can be executed.
-     * @param proposalType_ Type of proposal.
+     * @notice Check for unique proposal
+     * @param target_ Address of the contract with the method to be called
+     * @param value_ Native token amount sent with the transaction
+     * @param signature_ Signature of the function to be called
+     * @param data_ Arguments to be passed to the function when called
+     * @param eta_ Timestamp after which the transaction can be executed
+     * @param proposalType_ Type of proposal
      */
     function _queueOrRevertInternal(
         address target_,
