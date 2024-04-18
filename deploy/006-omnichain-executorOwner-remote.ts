@@ -80,6 +80,7 @@ const executeCommands = async (
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const srcChainId = testnetNetworks.includes(hre.network.name) ? LZ_CHAINID["bsctestnet"] : LZ_CHAINID["bscmainnet"];
+  const Guardian = await guardian(hre.network.name as SUPPORTED_NETWORKS);
 
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
@@ -98,7 +99,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [omnichainGovernanceExecutorAddress],
     contract: "OmnichainExecutorOwner",
     proxy: {
-      owner: hre.network.live ? normalTimelockAddress : deployer,
+      owner: hre.network.live ? Guardian : deployer, // Guardian will be replaced by normalTimelock once ownership of DefaultProxyAdmin is transferred to normalTimelock.
       proxyContract: "OpenZeppelinTransparentProxy",
       execute: {
         methodName: "initialize",
@@ -162,7 +163,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ...(await configureAccessControls(
       OmnichainGovernanceExecutorMethodsForGuardian,
       acmAddress,
-      await guardian(hre.network.name as SUPPORTED_NETWORKS),
+      Guardian,
       OmnichainExecutorOwner.address,
     )),
   ];
