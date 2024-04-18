@@ -30,6 +30,8 @@ export const OmnichainGovernanceExecutorMethods: string[] = [
   "setPayloadSizeLimit(uint16,uint256)",
   "setConfig(uint16,uint16,uint256,bytes)",
   "addTimelocks(ITimelock[])",
+  "setTimelockPendingAdmin(address,uint8)",
+  "retryMessage(uint16,bytes,uint64,bytes)",
 ];
 export const OmnichainGovernanceExecutorMethodsForGuardian: string[] = [
   "forceResumeReceive(uint16,bytes)",
@@ -38,6 +40,8 @@ export const OmnichainGovernanceExecutorMethodsForGuardian: string[] = [
   "unpause()",
   "setTrustedRemoteAddress(uint16,bytes)",
   "addTimelocks(ITimelock[])",
+  "setTimelockPendingAdmin(address,uint8)",
+  "retryMessage(uint16,bytes,uint64,bytes)",
 ];
 
 type Config = {
