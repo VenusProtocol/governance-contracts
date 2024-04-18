@@ -6797,7 +6797,7 @@
       ]
     },
     "OmnichainProposalSender": {
-      "address": "0x02d188Be98CF7676Cd98b03C8470f059fD7799Da",
+      "address": "0x2B2778D02B7D2F4AEa5aF696f7faC717E2D30bC3",
       "abi": [
         {
           "inputs": [
@@ -7168,6 +7168,11 @@
               "type": "bytes"
             },
             {
+              "internalType": "bool",
+              "name": "useZro_",
+              "type": "bool"
+            },
+            {
               "internalType": "bytes",
               "name": "adapterParams_",
               "type": "bytes"
@@ -7205,6 +7210,11 @@
               "internalType": "bytes",
               "name": "adapterParams_",
               "type": "bytes"
+            },
+            {
+              "internalType": "address",
+              "name": "zroPaymentAddress_",
+              "type": "address"
             }
           ],
           "name": "execute",
@@ -7366,6 +7376,11 @@
               "internalType": "bytes",
               "name": "adapterParams_",
               "type": "bytes"
+            },
+            {
+              "internalType": "address",
+              "name": "zroPaymentAddress_",
+              "type": "address"
             },
             {
               "internalType": "uint256",

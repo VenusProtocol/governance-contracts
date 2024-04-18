@@ -366,7 +366,7 @@
       ]
     },
     "CriticalTimelock": {
-      "address": "0x4a2C82Da46B7e0b2f44D1Fd781c4289E909FF427",
+      "address": "0x6E09f32F94B2d5056431710BA3eEF75aed40C3b1",
       "abi": [
         {
           "inputs": [
@@ -714,7 +714,7 @@
               "type": "bytes"
             }
           ],
-          "stateMutability": "payable",
+          "stateMutability": "nonpayable",
           "type": "function"
         },
         {
@@ -982,7 +982,7 @@
       ]
     },
     "FastTrackTimelock": {
-      "address": "0x033F00dFA336B240bbBBb8316cc9dBf3aa71Fb74",
+      "address": "0x599FD221b8765A816ca7dC4d27A4d5e62Bfc6627",
       "abi": [
         {
           "inputs": [
@@ -1330,7 +1330,7 @@
               "type": "bytes"
             }
           ],
-          "stateMutability": "payable",
+          "stateMutability": "nonpayable",
           "type": "function"
         },
         {
@@ -1433,7 +1433,7 @@
       ]
     },
     "NormalTimelock": {
-      "address": "0x51f560a018b89A470f8fcE6BF22f3a9F3a4789e5",
+      "address": "0xE401645aaf6C8F21De7309B9E5C6aC24A2369D3e",
       "abi": [
         {
           "inputs": [
@@ -1781,7 +1781,7 @@
               "type": "bytes"
             }
           ],
-          "stateMutability": "payable",
+          "stateMutability": "nonpayable",
           "type": "function"
         },
         {
@@ -2732,7 +2732,7 @@
       ]
     },
     "OmnichainGovernanceExecutor": {
-      "address": "0xE09E4784C2Dd7B0f2Db5bf9B00E101a4dC8CC9EB",
+      "address": "0x25E034878C9873D780f2D82D22A25481aA8c74F6",
       "abi": [
         {
           "inputs": [
@@ -3058,6 +3058,25 @@
             }
           ],
           "name": "SetSrcChainId",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint8",
+              "name": "",
+              "type": "uint8"
+            }
+          ],
+          "name": "SetTimelockPendingAdmin",
           "type": "event"
         },
         {
@@ -3623,22 +3642,22 @@
           "inputs": [
             {
               "internalType": "uint16",
-              "name": "_srcChainId",
+              "name": "srcChainId_",
               "type": "uint16"
             },
             {
               "internalType": "bytes",
-              "name": "_srcAddress",
+              "name": "srcAddress_",
               "type": "bytes"
             },
             {
               "internalType": "uint64",
-              "name": "_nonce",
+              "name": "nonce_",
               "type": "uint64"
             },
             {
               "internalType": "bytes",
-              "name": "_payload",
+              "name": "payload_",
               "type": "bytes"
             }
           ],
@@ -3777,6 +3796,24 @@
             }
           ],
           "name": "setSrcChainId",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "pendingAdmin_",
+              "type": "address"
+            },
+            {
+              "internalType": "uint8",
+              "name": "proposalType_",
+              "type": "uint8"
+            }
+          ],
+          "name": "setTimelockPendingAdmin",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
