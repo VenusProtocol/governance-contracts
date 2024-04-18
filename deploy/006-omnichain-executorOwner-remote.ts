@@ -131,7 +131,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       omnichainGovernanceExecutor,
       hre,
       deployer,
-      omnichainProposalSenderAddress as any,
+      omnichainProposalSenderAddress,
       LZ_CHAINID["bsctestnet"],
       normalTimelockAddress,
       fastTrackTimelockAddress,

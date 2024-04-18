@@ -3,7 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { delayConfig } from "../helpers/deploy/deploymentConfig";
+import { DelayConfig, delayConfig } from "../helpers/deploy/deploymentConfig";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
@@ -22,7 +22,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("NormalTimelock", {
     contract: "Timelock",
     from: deployer,
-    args: [getAdmin(), (delayConfig as any)[networkName].normal],
+    args: [getAdmin(), (delayConfig as DelayConfig)[networkName].normal],
     log: true,
     autoMine: true,
   });
@@ -30,7 +30,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("FastTrackTimelock", {
     contract: "Timelock",
     from: deployer,
-    args: [getAdmin(), (delayConfig as any)[networkName].fast],
+    args: [getAdmin(), (delayConfig as DelayConfig)[networkName].fast],
     log: true,
     autoMine: true,
   });
@@ -38,13 +38,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("CriticalTimelock", {
     contract: "Timelock",
     from: deployer,
-    args: [getAdmin(), (delayConfig as any)[networkName].critical],
+    args: [getAdmin(), (delayConfig as DelayConfig)[networkName].critical],
     log: true,
     autoMine: true,
   });
 };
 
-func.tags = ["Local", "Timelock", "LocalTimelock"];
+func.tags = ["LocalTimelock"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
   !(hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet") && hre.network.name !== "hardhat";

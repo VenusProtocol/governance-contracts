@@ -110,7 +110,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ),
   );
 };
-func.tags = ["OmnichainProposalSender", "OmnichainLocal"];
+func.tags = ["OmnichainProposalSender"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
   !(hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet") && hre.network.name !== "hardhat";

@@ -3,8 +3,6 @@ import { ethers, getNamedAccounts } from "hardhat";
 import bscTestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
 import { SUPPORTED_NETWORKS } from "./constants";
 
-const ADDRESS_ONE = "0x0000000000000000000000000000000000000001";
-
 const testnetNetworks = ["sepolia", "opbnbtestnet", "arbitrumsepolia"];
 const mainnetNetworks = ["ethereum", "opbnbmainnet", "arbitrumone"];
 
@@ -49,7 +47,7 @@ export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => 
   return deployer;
 };
 
-export const getOmnichainProposalSender = async (network: Omit<SUPPORTED_NETWORKS, "ethereum" | "sepolia">) => {
+export const getOmnichainProposalSender = async (network: SUPPORTED_NETWORKS) => {
   if (network === "hardhat") {
     const omnichainProposalSenderAddress = (await ethers.getContract("OmnichainProposalSender")).address;
     return omnichainProposalSenderAddress;
@@ -58,7 +56,7 @@ export const getOmnichainProposalSender = async (network: Omit<SUPPORTED_NETWORK
   }
 
   // It will be replaced by mainnet OmnichainProposalSender address once its mainnet deployment is done
-  return ADDRESS_ONE;
+  return "0x0000000000000000000000000000000000000001";
 };
 
 export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {

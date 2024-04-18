@@ -18,7 +18,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     autoMine: true,
   });
 };
-func.tags = ["OmnichainExecutor", "Remote"];
+func.tags = ["OmnichainGovernanceExecutor", "Remote"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
   hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet" || hre.network.name === "hardhat";

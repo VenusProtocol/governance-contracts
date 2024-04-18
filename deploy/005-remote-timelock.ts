@@ -3,7 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { delayConfig } from "../helpers/deploy/deploymentConfig";
+import { DelayConfig, delayConfig } from "../helpers/deploy/deploymentConfig";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
@@ -18,7 +18,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("NormalTimelock", {
     contract: live ? "TimelockV8" : "TestTimelockV8",
     from: deployer,
-    args: [omnichainGovernanceExecutorAddress, (delayConfig as any)[networkName].normal],
+    args: [omnichainGovernanceExecutorAddress, (delayConfig as DelayConfig)[networkName].normal],
     log: true,
     autoMine: true,
   });
@@ -26,7 +26,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("FastTrackTimelock", {
     contract: live ? "TimelockV8" : "TestTimelockV8",
     from: deployer,
-    args: [omnichainGovernanceExecutorAddress, (delayConfig as any)[networkName].fast],
+    args: [omnichainGovernanceExecutorAddress, (delayConfig as DelayConfig)[networkName].fast],
     log: true,
     autoMine: true,
   });
@@ -34,13 +34,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("CriticalTimelock", {
     contract: live ? "TimelockV8" : "TestTimelockV8",
     from: deployer,
-    args: [omnichainGovernanceExecutorAddress, (delayConfig as any)[networkName].critical],
+    args: [omnichainGovernanceExecutorAddress, (delayConfig as DelayConfig)[networkName].critical],
     log: true,
     autoMine: true,
   });
 };
 
-func.tags = ["Timelock", "Remote", "RemoteTimelock"];
+func.tags = ["RemoteTimelock", "Remote"];
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
   hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet" || hre.network.name === "hardhat";
 
