@@ -9,7 +9,7 @@ import {
   OmnichainGovernanceExecutorMethodsForGuardian,
   config,
 } from "../helpers/deploy/deploymentConfig";
-import { getOmnichainProposalSender, guardian } from "../helpers/deploy/deploymentUtils";
+import { getOmnichainProposalSender, guardian, testnetNetworks } from "../helpers/deploy/deploymentUtils";
 import { OmnichainGovernanceExecutor } from "../typechain";
 
 interface GovernanceCommand {
@@ -79,6 +79,8 @@ const executeCommands = async (
 };
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  const srcChainId = testnetNetworks.includes(hre.network.name) ? LZ_CHAINID["bsctestnet"] : LZ_CHAINID["bscmainnet"];
+
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
@@ -112,11 +114,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     OmnichainExecutorOwner.address,
     ethers.provider.getSigner(deployer),
   );
-  const omnichainGovernanceExecutor = (await ethers.getContractAt(
+  const omnichainGovernanceExecutor = await ethers.getContractAt<OmnichainGovernanceExecutor>(
     "OmnichainGovernanceExecutor",
     omnichainGovernanceExecutorAddress,
     ethers.provider.getSigner(deployer),
-  )) as OmnichainGovernanceExecutor;
+  );
 
   if ((await omnichainGovernanceExecutor.owner()) === deployer) {
     let tx = await omnichainGovernanceExecutor.addTimelocks([
@@ -132,7 +134,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       hre,
       deployer,
       omnichainProposalSenderAddress,
-      LZ_CHAINID["bsctestnet"],
+      srcChainId,
       normalTimelockAddress,
       fastTrackTimelockAddress,
       criticalTimelockAddress,
