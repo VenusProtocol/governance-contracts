@@ -82,55 +82,70 @@ export const delayConfig = {
     fast: 21600,
     critical: 3600,
   },
+  arbitrumsepolia: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  arbitrumone: {
+    normal: 172800,
+    fast: 21600,
+    critical: 3600,
+  },
 };
 export const config: Config = {
   bsctestnet: {
     methods: [
       { method: "setMaxDailyLimit(uint16,uint256)", args: [10161, 100] },
       { method: "updateValidChainId(uint16,bool)", args: [10161, true] },
-      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
   bscmainnet: {
     methods: [
       { method: "setMaxDailyLimit(uint16,uint256)", args: [101, 100] },
       { method: "updateValidChainId(uint16,bool)", args: [101, true] },
-      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
   sepolia: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
-      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
   ethereum: {
     methods: [
       { method: "setMaxDailyLimit(uint16,uint256)", args: [101, 100] },
       { method: "updateValidChainId(uint16,bool)", args: [101, true] },
-      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
   opbnbtestnet: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
-      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
   opbnbmainnet: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [101, 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
-      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
+    ],
+  },
+  arbitrumsepolia: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+    ],
+  },
+  arbitrumone: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [101, 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
     ],
   },
   hardhat: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [10102, 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
-      { method: "setTrustedRemoteAddress(uint16,bytes)", args: ["dstChainId", "dstAppAddress"] },
     ],
   },
 };

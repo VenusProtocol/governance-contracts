@@ -158,11 +158,6 @@ describe("Omnichain: ", async function () {
 
     tx = await accessControlManager
       .connect(deployer)
-      .giveCallPermission(sender.address, "updateValidChainId(uint16,bool)", signer1.address);
-    await tx.wait();
-
-    tx = await accessControlManager
-      .connect(deployer)
       .giveCallPermission(sender.address, "removeTrustedRemote(uint16)", signer1.address);
     await tx.wait();
     tx = await accessControlManager
