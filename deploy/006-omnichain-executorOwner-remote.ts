@@ -174,5 +174,5 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 func.tags = ["OmnichainExecutorOwner", "Remote"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
-  hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet" || hre.network.name === "hardhat";
+  hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet";
 export default func;
