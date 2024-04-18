@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.13;
+pragma solidity 0.8.25;
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
 /**
@@ -10,6 +10,27 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * and allow test deployments to override the value.
  */
 contract TimelockV8 {
+    /// @notice Required period to execute a proposal transaction
+    uint256 private constant DEFAULT_GRACE_PERIOD = 14 days;
+
+    /// @notice Minimum amount of time a proposal transaction must be queued
+    uint256 private constant DEFAULT_MINIMUM_DELAY = 1 hours;
+
+    /// @notice Maximum amount of time a proposal transaction must be queued
+    uint256 private constant DEFAULT_MAXIMUM_DELAY = 30 days;
+
+    /// @notice Timelock admin authorized to queue and execute transactions
+    address public admin;
+
+    /// @notice Account proposed as the next admin
+    address public pendingAdmin;
+
+    /// @notice Period for a proposal transaction to be queued
+    uint256 public delay;
+
+    /// @notice Mapping of queued transactions
+    mapping(bytes32 => bool) public queuedTransactions;
+
     /// @notice Event emitted when a new admin is accepted
     event NewAdmin(address indexed oldAdmin, address indexed newAdmin);
 
@@ -48,27 +69,6 @@ contract TimelockV8 {
         bytes data,
         uint256 eta
     );
-
-    /// @notice Required period to execute a proposal transaction
-    uint256 private constant DEFAULT_GRACE_PERIOD = 14 days;
-
-    /// @notice Minimum amount of time a proposal transaction must be queued
-    uint256 private constant DEFAULT_MINIMUM_DELAY = 1 hours;
-
-    /// @notice Maximum amount of time a proposal transaction must be queued
-    uint256 private constant DEFAULT_MAXIMUM_DELAY = 30 days;
-
-    /// @notice Timelock admin authorized to queue and execute transactions
-    address public admin;
-
-    /// @notice Account proposed as the next admin
-    address public pendingAdmin;
-
-    /// @notice Period for a proposal transaction to be queued
-    uint256 public delay;
-
-    /// @notice Mapping of queued transactions
-    mapping(bytes32 => bool) public queuedTransactions;
 
     constructor(address admin_, uint256 delay_) {
         require(delay_ >= MINIMUM_DELAY(), "Timelock::constructor: Delay must exceed minimum delay.");
@@ -134,11 +134,14 @@ contract TimelockV8 {
     /**
      * @notice Method to propose a new admin authorized to call timelock functions. This should be the Governor Contract
      * @param pendingAdmin_ Address of the proposed admin
-     * @custom:access Sender must be Timelock contract itself
+     * @custom:access Sender must be Timelock contract itself or admin
      * @custom:event Emit NewPendingAdmin with new pending admin
      */
     function setPendingAdmin(address pendingAdmin_) public {
-        require(msg.sender == address(this), "Timelock::setPendingAdmin: Call must come from Timelock.");
+        require(
+            msg.sender == address(this) || msg.sender == admin,
+            "Timelock::setPendingAdmin: Call must come from Timelock."
+        );
         ensureNonzeroAddress(pendingAdmin_);
         pendingAdmin = pendingAdmin_;
 
@@ -220,7 +223,7 @@ contract TimelockV8 {
         string calldata signature,
         bytes calldata data,
         uint256 eta
-    ) public payable returns (bytes memory) {
+    ) public returns (bytes memory) {
         require(msg.sender == admin, "Timelock::executeTransaction: Call must come from admin.");
 
         bytes32 txHash = keccak256(abi.encode(target, value, signature, data, eta));

@@ -6,6 +6,10 @@ export enum SUPPORTED_NETWORKS {
   OPBNBTESTNET = "opbnbtestnet",
   OPBNBMAINNET = "opbnbmainnet",
   HARDHAT = "hardhat",
+  OPBNBTESTNET = "opbnbtestnet",
+  OPBNBMAINNET = "opbnbmainnet",
+  ARBITRUM_SEPOLIA = "arbitrumsepolia",
+  ARBITRUM_ONE = "arbitrumone",
 }
 
 export const LZ_ENDPOINTS: Record<SUPPORTED_NETWORKS, string> = {

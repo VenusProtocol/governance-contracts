@@ -4,7 +4,7 @@
 
 - NodeJS - 12.x
 
-- Solc - v0.8.13 (https://github.com/ethereum/solidity/releases/tag/v0.8.13)
+- Solc - v0.8.25 (https://github.com/ethereum/solidity/releases/tag/v0.8.25)
 
 ### Installing
 

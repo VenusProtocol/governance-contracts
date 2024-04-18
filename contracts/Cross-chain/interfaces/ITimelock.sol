@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
-pragma solidity 0.8.13;
+pragma solidity ^0.8.25;
 
 /**
  * @title ITimelock
@@ -22,6 +22,11 @@ interface ITimelock {
      * @notice Method for accepting a proposed admin
      */
     function acceptAdmin() external;
+
+    /**
+     * @notice Method to propose a new admin authorized to call timelock functions. This should be the Governor Contract.
+     */
+    function setPendingAdmin(address pendingAdmin) external;
 
     /**
      * @notice Show mapping of queued transactions
