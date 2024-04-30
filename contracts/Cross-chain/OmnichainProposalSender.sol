@@ -263,6 +263,7 @@ contract OmnichainProposalSender is ReentrancyGuard, BaseOmnichainControllerSrc 
         _ensureAllowed("setTrustedRemoteAddress(uint16,bytes)");
         require(remoteChainId_ != 0, "OmnichainProposalSender: chainId must not be zero");
         ensureNonzeroAddress(address(uint160(bytes20(newRemoteAddress_))));
+        require(newRemoteAddress_.length == 20, "OmnichainProposalSender: remote address must be 20 bytes long");
         bytes memory oldRemoteAddress = trustedRemoteLookup[remoteChainId_];
         trustedRemoteLookup[remoteChainId_] = abi.encodePacked(newRemoteAddress_, address(this));
         emit SetTrustedRemoteAddress(remoteChainId_, oldRemoteAddress, trustedRemoteLookup[remoteChainId_]);
