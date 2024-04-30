@@ -631,6 +631,50 @@ describe("Omnichain: ", async function () {
     expect(await executor.failedMessages(localChainId, srcAddress, 1)).equals(ethers.constants.HashZero);
   });
 
+  it("Revert retry message on destination if trusted remote is changed", async function () {
+    let data = executor.interface.encodeFunctionData("pause", []);
+    const srcAddress = ethers.utils.solidityPack(["address", "address"], [sender.address, executor.address]);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.emit(executor, "Paused");
+    const payload = await getPayload(NormalTimelock.address);
+    expect(
+      await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
+        value: nativeFee,
+      }),
+    ).to.emit(sender, "ExecuteRemoteProposal");
+    expect(await executor.failedMessages(localChainId, srcAddress, 1)).not.equals(ethers.constants.HashZero);
+
+    data = executor.interface.encodeFunctionData("unpause", []);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.emit(executor, "Unpaused");
+
+    const addressOne = "0x0000000000000000000000000000000000000001";
+
+    //change trusted remote
+    await executorOwner.connect(signer1).setTrustedRemoteAddress(localChainId, addressOne);
+
+    data = executor.interface.encodeFunctionData("retryMessage", [
+      localChainId,
+      srcAddress,
+      1,
+      await payloadWithId(payload),
+    ]);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.be.reverted;
+  });
+
   it("Retry messages that failed due to low gas at the destination using the Endpoint.", async function () {
     // low destination gas
     const adapterParamsLocal = ethers.utils.solidityPack(["uint16", "uint256"], [remoteChainId, 10000]);
