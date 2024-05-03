@@ -28,29 +28,29 @@ contract TokenVaultStorage {
     bytes32 public constant DELEGATION_TYPEHASH =
         keccak256("Delegation(address delegatee,uint256 nonce,uint256 expiry)");
 
-    // @notice ERC20 tokens along with a bool value to indicate support of each token
-    mapping(address => bool) public tokens;
+    /// @custom:oz-upgrades-unsafe-allow state-variable-immutable
+    address public immutable token;
 
     /// @notice A record of each accounts delegate
     mapping(address => address) public delegates;
 
-    /// @notice A record of votes checkpoints for each account, by index for each token
-    mapping(address => mapping(address => mapping(uint32 => Checkpoint))) public checkpoints;
+    /// @notice A record of votes checkpoints for each account, by index
+    mapping(address => mapping(uint32 => Checkpoint)) public checkpoints;
 
-    /// @notice The number of checkpoints for each account for each token
-    mapping(address => mapping(address => uint32)) public numCheckpoints;
+    /// @notice The number of checkpoints for each account
+    mapping(address => uint32) public numCheckpoints;
 
-    /// @notice Tracks pending withdrawals for all users for a particular token
-    mapping(address => uint256) public totalPendingWithdrawals;
+    /// @notice Tracks pending withdrawals for all users
+    uint256 public totalPendingWithdrawals;
 
-    /// @notice Indicate lock period of each token
-    mapping(address => uint128) public tokenLockPeriod;
+    /// @notice Indicate lock period
+    uint128 public tokenLockPeriod;
 
-    // Info of requested but not yet executed withdrawals for each token
-    mapping(address => mapping(address => WithdrawalRequest[])) internal withdrawalRequests;
+    // Info of requested but not yet executed withdrawals
+    mapping(address => WithdrawalRequest[]) internal withdrawalRequests;
 
-    // Info of each user that stakes tokens, for each token
-    mapping(address => mapping(address => UserInfo)) internal userInfos;
+    // Info of each user that stakes tokens
+    mapping(address => UserInfo) internal userInfos;
 
     /// @notice A record of states for signing / validating signatures
     mapping(address => uint) public nonces;

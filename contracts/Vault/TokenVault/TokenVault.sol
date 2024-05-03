@@ -25,13 +25,13 @@ contract TokenVault is
     TokenVaultStorage
 {
     /// @notice Event emitted when deposit
-    event Deposit(address indexed user, address indexed token, uint256 indexed amount);
+    event Deposit(address indexed user, uint256 indexed amount);
 
     /// @notice Event emitted when execute withrawal
-    event ExecutedWithdrawal(address indexed user, address indexed token, uint256 indexed amount);
+    event ExecutedWithdrawal(address indexed user, uint256 indexed amount);
 
     /// @notice Event emitted when request withrawal
-    event RequestedWithdrawal(address indexed user, address indexed token, uint256 indexed amount);
+    event RequestedWithdrawal(address indexed user, uint256 indexed amount);
 
     /// @notice An event thats emitted when an account changes its delegate
     event DelegateChangedV2(address indexed delegator, address indexed fromDelegate, address indexed toDelegate);
@@ -39,95 +39,71 @@ contract TokenVault is
     /// @notice An event thats emitted when a delegate account's vote balance changes
     event DelegateVotesChangedV2(address indexed delegate, uint256 previousBalance, uint256 newBalance);
 
-    /// @notice Event emitted when tokens are updated
-    event UpdateTokens(address token, bool isAdded);
-
     /// @notice Event Emitted when lock period of token is set
-    event SetLockPeriod(address token, uint128 lockPeriod);
+    event SetLockPeriod(uint128 indexed oldLockPeriod, uint128 indexed newLockPeriod);
 
     using SafeERC20Upgradeable for IERC20Upgradeable;
 
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(bool _timeBased, uint256 _blocksPerYear) TimeManagerV8(_timeBased, _blocksPerYear) {
+    constructor(address _token, bool _timeBased, uint256 _blocksPerYear) TimeManagerV8(_timeBased, _blocksPerYear) {
+        ensureNonzeroAddress(_token);
+        token = _token;
         _disableInitializers();
     }
 
     /**
      * @notice Initialize the contract
      * @param _accessControlManager  Address of access control manager
-     * @param _token Address of token
      */
-    function initialize(address _accessControlManager, address _token) external initializer {
+    function initialize(address _accessControlManager) external initializer {
         ensureNonzeroAddress(_accessControlManager);
-        ensureNonzeroAddress(_token);
-        tokens[_token] = true;
         __AccessControlled_init(_accessControlManager);
     }
 
     /**
-     * @notice Update tokens supported by the vault
-     * @param _token Address of token
-     * @param _isAdded Bool value, should be true to add token
-     * @custom:access Controlled by Access Control Manager
-     * @custom:event Emit UpdateTokens with address of token and its bool value
-     */
-    function updateTokens(address _token, bool _isAdded) external {
-        _checkAccessAllowed("updateTokens(address,bool)");
-        ensureNonzeroAddress(address(_token));
-        tokens[_token] = _isAdded;
-        emit UpdateTokens(_token, _isAdded);
-    }
-
-    /**
      * @notice Sets Lock period of particular token
-     * @param _token Address of token
      * @param _lockPeriod  Minimum time between withdrawal request and its execution
      * @custom:event Emit SetLockPeriod with token and its lock period
      * @custom:access Controlled by Access Control Manager
      */
-    function setLockPeriod(address _token, uint128 _lockPeriod) external {
-        _checkAccessAllowed("setLockPeriod(address,uint128)");
-        isTokenRegistered(_token);
-        tokenLockPeriod[_token] = _lockPeriod;
-        emit SetLockPeriod(_token, _lockPeriod);
+    function setLockPeriod(uint128 _lockPeriod) external {
+        _checkAccessAllowed("setLockPeriod(uint128)");
+        emit SetLockPeriod(tokenLockPeriod, _lockPeriod);
+        tokenLockPeriod = _lockPeriod;
     }
 
     /**
      * @notice Deposit token to TokenVault
-     * @param _token Address of token to be deposited
      * @param _amount Amount of token to be deposited
      * @custom:event Emit Deposit with msg.sender, token and amount
      * @custom:error ZeroAmountNotAllowed is thrown when zero amount is passed
      */
-    function deposit(address _token, uint256 _amount) external nonReentrant whenNotPaused {
-        isTokenRegistered(_token);
+    function deposit(uint256 _amount) external nonReentrant whenNotPaused {
         if (_amount == 0) {
             revert ZeroAmountNotAllowed();
         }
-        UserInfo storage user = userInfos[_token][msg.sender];
-        IERC20Upgradeable(_token).safeTransferFrom(msg.sender, address(this), _amount);
-        userInfos[_token][msg.sender].amount = user.amount + _amount;
-        _moveDelegates(address(0), delegates[msg.sender], _amount, _token);
-        emit Deposit(msg.sender, _token, _amount);
+        UserInfo storage user = userInfos[msg.sender];
+        IERC20Upgradeable(token).safeTransferFrom(msg.sender, address(this), _amount);
+        userInfos[msg.sender].amount = user.amount + _amount;
+        _moveDelegates(address(0), delegates[msg.sender], _amount);
+        emit Deposit(msg.sender, _amount);
     }
 
     /**
      * @notice Execute withdrawal of given token
-     * @param _token  Address of token to be withdrawal. It should be a registered token
      * @custom:event Emit ExecutedWithdrawal with msg.sender, token and withdrawal amount
      */
-    function executeWithdrawal(address _token) external nonReentrant whenNotPaused {
-        isTokenRegistered(_token);
-        UserInfo storage user = userInfos[_token][msg.sender];
-        WithdrawalRequest[] storage requests = withdrawalRequests[_token][msg.sender];
+    function executeWithdrawal() external nonReentrant whenNotPaused {
+        UserInfo storage user = userInfos[msg.sender];
+        WithdrawalRequest[] storage requests = withdrawalRequests[msg.sender];
 
         uint256 withdrawalAmount = popEligibleWithdrawalRequests(user, requests);
         require(withdrawalAmount > 0, "nothing to withdraw");
 
         user.amount = user.amount - withdrawalAmount;
-        IERC20Upgradeable(_token).safeTransfer(address(msg.sender), withdrawalAmount);
-        totalPendingWithdrawals[_token] = totalPendingWithdrawals[_token] - withdrawalAmount;
-        emit ExecutedWithdrawal(msg.sender, _token, withdrawalAmount);
+        IERC20Upgradeable(token).safeTransfer(address(msg.sender), withdrawalAmount);
+        totalPendingWithdrawals = totalPendingWithdrawals - withdrawalAmount;
+        emit ExecutedWithdrawal(msg.sender, withdrawalAmount);
     }
 
     /**
@@ -150,46 +126,39 @@ contract TokenVault is
 
     /**
      * @notice Request withdrawal to TokenVault for token allocation
-     * @param _token Address of token to be withdrawal
      * @param _amount The amount to withdraw from the vault
      * @custom:event Emit RequestedWithdrawal with msg.sender, token and withdrawal amount
      * @custom:error ZeroAmountNotAllowed is thrown when zero amount is passed
      * @custom:error InvalidAmount is thrown when given amount and pending withdrawals are greater than deposited amount.
      */
-    function requestWithdrawal(address _token, uint256 _amount) external nonReentrant whenNotPaused {
-        isTokenRegistered(_token);
+    function requestWithdrawal(uint256 _amount) external nonReentrant whenNotPaused {
         if (_amount == 0) {
             revert ZeroAmountNotAllowed();
         }
-        UserInfo storage user = userInfos[_token][msg.sender];
-        WithdrawalRequest[] storage requests = withdrawalRequests[_token][msg.sender];
+        UserInfo storage user = userInfos[msg.sender];
+        WithdrawalRequest[] storage requests = withdrawalRequests[msg.sender];
 
         if (user.amount < user.pendingWithdrawals + _amount) {
             revert InvalidAmount();
         }
-        uint256 lockedUntil = tokenLockPeriod[_token] + block.timestamp;
+        uint256 lockedUntil = tokenLockPeriod + block.timestamp;
 
         pushWithdrawalRequest(user, requests, _amount, lockedUntil);
-        totalPendingWithdrawals[_token] = totalPendingWithdrawals[_token] + _amount;
+        totalPendingWithdrawals = totalPendingWithdrawals + _amount;
 
         // Update Delegate Amount
-        _moveDelegates(delegates[msg.sender], address(0), _amount, _token);
+        _moveDelegates(delegates[msg.sender], address(0), _amount);
 
-        emit RequestedWithdrawal(msg.sender, _token, _amount);
+        emit RequestedWithdrawal(msg.sender, _amount);
     }
 
     /**
      * @notice Get unlocked withdrawal amount
-     * @param _token Address of token
      * @param _user The User Address
      * @return withdrawalAmount Amount that the user can withdraw
      */
-    function getEligibleWithdrawalAmount(
-        address _token,
-        address _user
-    ) external view returns (uint256 withdrawalAmount) {
-        isTokenRegistered(_token);
-        WithdrawalRequest[] storage requests = withdrawalRequests[_token][_user];
+    function getEligibleWithdrawalAmount(address _user) external view returns (uint256 withdrawalAmount) {
+        WithdrawalRequest[] storage requests = withdrawalRequests[_user];
         // Since the requests are sorted by their unlock time, we can take
         // the entries from the end of the array and stop at the first
         // not-yet-eligible one
@@ -201,54 +170,44 @@ contract TokenVault is
 
     /**
      * @notice Get requested amount
-     * @param _token Address of token
      * @param _user The User Address
      * @return Total amount of requested but not yet executed withdrawals (including both executable and locked ones)
      */
-    function getRequestedAmount(address _token, address _user) external view returns (uint256) {
-        isTokenRegistered(_token);
-        UserInfo storage user = userInfos[_token][_user];
+    function getRequestedAmount(address _user) external view returns (uint256) {
+        UserInfo storage user = userInfos[_user];
         return user.pendingWithdrawals;
     }
 
     /**
      * @notice Returns the array of withdrawal requests that have not been executed yet
-     * @param _token Address of token
      * @param _user The User Address
      * @return An array of withdrawal requests
      */
-    function getWithdrawalRequests(address _token, address _user) external view returns (WithdrawalRequest[] memory) {
-        isTokenRegistered(_token);
-        return withdrawalRequests[_token][_user];
+    function getWithdrawalRequests(address _user) external view returns (WithdrawalRequest[] memory) {
+        return withdrawalRequests[_user];
     }
 
     /**
      * @notice Determine the token stake balance for an account
      * @param _account The address of the account to check
      * @param _blockNumberOrSecond The block number or second to get the vote balance at
-     * @param _token Address of token
      * @return The balance that user staked
      */
-    function getPriorVotes(
-        address _account,
-        uint256 _blockNumberOrSecond,
-        address _token
-    ) external view returns (uint256) {
+    function getPriorVotes(address _account, uint256 _blockNumberOrSecond) external view returns (uint256) {
         require(_blockNumberOrSecond < getBlockNumberOrTimestamp(), "Not yet determined");
-        isTokenRegistered(_token);
 
-        uint32 nCheckpoints = numCheckpoints[_token][_account];
+        uint32 nCheckpoints = numCheckpoints[_account];
         if (nCheckpoints == 0) {
             return 0;
         }
 
         // First check most recent balance
-        if (checkpoints[_token][_account][nCheckpoints - 1].fromBlockOrSecond <= _blockNumberOrSecond) {
-            return checkpoints[_token][_account][nCheckpoints - 1].votes;
+        if (checkpoints[_account][nCheckpoints - 1].fromBlockOrSecond <= _blockNumberOrSecond) {
+            return checkpoints[_account][nCheckpoints - 1].votes;
         }
 
         // Next check implicit zero balance
-        if (checkpoints[_token][_account][0].fromBlockOrSecond > _blockNumberOrSecond) {
+        if (checkpoints[_account][0].fromBlockOrSecond > _blockNumberOrSecond) {
             return 0;
         }
 
@@ -256,7 +215,7 @@ contract TokenVault is
         uint32 upper = nCheckpoints - 1;
         while (upper > lower) {
             uint32 center = upper - (upper - lower) / 2; // ceil, avoiding overflow
-            Checkpoint memory cp = checkpoints[_token][_account][center];
+            Checkpoint memory cp = checkpoints[_account][center];
             if (cp.fromBlockOrSecond == _blockNumberOrSecond) {
                 return cp.votes;
             } else if (cp.fromBlockOrSecond < _blockNumberOrSecond) {
@@ -265,22 +224,17 @@ contract TokenVault is
                 upper = center - 1;
             }
         }
-        return checkpoints[_token][_account][lower].votes;
+        return checkpoints[_account][lower].votes;
     }
 
     /**
      * @notice Get user info
-     * @param _token Address of token
      * @param _user User address
      * @return amount Deposited amount
      * @return pendingWithdrawals Requested but not yet executed withdrawals
      */
-    function getUserInfo(
-        address _token,
-        address _user
-    ) external view returns (uint256 amount, uint256 pendingWithdrawals) {
-        isTokenRegistered(_token);
-        UserInfo storage user = userInfos[_token][_user];
+    function getUserInfo(address _user) external view returns (uint256 amount, uint256 pendingWithdrawals) {
+        UserInfo storage user = userInfos[_user];
         amount = user.amount;
         pendingWithdrawals = user.pendingWithdrawals;
     }
@@ -288,11 +242,9 @@ contract TokenVault is
     /**
      * @notice Delegate votes from `msg.sender` to `delegatee`
      * @param _delegatee The address to delegate votes to
-     * @param _token Address of token
      */
-    function delegate(address _delegatee, address _token) external whenNotPaused {
-        isTokenRegistered(_token);
-        return _delegate(msg.sender, _delegatee, _token);
+    function delegate(address _delegatee) external whenNotPaused {
+        return _delegate(msg.sender, _delegatee);
     }
 
     /**
@@ -310,10 +262,8 @@ contract TokenVault is
         uint256 _expiry,
         uint8 v,
         bytes32 r,
-        bytes32 s,
-        address _token
+        bytes32 s
     ) external whenNotPaused {
-        isTokenRegistered(_token);
         bytes32 domainSeparator = keccak256(
             abi.encode(DOMAIN_TYPEHASH, keccak256(bytes("TokenVault")), block.chainid, address(this))
         );
@@ -322,18 +272,17 @@ contract TokenVault is
         address signatory = ECDSA.recover(digest, v, r, s);
         require(_nonce == nonces[signatory]++, "Invalid nonce");
         require(block.timestamp <= _expiry, "Signature expired");
-        return _delegate(signatory, _delegatee, _token);
+        return _delegate(signatory, _delegatee);
     }
 
     /**
      * @notice Gets the current votes balance for `account`
      * @param _account The address to get votes balance
-     * @param _token Address of token
      * @return The number of current votes for `account`
      */
-    function getCurrentVotes(address _account, address _token) external view returns (uint256) {
-        uint32 nCheckpoints = numCheckpoints[_token][_account];
-        return nCheckpoints > 0 ? checkpoints[_token][_account][nCheckpoints - 1].votes : 0;
+    function getCurrentVotes(address _account) external view returns (uint256) {
+        uint32 nCheckpoints = numCheckpoints[_account];
+        return nCheckpoints > 0 ? checkpoints[_account][nCheckpoints - 1].votes : 0;
     }
 
     /**
@@ -398,17 +347,16 @@ contract TokenVault is
      * @dev Delegate user votes
      * @param _delegator Address of delegator
      * @param _delegatee Address of delegatee
-     * @param _token  Address of token
      * @custom:event Emit DelegateChangedV2 with current delegate, new delegatee and token
      */
-    function _delegate(address _delegator, address _delegatee, address _token) internal {
+    function _delegate(address _delegator, address _delegatee) internal {
         address currentDelegate = delegates[_delegator];
-        uint256 delegatorBalance = getStakeAmount(_delegator, _token);
+        uint256 delegatorBalance = getStakeAmount(_delegator);
         delegates[_delegator] = _delegatee;
 
         emit DelegateChangedV2(_delegator, currentDelegate, _delegatee);
 
-        _moveDelegates(currentDelegate, _delegatee, delegatorBalance, _token);
+        _moveDelegates(currentDelegate, _delegatee, delegatorBalance);
     }
 
     /**
@@ -416,22 +364,21 @@ contract TokenVault is
      * @param _srcRep The address of the current representative whose voting power is being transferred
      * @param _dstRep The address of the new representative who will receive the transferred voting power
      * @param _amount The amount of voting power to be transferred
-     * @param _token The address of the token associated with the voting power
      */
-    function _moveDelegates(address _srcRep, address _dstRep, uint256 _amount, address _token) internal {
+    function _moveDelegates(address _srcRep, address _dstRep, uint256 _amount) internal {
         if (_srcRep != _dstRep && _amount > 0) {
             if (_srcRep != address(0)) {
-                uint32 srcRepNum = numCheckpoints[_token][_srcRep];
-                uint256 srcRepOld = srcRepNum > 0 ? checkpoints[_token][_srcRep][srcRepNum - 1].votes : 0;
+                uint32 srcRepNum = numCheckpoints[_srcRep];
+                uint256 srcRepOld = srcRepNum > 0 ? checkpoints[_srcRep][srcRepNum - 1].votes : 0;
                 uint256 srcRepNew = srcRepOld - _amount;
-                _writeCheckpoint(_srcRep, srcRepNum, srcRepOld, srcRepNew, _token);
+                _writeCheckpoint(_srcRep, srcRepNum, srcRepOld, srcRepNew);
             }
 
             if (_dstRep != address(0)) {
-                uint32 dstRepNum = numCheckpoints[_token][_dstRep];
-                uint256 dstRepOld = dstRepNum > 0 ? checkpoints[_token][_dstRep][dstRepNum - 1].votes : 0;
+                uint32 dstRepNum = numCheckpoints[_dstRep];
+                uint256 dstRepOld = dstRepNum > 0 ? checkpoints[_dstRep][dstRepNum - 1].votes : 0;
                 uint256 dstRepNew = dstRepOld + _amount;
-                _writeCheckpoint(_dstRep, dstRepNum, dstRepOld, dstRepNew, _token);
+                _writeCheckpoint(_dstRep, dstRepNum, dstRepOld, dstRepNew);
             }
         }
     }
@@ -445,26 +392,16 @@ contract TokenVault is
      * @param nCheckpoints The number of existing voting checkpoints for the delegatee
      * @param oldVotes The previous number of votes held by the delegatee
      * @param newVotes The new number of votes to be assigned to the delegatee
-     * @param _token The address of the token associated with the voting power
      * @custom:event Emits a DelegateVotesChangedV2 event to signal the change in voting power for the delegatee
      */
-    function _writeCheckpoint(
-        address delegatee,
-        uint32 nCheckpoints,
-        uint256 oldVotes,
-        uint256 newVotes,
-        address _token
-    ) internal {
+    function _writeCheckpoint(address delegatee, uint32 nCheckpoints, uint256 oldVotes, uint256 newVotes) internal {
         uint32 blockNumberOrSecond = uint32(getBlockNumberOrTimestamp());
 
-        if (
-            nCheckpoints > 0 &&
-            checkpoints[_token][delegatee][nCheckpoints - 1].fromBlockOrSecond == blockNumberOrSecond
-        ) {
-            checkpoints[_token][delegatee][nCheckpoints - 1].votes = newVotes;
+        if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlockOrSecond == blockNumberOrSecond) {
+            checkpoints[delegatee][nCheckpoints - 1].votes = newVotes;
         } else {
-            checkpoints[_token][delegatee][nCheckpoints] = Checkpoint(blockNumberOrSecond, newVotes);
-            numCheckpoints[_token][delegatee] = nCheckpoints + 1;
+            checkpoints[delegatee][nCheckpoints] = Checkpoint(blockNumberOrSecond, newVotes);
+            numCheckpoints[delegatee] = nCheckpoints + 1;
         }
 
         emit DelegateVotesChangedV2(delegatee, oldVotes, newVotes);
@@ -487,23 +424,11 @@ contract TokenVault is
     /**
      * @notice Get the token stake balance of an account (excluding the pending withdrawals)
      * @param _account The address of the account to check
-     * @param _token Address of token
      * @return The balance that user staked
      */
-    function getStakeAmount(address _account, address _token) internal view returns (uint256) {
-        UserInfo storage user = userInfos[_token][_account];
+    function getStakeAmount(address _account) internal view returns (uint256) {
+        UserInfo storage user = userInfos[_account];
         return user.amount - (user.pendingWithdrawals);
-    }
-
-    /**
-     * @dev This function reverts if token is not registered
-     * @param _token Address of the token
-     * @custom:error UnregisteredToken is thrown when token is not registered in TokenVault
-     */
-    function isTokenRegistered(address _token) private view {
-        if (!tokens[_token]) {
-            revert UnregisteredToken(_token);
-        }
     }
 
     /**
