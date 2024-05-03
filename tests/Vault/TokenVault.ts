@@ -30,12 +30,11 @@ describe("TokenVault", async () => {
       unsafeAllow: ["constructor"],
     });
 
-    await tokenVault.setLockPeriod(token.address, 300);
-    await token.faucet(parseUnits("100", 18));
-
     // Give permission
+
     let tx = await accessControl.giveCallPermission(tokenVault.address, "updateTokens(address,bool)", deployer.address);
     await tx.wait();
+
     tx = await accessControl.giveCallPermission(tokenVault.address, "setLockPeriod(address,uint128)", deployer.address);
     await tx.wait();
 
@@ -44,6 +43,9 @@ describe("TokenVault", async () => {
 
     tx = await accessControl.giveCallPermission(tokenVault.address, "unpause()", deployer.address);
     await tx.wait();
+
+    await tokenVault.setLockPeriod(token.address, 300);
+    await token.faucet(parseUnits("100", 18));
   };
 
   beforeEach("Configure Vault", async () => {
