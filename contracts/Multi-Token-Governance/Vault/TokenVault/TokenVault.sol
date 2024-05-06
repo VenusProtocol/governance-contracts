@@ -6,7 +6,7 @@ import { ReentrancyGuardUpgradeable } from "@openzeppelin/contracts-upgradeable/
 import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { IERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
-import { AccessControlledV8 } from "../../Governance/AccessControlledV8.sol";
+import { AccessControlledV8 } from "../../../Governance/AccessControlledV8.sol";
 import { SafeERC20Upgradeable } from "@openzeppelin/contracts-upgradeable/token/ERC20/utils/SafeERC20Upgradeable.sol";
 import { ECDSA } from "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
 import { TimeManagerV8 } from "@venusprotocol/solidity-utilities/contracts/TimeManagerV8.sol";
@@ -78,7 +78,7 @@ contract TokenVault is
      * @custom:event Emit Deposit with msg.sender, token and amount
      * @custom:error ZeroAmountNotAllowed is thrown when zero amount is passed
      */
-    function deposit(uint256 _amount) external nonReentrant whenNotPaused {
+    function deposit(uint96 _amount) external nonReentrant whenNotPaused {
         if (_amount == 0) {
             revert ZeroAmountNotAllowed();
         }
@@ -97,7 +97,7 @@ contract TokenVault is
         UserInfo storage user = userInfos[msg.sender];
         WithdrawalRequest[] storage requests = withdrawalRequests[msg.sender];
 
-        uint256 withdrawalAmount = popEligibleWithdrawalRequests(user, requests);
+        uint96 withdrawalAmount = popEligibleWithdrawalRequests(user, requests);
         require(withdrawalAmount > 0, "nothing to withdraw");
 
         user.amount = user.amount - withdrawalAmount;
@@ -131,7 +131,7 @@ contract TokenVault is
      * @custom:error ZeroAmountNotAllowed is thrown when zero amount is passed
      * @custom:error InvalidAmount is thrown when given amount and pending withdrawals are greater than deposited amount.
      */
-    function requestWithdrawal(uint256 _amount) external nonReentrant whenNotPaused {
+    function requestWithdrawal(uint96 _amount) external nonReentrant whenNotPaused {
         if (_amount == 0) {
             revert ZeroAmountNotAllowed();
         }
@@ -193,7 +193,7 @@ contract TokenVault is
      * @param _blockNumberOrSecond The block number or second to get the vote balance at
      * @return The balance that user staked
      */
-    function getPriorVotes(address _account, uint256 _blockNumberOrSecond) external view returns (uint256) {
+    function getPriorVotes(address _account, uint256 _blockNumberOrSecond) external view returns (uint96) {
         require(_blockNumberOrSecond < getBlockNumberOrTimestamp(), "Not yet determined");
 
         uint32 nCheckpoints = numCheckpoints[_account];
@@ -297,7 +297,7 @@ contract TokenVault is
     function pushWithdrawalRequest(
         UserInfo storage _user,
         WithdrawalRequest[] storage _requests,
-        uint256 _amount,
+        uint96 _amount,
         uint256 _lockedUntil
     ) internal {
         uint256 i = _requests.length;
@@ -328,7 +328,7 @@ contract TokenVault is
     function popEligibleWithdrawalRequests(
         UserInfo storage _user,
         WithdrawalRequest[] storage _requests
-    ) internal returns (uint256 withdrawalAmount) {
+    ) internal returns (uint96 withdrawalAmount) {
         // Since the requests are sorted by their unlock time, we can just
         // pop them from the array and stop at the first not-yet-eligible one
         for (uint256 i = _requests.length; i > 0 && isUnlocked(_requests[i - 1]); ) {
@@ -351,7 +351,7 @@ contract TokenVault is
      */
     function _delegate(address _delegator, address _delegatee) internal {
         address currentDelegate = delegates[_delegator];
-        uint256 delegatorBalance = getStakeAmount(_delegator);
+        uint96 delegatorBalance = getStakeAmount(_delegator);
         delegates[_delegator] = _delegatee;
 
         emit DelegateChangedV2(_delegator, currentDelegate, _delegatee);
@@ -365,19 +365,19 @@ contract TokenVault is
      * @param _dstRep The address of the new representative who will receive the transferred voting power
      * @param _amount The amount of voting power to be transferred
      */
-    function _moveDelegates(address _srcRep, address _dstRep, uint256 _amount) internal {
+    function _moveDelegates(address _srcRep, address _dstRep, uint96 _amount) internal {
         if (_srcRep != _dstRep && _amount > 0) {
             if (_srcRep != address(0)) {
                 uint32 srcRepNum = numCheckpoints[_srcRep];
-                uint256 srcRepOld = srcRepNum > 0 ? checkpoints[_srcRep][srcRepNum - 1].votes : 0;
-                uint256 srcRepNew = srcRepOld - _amount;
+                uint96 srcRepOld = srcRepNum > 0 ? checkpoints[_srcRep][srcRepNum - 1].votes : 0;
+                uint96 srcRepNew = srcRepOld - _amount;
                 _writeCheckpoint(_srcRep, srcRepNum, srcRepOld, srcRepNew);
             }
 
             if (_dstRep != address(0)) {
                 uint32 dstRepNum = numCheckpoints[_dstRep];
-                uint256 dstRepOld = dstRepNum > 0 ? checkpoints[_dstRep][dstRepNum - 1].votes : 0;
-                uint256 dstRepNew = dstRepOld + _amount;
+                uint96 dstRepOld = dstRepNum > 0 ? checkpoints[_dstRep][dstRepNum - 1].votes : 0;
+                uint96 dstRepNew = dstRepOld + _amount;
                 _writeCheckpoint(_dstRep, dstRepNum, dstRepOld, dstRepNew);
             }
         }
@@ -394,7 +394,7 @@ contract TokenVault is
      * @param newVotes The new number of votes to be assigned to the delegatee
      * @custom:event Emits a DelegateVotesChangedV2 event to signal the change in voting power for the delegatee
      */
-    function _writeCheckpoint(address delegatee, uint32 nCheckpoints, uint256 oldVotes, uint256 newVotes) internal {
+    function _writeCheckpoint(address delegatee, uint32 nCheckpoints, uint256 oldVotes, uint96 newVotes) internal {
         uint32 blockNumberOrSecond = uint32(getBlockNumberOrTimestamp());
 
         if (nCheckpoints > 0 && checkpoints[delegatee][nCheckpoints - 1].fromBlockOrSecond == blockNumberOrSecond) {
@@ -426,7 +426,7 @@ contract TokenVault is
      * @param _account The address of the account to check
      * @return The balance that user staked
      */
-    function getStakeAmount(address _account) internal view returns (uint256) {
+    function getStakeAmount(address _account) internal view returns (uint96) {
         UserInfo storage user = userInfos[_account];
         return user.amount - (user.pendingWithdrawals);
     }

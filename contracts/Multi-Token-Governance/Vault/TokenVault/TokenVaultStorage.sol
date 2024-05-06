@@ -5,19 +5,19 @@ pragma solidity 0.8.25;
 contract TokenVaultStorage {
     /// @notice Info of each user.
     struct UserInfo {
-        uint256 amount;
-        uint256 pendingWithdrawals;
+        uint96 amount;
+        uint96 pendingWithdrawals;
     }
     // Infomation about a withdrawal request
     struct WithdrawalRequest {
-        uint256 amount;
+        uint96 amount;
         uint128 lockedUntil;
     }
 
     /// @notice A checkpoint for marking number of votes from a given block or second
     struct Checkpoint {
         uint32 fromBlockOrSecond;
-        uint256 votes;
+        uint96 votes;
     }
 
     /// @notice The EIP-712 typehash for the contract's domain
