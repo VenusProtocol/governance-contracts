@@ -61,7 +61,10 @@ describe("MultiTokenGovernance", async () => {
       unsafeAllow: ["constructor"],
     });
     const vaultAggregatorFactory = await ethers.getContractFactory("VaultAggregator");
-    vaultAggregator = await upgrades.deployProxy(vaultAggregatorFactory, [accessControl.address]);
+    vaultAggregator = await upgrades.deployProxy(vaultAggregatorFactory, [
+      accessControl.address,
+      [tokenVault1.address],
+    ]);
 
     const MultiTokenGovernorBravoDelegateFactory = await ethers.getContractFactory("MultiTokenGovernorBravoDelegate");
     governorBravoDelegate = await upgrades.deployProxy(MultiTokenGovernorBravoDelegateFactory, [
@@ -109,7 +112,6 @@ describe("MultiTokenGovernance", async () => {
     );
     await tx.wait();
 
-    expect(await vaultAggregator.updateVault(tokenVault1.address, true)).to.emit(vaultAggregator, "UpdateVault");
     expect(await vaultAggregator.updateVault(tokenVault2.address, true)).to.emit(vaultAggregator, "UpdateVault");
 
     await expect(vaultAggregator.updateDefaultWeights([100, 0, 0, 0, 0, 0, 0, 0])).to.emit(

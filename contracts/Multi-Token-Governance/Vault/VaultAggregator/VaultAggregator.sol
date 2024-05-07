@@ -30,8 +30,20 @@ contract VaultAggregator is PausableUpgradeable, AccessControlledV8 {
      * @notice Initialize the contract
      * @param _accessControlManager  Address of access control manager
      */
-    function initialize(address _accessControlManager) external initializer {
+    function initialize(address _accessControlManager, IVault[] memory _vaults) external initializer {
         ensureNonzeroAddress(_accessControlManager);
+        if (_vaults.length >= 7) {
+            revert VaultLimitExceed();
+        }
+        for (uint8 i; i < _vaults.length; ) {
+            if (address(_vaults[i]) != address(0)) {
+                vaults.push(_vaults[i]);
+            }
+            unchecked {
+                ++i;
+            }
+        }
+
         __AccessControlled_init(_accessControlManager);
     }
 
