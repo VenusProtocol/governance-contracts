@@ -278,6 +278,10 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
         uint64 nonce_,
         bytes calldata payload_
     ) public payable override onlyOwner nonReentrant {
+        require(
+            keccak256(trustedRemoteLookup[srcChainId_]) == keccak256(srcAddress_),
+            "OmnichainGovernanceExecutor::retryMessage: not a trusted remote"
+        );
         super.retryMessage(srcChainId_, srcAddress_, nonce_, payload_);
     }
 

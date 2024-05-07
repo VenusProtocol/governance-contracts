@@ -81,7 +81,6 @@ describe("Omnichain: ", async function () {
       "setSendVersion(uint16)",
       "setReceiveVersion(uint16)",
       "forceResumeReceive(uint16,bytes)",
-      "setTrustedRemoteAddress(uint16,bytes)",
       "setPrecrime(address)",
       "setMinDstGas(uint16,uint16,uint256)",
       "setPayloadSizeLimit(uint16,uint256)",
@@ -266,6 +265,12 @@ describe("Omnichain: ", async function () {
     ).to.be.revertedWith("OmnichainProposalSender: destination chain is not a trusted source");
   });
 
+  it("Reverts if remote address is more than 20 bytes", async function () {
+    await expect(sender.connect(signer1).setTrustedRemoteAddress(remoteChainId, remotePath + "99")).to.be.revertedWith(
+      "OmnichainProposalSender: remote address must be 20 bytes long",
+    );
+  });
+
   it("Reverts with Daily Transaction Limit Exceed", async function () {
     await sender.connect(signer1).setMaxDailyLimit(remoteChainId, 0);
     const payload = await getPayload(NormalTimelock.address);
@@ -306,9 +311,22 @@ describe("Omnichain: ", async function () {
   });
 
   it("Function registry should not emit event if function is added twice", async function () {
-    expect(
-      await executorOwner.connect(deployer).upsertSignature(["setTrustedRemoteAddress(uint16,bytes)"], [true]),
-    ).to.not.emit(executorOwner, "FunctionRegistryChanged");
+    await expect(executorOwner.connect(deployer).upsertSignature(["pause()"], [true])).to.not.emit(
+      executorOwner,
+      "FunctionRegistryChanged",
+    );
+  });
+
+  it("Reverts if invalid parameters passed in trusted remote", async function () {
+    await expect(executorOwner.connect(signer1).setTrustedRemoteAddress(0, localPath)).to.be.revertedWith(
+      "ChainId must not be zero",
+    );
+    await expect(
+      executorOwner.connect(signer1).setTrustedRemoteAddress(localChainId, ethers.constants.AddressZero),
+    ).to.be.revertedWithCustomError(executor, "ZeroAddressNotAllowed");
+    await expect(
+      executorOwner.connect(signer1).setTrustedRemoteAddress(localChainId, localPath + "99"),
+    ).to.be.revertedWith("Source address must be 20 bytes long");
   });
 
   it("Reverts if EOA called owner function of Executor", async function () {
@@ -611,6 +629,50 @@ describe("Omnichain: ", async function () {
       }),
     ).to.emit(executor, "RetryMessageSuccess");
     expect(await executor.failedMessages(localChainId, srcAddress, 1)).equals(ethers.constants.HashZero);
+  });
+
+  it("Revert retry message on destination if trusted remote is changed", async function () {
+    let data = executor.interface.encodeFunctionData("pause", []);
+    const srcAddress = ethers.utils.solidityPack(["address", "address"], [sender.address, executor.address]);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.emit(executor, "Paused");
+    const payload = await getPayload(NormalTimelock.address);
+    expect(
+      await sender.connect(signer1).execute(remoteChainId, payload, adapterParams, ethers.constants.AddressZero, {
+        value: nativeFee,
+      }),
+    ).to.emit(sender, "ExecuteRemoteProposal");
+    expect(await executor.failedMessages(localChainId, srcAddress, 1)).not.equals(ethers.constants.HashZero);
+
+    data = executor.interface.encodeFunctionData("unpause", []);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.emit(executor, "Unpaused");
+
+    const addressOne = "0x0000000000000000000000000000000000000001";
+
+    //change trusted remote
+    await executorOwner.connect(signer1).setTrustedRemoteAddress(localChainId, addressOne);
+
+    data = executor.interface.encodeFunctionData("retryMessage", [
+      localChainId,
+      srcAddress,
+      1,
+      await payloadWithId(payload),
+    ]);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.be.reverted;
   });
 
   it("Retry messages that failed due to low gas at the destination using the Endpoint.", async function () {
