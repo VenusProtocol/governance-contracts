@@ -1,4 +1,3 @@
-import { smock } from "@defi-wonderland/smock";
 import { SignerWithAddress } from "@nomicfoundation/hardhat-ethers/signers";
 import { loadFixture, mine } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
@@ -7,14 +6,7 @@ import { parseUnits } from "ethers/lib/utils";
 import { ethers, upgrades } from "hardhat";
 
 import { convertToUnit } from "../../helpers/utils";
-import {
-  AccessControlManager,
-  MockToken,
-  MultiTokenGovernorBravoDelegate__factory,
-  Timelock,
-  TokenVault,
-  VaultAggregator,
-} from "../../typechain";
+import { AccessControlManager, MockToken, Timelock, TokenVault, VaultAggregator } from "../../typechain";
 
 enum ProposalType {
   NORMAL,
@@ -68,6 +60,21 @@ describe("MultiTokenGovernance", async () => {
       initializer: "initialize",
       unsafeAllow: ["constructor"],
     });
+    const vaultAggregatorFactory = await ethers.getContractFactory("VaultAggregator");
+    vaultAggregator = await upgrades.deployProxy(vaultAggregatorFactory, [accessControl.address]);
+
+    const MultiTokenGovernorBravoDelegateFactory = await ethers.getContractFactory("MultiTokenGovernorBravoDelegate");
+    governorBravoDelegate = await upgrades.deployProxy(MultiTokenGovernorBravoDelegateFactory, [
+      vaultAggregator.address,
+      [
+        [1, 20 * 60 * 5, convertToUnit("150000", 18)],
+        [1, 20 * 60 * 4, convertToUnit("200000", 18)],
+        [1, 20 * 60 * 3, convertToUnit("250000", 18)],
+      ],
+      [normalTimelock.address, fasttrackTimelock.address, criticalTimelock.address],
+      deployer.address,
+      accessControl.address,
+    ]);
     const proposeAmount = parseUnits("150000", 18);
     token1Amount = parseUnits("50000", 18);
     token2Amount = parseUnits("20000", 18);
@@ -86,13 +93,6 @@ describe("MultiTokenGovernance", async () => {
 
     await expect(tokenVault2.connect(signer1).deposit(token2Amount)).to.emit(tokenVault2, "Deposit");
     await expect(tokenVault2.connect(signer1).delegate(signer1.address)).to.emit(tokenVault2, "DelegateChangedV2");
-
-    const MultiTokenGovernorBravoDelegateFactory = await smock.mock<MultiTokenGovernorBravoDelegate__factory>(
-      "MultiTokenGovernorBravoDelegate",
-    );
-    governorBravoDelegate = await MultiTokenGovernorBravoDelegateFactory.deploy();
-    const vaultAggregatorFactory = await ethers.getContractFactory("VaultAggregator");
-    vaultAggregator = await upgrades.deployProxy(vaultAggregatorFactory, [accessControl.address]);
 
     // Give permission
     let tx = await accessControl.giveCallPermission(
@@ -117,17 +117,6 @@ describe("MultiTokenGovernance", async () => {
       "DefaultWeightsUpdated",
     );
 
-    await governorBravoDelegate.setVariable("admin", await deployer.getAddress());
-    await governorBravoDelegate.initialize(
-      vaultAggregator.address,
-      [
-        [1, 20 * 60 * 5, convertToUnit("150000", 18)],
-        [1, 20 * 60 * 4, convertToUnit("200000", 18)],
-        [1, 20 * 60 * 3, convertToUnit("250000", 18)],
-      ],
-      [normalTimelock.address, fasttrackTimelock.address, criticalTimelock.address],
-      deployer.address,
-    );
     targets = [deployer.address];
     values = ["0"];
     signatures = ["getBalanceOf(address)"];
@@ -151,7 +140,7 @@ describe("MultiTokenGovernance", async () => {
       governorBravoDelegate
         .connect(signer2)
         .propose(targets, values, signatures, callDatas, "", ProposalType.NORMAL, [token1Weight, token2Weight]),
-    ).to.be.revertedWith("proposer votes below proposal threshold");
+    ).to.be.revertedWithCustomError(governorBravoDelegate, "UnderThreshold");
   });
   it("Vote successfully", async () => {
     await expect(
