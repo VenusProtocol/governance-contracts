@@ -62,6 +62,9 @@ contract MultiTokenGovernorBravoEvents {
 
     /// @notice Emitted when the maximum number of operations in one proposal is updated
     event ProposalMaxOperationsUpdated(uint oldMaxOperations, uint newMaxOperations);
+
+    /// @notice Emitted when Vault Aggregator address updated
+    event UpdateVaultAggregator(address oldVaultAggregator, address newVaultAggregator);
 }
 
 /**

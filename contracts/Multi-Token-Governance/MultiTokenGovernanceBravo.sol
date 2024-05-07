@@ -86,6 +86,17 @@ contract MultiTokenGovernorBravoDelegate is MultiTokenGovernorBravoDelegateStora
     }
 
     /**
+     * @notice It updates Vault Aggregator
+     * @dev Admin only
+     * @param newVaultAggregator Address of new Vault Aggregator
+     */
+    function updateVaultAggregator(VaultAggregatorInterface newVaultAggregator) external {
+        require(address(newVaultAggregator) != address(0), "invalid VaultAggregator address");
+        require(msg.sender == admin, "admin only");
+        vaultAggregator = newVaultAggregator;
+    }
+
+    /**
      * @notice Function used to propose a new proposal. Sender must have delegates above the proposal threshold.
      * targets, values, signatures, and calldatas must be of equal length
      * @dev NOTE: Proposals with duplicate set of actions can not be queued for execution. If the proposals consists
