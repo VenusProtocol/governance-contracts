@@ -366,7 +366,7 @@
       ]
     },
     "CriticalTimelock": {
-      "address": "0xBfEBa4bEdf687296ff69E162D21924bF48B2cc91",
+      "address": "0x542bd864DCFDD6031F4EEa35C602B564f952c442",
       "abi": [
         {
           "inputs": [
@@ -982,7 +982,7 @@
       ]
     },
     "FastTrackTimelock": {
-      "address": "0x2d925b3180BecFE864327146Cf26Ae6D91b7dd52",
+      "address": "0xB2Cd2b51919160FC57a788e1D3B15BCe2F591b0f",
       "abi": [
         {
           "inputs": [
@@ -1433,7 +1433,7 @@
       ]
     },
     "NormalTimelock": {
-      "address": "0x851Ee6756bcBfaE7bF5Ed2cad0DCbDa71ba85a35",
+      "address": "0x9952fc9A06788B0960Db88434Da43EDacDF1935e",
       "abi": [
         {
           "inputs": [
@@ -1884,7 +1884,7 @@
       ]
     },
     "OmnichainExecutorOwner": {
-      "address": "0x3fDa6fA02E411ca4f0f01c155E8b6074B2a35682",
+      "address": "0x0E33024CD69530126586186C282573D8BD6783ea",
       "abi": [
         {
           "anonymous": false,
@@ -2031,6 +2031,11 @@
           "type": "error"
         },
         {
+          "inputs": [],
+          "name": "ZeroAddressNotAllowed",
+          "type": "error"
+        },
+        {
           "anonymous": false,
           "inputs": [
             {
@@ -2233,6 +2238,24 @@
         {
           "inputs": [
             {
+              "internalType": "uint16",
+              "name": "srcChainId_",
+              "type": "uint16"
+            },
+            {
+              "internalType": "bytes",
+              "name": "srcAddress_",
+              "type": "bytes"
+            }
+          ],
+          "name": "setTrustedRemoteAddress",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
               "internalType": "address",
               "name": "newOwner_",
               "type": "address"
@@ -2298,7 +2321,7 @@
       ]
     },
     "OmnichainExecutorOwner_Implementation": {
-      "address": "0x599385ED68a06801Ccd02b0f08a64A4C9Fa8dE7c",
+      "address": "0x72a256f67AcD6a06d39dE6f82E9341dB252c42D4",
       "abi": [
         {
           "inputs": [
@@ -2330,6 +2353,11 @@
             }
           ],
           "name": "Unauthorized",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "ZeroAddressNotAllowed",
           "type": "error"
         },
         {
@@ -2539,6 +2567,24 @@
         {
           "inputs": [
             {
+              "internalType": "uint16",
+              "name": "srcChainId_",
+              "type": "uint16"
+            },
+            {
+              "internalType": "bytes",
+              "name": "srcAddress_",
+              "type": "bytes"
+            }
+          ],
+          "name": "setTrustedRemoteAddress",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
               "internalType": "address",
               "name": "newOwner_",
               "type": "address"
@@ -2583,7 +2629,7 @@
       ]
     },
     "OmnichainExecutorOwner_Proxy": {
-      "address": "0x3fDa6fA02E411ca4f0f01c155E8b6074B2a35682",
+      "address": "0x0E33024CD69530126586186C282573D8BD6783ea",
       "abi": [
         {
           "inputs": [
@@ -2732,7 +2778,7 @@
       ]
     },
     "OmnichainGovernanceExecutor": {
-      "address": "0x481eb7A1c319d24CE4bE36EF0F4D445CfeE610A5",
+      "address": "0x92c6f22d9059d50bac82cd9eb1aa72142a76339a",
       "abi": [
         {
           "inputs": [
