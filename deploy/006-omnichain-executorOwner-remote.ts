@@ -122,13 +122,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   );
 
   if ((await omnichainGovernanceExecutor.owner()) === deployer) {
-    let tx = await omnichainGovernanceExecutor.addTimelocks([
-      normalTimelockAddress,
-      fastTrackTimelockAddress,
-      criticalTimelockAddress,
-    ]);
-    await tx.wait();
-
     const omnichainProposalSenderAddress = await getOmnichainProposalSender(networkName);
     await executeCommands(
       omnichainGovernanceExecutor,
@@ -140,7 +133,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       fastTrackTimelockAddress,
       criticalTimelockAddress,
     );
-    tx = await omnichainGovernanceExecutor.transferOwnership(OmnichainExecutorOwner.address);
+    const tx = await omnichainGovernanceExecutor.transferOwnership(OmnichainExecutorOwner.address);
     await tx.wait();
   }
 
