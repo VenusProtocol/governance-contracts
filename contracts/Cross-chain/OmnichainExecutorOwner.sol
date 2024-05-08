@@ -3,6 +3,7 @@ pragma solidity 0.8.25;
 
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { IOmnichainGovernanceExecutor } from "./interfaces/IOmnichainGovernanceExecutor.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
 /**
  * @title OmnichainExecutorOwner
@@ -43,6 +44,21 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     function initialize(address accessControlManager_) external initializer {
         require(accessControlManager_ != address(0), "Address must not be zero");
         __AccessControlled_init(accessControlManager_);
+    }
+
+    /**
+     * @notice Sets the source message sender address
+     * @param srcChainId_ The LayerZero id of a source chain
+     * @param srcAddress_ The address of the contract on the source chain
+     * @custom:access Controlled by AccessControlManager
+     * @custom:event Emits SetTrustedRemoteAddress with source chain Id and source address
+     */
+    function setTrustedRemoteAddress(uint16 srcChainId_, bytes calldata srcAddress_) external {
+        _checkAccessAllowed("setTrustedRemoteAddress(uint16,bytes)");
+        require(srcChainId_ != 0, "ChainId must not be zero");
+        ensureNonzeroAddress(address(uint160(bytes20(srcAddress_))));
+        require(srcAddress_.length == 20, "Source address must be 20 bytes long");
+        OMNICHAIN_GOVERNANCE_EXECUTOR.setTrustedRemoteAddress(srcChainId_, srcAddress_);
     }
 
     /**
