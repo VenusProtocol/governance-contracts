@@ -2,15 +2,40 @@ import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { delayConfig } from "../helpers/deploy/deploymentConfig";
+type DelayTypes = {
+  normal: number;
+  fast: number;
+  critical: number;
+};
+export type DelayConfig = {
+  hardhat: DelayTypes;
+  bscmainnet: DelayTypes;
+  bsctestnet: DelayTypes;
+};
 
+export const delayConfig: DelayConfig = {
+  hardhat: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  bscmainnet: {
+    normal: 172800,
+    fast: 21600,
+    critical: 3600,
+  },
+  bsctestnet: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+};
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 
-  const networkName = hre.network.name as SUPPORTED_NETWORKS;
+  const networkName = (hre.network.name as "hardhat") || "bsctestnet" || "bscmainnet";
   const live = hre.network.live;
 
   const getAdmin = async () => {
@@ -18,7 +43,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   };
 
   await deploy("NormalTimelock", {
-    contract: live ? "Timelock" : "TestTimelock",
+    contract: live ? "Timelock" : "TestTimelockV8",
     from: deployer,
     args: [await getAdmin(), delayConfig[networkName].normal],
     log: true,
@@ -26,7 +51,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 
   await deploy("FastTrackTimelock", {
-    contract: live ? "Timelock" : "TestTimelock",
+    contract: live ? "Timelock" : "TestTimelockV8",
     from: deployer,
     args: [await getAdmin(), delayConfig[networkName].fast],
     log: true,
@@ -34,7 +59,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 
   await deploy("CriticalTimelock", {
-    contract: live ? "Timelock" : "TestTimelock",
+    contract: live ? "Timelock" : "TestTimelockV8",
     from: deployer,
     args: [await getAdmin(), delayConfig[networkName].critical],
     log: true,

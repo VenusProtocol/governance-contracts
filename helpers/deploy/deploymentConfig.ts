@@ -50,62 +50,6 @@ type Config = {
   };
 };
 
-type DelayTypes = {
-  normal: number;
-  fast: number;
-  critical: number;
-};
-export type DelayConfig = {
-  [key in SUPPORTED_NETWORKS]: DelayTypes;
-};
-
-export const delayConfig: DelayConfig = {
-  hardhat: {
-    normal: 600,
-    fast: 300,
-    critical: 100,
-  },
-  bscmainnet: {
-    normal: 172800,
-    fast: 21600,
-    critical: 3600,
-  },
-  bsctestnet: {
-    normal: 600,
-    fast: 300,
-    critical: 100,
-  },
-  sepolia: {
-    normal: 600,
-    fast: 300,
-    critical: 100,
-  },
-  ethereum: {
-    normal: 172800,
-    fast: 21600,
-    critical: 3600,
-  },
-  opbnbtestnet: {
-    normal: 600,
-    fast: 300,
-    critical: 100,
-  },
-  opbnbmainnet: {
-    normal: 172800,
-    fast: 21600,
-    critical: 3600,
-  },
-  arbitrumsepolia: {
-    normal: 600,
-    fast: 300,
-    critical: 100,
-  },
-  arbitrumone: {
-    normal: 172800,
-    fast: 21600,
-    critical: 3600,
-  },
-};
 export const config: Config = {
   bscmainnet: {
     methods: [
