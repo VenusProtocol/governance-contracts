@@ -5,8 +5,10 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { LZ_CHAINID, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
 import {
-  OmnichainGovernanceExecutorMethods,
+  OmnichainGovernanceExecutorCriticalMethods,
+  OmnichainGovernanceExecutorFasttrackMethods,
   OmnichainGovernanceExecutorMethodsForGuardian,
+  OmnichainGovernanceExecutorNormalMethods,
   config,
 } from "../helpers/deploy/deploymentConfig";
 import { getOmnichainProposalSender, guardian, testnetNetworks } from "../helpers/deploy/deploymentUtils";
@@ -138,8 +140,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 
   if ((await omnichainExecutorOwner.owner()) === deployer) {
-    const isAdded = new Array(OmnichainGovernanceExecutorMethods.length).fill(true);
-    let tx = await omnichainExecutorOwner.upsertSignature(OmnichainGovernanceExecutorMethods, isAdded);
+    let isAdded = new Array(OmnichainGovernanceExecutorNormalMethods.length).fill(true);
+    let tx = await omnichainExecutorOwner.upsertSignature(OmnichainGovernanceExecutorNormalMethods, isAdded);
+    isAdded = new Array(OmnichainGovernanceExecutorMethodsForGuardian.length).fill(true);
+    tx = await omnichainExecutorOwner.upsertSignature(OmnichainGovernanceExecutorMethodsForGuardian, isAdded);
+
     await tx.wait();
     tx = await omnichainExecutorOwner.transferOwnership(normalTimelockAddress);
     await tx.wait();
@@ -148,9 +153,21 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const commands = [
     ...(await configureAccessControls(
-      OmnichainGovernanceExecutorMethods,
+      OmnichainGovernanceExecutorNormalMethods,
       acmAddress,
       normalTimelockAddress,
+      OmnichainExecutorOwner.address,
+    )),
+    ...(await configureAccessControls(
+      OmnichainGovernanceExecutorFasttrackMethods,
+      acmAddress,
+      fastTrackTimelockAddress,
+      OmnichainExecutorOwner.address,
+    )),
+    ...(await configureAccessControls(
+      OmnichainGovernanceExecutorCriticalMethods,
+      acmAddress,
+      criticalTimelockAddress,
       OmnichainExecutorOwner.address,
     )),
     ...(await configureAccessControls(

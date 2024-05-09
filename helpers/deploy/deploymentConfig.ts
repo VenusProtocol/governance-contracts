@@ -6,24 +6,46 @@ export type AccessControlEntry = {
   method: string;
 };
 
-export const OmnichainProposalSenderMethods: string[] = [
+export const OmnichainProposalSenderNormalMethods: string[] = [
   "setTrustedRemoteAddress(uint16,bytes)",
   "setMaxDailyLimit(uint16,uint256)",
   "execute(uint16,bytes,bytes)",
+  "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
   "pause()",
   "unpause()",
   "setSendVersion(uint16)",
   "setConfig(uint16,uint16,uint256,bytes)",
 ];
-
-export const OmnichainGovernanceExecutorMethods: string[] = [
-  "setSendVersion(uint16)",
-  "setReceiveVersion(uint16)",
-  "forceResumeReceive(uint16,bytes)",
-  "setOracle(address)",
-  "setMaxDailyReceiveLimit(uint16,uint256)",
+export const OmnichainProposalSenderFasttrackMethods: string[] = [
+  "setMaxDailyLimit(uint16,uint256)",
+  "execute(uint16,bytes,bytes)",
+  "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
   "pause()",
   "unpause()",
+  "setSendVersion(uint16)",
+  "setConfig(uint16,uint16,uint256,bytes)",
+];
+export const OmnichainProposalSenderCriticalMethods: string[] = [
+  "setMaxDailyLimit(uint16,uint256)",
+  "execute(uint16,bytes,bytes)",
+  "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
+  "pause()",
+  "unpause()",
+  "setSendVersion(uint16)",
+  "setConfig(uint16,uint16,uint256,bytes)",
+];
+export const OmnichainProposalSenderGuardianMethods: string[] = [
+  "setMaxDailyLimit(uint16,uint256)",
+  "pause()",
+  "unpause()",
+  "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
+];
+
+export const OmnichainGovernanceExecutorNormalMethods: string[] = [
+  "setSendVersion(uint16)",
+  "setReceiveVersion(uint16)",
+  "setMaxDailyReceiveLimit(uint256)",
+  "pause()",
   "setTrustedRemoteAddress(uint16,bytes)",
   "setPrecrime(address)",
   "setMinDstGas(uint16,uint16,uint256)",
@@ -33,9 +55,29 @@ export const OmnichainGovernanceExecutorMethods: string[] = [
   "setTimelockPendingAdmin(address,uint8)",
   "retryMessage(uint16,bytes,uint64,bytes)",
 ];
+export const OmnichainGovernanceExecutorFasttrackMethods: string[] = [
+  "setReceiveVersion(uint16)",
+  "setMaxDailyReceiveLimit(uint256)",
+  "pause()",
+  "setTrustedRemoteAddress(uint16,bytes)",
+  "setConfig(uint16,uint16,uint256,bytes)",
+  "addTimelocks(ITimelock[])",
+  "setTimelockPendingAdmin(address,uint8)",
+  "retryMessage(uint16,bytes,uint64,bytes)",
+];
+export const OmnichainGovernanceExecutorCriticalMethods: string[] = [
+  "setReceiveVersion(uint16)",
+  "setMaxDailyReceiveLimit(uint256)",
+  "pause()",
+  "setTrustedRemoteAddress(uint16,bytes)",
+  "setConfig(uint16,uint16,uint256,bytes)",
+  "addTimelocks(ITimelock[])",
+  "setTimelockPendingAdmin(address,uint8)",
+  "retryMessage(uint16,bytes,uint64,bytes)",
+];
 export const OmnichainGovernanceExecutorMethodsForGuardian: string[] = [
   "forceResumeReceive(uint16,bytes)",
-  "setMaxDailyReceiveLimit(uint16,uint256)",
+  "setMaxDailyReceiveLimit(uint256)",
   "pause()",
   "unpause()",
   "setTrustedRemoteAddress(uint16,bytes)",

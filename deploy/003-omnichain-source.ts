@@ -3,8 +3,14 @@ import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { OmnichainProposalSenderMethods, config } from "../helpers/deploy/deploymentConfig";
+import { BNB_GUARDIAN, LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
+import {
+  OmnichainProposalSenderCriticalMethods,
+  OmnichainProposalSenderFasttrackMethods,
+  OmnichainProposalSenderGuardianMethods,
+  OmnichainProposalSenderNormalMethods,
+  config,
+} from "../helpers/deploy/deploymentConfig";
 import { getArgTypesFromSignature } from "../helpers/utils";
 
 interface GovernanceCommand {
@@ -84,23 +90,30 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
   const commands = [
     ...(await configureAccessControls(
-      OmnichainProposalSenderMethods,
+      OmnichainProposalSenderNormalMethods,
       acmAddress,
       normalTimelockAddress,
       OmnichainProposalSender.address,
     )),
     ...(await configureAccessControls(
-      OmnichainProposalSenderMethods,
+      OmnichainProposalSenderFasttrackMethods,
       acmAddress,
       fastTrackTimelockAddress,
       OmnichainProposalSender.address,
     )),
     ...(await configureAccessControls(
-      OmnichainProposalSenderMethods,
+      OmnichainProposalSenderCriticalMethods,
       acmAddress,
       criticalTimelockAddress,
       OmnichainProposalSender.address,
     )),
+    ...(await configureAccessControls(
+      OmnichainProposalSenderGuardianMethods,
+      acmAddress,
+      BNB_GUARDIAN,
+      OmnichainProposalSender.address,
+    )),
+
     ...(await configureCommands(OmnichainProposalSender.address, hre)),
   ];
   console.log("Please propose a VIP with the following commands:");
