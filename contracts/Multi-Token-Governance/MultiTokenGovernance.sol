@@ -2,7 +2,7 @@
 
 pragma solidity 0.8.25;
 
-import { MultiTokenGovernorBravoDelegateStorageV2, MultiTokenGovernorBravoEvents, MultiTokenGovernanceErrors } from "./MultiTokenGovernorBravoStorage.sol";
+import { MultiTokenGovernanceInterface } from "./MultiTokenGovernanceInterface.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
@@ -10,18 +10,12 @@ import { ITimelock } from "./ITimelock.sol";
 import { IVaultAggregator } from "./IVaultAggregator.sol";
 
 /**
- * @title MultiTokenGovernorBravoDelegate
+ * @title MultiTokenGovernance
  * @author Venus
  * @notice Multi-Token Governor Bravo Delegate is a governance contract akin to Governance Bravo Delegate, designed to facilitate governance across multiple tokens.
  *         Votes in this contract are aggregated through the vault aggregator.
  */
-contract MultiTokenGovernorBravoDelegate is
-    MultiTokenGovernorBravoDelegateStorageV2,
-    MultiTokenGovernorBravoEvents,
-    MultiTokenGovernanceErrors,
-    Initializable,
-    AccessControlledV8
-{
+contract MultiTokenGovernance is MultiTokenGovernanceInterface, Initializable, AccessControlledV8 {
     /// @notice The name of this contract
     string public constant name = "Venus Multi Token Governor Bravo";
 
@@ -32,16 +26,16 @@ contract MultiTokenGovernorBravoDelegate is
     uint256 public constant MAX_PROPOSAL_THRESHOLD = 300000e18; //300,000
 
     /// @notice The minimum setable voting period
-    uint256 public constant MIN_VOTING_PERIOD = 20 * 60 * 3; // About 3 hours, 3 secs per block
+    uint256 public constant MIN_VOTING_PERIOD = 12 * 60 * 3; // About 3 hours, 5 secs per block
 
     /// @notice The max setable voting period
-    uint256 public constant MAX_VOTING_PERIOD = 20 * 60 * 24 * 14; // About 2 weeks, 3 secs per block
+    uint256 public constant MAX_VOTING_PERIOD = 12 * 60 * 24 * 14; // About 2 weeks, 5 secs per block
 
     /// @notice The min setable voting delay
     uint256 public constant MIN_VOTING_DELAY = 1;
 
     /// @notice The max setable voting delay
-    uint256 public constant MAX_VOTING_DELAY = 20 * 60 * 24 * 7; // About 1 week, 3 secs per block
+    uint256 public constant MAX_VOTING_DELAY = 12 * 60 * 24 * 7; // About 1 week, 5 secs per block
 
     /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
     uint256 public constant quorumVotes = 600000e18; // 600,000
@@ -303,8 +297,11 @@ contract MultiTokenGovernorBravoDelegate is
     /**
      * @notice Sets the new governance guardian
      * @param newGuardian the address of the new guardian
+     * @custom:event Emit NewGuardian with old and new guardian address
+     * @custom:access Controlled by Access Control Manager
+     *
      */
-    function _setGuardian(address newGuardian) external {
+    function setGuardian(address newGuardian) external {
         _checkAccessAllowed("_setGuardian(address)");
         ensureNonzeroAddress(newGuardian);
         emit NewGuardian(guardian, newGuardian);
@@ -315,8 +312,10 @@ contract MultiTokenGovernorBravoDelegate is
      * @notice Set max proposal operations
      * @dev Admin only.
      * @param proposalMaxOperations_ Max proposal operations
+     * @custom:event ProposalMaxOperationsUpdated with old and new proposal max operations
+     * @custom:access Controlled by Access Control Manager
      */
-    function _setProposalMaxOperations(uint256 proposalMaxOperations_) external {
+    function setProposalMaxOperations(uint256 proposalMaxOperations_) external {
         _checkAccessAllowed("_setProposalMaxOperations(uint256)");
         emit ProposalMaxOperationsUpdated(proposalMaxOperations, proposalMaxOperations_);
         proposalMaxOperations = proposalMaxOperations_;
@@ -328,7 +327,8 @@ contract MultiTokenGovernorBravoDelegate is
      * @return targets Array of target addresses of the proposal actions
      * @return values Array of values (i.e., msg.value) to be passed to the calls
      * @return signatures Array of function signatures to be called
-     * @return calldatas Array of calldata to be passed to each call     */
+     * @return calldatas Array of calldata to be passed to each call
+     */
     function getActions(
         uint256 proposalId
     )
@@ -377,6 +377,15 @@ contract MultiTokenGovernorBravoDelegate is
         }
     }
 
+    /**
+     * @dev Internal function to carry out queue logic
+     * @param target Target addresses for proposal calls
+     * @param value BNB values for proposal calls
+     * @param signature Function signatures for proposal calls
+     * @param data Data for proposal calls
+     * @param eta eta for an proposal
+     * @param proposalType Proposal Type
+     */
     function queueOrRevertInternal(
         address target,
         uint256 value,
@@ -397,7 +406,7 @@ contract MultiTokenGovernorBravoDelegate is
     }
 
     /**
-     * @notice Internal function that caries out voting logic
+     * @dev Internal function that caries out voting logic
      * @param voter The voter that is casting their vote
      * @param proposalId The id of the proposal to vote on
      * @param support The support value for the vote. 0=against, 1=for, 2=abstain
@@ -426,6 +435,9 @@ contract MultiTokenGovernorBravoDelegate is
         return votes;
     }
 
+    /**
+     * @dev Internal function that carries out propose function
+     */
     function _propose(
         uint256 id,
         address[] memory targets,
