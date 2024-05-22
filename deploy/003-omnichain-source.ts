@@ -13,7 +13,8 @@ import {
 } from "../helpers/deploy/deploymentConfig";
 import { getArgTypesFromSignature } from "../helpers/utils";
 
-const BNB_GUARDIAN = "0x1C2CAc6ec528c20800B2fe734820D87b581eAA6B";
+const BNB_MAINNET_GUARDIAN = "0x1C2CAc6ec528c20800B2fe734820D87b581eAA6B";
+const BNB_TESTNET_GUARDIAN = "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706";
 
 interface GovernanceCommand {
   contract: string;
@@ -71,6 +72,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const normalTimelockAddress = (await ethers.getContract("NormalTimelock")).address;
   const fastTrackTimelockAddress = (await ethers.getContract("FastTrackTimelock")).address;
   const criticalTimelockAddress = (await ethers.getContract("CriticalTimelock")).address;
+  const BNB_GUARDIAN = hre.network.name === "bscmainnet" ? BNB_MAINNET_GUARDIAN : BNB_TESTNET_GUARDIAN;
 
   const OmnichainProposalSender = await deploy("OmnichainProposalSender", {
     from: deployer,
