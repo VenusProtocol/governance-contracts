@@ -1,7 +1,7 @@
 import { ethers, getNamedAccounts } from "hardhat";
 
 import bscTestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
-import { SUPPORTED_NETWORKS } from "./constants";
+import { LZ_CHAINID, SUPPORTED_NETWORKS } from "./constants";
 
 export const testnetNetworks = ["sepolia", "opbnbtestnet", "arbitrumsepolia", "hardhat"];
 const mainnetNetworks = ["ethereum", "opbnbmainnet", "arbitrumone", "hardhat"];
@@ -61,9 +61,9 @@ export const getOmnichainProposalSender = async (network: SUPPORTED_NETWORKS) =>
 
 export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {
   if (testnetNetworks.includes(network as string)) {
-    return 10102;
+    return LZ_CHAINID.bsctestnet;
   } else if (mainnetNetworks.includes(network as string)) {
-    return 102;
+    return LZ_CHAINID.bscmainnet;
   }
   return 1;
 };

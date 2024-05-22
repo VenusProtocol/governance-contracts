@@ -34,7 +34,5 @@ export const LZ_CHAINID: Record<SUPPORTED_NETWORKS, number> = {
   hardhat: 10102,
 };
 
-export const BNB_GUARDIAN = "0x1C2CAc6ec528c20800B2fe734820D87b581eAA6B";
-
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export default () => {};

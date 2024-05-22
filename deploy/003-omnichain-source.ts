@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { BNB_GUARDIAN, LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
+import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
 import {
   OmnichainProposalSenderCriticalMethods,
   OmnichainProposalSenderFasttrackMethods,
@@ -12,6 +12,8 @@ import {
   config,
 } from "../helpers/deploy/deploymentConfig";
 import { getArgTypesFromSignature } from "../helpers/utils";
+
+const BNB_GUARDIAN = "0x1C2CAc6ec528c20800B2fe734820D87b581eAA6B";
 
 interface GovernanceCommand {
   contract: string;
