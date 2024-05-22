@@ -3,8 +3,8 @@ import { ethers, getNamedAccounts } from "hardhat";
 import bscTestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
 import { SUPPORTED_NETWORKS } from "./constants";
 
-export const testnetNetworks = ["sepolia", "opbnbtestnet", "arbitrumsepolia"];
-const mainnetNetworks = ["ethereum", "opbnbmainnet", "arbitrumone"];
+export const testnetNetworks = ["sepolia", "opbnbtestnet", "arbitrumsepolia", "hardhat"];
+const mainnetNetworks = ["ethereum", "opbnbmainnet", "arbitrumone", "hardhat"];
 
 export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<string> => {
   const { deployer } = await getNamedAccounts();
