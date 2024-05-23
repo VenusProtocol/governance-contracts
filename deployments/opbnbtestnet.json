@@ -366,7 +366,7 @@
       ]
     },
     "CriticalTimelock": {
-      "address": "0x606f7696b39EEd74aBCB61901058F191618a5e21",
+      "address": "0xF4Bfe9F6C93eD08f5298574aa7a640Bb3d34F762",
       "abi": [
         {
           "inputs": [
@@ -982,7 +982,7 @@
       ]
     },
     "FastTrackTimelock": {
-      "address": "0x6F6AAB43696b6a7391F56265bA4f215114332522",
+      "address": "0xF58E03870105F799e0147f465629bD2359dfCa30",
       "abi": [
         {
           "inputs": [
@@ -1433,7 +1433,7 @@
       ]
     },
     "NormalTimelock": {
-      "address": "0xd8aA824CCBeF8A0a3eCdF87c3523D8Fd49Dc93aE",
+      "address": "0xd8Adf0e83189B3cea99F8ad7320afFa8a66Ba75B",
       "abi": [
         {
           "inputs": [
@@ -1884,7 +1884,7 @@
       ]
     },
     "OmnichainExecutorOwner": {
-      "address": "0x233eFd8aFd8C164A8d5e54f649E948F823f0a425",
+      "address": "0x22E504FaD56cc14B0Cf258C374C44384772c8A40",
       "abi": [
         {
           "anonymous": false,
@@ -2321,7 +2321,7 @@
       ]
     },
     "OmnichainExecutorOwner_Implementation": {
-      "address": "0x433b3552382a824cFC3C754D3Ef85e36bbd3Cce9",
+      "address": "0x60a67184CEe5b1fEa8Af3e064aC26723F5d9414E",
       "abi": [
         {
           "inputs": [
@@ -2629,7 +2629,7 @@
       ]
     },
     "OmnichainExecutorOwner_Proxy": {
-      "address": "0x233eFd8aFd8C164A8d5e54f649E948F823f0a425",
+      "address": "0x22E504FaD56cc14B0Cf258C374C44384772c8A40",
       "abi": [
         {
           "inputs": [
@@ -2778,7 +2778,7 @@
       ]
     },
     "OmnichainGovernanceExecutor": {
-      "address": "0x2a32fF4B6750Fa70be6c493C42b9337500197983",
+      "address": "0x954F6a553aee92CE94BdA3a8f26867E44af9B370",
       "abi": [
         {
           "inputs": [
