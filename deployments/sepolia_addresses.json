@@ -2,6 +2,14 @@
   "name": "sepolia",
   "chainId": "11155111",
   "addresses": {
-    "AccessControlManager": "0xbf705C00578d43B6147ab4eaE04DBBEd1ccCdc96"
+    "AccessControlManager": "0xbf705C00578d43B6147ab4eaE04DBBEd1ccCdc96",
+    "CriticalTimelock": "0x542bd864DCFDD6031F4EEa35C602B564f952c442",
+    "DefaultProxyAdmin": "0x01435866babd91311b1355cf3af488cca36db68e",
+    "FastTrackTimelock": "0xB2Cd2b51919160FC57a788e1D3B15BCe2F591b0f",
+    "NormalTimelock": "0x9952fc9A06788B0960Db88434Da43EDacDF1935e",
+    "OmnichainExecutorOwner": "0x0E33024CD69530126586186C282573D8BD6783ea",
+    "OmnichainExecutorOwner_Implementation": "0x72a256f67AcD6a06d39dE6f82E9341dB252c42D4",
+    "OmnichainExecutorOwner_Proxy": "0x0E33024CD69530126586186C282573D8BD6783ea",
+    "OmnichainGovernanceExecutor": "0x92c6f22d9059d50bac82cd9eb1aa72142a76339a"
   }
 }

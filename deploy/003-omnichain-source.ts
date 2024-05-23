@@ -4,8 +4,17 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { OmnichainProposalSenderMethods, config } from "../helpers/deploy/deploymentConfig";
+import {
+  OmnichainProposalSenderCriticalMethods,
+  OmnichainProposalSenderFasttrackMethods,
+  OmnichainProposalSenderGuardianMethods,
+  OmnichainProposalSenderNormalMethods,
+  config,
+} from "../helpers/deploy/deploymentConfig";
 import { getArgTypesFromSignature } from "../helpers/utils";
+
+const BNB_MAINNET_GUARDIAN = "0x1C2CAc6ec528c20800B2fe734820D87b581eAA6B";
+const BNB_TESTNET_GUARDIAN = "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706";
 
 interface GovernanceCommand {
   contract: string;
@@ -63,11 +72,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const normalTimelockAddress = (await ethers.getContract("NormalTimelock")).address;
   const fastTrackTimelockAddress = (await ethers.getContract("FastTrackTimelock")).address;
   const criticalTimelockAddress = (await ethers.getContract("CriticalTimelock")).address;
-  const governorBravoDelegatorAddress = (await ethers.getContract("GovernorBravoDelegator")).address;
+  const BNB_GUARDIAN = hre.network.name === "bscmainnet" ? BNB_MAINNET_GUARDIAN : BNB_TESTNET_GUARDIAN;
 
   const OmnichainProposalSender = await deploy("OmnichainProposalSender", {
     from: deployer,
-    args: [LZ_ENDPOINTS[hre.network.name as keyof typeof LZ_ENDPOINTS], acmAddress, governorBravoDelegatorAddress],
+    args: [LZ_ENDPOINTS[hre.network.name as keyof typeof LZ_ENDPOINTS], acmAddress],
     log: true,
     autoMine: true,
   });
@@ -85,31 +94,31 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
   const commands = [
     ...(await configureAccessControls(
-      OmnichainProposalSenderMethods,
+      OmnichainProposalSenderNormalMethods,
       acmAddress,
       normalTimelockAddress,
       OmnichainProposalSender.address,
     )),
     ...(await configureAccessControls(
-      OmnichainProposalSenderMethods,
+      OmnichainProposalSenderFasttrackMethods,
       acmAddress,
       fastTrackTimelockAddress,
       OmnichainProposalSender.address,
     )),
     ...(await configureAccessControls(
-      OmnichainProposalSenderMethods,
+      OmnichainProposalSenderCriticalMethods,
       acmAddress,
       criticalTimelockAddress,
       OmnichainProposalSender.address,
     )),
-    ...(await configureCommands(OmnichainProposalSender.address, hre)),
+    ...(await configureAccessControls(
+      OmnichainProposalSenderGuardianMethods,
+      acmAddress,
+      BNB_GUARDIAN,
+      OmnichainProposalSender.address,
+    )),
 
-    {
-      contract: OmnichainProposalSender.address,
-      signature: "setTrustedRemote(uint16,bytes)",
-      parameters: ["dstChainId", "0xDestAddressSrcAddress"],
-      value: 0,
-    },
+    ...(await configureCommands(OmnichainProposalSender.address, hre)),
   ];
   console.log("Please propose a VIP with the following commands:");
   console.log(
@@ -118,7 +127,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     ),
   );
 };
-func.tags = ["OmnichainProposalSender", "omnichainlocal"];
+func.tags = ["OmnichainProposalSender"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
   !(hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet") && hre.network.name !== "hardhat";
