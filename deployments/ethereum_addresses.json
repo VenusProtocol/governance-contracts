@@ -2,6 +2,14 @@
   "name": "ethereum",
   "chainId": "1",
   "addresses": {
-    "AccessControlManager": "0x230058da2D23eb8836EC5DB7037ef7250c56E25E"
+    "AccessControlManager": "0x230058da2D23eb8836EC5DB7037ef7250c56E25E",
+    "CriticalTimelock": "0x9dDA9063D5b86CD3fa5Fa316fE0B0E9bd2f85A41",
+    "DefaultProxyAdmin": "0x567e4cc5e085d09f66f836fa8279f38b4e5866b9",
+    "FastTrackTimelock": "0x9bF389b62eab4b1b5A68ba5C60a61Bb60092116a",
+    "NormalTimelock": "0x58427ae12C559a5376918b11ce0C88564452ecE6",
+    "OmnichainExecutorOwner": "0xE837D75Acc0eB41D97fCe2f2613d41d6D6590855",
+    "OmnichainExecutorOwner_Implementation": "0x6f8E5a94e7EfF8f1b4d649abBbCE429488FA3809",
+    "OmnichainExecutorOwner_Proxy": "0xE837D75Acc0eB41D97fCe2f2613d41d6D6590855",
+    "OmnichainGovernanceExecutor": "0x68D415ae73253fe8Fe5Af7B3eA4eDA2EA8a29Ef1"
   }
 }
