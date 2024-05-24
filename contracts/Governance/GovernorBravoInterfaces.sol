@@ -61,6 +61,9 @@ contract GovernorBravoEvents {
 
     /// @notice Emitted when the maximum number of operations in one proposal is updated
     event ProposalMaxOperationsUpdated(uint oldMaxOperations, uint newMaxOperations);
+
+    ///@notice Emitted when address of XVS vault updated
+    event SetXvsVault(address indexed oldXvsVault, address indexed newXvsVault);
 }
 
 /**
