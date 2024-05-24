@@ -1,5 +1,6 @@
 import { ethers, getNamedAccounts } from "hardhat";
 
+import bscMainnetGovernanceDeployments from "../../deployments/bscmainnet.json";
 import bscTestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
 import { LZ_CHAINID, SUPPORTED_NETWORKS } from "./constants";
 
@@ -53,9 +54,9 @@ export const getOmnichainProposalSender = async (network: SUPPORTED_NETWORKS) =>
     return omnichainProposalSenderAddress;
   } else if (testnetNetworks.includes(network as string)) {
     return bscTestnetGovernanceDeployments.contracts.OmnichainProposalSender.address;
+  } else if (mainnetNetworks.includes(network as string)) {
+    return bscMainnetGovernanceDeployments.contracts.OmnichainProposalSender.address;
   }
-
-  // It will be replaced by mainnet OmnichainProposalSender address once its mainnet deployment is done
   return "0x0000000000000000000000000000000000000001";
 };
 
