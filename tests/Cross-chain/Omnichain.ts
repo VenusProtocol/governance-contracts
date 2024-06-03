@@ -88,6 +88,7 @@ describe("Omnichain: ", async function () {
       "addTimelocks(address[])",
       "setTimelockPendingAdmin(address,uint8)",
       "retryMessage(uint16,bytes,uint64,bytes)",
+      "setGuardian(address)",
     ];
     const activeArray = new Array(functionregistry.length).fill(true);
     await executorOwner.upsertSignature(functionregistry, activeArray);
@@ -188,6 +189,10 @@ describe("Omnichain: ", async function () {
     tx = await accessControlManager
       .connect(deployer)
       .giveCallPermission(executorOwner.address, "retryMessage(uint16,bytes,uint64,bytes)", signer1.address);
+    await tx.wait();
+    tx = await accessControlManager
+      .connect(deployer)
+      .giveCallPermission(executorOwner.address, "setGuardian(address)", signer1.address);
     await tx.wait();
 
     remotePath = ethers.utils.solidityPack(["address"], [executor.address]);
@@ -357,6 +362,36 @@ describe("Omnichain: ", async function () {
         data: data,
       }),
     ).to.reverted;
+  });
+
+  it("Revert if call by non guardian", async () => {
+    const data = executor.interface.encodeFunctionData("setGuardian", [signer2.address]);
+    await expect(
+      signer2.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.be.reverted;
+  });
+  it("Revert if zero address is passed in guardian", async () => {
+    const data = executor.interface.encodeFunctionData("setGuardian", [ethers.constants.AddressZero]);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.be.reverted;
+  });
+
+  it("should set new guardian for Executor", async () => {
+    const data = executor.interface.encodeFunctionData("setGuardian", [signer2.address]);
+    await expect(
+      signer1.sendTransaction({
+        to: executorOwner.address,
+        data: data,
+      }),
+    ).to.emit(executor, "NewGuardian");
+    expect(await executor.guardian()).equals(signer2.address);
   });
 
   it("Emit TimelocksAdded event", async function () {

@@ -58,7 +58,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     /**
      * @notice A privileged role that can cancel any proposal
      */
-    address public immutable GUARDIAN;
+    address public guardian;
 
     /**
      * @notice Stores BNB chain layerzero endpoint id
@@ -128,18 +128,23 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     event SetSrcChainId(uint16 indexed oldSrcChainId, uint16 indexed newSrcChainId);
 
     /**
-     * @notice Thrown when proposal ID is invalid
+     * @notice Emitted when new guardian address is set
      */
-    error InvalidProposalId();
+    event NewGuardian(address indexed oldGuardian, address indexed newGuardian);
 
     /**
      * @notice Emitted when pending admin of Timelock is updated
      */
     event SetTimelockPendingAdmin(address, uint8);
 
+    /**
+     * @notice Thrown when proposal ID is invalid
+     */
+    error InvalidProposalId();
+
     constructor(address endpoint_, address guardian_, uint16 srcChainId_) BaseOmnichainControllerDest(endpoint_) {
         ensureNonzeroAddress(guardian_);
-        GUARDIAN = guardian_;
+        guardian = guardian_;
         srcChainId = srcChainId_;
     }
 
@@ -152,6 +157,22 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
     function setSrcChainId(uint16 srcChainId_) external onlyOwner {
         emit SetSrcChainId(srcChainId, srcChainId_);
         srcChainId = srcChainId_;
+    }
+
+    /**
+     * @notice Sets the new executor guardian
+     * @param newGuardian The address of the new guardian
+     * @custom:access Must be call by guardian or owner
+     * @custom:event Emit NewGuardian with old and new guardian address
+     */
+    function setGuardian(address newGuardian) external {
+        require(
+            msg.sender == guardian || msg.sender == owner(),
+            "OmnichainGovernanceExecutor::setGuardian: owner or guardian only"
+        );
+        ensureNonzeroAddress(newGuardian);
+        emit NewGuardian(guardian, newGuardian);
+        guardian = newGuardian;
     }
 
     /**
@@ -216,7 +237,7 @@ contract OmnichainGovernanceExecutor is ReentrancyGuard, BaseOmnichainController
             "OmnichainGovernanceExecutor::cancel: proposal should be queued and not executed"
         );
         Proposal storage proposal = proposals[proposalId_];
-        require(msg.sender == GUARDIAN, "OmnichainGovernanceExecutor::cancel: sender must be guardian");
+        require(msg.sender == guardian, "OmnichainGovernanceExecutor::cancel: sender must be guardian");
 
         proposal.canceled = true;
         ITimelock timelock = proposalTimelocks[proposal.proposalType];
