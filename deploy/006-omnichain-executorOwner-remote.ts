@@ -176,6 +176,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       Guardian,
       OmnichainExecutorOwner.address,
     )),
+    {
+      contract: omnichainExecutorOwner.address,
+      signature: "acceptOwnership()",
+      parameters: [],
+      value: 0,
+    },
   ];
   console.log("Please propose a VIP with the following commands:");
   console.log(
