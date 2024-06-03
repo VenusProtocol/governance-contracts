@@ -85,7 +85,7 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
     function upsertSignature(string[] calldata signatures_, bool[] calldata active_) external onlyOwner {
         uint256 signatureLength = signatures_.length;
         require(signatureLength == active_.length, "Input arrays must have the same length");
-        for (uint256 i; i < signatureLength; ) {
+        for (uint256 i; i < signatureLength; ++i) {
             bytes4 sigHash = bytes4(keccak256(bytes(signatures_[i])));
             bytes memory signature = bytes(functionRegistry[sigHash]);
             if (active_[i] && signature.length == 0) {
@@ -94,9 +94,6 @@ contract OmnichainExecutorOwner is AccessControlledV8 {
             } else if (!active_[i] && signature.length != 0) {
                 delete functionRegistry[sigHash];
                 emit FunctionRegistryChanged(signatures_[i], false);
-            }
-            unchecked {
-                ++i;
             }
         }
     }
