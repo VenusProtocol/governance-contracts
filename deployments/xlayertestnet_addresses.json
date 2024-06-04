@@ -1,0 +1,7 @@
+{
+  "name": "xlayertestnet",
+  "chainId": "195",
+  "addresses": {
+    "AccessControlManager": "0x6dB7eC37a0fb4d97F9a292C47e5C938763Da861F"
+  }
+}
