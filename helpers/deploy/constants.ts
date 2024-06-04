@@ -8,6 +8,8 @@ export enum SUPPORTED_NETWORKS {
   OPBNBMAINNET = "opbnbmainnet",
   ARBITRUM_SEPOLIA = "arbitrumsepolia",
   ARBITRUM_ONE = "arbitrumone",
+  XLAYER_TESTNET = "xlayertestnet",
+  XLAYER_MAINNET = "xlayermainnet",
 }
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function

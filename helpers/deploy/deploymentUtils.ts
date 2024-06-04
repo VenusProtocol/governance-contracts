@@ -18,6 +18,10 @@ export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<s
     return "0x1426A5Ae009c4443188DA8793751024E358A61C2"; //ARBITRUM SEPOLIA MULTISIG
   } else if (network === "arbitrumone") {
     return "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0"; //ARBITRUM ONE MULTISIG
+  } else if (network === "xlayertestnet") {
+    return "0x5961449d63149035aCfC0714D5155f24C9819004"; //XLAYER TESTNET ONE MULTISIG
+  } else if (network === "xlayermainnet") {
+    return ""; //XLAYER MAINNET ONE MULTISIG
   }
 
   const normalTimelock = await ethers.getContract("NormalTimeLock");
