@@ -366,7 +366,7 @@
       ]
     },
     "CriticalTimelock": {
-      "address": "0xF4Bfe9F6C93eD08f5298574aa7a640Bb3d34F762",
+      "address": "0xBd06aCDEF38230F4EdA0c6FD392905Ad463e42E3",
       "abi": [
         {
           "inputs": [
@@ -982,7 +982,7 @@
       ]
     },
     "FastTrackTimelock": {
-      "address": "0xF58E03870105F799e0147f465629bD2359dfCa30",
+      "address": "0xB2E6268085E75817669479b22c73C2AfEaADF7A6",
       "abi": [
         {
           "inputs": [
@@ -1433,7 +1433,7 @@
       ]
     },
     "NormalTimelock": {
-      "address": "0xd8Adf0e83189B3cea99F8ad7320afFa8a66Ba75B",
+      "address": "0x1c4e015Bd435Efcf4f58D82B0d0fBa8fC4F81120",
       "abi": [
         {
           "inputs": [
@@ -1884,7 +1884,7 @@
       ]
     },
     "OmnichainExecutorOwner": {
-      "address": "0x22E504FaD56cc14B0Cf258C374C44384772c8A40",
+      "address": "0x4F570240FF6265Fbb1C79cE824De6408F1948913",
       "abi": [
         {
           "anonymous": false,
@@ -2321,7 +2321,7 @@
       ]
     },
     "OmnichainExecutorOwner_Implementation": {
-      "address": "0x60a67184CEe5b1fEa8Af3e064aC26723F5d9414E",
+      "address": "0x8900AEC43bdf3615fe41e6D7280073A986e89Df6",
       "abi": [
         {
           "inputs": [
@@ -2629,7 +2629,7 @@
       ]
     },
     "OmnichainExecutorOwner_Proxy": {
-      "address": "0x22E504FaD56cc14B0Cf258C374C44384772c8A40",
+      "address": "0x4F570240FF6265Fbb1C79cE824De6408F1948913",
       "abi": [
         {
           "inputs": [
@@ -2778,7 +2778,7 @@
       ]
     },
     "OmnichainGovernanceExecutor": {
-      "address": "0x954F6a553aee92CE94BdA3a8f26867E44af9B370",
+      "address": "0x0aa644c4408268E9fED5089A113470B6e706bc0C",
       "abi": [
         {
           "inputs": [
@@ -2846,6 +2846,25 @@
             }
           ],
           "name": "MessageFailed",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "oldGuardian",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newGuardian",
+              "type": "address"
+            }
+          ],
+          "name": "NewGuardian",
           "type": "event"
         },
         {
@@ -3215,19 +3234,6 @@
           "type": "function"
         },
         {
-          "inputs": [],
-          "name": "GUARDIAN",
-          "outputs": [
-            {
-              "internalType": "address",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
           "inputs": [
             {
               "internalType": "contract ITimelock[]",
@@ -3361,6 +3367,19 @@
               "internalType": "bytes",
               "name": "",
               "type": "bytes"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "guardian",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
             }
           ],
           "stateMutability": "view",
@@ -3736,6 +3755,19 @@
             }
           ],
           "name": "setConfig",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newGuardian",
+              "type": "address"
+            }
+          ],
+          "name": "setGuardian",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
