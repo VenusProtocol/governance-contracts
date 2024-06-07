@@ -54,6 +54,7 @@ export const OmnichainGovernanceExecutorNormalMethods: string[] = [
   "addTimelocks(ITimelock[])",
   "setTimelockPendingAdmin(address,uint8)",
   "retryMessage(uint16,bytes,uint64,bytes)",
+  "setGuardian(address)",
 ];
 export const OmnichainGovernanceExecutorFasttrackMethods: string[] = [
   "setReceiveVersion(uint16)",
@@ -64,6 +65,7 @@ export const OmnichainGovernanceExecutorFasttrackMethods: string[] = [
   "addTimelocks(ITimelock[])",
   "setTimelockPendingAdmin(address,uint8)",
   "retryMessage(uint16,bytes,uint64,bytes)",
+  "setGuardian(address)",
 ];
 export const OmnichainGovernanceExecutorCriticalMethods: string[] = [
   "setReceiveVersion(uint16)",
@@ -74,6 +76,7 @@ export const OmnichainGovernanceExecutorCriticalMethods: string[] = [
   "addTimelocks(ITimelock[])",
   "setTimelockPendingAdmin(address,uint8)",
   "retryMessage(uint16,bytes,uint64,bytes)",
+  "setGuardian(address)",
 ];
 export const OmnichainGovernanceExecutorMethodsForGuardian: string[] = [
   "forceResumeReceive(uint16,bytes)",
@@ -84,6 +87,7 @@ export const OmnichainGovernanceExecutorMethodsForGuardian: string[] = [
   "addTimelocks(ITimelock[])",
   "setTimelockPendingAdmin(address,uint8)",
   "retryMessage(uint16,bytes,uint64,bytes)",
+  "setGuardian(address)",
 ];
 
 type Config = {
