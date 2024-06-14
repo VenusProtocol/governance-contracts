@@ -1,3 +1,19 @@
+## [2.1.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.0.0...v2.1.0) (2024-05-14)
+
+
+### Features
+
+* add deployment for ACM on arbitrum one ([d46de6b](https://github.com/VenusProtocol/governance-contracts/commit/d46de6b976588dcbedacb65893fe97f44ec1e84f))
+* updating deployment files ([9d8ba6f](https://github.com/VenusProtocol/governance-contracts/commit/9d8ba6fa7f859caeb90382e48df236b7a37be325))
+
+## [2.1.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.0.0...v2.1.0-dev.1) (2024-05-10)
+
+
+### Features
+
+* add deployment for ACM on arbitrum one ([d46de6b](https://github.com/VenusProtocol/governance-contracts/commit/d46de6b976588dcbedacb65893fe97f44ec1e84f))
+* updating deployment files ([9d8ba6f](https://github.com/VenusProtocol/governance-contracts/commit/9d8ba6fa7f859caeb90382e48df236b7a37be325))
+
 ## [2.0.0](https://github.com/VenusProtocol/governance-contracts/compare/v1.4.0...v2.0.0) (2024-04-10)
 
 

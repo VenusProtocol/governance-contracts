@@ -1,5 +1,7 @@
 {
   "name": "arbitrumone",
   "chainId": "42161",
-  "addresses": {}
+  "addresses": {
+    "AccessControlManager": "0xD9dD18EB0cf10CbA837677f28A8F9Bda4bc2b157"
+  }
 }
