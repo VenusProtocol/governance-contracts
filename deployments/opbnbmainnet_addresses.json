@@ -3,13 +3,13 @@
   "chainId": "204",
   "addresses": {
     "AccessControlManager": "0xA60Deae5344F1152426cA440fb6552eA0e3005D6",
-    "CriticalTimelock": "0x372c3318241E430CF32f59a6905841261caE7365",
+    "CriticalTimelock": "0xA7DD2b15B24377296F11c702e758cd9141AB34AA",
     "DefaultProxyAdmin": "0xF77bD1D893F67b3EB2Cd256239c98Ba3F238fb52",
-    "FastTrackTimelock": "0x55fe000003Ad403a2F740dC1D0c58B59de7A6CD9",
-    "NormalTimelock": "0x372044f837eBBec77e64a449173732f8955c75bA",
-    "OmnichainExecutorOwner": "0xf19b44Bf78A5330354312Cbc236EA8984828b4E2",
-    "OmnichainExecutorOwner_Implementation": "0x87bEcE0223CB535a1E697386f7f2b136C8402191",
-    "OmnichainExecutorOwner_Proxy": "0xf19b44Bf78A5330354312Cbc236EA8984828b4E2",
-    "OmnichainGovernanceExecutor": "0xce4684FF3983fa461D7A8ff422Cb29021Cd13d50"
+    "FastTrackTimelock": "0xEdD04Ecef0850e834833789576A1d435e7207C0d",
+    "NormalTimelock": "0x10f504e939b912569Dca611851fDAC9E3Ef86819",
+    "OmnichainExecutorOwner": "0xf7e4c81Cf4A03d52472a4d00c3d9Ef35aF127E45",
+    "OmnichainExecutorOwner_Implementation": "0x1B346E8eFA1Ab5067D4D6eEA96Cfac0E311011Fe",
+    "OmnichainExecutorOwner_Proxy": "0xf7e4c81Cf4A03d52472a4d00c3d9Ef35aF127E45",
+    "OmnichainGovernanceExecutor": "0x82598878Adc43F1013A27484E61ad663c5d50A03"
   }
 }
