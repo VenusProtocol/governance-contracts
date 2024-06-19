@@ -86,9 +86,7 @@ export const OmnichainGovernanceExecutorMethodsForGuardian: string[] = [
   "setReceiveVersion(uint16)",
   "setConfig(uint16,uint16,uint256,bytes)",
 ];
-export const OmnichainGovernanceExecutorOwnerMethods: string[] = [
-  "transferBridgeOwnership(address)",
-];
+export const OmnichainGovernanceExecutorOwnerMethods: string[] = ["transferBridgeOwnership(address)"];
 
 type Config = {
   [key in SUPPORTED_NETWORKS]: {
