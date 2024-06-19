@@ -9,6 +9,7 @@ import {
   OmnichainGovernanceExecutorFasttrackMethods,
   OmnichainGovernanceExecutorMethodsForGuardian,
   OmnichainGovernanceExecutorNormalMethods,
+  OmnichainGovernanceExecutorOwnerMethods,
   config,
 } from "../helpers/deploy/deploymentConfig";
 import { getOmnichainProposalSender, guardian, testnetNetworks } from "../helpers/deploy/deploymentUtils";
@@ -174,6 +175,18 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       OmnichainGovernanceExecutorMethodsForGuardian,
       acmAddress,
       Guardian,
+      OmnichainExecutorOwner.address,
+    )),
+    ...(await configureAccessControls(
+      OmnichainGovernanceExecutorOwnerMethods,
+      acmAddress,
+      Guardian,
+      OmnichainExecutorOwner.address,
+    )),
+    ...(await configureAccessControls(
+      OmnichainGovernanceExecutorOwnerMethods,
+      acmAddress,
+      normalTimelockAddress,
       OmnichainExecutorOwner.address,
     )),
     {
