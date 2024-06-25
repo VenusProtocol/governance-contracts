@@ -5,6 +5,7 @@
   "author": "",
   "files": [
     "artifacts",
+    "typechain",
     "dist",
     "deploy",
     "deployments",
