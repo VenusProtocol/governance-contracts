@@ -1,0 +1,59 @@
+{
+  "contracts": [
+    {
+      "address": "0x6592b5DE802159F3E74B2486b091D11a8256ab8A",
+      "functions": [
+        "pause()",
+        "unpause()",
+        "setOracle(address,address,uint8)",
+        "enableOracle(address,uint8,bool)",
+        "setTokenConfig(TokenConfig)"
+      ]
+    },
+    {
+      "address": "0x1B2103441A0A108daD8848D8F5d790e4D402921F",
+      "functions": ["setTokenConfig(TokenConfig)", "setDirectPrice(address,uint256)"]
+    },
+    {
+      "address": "0x8455EFA4D7Ff63b8BFD96AdD889483Ea7d39B70a",
+      "functions": ["setTokenConfig(TokenConfig)", "setDirectPrice(address,uint256)"]
+    },
+    {
+      "address": "0x594810b741d136f1960141C0d8Fb4a91bE78A820",
+      "functions": ["setMaxStalePeriod(string,uint256)", "setSymbolOverride(string,string)"]
+    },
+    {
+      "address": "0x6E332fF0bB52475304494E4AE5063c1051c7d735",
+      "functions": ["setValidateConfig(ValidateConfig)"]
+    },
+    {
+      "address": "0x70d644877b7b73800E9073BCFCE981eAaB6Dbc21",
+      "functions": [
+        "setSendVersion(uint16)",
+        "setReceiveVersion(uint16)",
+        "forceResumeReceive(uint16,bytes)",
+        "setOracle(address)",
+        "setMaxDailyLimit(uint16,uint256)",
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        "setMaxDailyReceiveLimit(uint16,uint256)",
+        "pause()",
+        "unpause()",
+        "removeTrustedRemote(uint16)",
+        "dropFailedMessage(uint16,bytes,uint64)",
+        "setPrecrime(address)",
+        "setMinDstGas(uint16,uint16,uint256)",
+        "setPayloadSizeLimit(uint16,uint256)",
+        "setWhitelist(address,bool)",
+        "setConfig(uint16,uint16,uint256,bytes)",
+        "sweepToken(address,address,uint256)",
+        "updateSendAndCallEnabled(bool)",
+        "setTrustedRemoteAddress(uint16,bytes)",
+        "transferBridgeOwnership(address)"
+      ]
+    },
+    {
+      "address": "0x38B4Efab9ea1bAcD19dC81f19c4D1C2F9DeAe1B2",
+      "functions": ["", "", "", "", "", "", ""]
+    }
+  ]
+}
