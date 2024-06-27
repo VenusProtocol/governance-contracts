@@ -1,21 +1,15 @@
-import { Contract, EventFilter, Wallet, utils } from "ethers";
+import { Contract, EventFilter } from "ethers";
 import * as fs from "fs";
 import { ethers } from "hardhat";
+import hre from "hardhat";
 import inquirer from "inquirer";
 import path from "path";
 
-import arbitrumoneAddresses from "../deployments/arbitrumone.json";
-import arbitrumsepoliaAddresses from "../deployments/arbitrumsepolia.json";
-import bscmainnetAddresses from "../deployments/bscmainnet.json";
-import bsctestnetAddresses from "../deployments/bsctestnet.json";
-import ethereumAddresses from "../deployments/ethereum.json";
-import opbnbmainnetAddresses from "../deployments/opbnbmainnet.json";
-import opbnbtestnetAddresses from "../deployments/opbnbtestnet.json";
-import sepoliaAddresses from "../deployments/sepolia.json";
+import { SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
 
 require("dotenv").config();
 
-const startingBlockForACM = {
+const startingBlockForACM: Record<string, number> = {
   bscmainnet: 21968139,
   bsctestnet: 26711168,
   ethereum: 18641314,
@@ -34,109 +28,56 @@ type Event = {
   blockNumber: number;
 };
 
-inquirer
-  .prompt([
-    {
-      type: "checkbox",
-      name: "chain",
-      message: "For which chain you want to get ACM permissions",
-      choices: [
-        "bscmainnet",
-        "bsctestnet",
-        "ethereum",
-        "sepolia",
-        "opbnbtestnet",
-        "opbnbmainnet",
-        "arbitrumsepolia",
-        "arbitrumone",
-      ],
-    },
-  ])
-  .then(answer => {
-    const network = answer.chain[0];
-    console.info("Fetching Permissions for", network);
-    let acmAddress: string;
+const network = hre.network.name as SUPPORTED_NETWORKS;
 
-    switch (network) {
-      case "bscmainnet":
-        acmAddress = bscmainnetAddresses.contracts.AccessControlManager.address;
-        break;
-      case "bsctestnet":
-        acmAddress = bsctestnetAddresses.contracts.AccessControlManager.address;
-        break;
-      case "ethereum":
-        acmAddress = ethereumAddresses.contracts.AccessControlManager.address;
-        break;
-      case "sepolia":
-        acmAddress = sepoliaAddresses.contracts.AccessControlManager.address;
-        break;
-      case "opbnbtestnet":
-        acmAddress = opbnbtestnetAddresses.contracts.AccessControlManager.address;
-        break;
-      case "opbnbmainnet":
-        acmAddress = opbnbmainnetAddresses.contracts.AccessControlManager.address;
-        break;
-      case "arbitrumone":
-        acmAddress = arbitrumoneAddresses.contracts.AccessControlManager.address;
-        break;
-      case "arbitrumsepolia":
-        acmAddress = arbitrumsepoliaAddresses.contracts.AccessControlManager.address;
-        break;
-      default:
-        throw new Error("Unsupported chain selected");
-    }
-    if (network === "bscmainnet") {
-      inquirer
-        .prompt([
-          {
-            name: "functionSignatureFile",
-            message: "Please enter path of the .json file containing contract addresses and function signatures",
-            default: "./BNBPermissions.json",
-          },
-          {
-            name: "startBlock",
-            message: "Please enter starting block of given network from which you want the logs {optional}",
-            default: startingBlockForACM[network],
-          },
-          {
-            name: "endBlock",
-            message: "Please enter ending block of given network till which you want the logs {optional}",
-            default: "latest",
-          },
-        ])
-        .then(answers => {
-          const startingBlock = parseInt(answers.startBlock, 10);
-          const endingBlock = parseInt(answers.endBlock, 10);
-          getACMPermissionsOnBNB(acmAddress, answers.functionSignatureFile, startingBlock, endingBlock);
-        });
-    } else {
-      inquirer
-        .prompt([
-          {
-            name: "startBlock",
-            message: "Please enter starting block of given network from which you want the logs {optional}",
-            default: startingBlockForACM[network],
-          },
-          {
-            name: "endBlock",
-            message: "Please enter ending block of given network till which you want the logs {optional}",
-            default: "latest",
-          },
-        ])
-        .then(answers => {
-          const startingBlock = parseInt(answers.startBlock, 10);
-          const endingBlock = parseInt(answers.endBlock, 10);
-          getACMPermission(acmAddress, network, startingBlock, endingBlock);
-        });
-    }
-  })
-  .catch(error => {
-    console.log(error);
-  });
+if (network === "bscmainnet") {
+  inquirer
+    .prompt([
+      {
+        name: "functionSignatureFile",
+        message: "Please enter path of the .json file containing contract addresses and function signatures",
+        default: "./BNBPermissions.json",
+      },
+      {
+        name: "startBlock",
+        message: "Please enter starting block of given network from which you want the logs {optional}",
+        default: startingBlockForACM[network],
+      },
+      {
+        name: "endBlock",
+        message: "Please enter ending block of given network till which you want the logs {optional}",
+        default: "latest",
+      },
+    ])
+    .then((answers: { startBlock: string; endBlock: string; functionSignatureFile: string }) => {
+      const startingBlock = parseInt(answers.startBlock, 10);
+      const endingBlock = parseInt(answers.endBlock, 10);
+      getACMPermissionsOnBNB(answers.functionSignatureFile, startingBlock, endingBlock);
+    });
+} else {
+  inquirer
+    .prompt([
+      {
+        name: "startBlock",
+        message: "Please enter starting block of given network from which you want the logs {optional}",
+        default: startingBlockForACM[network],
+      },
+      {
+        name: "endBlock",
+        message: "Please enter ending block of given network till which you want the logs {optional}",
+        default: "latest",
+      },
+    ])
+    .then((answers: { startBlock: string; endBlock: string }) => {
+      const startingBlock = parseInt(answers.startBlock, 10);
+      const endingBlock = parseInt(answers.endBlock, 10);
+      getACMPermission(network, startingBlock, endingBlock);
+    });
+}
 
-async function getACMPermission(acmAddress: string, network: string, startBlock: number, endBlock: number) {
+async function getACMPermission(network: string, startBlock: number, endBlock: number) {
   try {
-    const acm = await ethers.getContractAt("AccessControlManager", acmAddress, getSigner(network));
+    const acm = await ethers.getContract("AccessControlManager");
     let eventFilter = acm.filters.PermissionGranted();
     const permissionGrantedEvents = await getPastEvents(acm, network, startBlock, endBlock, eventFilter);
     eventFilter = acm.filters.PermissionRevoked();
@@ -164,16 +105,16 @@ function getActualPermissions(grantedEvents: Event[], revokedEvents: Event[]): E
   return Array.from(permissionMap.values());
 }
 
-async function getACMPermissionsOnBNB(acmAddress: string, inputPath: string, startBlock: number, endBlock: number) {
-  const network = "bscmainnet";
+async function getACMPermissionsOnBNB(inputPath: string, startBlock: number, endBlock: number) {
   const filePath = path.join(__dirname, inputPath);
+  if (!isValidJson(filePath)) {
+    throw new Error("Invalid Json");
+  }
 
   const roleHashTable = getRoleHashTable(filePath);
   try {
-    const acm = await ethers.getContractAt("AccessControlManager", acmAddress, getSigner(network));
-
+    const acm = await ethers.getContract("AccessControlManager");
     const modifiedEvent: Event[] = [];
-
     const eventFilter = acm.filters.RoleGranted();
     const events = await getPastEvents(acm, network, startBlock, endBlock, eventFilter);
     let contractAddress: string;
@@ -210,8 +151,8 @@ async function getPastEvents(
 ) {
   const fromBlock = startBlock ? startBlock : startingBlockForACM[network];
   const toBlock = endBlock ? endBlock : await contract.provider.getBlockNumber();
-  const chunkSize = 50000;
-  const MAX_RETRIES = 5;
+  const chunkSize = 40000;
+  const MAX_RETRIES = 3;
   const BASE_DELAY = 1000;
   const events: any[] = [];
   let start = fromBlock;
@@ -256,19 +197,6 @@ function updatePermissionFile(events: Event[], network: string) {
   console.log(`File ${fileName} has been saved!`);
 }
 
-function getSigner(network: string): Wallet {
-  const url = process.env[`ARCHIVE_NODE_${network}`] as string;
-  const provider = new ethers.providers.JsonRpcProvider(url);
-  if (process.env.MNEMONIC === undefined) {
-    throw new Error("mnemonic not found");
-  }
-
-  // Get account from Mnemonics
-  const account = utils.HDNode.fromMnemonic(process.env.MNEMONIC as string).derivePath(`m/44'/60'/0'/0/${1}`);
-  const signer = new Wallet(account, provider);
-
-  return signer;
-}
 async function delay(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
@@ -280,17 +208,41 @@ function getRoleHashTable(filePath: string): Record<string, { address: string; f
   const hashTable: Record<string, { address: string; functionSig: string }> = {};
 
   for (const contract of data.contracts) {
-    for (const funcSig of contract.functions) {
-      const role = ethers.utils.solidityPack(["address", "string"], [contract.address, funcSig]);
-      const roleHash = ethers.utils.keccak256(role);
-
-      hashTable[roleHash] = {
-        address: contract.address,
-        functionSig: funcSig,
-      };
+    for (const address of contract.address) {
+      for (const funcSig of contract.functions) {
+        const role = ethers.utils.solidityPack(["address", "string"], [address, funcSig]);
+        const roleHash = ethers.utils.keccak256(role);
+        hashTable[roleHash] = {
+          address: contract.address,
+          functionSig: funcSig,
+        };
+      }
     }
   }
   return hashTable;
+}
+
+function isValidJson(filePath: string) {
+  const jsonData = fs.readFileSync(filePath, "utf8");
+  const data = JSON.parse(jsonData);
+  if (typeof data !== "object" || data === null || !Array.isArray(data.contracts)) {
+    return false;
+  }
+  for (const contract of data.contracts) {
+    if (typeof contract !== "object" || contract === null) {
+      return false;
+    }
+    if (!Array.isArray(contract.address) || !Array.isArray(contract.functions)) {
+      return false;
+    }
+    if (!contract.address.every((addr: any) => typeof addr === "string" && addr.length === 42)) {
+      return false;
+    }
+    if (!contract.functions.every((func: any) => typeof func === "string" && func === func.trim())) {
+      return false;
+    }
+  }
+  return true;
 }
 
 async function fetchWithExponentialBackoff(
