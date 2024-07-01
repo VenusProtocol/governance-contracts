@@ -2,6 +2,14 @@
   "name": "arbitrumsepolia",
   "chainId": "421614",
   "addresses": {
-    "AccessControlManager": "0xa36AD96441cB931D8dFEAAaC97D3FaB4B39E590F"
+    "AccessControlManager": "0xa36AD96441cB931D8dFEAAaC97D3FaB4B39E590F",
+    "CriticalTimelock": "0x0b32Be083f7041608E023007e7802430396a2123",
+    "DefaultProxyAdmin": "0xA78A1Df376c3CEeBC5Fab574fe6EdDbbF76fd03e",
+    "FastTrackTimelock": "0x14642991184F989F45505585Da52ca6A6a7dD4c8",
+    "NormalTimelock": "0x794BCA78E606f3a462C31e5Aba98653Efc1322F8",
+    "OmnichainExecutorOwner": "0xfCA70dd553b7dF6eB8F813CFEA6a9DD039448878",
+    "OmnichainExecutorOwner_Implementation": "0x0314cfFdE77F6Bb5259B8d0fa5F0e9a9D4dB70dB",
+    "OmnichainExecutorOwner_Proxy": "0xfCA70dd553b7dF6eB8F813CFEA6a9DD039448878",
+    "OmnichainGovernanceExecutor": "0xcf3e6972a8e9c53D33b642a2592938944956f138"
   }
 }
