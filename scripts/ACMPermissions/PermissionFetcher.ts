@@ -45,7 +45,7 @@ export class PermissionFetcher {
   roleHashTable: Record<string, { address: string; functionSig: string }>;
   bnbPermissionFile: string;
   existingPermissions: Permission[];
-  initial: boolean
+  initial: boolean;
 
   constructor(network: any, backOffParams: any[], bnbPermissionFile: string) {
     this.network = network;
@@ -57,7 +57,6 @@ export class PermissionFetcher {
     const { permissions: existingPermissions } = this.getPermissionsJson();
     this.existingPermissions = existingPermissions;
     this.initial = true;
-
   }
 
   async getPastEvents(startBlock: number, endBlock: number) {
@@ -148,7 +147,6 @@ export class PermissionFetcher {
         start = endBlock + 1;
       }
     } catch (err: any) {
-
       throw new Error(err.toString());
     }
   }
@@ -176,21 +174,14 @@ export class PermissionFetcher {
         } else if (event.type === PermissionsEnum.Revoked) {
           remove(permission.addresses, address => address === event.account);
         }
-        this.permissionsMap[hash].addresses = permission.addresses
+        this.permissionsMap[hash].addresses = permission.addresses;
       }
     });
     this.storeInJson(height);
-
   }
-  public storeInJson(height: string): void {
-    let permissions
-    if(this.initial){
-       permissions = this.existingPermissions.concat(Object.values(this.permissionsMap));
-    }else{
-      permissions = Object.values(this.permissionsMap)
-    }
+  public storeInJson(height: string): void {    
     const snapshot: Snapshot = {
-      permissions: permissions ,
+      permissions: this.existingPermissions.concat(Object.values(this.permissionsMap)),
       height: height,
     };
 

@@ -29,6 +29,6 @@ inquirer
   .then((answers: { startBlock: string; endBlock: string; BNBFunctionSignatureFile: string }) => {
     const startingBlock = parseInt(answers.startBlock, 10);
     const endingBlock = parseInt(answers.endBlock, 10);
-    const permissionFetcher = new PermissionFetcher(network, [], answers.BNBFunctionSignatureFile );
+    const permissionFetcher = new PermissionFetcher(network, [], answers.BNBFunctionSignatureFile);
     permissionFetcher.getPastEvents(startingBlock, endingBlock);
   });
