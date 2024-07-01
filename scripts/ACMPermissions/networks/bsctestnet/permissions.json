@@ -1,0 +1,379 @@
+{
+  "permissions": [
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setCollateralFactor(address,uint256,uint256)",
+      "addresses": [
+        "0xF57fdd25224807B1113f40E4F95c5f625fB458E2",
+        "0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B",
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D",
+        "0xC85491616Fa949E048F3aAc39fbf5b0703800667"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setMarketSupplyCaps(address[],uint256[])",
+      "addresses": [
+        "0xF57fdd25224807B1113f40E4F95c5f625fB458E2",
+        "0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B",
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D",
+        "0xC85491616Fa949E048F3aAc39fbf5b0703800667"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setMarketBorrowCaps(address[],uint256[])",
+      "addresses": [
+        "0xF57fdd25224807B1113f40E4F95c5f625fB458E2",
+        "0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B",
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D",
+        "0xC85491616Fa949E048F3aAc39fbf5b0703800667"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setLiquidationIncentive(uint256)",
+      "addresses": [
+        "0xF57fdd25224807B1113f40E4F95c5f625fB458E2",
+        "0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B",
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0xC85491616Fa949E048F3aAc39fbf5b0703800667"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setCloseFactor(uint256)",
+      "addresses": [
+        "0xF57fdd25224807B1113f40E4F95c5f625fB458E2",
+        "0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B",
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0xC85491616Fa949E048F3aAc39fbf5b0703800667"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setMinLiquidatableCollateral(uint256)",
+      "addresses": [
+        "0xF57fdd25224807B1113f40E4F95c5f625fB458E2",
+        "0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B",
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0xC85491616Fa949E048F3aAc39fbf5b0703800667"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "supportMarket(address)",
+      "addresses": [
+        "0xF57fdd25224807B1113f40E4F95c5f625fB458E2",
+        "0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B",
+        "0xC85491616Fa949E048F3aAc39fbf5b0703800667"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "swapPoolsAssets(address[],uint256[],address[][])",
+      "addresses": [
+        "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706"
+      ]
+    },
+    {
+      "contractAddress": "0xF57fdd25224807B1113f40E4F95c5f625fB458E2",
+      "functionSignature": "addPool(string,address,uint256,uint256,uint256)",
+      "addresses": [
+        "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706"
+      ]
+    },
+    {
+      "contractAddress": "0xF57fdd25224807B1113f40E4F95c5f625fB458E2",
+      "functionSignature": "addMarket(AddMarketInput)",
+      "addresses": [
+        "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setRewardTokenSpeeds(address[],uint256[],uint256[])",
+      "addresses": [
+        "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setActionsPaused(address[],uint256[],bool)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "addPool(string,address,uint256,uint256,uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "addMarket(AddMarketInput)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setPoolName(address,string)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "updatePoolMetadata(address,VenusPoolMetaData)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setProtocolSeizeShare(uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setReserveFactor(uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setInterestRateModel(address)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x2822E0Ac03e64F7BA26e0aCb79EC0B6336e9CA2A",
+      "functionSignature": "setFeeIn(uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x2822E0Ac03e64F7BA26e0aCb79EC0B6336e9CA2A",
+      "functionSignature": "setFeeOut(uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x2822E0Ac03e64F7BA26e0aCb79EC0B6336e9CA2A",
+      "functionSignature": "setVaiMintCap(uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x2822E0Ac03e64F7BA26e0aCb79EC0B6336e9CA2A",
+      "functionSignature": "setComptroller(address)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x2822E0Ac03e64F7BA26e0aCb79EC0B6336e9CA2A",
+      "functionSignature": "setVenusTreasury(address)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x2822E0Ac03e64F7BA26e0aCb79EC0B6336e9CA2A",
+      "functionSignature": "pause()",
+      "addresses": [
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x2822E0Ac03e64F7BA26e0aCb79EC0B6336e9CA2A",
+      "functionSignature": "resume()",
+      "addresses": [
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0xB58BFDCE610042311Dc0e034a80Cc7776c1D68f5",
+      "functionSignature": "setSymbolOverride(string,string)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setLastRewardingBlock(address[],uint32[],uint32[])",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x23a73971A6B9f6580c048B9CB188869B2A2aA2aD",
+      "functionSignature": "removeMarket(address)",
+      "addresses": []
+    },
+    {
+      "contractAddress": "0xC85491616Fa949E048F3aAc39fbf5b0703800667",
+      "functionSignature": "removeMarket(address,address)",
+      "addresses": []
+    },
+    {
+      "contractAddress": "0x55AEABa76ecf144031Ef64E222166eb28Cb4865F",
+      "functionSignature": "restrictLiquidation(address)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x55AEABa76ecf144031Ef64E222166eb28Cb4865F",
+      "functionSignature": "unrestrictLiquidation(address)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x55AEABa76ecf144031Ef64E222166eb28Cb4865F",
+      "functionSignature": "addToAllowlist(address,address)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x55AEABa76ecf144031Ef64E222166eb28Cb4865F",
+      "functionSignature": "removeFromAllowlist(address,address)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x55AEABa76ecf144031Ef64E222166eb28Cb4865F",
+      "functionSignature": "setTreasuryPercent(uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x55AEABa76ecf144031Ef64E222166eb28Cb4865F",
+      "functionSignature": "setMinLiquidatableVAI(uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0x55AEABa76ecf144031Ef64E222166eb28Cb4865F",
+      "functionSignature": "pauseForceVAILiquidate()",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x55AEABa76ecf144031Ef64E222166eb28Cb4865F",
+      "functionSignature": "resumeForceVAILiquidate()",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x55AEABa76ecf144031Ef64E222166eb28Cb4865F",
+      "functionSignature": "setPendingRedeemChunkLength(uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0xB21E69eef4Bc1D64903fa28D9b32491B1c0786F1",
+      "functionSignature": "setFeeIn(uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0xB21E69eef4Bc1D64903fa28D9b32491B1c0786F1",
+      "functionSignature": "setFeeOut(uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0xB21E69eef4Bc1D64903fa28D9b32491B1c0786F1",
+      "functionSignature": "setVaiMintCap(uint256)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0xB21E69eef4Bc1D64903fa28D9b32491B1c0786F1",
+      "functionSignature": "setOracle(address)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0xB21E69eef4Bc1D64903fa28D9b32491B1c0786F1",
+      "functionSignature": "setVenusTreasury(address)",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327"
+      ]
+    },
+    {
+      "contractAddress": "0xB21E69eef4Bc1D64903fa28D9b32491B1c0786F1",
+      "functionSignature": "pause()",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0xB21E69eef4Bc1D64903fa28D9b32491B1c0786F1",
+      "functionSignature": "resume()",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    }
+  ],
+  "height": 32236459
+}
