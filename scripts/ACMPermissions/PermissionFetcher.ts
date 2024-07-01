@@ -42,10 +42,9 @@ export class PermissionFetcher {
   mdFilePath: string;
   jsonFilePath: string;
   permissionsMap: Record<string, Permission> = {};
-  roleHashTable: Record<string, { address: string; functionSig: string }>;
+  roleHashTable: Record<string, Role>;
   bnbPermissionFile: string;
   existingPermissions: Permission[];
-  initial: boolean;
 
   constructor(network: any, backOffParams: any[], bnbPermissionFile: string) {
     this.network = network;
@@ -54,9 +53,9 @@ export class PermissionFetcher {
     this.jsonFilePath = path.join(__dirname, "networks", this.network, "permissions.json");
     this.bnbPermissionFile = path.join(__dirname, bnbPermissionFile);
     this.roleHashTable = this.getRoleHashTable(this.bnbPermissionFile);
-    const { permissions: existingPermissions } = this.getPermissionsJson();
+    const { permissions: existingPermissions } = this.getPermissionsJson(); // into permissionMap
     this.existingPermissions = existingPermissions;
-    this.initial = true;
+    this.addPrevPermissionsInMap();
   }
 
   async getPastEvents(startBlock: number, endBlock: number) {
@@ -112,26 +111,33 @@ export class PermissionFetcher {
           events.forEach(event => {
             const role = ethers.utils.defaultAbiCoder.decode(["bytes32"], event.topics[1])[0];
             const account = ethers.utils.defaultAbiCoder.decode(["address"], event.topics[2])[0];
-            if (this.roleHashTable[role] !== undefined) {
-              contractAddress = this.roleHashTable[role].address;
-              functionSig = this.roleHashTable[role].functionSig;
-            }
-            const eventType = event.topics[0] === topics[0] ? PermissionsEnum.Granted : PermissionsEnum.Revoked;
+            const defaultAdminRole = "0x0000000000000000000000000000000000000000000000000000000000000000";
+            if (this.roleHashTable[role] !== undefined || role === defaultAdminRole) {
+              if (role === defaultAdminRole) {
+                contractAddress = acm.address;
+                functionSig = "DFAULT_ADMIN_ROLE";
+              } else {
+                contractAddress = this.roleHashTable[role].contractAddress;
+                functionSig = this.roleHashTable[role].functionSignature;
+              }
+              const eventType = event.topics[0] === topics[0] ? PermissionsEnum.Granted : PermissionsEnum.Revoked;
 
-            modifiedEvent.push({
-              contractAddress: contractAddress,
-              functionSignature: functionSig,
-              account: account,
-              type: eventType,
-            });
-            height = event.blockNumber;
+              modifiedEvent.push({
+                contractAddress: contractAddress,
+                functionSignature: functionSig,
+                account: account,
+                type: eventType,
+              });
+              height = event.blockNumber;
+              this.processEvents(modifiedEvent, height);
+            } else {
+              console.log(`Missing role ${role} in mapping`);
+            }
           });
-          this.processEvents(modifiedEvent, height);
         } else {
           events.forEach(event => {
             const data = event.data;
             const { account, contractAddress, functionSignature } = this.decodeLogs(data);
-
             const eventType = event.topics[0] === topics[0] ? PermissionsEnum.Granted : PermissionsEnum.Revoked;
             modifiedEvent.push({
               contractAddress: contractAddress,
@@ -141,8 +147,8 @@ export class PermissionFetcher {
             });
             height = event.blockNumber;
           });
+          this.processEvents(modifiedEvent, height);
         }
-        this.processEvents(modifiedEvent, height);
         console.log(`Fetched events from block ${start} to ${endBlock}`);
         start = endBlock + 1;
       }
@@ -153,35 +159,36 @@ export class PermissionFetcher {
 
   processEvents(events: Event[], height: string) {
     events.forEach(event => {
-      if (event.contractAddress && event.functionSignature) {
-        const hash = ethers.utils.solidityKeccak256(
-          ["string", "string"],
-          [event.contractAddress, event.functionSignature],
-        );
+      const hash = this.getHash(event.contractAddress, event.functionSignature);
 
-        if (!this.permissionsMap[hash]) {
-          this.permissionsMap[hash] = {
-            contractAddress: event.contractAddress,
-            functionSignature: event.functionSignature,
-            addresses: [],
-          };
-        }
-
-        const permission = this.permissionsMap[hash];
-
-        if (event.type === PermissionsEnum.Granted) {
-          permission.addresses = union(permission.addresses, [event.account]);
-        } else if (event.type === PermissionsEnum.Revoked) {
-          remove(permission.addresses, address => address === event.account);
-        }
-        this.permissionsMap[hash].addresses = permission.addresses;
+      if (!this.permissionsMap[hash]) {
+        this.permissionsMap[hash] = {
+          contractAddress: event.contractAddress,
+          functionSignature: event.functionSignature,
+          addresses: [],
+        };
       }
+      const permission = this.permissionsMap[hash];
+
+      if (event.type === PermissionsEnum.Granted) {
+        permission.addresses = union(permission.addresses, [event.account]);
+      } else if (event.type === PermissionsEnum.Revoked) {
+        remove(permission.addresses, address => address === event.account);
+      }
+      this.permissionsMap[hash].addresses = permission.addresses;
     });
     this.storeInJson(height);
   }
-  public storeInJson(height: string): void {    
+  private addPrevPermissionsInMap() {
+    this.existingPermissions.forEach(permission => {
+      const hash = this.getHash(permission.contractAddress, permission.functionSignature);
+      this.permissionsMap[hash] = permission;
+    });
+  }
+
+  private storeInJson(height: string): void {
     const snapshot: Snapshot = {
-      permissions: this.existingPermissions.concat(Object.values(this.permissionsMap)),
+      permissions: Object.values(this.permissionsMap),
       height: height,
     };
 
@@ -191,7 +198,6 @@ export class PermissionFetcher {
     } catch (error) {
       console.error(`Error writing to ${this.jsonFilePath}:`, error);
     }
-    this.initial = false;
   }
 
   private decodeLogs(data: string): { account: string; contractAddress: string; functionSignature: string } {
@@ -205,11 +211,11 @@ export class PermissionFetcher {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  private getRoleHashTable(filePath: string): Record<string, { address: string; functionSig: string }> {
+  private getRoleHashTable(filePath: string): Record<string, Role> {
     const jsonData = fs.readFileSync(filePath, "utf8");
     const data = JSON.parse(jsonData);
 
-    const hashTable: Record<string, { address: string; functionSig: string }> = {};
+    const hashTable: Record<string, Role> = {};
 
     for (const contract of data.contracts) {
       for (const address of contract.address) {
@@ -217,8 +223,8 @@ export class PermissionFetcher {
           const role = ethers.utils.solidityPack(["address", "string"], [address, funcSig]);
           const roleHash = ethers.utils.keccak256(role);
           hashTable[roleHash] = {
-            address: contract.address,
-            functionSig: funcSig,
+            contractAddress: address,
+            functionSignature: funcSig,
           };
         }
       }
@@ -239,7 +245,7 @@ export class PermissionFetcher {
       if (!Array.isArray(contract.address) || !Array.isArray(contract.functions)) {
         return false;
       }
-      if (!contract.address.every((addr: any) => typeof addr === "string" && addr.length === 42)) {
+      if (!contract.address.every((addr: any) => typeof addr === "string" && addr === addr.trim())) {
         return false;
       }
       if (!contract.functions.every((func: any) => typeof func === "string" && func === func.trim())) {
@@ -302,5 +308,10 @@ export class PermissionFetcher {
       return parseInt(lastMatch[1], 10);
     }
     return startingBlockForACM[this.network];
+  }
+
+  private getHash(contractAddress: string, functionSignature: string): string {
+    const hash = ethers.utils.solidityKeccak256(["string", "string"], [contractAddress, functionSignature]);
+    return hash;
   }
 }
