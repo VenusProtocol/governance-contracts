@@ -1,10 +1,9 @@
-import { Contract, EventFilter } from "ethers";
 import * as fs from "fs";
 import { ethers } from "hardhat";
 import { remove, union } from "lodash";
 import path from "path";
 
-import { startingBlockForACM } from "./config";
+import { addressMap, startingBlockForACM } from "./config";
 
 require("dotenv").config();
 
@@ -91,8 +90,8 @@ export class PermissionFetcher {
         acmAddress,
         topics: [topics],
       };
+      let height = this.getLastBlockNumber();
       while (start <= toBlock) {
-        let height: string;
         const endBlock = Math.min(start + chunkSize - 1, toBlock);
         const chunkEvents = await this.fetchWithExponentialBackoff(
           () => acm.queryFilter(eventFilter, start, endBlock),
@@ -152,6 +151,7 @@ export class PermissionFetcher {
         console.log(`Fetched events from block ${start} to ${endBlock}`);
         start = endBlock + 1;
       }
+      this.mapAddresses();
     } catch (err: any) {
       throw new Error(err.toString());
     }
@@ -191,7 +191,6 @@ export class PermissionFetcher {
       permissions: Object.values(this.permissionsMap),
       height: height,
     };
-
     try {
       fs.writeFileSync(this.jsonFilePath, JSON.stringify(snapshot, null, 2), "utf8");
       console.log(`Snapshot successfully written to ${this.jsonFilePath}`);
@@ -255,6 +254,25 @@ export class PermissionFetcher {
     return true;
   }
 
+  private mapAddresses () {
+    try {
+      const jsonData = fs.readFileSync(this.jsonFilePath, 'utf8');
+      const data = JSON.parse(jsonData);
+  
+      data.permissions.forEach((permission: { addresses: any[]; }) => {
+        permission.addresses = permission.addresses.map(address => {
+          return addressMap[address] || address;
+        });
+      });
+  
+      fs.writeFileSync(this.jsonFilePath, JSON.stringify(data, null, 2), 'utf8');
+      console.log(`File ${this.jsonFilePath} has been updated with mapped addresses!`);
+    } catch (error) {
+      console.error(`Error processing ${this.jsonFilePath}:`, error);
+    }
+  }
+  
+  
   private async fetchWithExponentialBackoff(
     fetchFunction: () => Promise<any>,
     retries: number,
