@@ -1,7 +1,9 @@
+import { Contract } from "ethers";
 import * as fs from "fs";
 import { ethers } from "hardhat";
 import { remove, union } from "lodash";
 import path from "path";
+import { BackOffPolicy, ExponentialBackoffStrategy, Retryable } from "typescript-retry-decorator";
 
 import { addressMap, startingBlockForACM } from "./config";
 
@@ -66,8 +68,6 @@ export class PermissionFetcher {
     const fromBlock = startBlock ? startBlock : startingBlockForACM[this.network];
     const toBlock = endBlock ? endBlock : await ethers.provider.getBlockNumber();
     const chunkSize = 40000;
-    const MAX_RETRIES = 3;
-    const BASE_DELAY = 1000;
     const events: any[] = [];
 
     let start = fromBlock;
@@ -100,11 +100,8 @@ export class PermissionFetcher {
       let height = this.getLastBlockNumber().toString();
       while (start <= toBlock) {
         const endBlock = Math.min(start + chunkSize - 1, toBlock);
-        const chunkEvents = await this.fetchWithExponentialBackoff(
-          () => acm.queryFilter(eventFilter, start, endBlock),
-          MAX_RETRIES,
-          BASE_DELAY,
-        );
+
+        const chunkEvents = await this.fetchEvents(acm, eventFilter, start, endBlock);
         events.push(...chunkEvents);
 
         if (this.network === "bscmainnet") {
@@ -136,15 +133,13 @@ export class PermissionFetcher {
               });
               height = event.blockNumber.toString();
               this.processEvents(modifiedEvent, height);
-            }  else {
+            } else {
               if (!this.missingRoleMap[role]) {
                 this.missingRoleMap[role] = { transactions: [] };
               }
-              console.log(event.transactionHash, "[[[[[[[[[[[[[[[[[[[[[[[[");
-              this.missingRoleMap[role].transactions = union(
-                this.missingRoleMap[role].transactions,
-                [event.transactionHash],
-              );
+              this.missingRoleMap[role].transactions = union(this.missingRoleMap[role].transactions, [
+                event.transactionHash,
+              ]);
               const missingRoleFile = path.join(__dirname, "networks", this.network, "BNBMissingRole.json");
               fs.writeFileSync(missingRoleFile, JSON.stringify(this.missingRoleMap, null, 2), "utf8");
               console.log(`Missing role ${role}, added in ${missingRoleFile}`);
@@ -314,24 +309,22 @@ export class PermissionFetcher {
     }
   }
 
-  private async fetchWithExponentialBackoff(
-    fetchFunction: () => Promise<any>,
-    retries: number,
-    baseDelay: number,
+  @Retryable({
+    maxAttempts: 3,
+    backOffPolicy: BackOffPolicy.ExponentialBackOffPolicy,
+    backOff: 1000,
+    exponentialOption: { maxInterval: 4000, multiplier: 2, backoffStrategy: ExponentialBackoffStrategy.FullJitter },
+  })
+  private async fetchEvents(
+    acm: Contract,
+    eventFilter: {
+      acmAddress: string;
+      topics: string[][];
+    },
+    start: number,
+    endBlock: number,
   ): Promise<any> {
-    for (let attempt = 0; attempt < retries; attempt++) {
-      try {
-        return await fetchFunction();
-      } catch (error) {
-        if (attempt < retries - 1) {
-          const delayTime = baseDelay * Math.pow(2, attempt);
-          console.warn(`Attempt ${attempt + 1} failed. Retrying in ${delayTime}ms...`);
-          await this.delay(delayTime);
-        } else {
-          throw error;
-        }
-      }
-    }
+    return await acm.queryFilter(eventFilter, start, endBlock);
   }
 
   private getPermissionsJson(): { permissions: Permission[]; height: string } {

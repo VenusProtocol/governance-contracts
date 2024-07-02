@@ -293,9 +293,8 @@
       "functions": ["pause()", "resume()", "withdrawBep20(address,address,uint256)", "setLastAccruingBlock(uint256)"]
     },
     {
-      "address":["0x0667Eed0a0aAb930af74a3dfeDD263A73994f216"],
-      "functions":["pause()", "resume()"]
+      "address": ["0x0667Eed0a0aAb930af74a3dfeDD263A73994f216"],
+      "functions": ["pause()", "resume()"]
     }
-
   ]
 }
