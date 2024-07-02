@@ -19,7 +19,11 @@
         "0x8455EFA4D7Ff63b8BFD96AdD889483Ea7d39B70a",
         "0x0000000000000000000000000000000000000000000000000000000000000000"
       ],
-      "functions": ["setTokenConfig(TokenConfig)", "setDirectPrice(address,uint256)"]
+      "functions": [
+        "setTokenConfig(TokenConfig)",
+        "setDirectPrice(address,uint256)",
+        "setUnderlyingPrice(address,uint256)"
+      ]
     },
     {
       "address": [
@@ -38,6 +42,10 @@
     {
       "address": ["0xb893E38162f55fb80B18Aa44da76FaDf8E9B2262"],
       "functions": ["setUnderlyingPythOracle(address)", "setTokenConfig(TokenConfig)"]
+    },
+    {
+      "address": ["0xea2f042e1A4f057EF8A5220e57733AD747ea8867"],
+      "functions": ["setTokenConfig(TokenConfig)"]
     },
 
     {
@@ -104,7 +112,8 @@
         "setMarketSupplyCaps(address[],uint256[])",
         "setActionsPaused(address[],uint256[],bool)",
         "setMinLiquidatableCollateral(uint256)",
-        "setForcedLiquidation(address,bool)"
+        "setForcedLiquidation(address,bool)",
+        "supportMarket(address)"
       ]
     },
     {
@@ -244,6 +253,49 @@
         "0x0000000000000000000000000000000000000000000000000000000000000000"
       ],
       "functions": ["addTokenConverter(address)", "removeTokenConverter(address)"]
+    },
+    {
+      "address": ["0x051100480289e704d20e9DB4804837068f3f9204"],
+      "functions": [
+        "pause()",
+        "resume()",
+        "add(address,uint256,address,uint256,uint256)",
+        "set(address,uint256,uint256)",
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
+        "setRewardAmountPerBlock(address,uint256)"
+      ]
+    },
+    {
+      "address": ["0x004065D34C6b18cE4370ced1CeBDE94865DbFAFE"],
+      "functions": ["setBaseRate(uint256)", "setFloatRate(uint256)", "setMintCap(uint256)"]
+    },
+    {
+      "address": ["0x0870793286aada55d39ce7f82fb2766e8004cf43"],
+      "functions": [
+        "restrictLiquidation(address)",
+        "unrestrictLiquidation(address)",
+        "addToAllowlist(address,address)",
+        "removeFromAllowlist(address,address)",
+        "setTreasuryPercent(uint256)",
+        "setMinLiquidatableVAI(uint256)",
+        "setPendingRedeemChunkLength(uint256)",
+        "pauseForceVAILiquidate()",
+        "resumeForceVAILiquidate()"
+      ]
+    },
+    {
+      "address": ["0x0000000000000000000000000000000000000000000000000000000000000000"],
+      "functions": ["updateJumpRateModel(uint256,uint256,uint256,uint256)"]
+    },
+    {
+      "address": ["0x98bF4786D72AAEF6c714425126Dd92f149e3F334"],
+      "functions": ["pause()", "resume()", "withdrawBep20(address,address,uint256)", "setLastAccruingBlock(uint256)"]
+    },
+    {
+      "address":["0x0667Eed0a0aAb930af74a3dfeDD263A73994f216"],
+      "functions":["pause()", "resume()"]
     }
+
   ]
 }

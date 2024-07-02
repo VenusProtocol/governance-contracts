@@ -11,7 +11,11 @@ enum PermissionsEnum {
   "Granted",
   "Revoked",
 }
-
+type MissingRoleMap = {
+  [role: string]: {
+    transactions: string[];
+  };
+};
 type Snapshot = {
   permissions: Permission[];
   height: string;
@@ -41,6 +45,7 @@ export class PermissionFetcher {
   mdFilePath: string;
   jsonFilePath: string;
   permissionsMap: Record<string, Permission> = {};
+  missingRoleMap: MissingRoleMap = {};
   roleHashTable: Record<string, Role>;
   bnbPermissionFile: string;
   existingPermissions: Permission[];
@@ -52,7 +57,7 @@ export class PermissionFetcher {
     this.jsonFilePath = path.join(__dirname, "networks", this.network, "permissions.json");
     this.bnbPermissionFile = path.join(__dirname, bnbPermissionFile);
     this.roleHashTable = this.getRoleHashTable(this.bnbPermissionFile);
-    const { permissions: existingPermissions } = this.getPermissionsJson(); // into permissionMap
+    const { permissions: existingPermissions } = this.getPermissionsJson();
     this.existingPermissions = existingPermissions;
     this.addPrevPermissionsInMap();
   }
@@ -67,6 +72,8 @@ export class PermissionFetcher {
 
     let start = fromBlock;
     const lastStoredBlock = this.getLastBlockNumber();
+    console.log("StartBlock:", lastStoredBlock);
+
     if (start < lastStoredBlock) {
       start = lastStoredBlock + 1;
     }
@@ -90,7 +97,7 @@ export class PermissionFetcher {
         acmAddress,
         topics: [topics],
       };
-      let height = this.getLastBlockNumber();
+      let height = this.getLastBlockNumber().toString();
       while (start <= toBlock) {
         const endBlock = Math.min(start + chunkSize - 1, toBlock);
         const chunkEvents = await this.fetchWithExponentialBackoff(
@@ -127,10 +134,20 @@ export class PermissionFetcher {
                 account: account,
                 type: eventType,
               });
-              height = event.blockNumber;
+              height = event.blockNumber.toString();
               this.processEvents(modifiedEvent, height);
-            } else {
-              console.log(`Missing role ${role} in mapping`);
+            }  else {
+              if (!this.missingRoleMap[role]) {
+                this.missingRoleMap[role] = { transactions: [] };
+              }
+              console.log(event.transactionHash, "[[[[[[[[[[[[[[[[[[[[[[[[");
+              this.missingRoleMap[role].transactions = union(
+                this.missingRoleMap[role].transactions,
+                [event.transactionHash],
+              );
+              const missingRoleFile = path.join(__dirname, "networks", this.network, "BNBMissingRole.json");
+              fs.writeFileSync(missingRoleFile, JSON.stringify(this.missingRoleMap, null, 2), "utf8");
+              console.log(`Missing role ${role}, added in ${missingRoleFile}`);
             }
           });
         } else {
@@ -144,7 +161,7 @@ export class PermissionFetcher {
               account: account,
               type: eventType,
             });
-            height = event.blockNumber;
+            height = event.blockNumber.toString();
           });
           this.processEvents(modifiedEvent, height);
         }
@@ -152,6 +169,7 @@ export class PermissionFetcher {
         start = endBlock + 1;
       }
       this.mapAddresses();
+      this.updateMDPermissionFile();
     } catch (err: any) {
       throw new Error(err.toString());
     }
@@ -178,6 +196,30 @@ export class PermissionFetcher {
       this.permissionsMap[hash].addresses = permission.addresses;
     });
     this.storeInJson(height);
+  }
+
+  private updateMDPermissionFile() {
+    try {
+      const jsonData = fs.readFileSync(this.jsonFilePath, "utf8");
+      const data = JSON.parse(jsonData);
+
+      let mdContent = "# Permissions\n\n";
+
+      data.permissions.forEach((permission: Permission) => {
+        mdContent += `## Contract Address: ${permission.contractAddress}\n`;
+        mdContent += `- **Function Signature**: \`${permission.functionSignature}\`\n`;
+        mdContent += `- **Addresses**:\n`;
+        permission.addresses.forEach(address => {
+          mdContent += `  - \`${address}\`\n`;
+        });
+        mdContent += "\n";
+      });
+
+      fs.writeFileSync(this.mdFilePath, mdContent, "utf8");
+      console.log(`Markdown file has been written to ${this.mdFilePath}`);
+    } catch (error) {
+      console.error(`Error processing ${this.jsonFilePath}:`, error);
+    }
   }
   private addPrevPermissionsInMap() {
     this.existingPermissions.forEach(permission => {
@@ -254,25 +296,24 @@ export class PermissionFetcher {
     return true;
   }
 
-  private mapAddresses () {
+  private mapAddresses() {
     try {
-      const jsonData = fs.readFileSync(this.jsonFilePath, 'utf8');
+      const jsonData = fs.readFileSync(this.jsonFilePath, "utf8");
       const data = JSON.parse(jsonData);
-  
-      data.permissions.forEach((permission: { addresses: any[]; }) => {
+
+      data.permissions.forEach((permission: { addresses: any[] }) => {
         permission.addresses = permission.addresses.map(address => {
           return addressMap[address] || address;
         });
       });
-  
-      fs.writeFileSync(this.jsonFilePath, JSON.stringify(data, null, 2), 'utf8');
+
+      fs.writeFileSync(this.jsonFilePath, JSON.stringify(data, null, 2), "utf8");
       console.log(`File ${this.jsonFilePath} has been updated with mapped addresses!`);
     } catch (error) {
       console.error(`Error processing ${this.jsonFilePath}:`, error);
     }
   }
-  
-  
+
   private async fetchWithExponentialBackoff(
     fetchFunction: () => Promise<any>,
     retries: number,
@@ -313,17 +354,10 @@ export class PermissionFetcher {
   private getLastBlockNumber(): number {
     const fileContent = fs.readFileSync(this.jsonFilePath, "utf8");
 
-    const blockNumberRegex = /"height":\s*(\d+)/g;
-    let match;
-    let lastMatch;
-
-    while ((match = blockNumberRegex.exec(fileContent)) !== null) {
-      lastMatch = match;
-    }
-    if (lastMatch) {
-      console.log("Last Block Number found:", parseInt(lastMatch[1], 10));
-
-      return parseInt(lastMatch[1], 10);
+    const blockNumberRegex = /"height":\s*"(\d+)"/g;
+    const match = blockNumberRegex.exec(fileContent);
+    if (match) {
+      return parseInt(match[1], 10);
     }
     return startingBlockForACM[this.network];
   }
