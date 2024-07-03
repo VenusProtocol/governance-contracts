@@ -36,11 +36,6 @@
       "addresses": ["NormalTimelock", "Guardian 2", "FastTrackTimelock", "CriticalTimelock"]
     },
     {
-      "contractAddress": "0xfD36E2c2a6789Db23113685031d7F16329158384",
-      "functionSignature": "_setActionsPaused(address[],uint256[],bool)",
-      "addresses": []
-    },
-    {
       "contractAddress": "0x004065D34C6b18cE4370ced1CeBDE94865DbFAFE",
       "functionSignature": "setBaseRate(uint256)",
       "addresses": ["FastTrackTimelock", "NormalTimelock", "CriticalTimelock"]
@@ -845,6 +840,11 @@
       "contractAddress": "0x36a69dE601381be7b0DcAc5D5dD058825505F8f6",
       "functionSignature": "setTrustedRemoteAddress(uint16,bytes)",
       "addresses": ["NormalTimelock"]
+    },
+    {
+      "contractAddress": "0x36a69dE601381be7b0DcAc5D5dD058825505F8f6",
+      "functionSignature": "setMaxDailyLimit(uint16,uint256)",
+      "addresses": ["NormalTimelock", "FastTrackTimelock", "CriticalTimelock", "Guardian 2"]
     },
     {
       "contractAddress": "0x36a69dE601381be7b0DcAc5D5dD058825505F8f6",

@@ -386,7 +386,7 @@
         "setTrustedRemoteAddress(uint16,bytes)",
         "setConfig(uint16,uint16,uint256,bytes)",
         "setSendVersion(uint16)",
-        "etMaxDailyLimit(uint16,uint256)",
+        "setMaxDailyLimit(uint16,uint256)",
         "pause()",
         "unpause()"
       ]

@@ -54,11 +54,6 @@
   - `FastTrackTimelock`
   - `CriticalTimelock`
 
-## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
-
-- **Function Signature**: `_setActionsPaused(address[],uint256[],bool)`
-- **Addresses**:
-
 ## Contract Address: 0x004065D34C6b18cE4370ced1CeBDE94865DbFAFE
 
 - **Function Signature**: `setBaseRate(uint256)`
@@ -1316,6 +1311,15 @@
 - **Function Signature**: `setTrustedRemoteAddress(uint16,bytes)`
 - **Addresses**:
   - `NormalTimelock`
+
+## Contract Address: 0x36a69dE601381be7b0DcAc5D5dD058825505F8f6
+
+- **Function Signature**: `setMaxDailyLimit(uint16,uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+  - `Guardian 2`
 
 ## Contract Address: 0x36a69dE601381be7b0DcAc5D5dD058825505F8f6
 
