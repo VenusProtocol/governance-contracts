@@ -61,6 +61,7 @@
         "setMaxDailyLimit(uint16,uint256)",
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
         "setMaxDailyReceiveLimit(uint16,uint256)",
+        "setMaxSingleTransactionLimit(uint16,uint256)",
         "pause()",
         "unpause()",
         "removeTrustedRemote(uint16)",
@@ -73,7 +74,9 @@
         "sweepToken(address,address,uint256)",
         "updateSendAndCallEnabled(bool)",
         "setTrustedRemoteAddress(uint16,bytes)",
-        "transferBridgeOwnership(address)"
+        "transferBridgeOwnership(address)",
+        "fallbackWithdraw(address,uint256)",
+        "fallbackDeposit(address,uint256)"
       ]
     },
     {
@@ -206,7 +209,8 @@
         "addPool(string,address,uint256,uint256,uint256)",
         "addMarket(AddMarketInput)",
         "setPoolName(address,string)",
-        "updatePoolMetadata(address,VenusPoolMetaData)"
+        "updatePoolMetadata(address,VenusPoolMetaData)",
+        "removeMarket(address,address)"
       ]
     },
     {
@@ -222,7 +226,13 @@
         "0xA5622D276CcbB8d9BBE3D1ffd1BB11a0032E53F0",
         "0x0000000000000000000000000000000000000000000000000000000000000000"
       ],
-      "functions": ["setPoolsAssetsDirectTransfer(address[],address[][],bool[][])"]
+      "functions": [
+        "setPoolsAssetsDirectTransfer(address[],address[][],bool[][])",
+        "setConversionConfig(address,address,ConversionConfig)",
+        "pauseConversion()",
+        "resumeConversion()",
+        "setMinAmountToConvert(uint256)"
+      ]
     },
     {
       "address": [
@@ -268,7 +278,12 @@
     },
     {
       "address": ["0x004065D34C6b18cE4370ced1CeBDE94865DbFAFE"],
-      "functions": ["setBaseRate(uint256)", "setFloatRate(uint256)", "setMintCap(uint256)"]
+      "functions": [
+        "setBaseRate(uint256)",
+        "setFloatRate(uint256)",
+        "setMintCap(uint256)",
+        "toggleOnlyPrimeHolderMint()"
+      ]
     },
     {
       "address": ["0x0870793286aada55d39ce7f82fb2766e8004cf43"],
@@ -295,6 +310,86 @@
     {
       "address": ["0x0667Eed0a0aAb930af74a3dfeDD263A73994f216"],
       "functions": ["pause()", "resume()"]
+    },
+    {
+      "address": [
+        "0xC138aa4E424D1A8539e8F38Af5a754a2B7c3Cc36",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": [
+        "pause()",
+        "resume()",
+        "setFeeIn(uint256)",
+        "setFeeOut(uint256)",
+        "setVAIMintCap(uint256)",
+        "setVenusTreasury(address)",
+        "setOracle(address)"
+      ]
+    },
+    {
+      "address": ["0x3344417c9360b963ca93A4e8305361AEde340Ab9"],
+      "functions": ["removeMarket(address)"]
+    },
+    {
+      "address": ["0xdF31a28D68A2AB381D42b380649Ead7ae2A76E42"],
+      "functions": [
+        "setMinAmountToConvert(uint256)",
+        "swapPoolsAssets(address[],uint256[],address[][],uint256)",
+        "setConvertibleBaseAsset(address)"
+      ]
+    },
+    {
+      "address": ["0xf37530A8a810Fcb501AA0Ecd0B0699388F0F2209"],
+      "functions": [
+        "updateNextBidderBlockLimit(uint256)",
+        "updateIncentiveBps(uint256)",
+        "updateMinimumPoolBadDebt(uint256)",
+        "updateWaitForFirstBidder(uint256)",
+        "pauseAuctions()",
+        "resumeAuctions()"
+      ]
+    },
+    {
+      "address": ["0xCa01D5A9A248a830E9D93231e791B1afFed7c446"],
+      "functions": ["addOrUpdateDistributionConfigs(DistributionConfig[])", "removeDistributionConfig(Schema,address)"]
+    },
+    {
+      "address": ["0x23c4F844ffDdC6161174eB32c770D4D8C07833F2"],
+      "functions": [
+        "setTokensDistributionSpeed(address[],uint256[])",
+        "setMaxTokensDistributionSpeed(address[],uint256[])",
+        "setMaxLoopsLimit(uint256)",
+        "pauseFundsTransfer()",
+        "resumeFundsTransfer()"
+      ]
+    },
+    {
+      "address": ["0xBbCD063efE506c3D42a0Fa2dB5C08430288C71FC"],
+      "functions": [
+        "updateAlpha(uint128,uint128)",
+        "updateMultipliers(address,uint256,uint256)",
+        "setStakedAt(address[],uint256[])",
+        "addMarket(address,address,uint256,uint256)",
+        "setLimit(uint256,uint256)",
+        "setMaxLoopsLimit(uint256)",
+        "issue(bool,address[])",
+        "burn(address)",
+        "togglePause()"
+      ]
+    },
+    {
+      "address": ["0x36a69dE601381be7b0DcAc5D5dD058825505F8f6"],
+      "functions": [
+        "removeTrustedRemote(uint16)",
+        "execute(uint16,bytes,bytes,address)",
+        "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
+        "setTrustedRemoteAddress(uint16,bytes)",
+        "setConfig(uint16,uint16,uint256,bytes)",
+        "setSendVersion(uint16)",
+        "etMaxDailyLimit(uint16,uint256)",
+        "pause()",
+        "unpause()"
+      ]
     }
   ]
 }
