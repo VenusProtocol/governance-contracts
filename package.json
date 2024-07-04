@@ -40,11 +40,9 @@
     "prepare": "husky install"
   },
   "dependencies": {
-    "@types/lodash": "^4.17.6",
     "@venusprotocol/solidity-utilities": "2.0.0",
     "hardhat-deploy-ethers": "^0.3.0-beta.13",
-    "module-alias": "^2.2.2",
-    "typescript-retry-decorator": "^2.4.2"
+    "module-alias": "^2.2.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
@@ -70,7 +68,6 @@
     "@typechain/hardhat": "^6.1.4",
     "@types/chai": "^4.3.4",
     "@types/fs-extra": "^9.0.13",
-    "@types/inquirer": "^9.0.7",
     "@types/mocha": "^10.0.0",
     "@types/node": "^18.16.3",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
