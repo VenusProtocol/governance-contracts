@@ -170,7 +170,7 @@ export class PermissionFetcher {
     }
   }
 
-  processEvents(events: Event[], height: string) {
+  private processEvents(events: Event[], height: string) {
     events.forEach(event => {
       const hash = this.getHash(event.contractAddress, event.functionSignature);
 
@@ -241,10 +241,6 @@ export class PermissionFetcher {
     const decodedData = abiCoder.decode(["address", "address", "string"], data);
 
     return { account: decodedData[0], contractAddress: decodedData[1], functionSignature: decodedData[2] };
-  }
-
-  async delay(ms: number) {
-    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   private getRoleHashTable(filePath: string): Record<string, Role> {
