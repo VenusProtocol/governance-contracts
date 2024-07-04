@@ -51,6 +51,7 @@ export class PermissionFetcher {
   roleHashTable: Record<string, Role>;
   bnbPermissionFile: string;
   existingPermissions: Permission[];
+  missingRoleFile: string;
 
   constructor(network: any, backOffParams: any[], bnbPermissionFile: string) {
     this.network = network;
@@ -61,6 +62,8 @@ export class PermissionFetcher {
     this.roleHashTable = this.getRoleHashTable(this.bnbPermissionFile);
     const { permissions: existingPermissions } = this.getPermissionsJson();
     this.existingPermissions = existingPermissions;
+    this.missingRoleFile = path.join(__dirname, "networks", this.network, "BNBMissingRole.json");
+
     this.addPrevPermissionsInMap();
   }
 
@@ -134,15 +137,7 @@ export class PermissionFetcher {
               height = event.blockNumber.toString();
               this.processEvents(modifiedEvent, height);
             } else {
-              if (!this.missingRoleMap[role]) {
-                this.missingRoleMap[role] = { transactions: [] };
-              }
-              this.missingRoleMap[role].transactions = union(this.missingRoleMap[role].transactions, [
-                event.transactionHash,
-              ]);
-              const missingRoleFile = path.join(__dirname, "networks", this.network, "BNBMissingRole.json");
-              fs.writeFileSync(missingRoleFile, JSON.stringify(this.missingRoleMap, null, 2), "utf8");
-              console.log(`Missing role ${role}, added in ${missingRoleFile}`);
+              this.addMissingRole(role, event.transactionHash);
             }
           });
         } else {
@@ -340,6 +335,36 @@ export class PermissionFetcher {
       throw error;
     }
   }
+
+  private addMissingRole(role: string, transaction: string) {
+    let data: MissingRoleMap = {};
+
+    try {
+      if (fs.existsSync(this.missingRoleFile)) {
+        const fileContent = fs.readFileSync(this.missingRoleFile, "utf8").trim();
+        if (fileContent) {
+          try {
+            data = JSON.parse(fileContent);
+          } catch (error) {
+            console.error("Error parsing JSON:", error);
+          }
+        }
+      }
+
+      if (!data[role]) {
+        data[role] = { transactions: [] };
+      }
+
+      if (!data[role].transactions.includes(transaction)) {
+        data[role].transactions.push(transaction);
+      }
+
+      fs.writeFileSync(this.missingRoleFile, JSON.stringify(data, null, 2), "utf8");
+    } catch (error) {
+      console.error("Error adding missing role:", error);
+    }
+  }
+
   private getLastBlockNumber(): number {
     const fileContent = fs.readFileSync(this.jsonFilePath, "utf8");
 
