@@ -2,6 +2,14 @@
   "name": "arbitrumone",
   "chainId": "42161",
   "addresses": {
-    "AccessControlManager": "0xD9dD18EB0cf10CbA837677f28A8F9Bda4bc2b157"
+    "AccessControlManager": "0xD9dD18EB0cf10CbA837677f28A8F9Bda4bc2b157",
+    "CriticalTimelock": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
+    "DefaultProxyAdmin": "0xF6fF3e9459227f0cDE8B102b90bE25960317b216",
+    "FastTrackTimelock": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
+    "NormalTimelock": "0x4b94589Cc23F618687790036726f744D602c4017",
+    "OmnichainExecutorOwner": "0xf72C1Aa0A1227B4bCcB28E1B1015F0616E2db7fD",
+    "OmnichainExecutorOwner_Implementation": "0x56fa88B1dE859624502f6acd8fd48CfA2BA87cb6",
+    "OmnichainExecutorOwner_Proxy": "0xf72C1Aa0A1227B4bCcB28E1B1015F0616E2db7fD",
+    "OmnichainGovernanceExecutor": "0xc1858cCE6c28295Efd3eE742795bDa316D7c7526"
   }
 }

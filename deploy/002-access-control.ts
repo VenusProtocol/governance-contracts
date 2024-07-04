@@ -18,7 +18,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 
   const acm = await ethers.getContractAt("AccessControlManager", acmDeployment.address);
-
   if (hre.network.live) {
     const networkName = hre.network.name as SUPPORTED_NETWORKS;
     const adminAccount = await getAcmAdminAccount(networkName);

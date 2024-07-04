@@ -2,6 +2,7 @@
 pragma solidity 0.8.25;
 
 import "../Governance/AccessControlledV8.sol";
+import "@layerzerolabs/solidity-examples/contracts/lzApp/mocks/LZEndpointMock.sol";
 
 contract MockAccessTest is AccessControlledV8 {
     /**

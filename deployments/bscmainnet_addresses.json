@@ -11,6 +11,7 @@
     "GovernorBravoDelegator": "0x2d56dC077072B53571b8252008C60e945108c75a",
     "GovernorBravoDelegator_Implementation": "0x360ac19648efc29d2b7b70bac227c35e909272fd",
     "GovernorBravoDelegator_Proxy": "0x2d56dC077072B53571b8252008C60e945108c75a",
-    "NormalTimelock": "0x939bD8d64c0A9583A7Dcea9933f7b21697ab6396"
+    "NormalTimelock": "0x939bD8d64c0A9583A7Dcea9933f7b21697ab6396",
+    "OmnichainProposalSender": "0x36a69dE601381be7b0DcAc5D5dD058825505F8f6"
   }
 }
