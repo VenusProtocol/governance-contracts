@@ -18,12 +18,15 @@ export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<s
   } else if (network === "opbnbtestnet") {
     return "0xb15f6EfEbC276A3b9805df81b5FB3D50C2A62BDf"; // OPBNBTESTNET MULTISIG
   } else if (network === "opbnbmainnet") {
-    return "0xC46796a21a3A9FAB6546aF3434F2eBfFd0604207"; //OPBNBMAINNET MULTISIG
+    return "0xC46796a21a3A9FAB6546aF3434F2eBfFd0604207"; // OPBNBMAINNET MULTISIG
   } else if (network === "arbitrumsepolia") {
-    return "0x1426A5Ae009c4443188DA8793751024E358A61C2"; //ARBITRUM SEPOLIA MULTISIG
+    return "0x1426A5Ae009c4443188DA8793751024E358A61C2"; // ARBITRUM SEPOLIA MULTISIG
   } else if (network === "arbitrumone") {
-    return "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0"; //ARBITRUM ONE MULTISIG
+    return "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0"; // ARBITRUM ONE MULTISIG
+  } else if (network === "opsepolia") {
+    return "0xd57365EE4E850e881229e2F8Aa405822f289e78d"; // OPSEPOLIA MULTISIG
   }
+
   const normalTimelock = await ethers.getContract("NormalTimelock");
   return normalTimelock.address;
 };
@@ -44,7 +47,10 @@ export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => 
     return "0x1426A5Ae009c4443188DA8793751024E358A61C2"; //ARBITRUM SEPOLIA MULTISIG
   } else if (network === "arbitrumone") {
     return "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0"; //ARBITRUM ONE MULTISIG
+  } else if (network === "opsepolia") {
+    return "0xd57365EE4E850e881229e2F8Aa405822f289e78d"; // OPSEPOLIA MULTISIG
   }
+
   return deployer;
 };
 
