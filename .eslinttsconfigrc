@@ -4,7 +4,7 @@
     "./typechain",
     "./deploy",
     "./tests",
-    "./script",
+    "./scripts",
     "./scenario",
     "jest.config.js",
     "saddle.config.js",

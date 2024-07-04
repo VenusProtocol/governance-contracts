@@ -80,7 +80,7 @@ export class PermissionFetcher {
     try {
       const acm = await ethers.getContract("AccessControlManager");
       const acmAddress = acm.address;
-      let modifiedEvent: Event[] = [];
+      const modifiedEvent: Event[] = [];
       let topics;
       if (this.network === "bscmainnet") {
         topics = [
