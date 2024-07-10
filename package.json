@@ -74,7 +74,7 @@
     "@types/node": "^18.16.3",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
-    "@venusprotocol/venus-protocol": "8.0.0",
+    "@venusprotocol/venus-protocol": "https://github.com/VenusProtocol/venus-protocol#4b781616763e158056272b46aa6f5f40560b7fd0",
     "bignumber.js": "^9.1.1",
     "chai": "^4.3.7",
     "commitizen": "^4.2.5",
@@ -108,6 +108,9 @@
     "tsconfig-paths": "^4.1.2",
     "typechain": "^8.1.1",
     "typescript": "^4.9.3"
+  },
+  "peerDependencies": {
+    "@venusprotocol/venus-protocol": "*"
   },
   "_moduleAliases": {
     "@nomiclabs/hardhat-ethers": "node_modules/hardhat-deploy-ethers"
