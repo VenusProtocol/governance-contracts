@@ -1,171 +1,70 @@
-import { Contract } from "ethers";
+import "dotenv/config";
+import { Event as NetworkEvent } from "ethers";
 import * as fs from "fs";
 import { ethers } from "hardhat";
+import { SUPPORTED_NETWORKS } from "helpers/deploy/constants";
 import { remove, union } from "lodash";
 import path from "path";
-import { BackOffPolicy, ExponentialBackoffStrategy, Retryable } from "typescript-retry-decorator";
+import { BackOffPolicy, Retryable } from "typescript-retry-decorator";
 
 import { addressMap, startingBlockForACM } from "./config";
-
-require("dotenv").config();
-
-enum PermissionsEnum {
-  "Granted",
-  "Revoked",
-}
-type MissingRoleMap = {
-  [role: string]: {
-    transactions: string[];
-  };
-};
-type Snapshot = {
-  permissions: Permission[];
-  height: string;
-};
-
-type Permission = {
-  contractAddress: string;
-  functionSignature: string;
-  addresses: string[];
-};
-
-type Event = {
-  contractAddress: string;
-  functionSignature: string;
-  account: string;
-  type: PermissionsEnum;
-};
-
-type Role = {
-  contractAddress: string;
-  functionSignature: string;
-};
+import { Event, MissingRoleMap, Permission, PermissionsEnum, Role, Snapshot } from "./types";
 
 export class PermissionFetcher {
-  readonly network: string;
-  backOffParams: any[];
   mdFilePath: string;
   jsonFilePath: string;
   permissionsMap: Record<string, Permission> = {};
   missingRoleMap: MissingRoleMap = {};
   roleHashTable: Record<string, Role>;
-  bnbPermissionFile: string;
   existingPermissions: Permission[];
   missingRoleFile: string;
+  blocksParsed: number;
 
-  constructor(network: any, backOffParams: any[], bnbPermissionFile: string) {
-    this.network = network;
-    this.backOffParams = backOffParams;
+  constructor(readonly network: SUPPORTED_NETWORKS, readonly bnbPermissionFile: string, readonly chunkSize: number) {
     this.mdFilePath = path.join(__dirname, "networks", this.network, "permissions.md");
     this.jsonFilePath = path.join(__dirname, "networks", this.network, "permissions.json");
-    this.bnbPermissionFile = path.join(__dirname, bnbPermissionFile);
     this.roleHashTable = this.getRoleHashTable(this.bnbPermissionFile);
-    const { permissions: existingPermissions } = this.getPermissionsJson();
-    this.existingPermissions = existingPermissions;
     this.missingRoleFile = path.join(__dirname, "networks", this.network, "BNBMissingRole.json");
 
+    const { permissions: existingPermissions } = this.getPermissionsJson();
+    this.existingPermissions = existingPermissions;
+    this.blocksParsed = this.getLastBlockNumber();
     this.addPrevPermissionsInMap();
   }
 
   async getPastEvents(startBlock: number, endBlock: number) {
     const fromBlock = startBlock ? startBlock : startingBlockForACM[this.network];
     const toBlock = endBlock ? endBlock : await ethers.provider.getBlockNumber();
-    const chunkSize = 40000;
-    const events: any[] = [];
+
+    if (fromBlock >= toBlock) {
+      throw new Error(`From block ${fromBlock} cannot be more than to block ${toBlock}`);
+    }
 
     let start = fromBlock;
-    const lastStoredBlock = this.getLastBlockNumber();
+    const lastStoredBlock = this.blocksParsed;
+
     console.log("StartBlock:", lastStoredBlock);
 
+    // If last stored block is found, start from the last stored block and ignore the input fromBlock.
     if (start < lastStoredBlock) {
       start = lastStoredBlock + 1;
     }
-    try {
-      const acm = await ethers.getContract("AccessControlManager");
-      const acmAddress = acm.address;
-      const modifiedEvent: Event[] = [];
-      let topics;
-      if (this.network === "bscmainnet") {
-        topics = [
-          ethers.utils.id("RoleGranted(bytes32,address,address)"),
-          ethers.utils.id("RoleRevoked(bytes32,address,address)"),
-        ];
-      } else {
-        topics = [
-          ethers.utils.id("PermissionGranted(address,address,string)"),
-          ethers.utils.id("PermissionRevoked(address,address,string)"),
-        ];
-      }
-      const eventFilter = {
-        acmAddress,
-        topics: [topics],
-      };
-      let height = this.getLastBlockNumber().toString();
-      while (start <= toBlock) {
-        const endBlock = Math.min(start + chunkSize - 1, toBlock);
 
-        const chunkEvents = await this.fetchEvents(acm, eventFilter, start, endBlock);
-        events.push(...chunkEvents);
+    while (start <= toBlock) {
+      const endBlock = Math.min(start + this.chunkSize - 1, toBlock);
+      const events = await this.fetchEvents(start, endBlock);
+      this.processEvents(events);
+      this.storeInJson();
+      this.blocksParsed = endBlock;
 
-        if (this.network === "bscmainnet") {
-          if (!this.isValidJson(this.bnbPermissionFile as string)) {
-            throw new Error("Invalid Json");
-          }
-          let contractAddress: string;
-          let functionSig: string;
-
-          events.forEach(event => {
-            const role = ethers.utils.defaultAbiCoder.decode(["bytes32"], event.topics[1])[0];
-            const account = ethers.utils.defaultAbiCoder.decode(["address"], event.topics[2])[0];
-            const defaultAdminRole = "0x0000000000000000000000000000000000000000000000000000000000000000";
-            if (this.roleHashTable[role] !== undefined || role === defaultAdminRole) {
-              if (role === defaultAdminRole) {
-                contractAddress = acm.address;
-                functionSig = "DFAULT_ADMIN_ROLE";
-              } else {
-                contractAddress = this.roleHashTable[role].contractAddress;
-                functionSig = this.roleHashTable[role].functionSignature;
-              }
-              const eventType = event.topics[0] === topics[0] ? PermissionsEnum.Granted : PermissionsEnum.Revoked;
-
-              modifiedEvent.push({
-                contractAddress: contractAddress,
-                functionSignature: functionSig,
-                account: account,
-                type: eventType,
-              });
-              height = event.blockNumber.toString();
-              this.processEvents(modifiedEvent, height);
-            } else {
-              this.addMissingRole(role, event.transactionHash);
-            }
-          });
-        } else {
-          events.forEach(event => {
-            const data = event.data;
-            const { account, contractAddress, functionSignature } = this.decodeLogs(data);
-            const eventType = event.topics[0] === topics[0] ? PermissionsEnum.Granted : PermissionsEnum.Revoked;
-            modifiedEvent.push({
-              contractAddress: contractAddress,
-              functionSignature: functionSignature,
-              account: account,
-              type: eventType,
-            });
-            height = event.blockNumber.toString();
-          });
-          this.processEvents(modifiedEvent, height);
-        }
-        console.log(`Fetched events from block ${start} to ${endBlock}`);
-        start = endBlock + 1;
-      }
-      this.mapAddresses();
-      this.updateMDPermissionFile();
-    } catch (err: any) {
-      throw new Error(err.toString());
+      console.log(`Fetched events from block ${start} to ${endBlock}`);
+      start = endBlock + 1;
     }
+
+    this.updateMDPermissionFile();
   }
 
-  private processEvents(events: Event[], height: string) {
+  private processEvents(events: Event[]) {
     events.forEach(event => {
       const hash = this.getHash(event.contractAddress, event.functionSignature);
 
@@ -185,7 +84,6 @@ export class PermissionFetcher {
       }
       this.permissionsMap[hash].addresses = permission.addresses;
     });
-    this.storeInJson(height);
   }
 
   private updateMDPermissionFile() {
@@ -200,7 +98,7 @@ export class PermissionFetcher {
         mdContent += `- **Function Signature**: \`${permission.functionSignature}\`\n`;
         mdContent += `- **Addresses**:\n`;
         permission.addresses.forEach(address => {
-          mdContent += `  - \`${address}\`\n`;
+          mdContent += `  - \`${address} (${addressMap[address] || "unknown"})\`\n`;
         });
         mdContent += "\n";
       });
@@ -208,7 +106,7 @@ export class PermissionFetcher {
       fs.writeFileSync(this.mdFilePath, mdContent, "utf8");
       console.log(`Markdown file has been written to ${this.mdFilePath}`);
     } catch (error) {
-      console.error(`Error processing ${this.jsonFilePath}:`, error);
+      console.error(`Error writing to MD file ${this.jsonFilePath}:`, error);
     }
   }
   private addPrevPermissionsInMap() {
@@ -218,16 +116,18 @@ export class PermissionFetcher {
     });
   }
 
-  private storeInJson(height: string): void {
+  private storeInJson(): void {
     const snapshot: Snapshot = {
       permissions: Object.values(this.permissionsMap),
-      height: height,
+      height: this.blocksParsed,
     };
+
     try {
       fs.writeFileSync(this.jsonFilePath, JSON.stringify(snapshot, null, 2), "utf8");
       console.log(`Snapshot successfully written to ${this.jsonFilePath}`);
     } catch (error) {
-      console.error(`Error writing to ${this.jsonFilePath}:`, error);
+      console.error(`Error writing JSON to ${this.jsonFilePath}:`, error);
+      throw new Error(`Error writing JSON to ${this.jsonFilePath}`);
     }
   }
 
@@ -241,6 +141,26 @@ export class PermissionFetcher {
   private getRoleHashTable(filePath: string): Record<string, Role> {
     const jsonData = fs.readFileSync(filePath, "utf8");
     const data = JSON.parse(jsonData);
+
+    // [TODO]: use a schema validator
+    if (typeof data !== "object" || data === null || !Array.isArray(data.contracts)) {
+      throw new Error("Invalid Json");
+    }
+
+    for (const contract of data.contracts) {
+      if (typeof contract !== "object" || contract === null) {
+        throw new Error("Invalid Json");
+      }
+      if (!Array.isArray(contract.address) || !Array.isArray(contract.functions)) {
+        throw new Error("Invalid Json");
+      }
+      if (!contract.address.every((addr: any) => typeof addr === "string" && addr === addr.trim())) {
+        throw new Error("Invalid Json");
+      }
+      if (!contract.functions.every((func: any) => typeof func === "string" && func === func.trim())) {
+        throw new Error("Invalid Json");
+      }
+    }
 
     const hashTable: Record<string, Role> = {};
 
@@ -259,63 +179,81 @@ export class PermissionFetcher {
     return hashTable;
   }
 
-  private isValidJson(filePath: string): boolean {
-    const jsonData = fs.readFileSync(filePath, "utf8");
-    const data = JSON.parse(jsonData);
-    if (typeof data !== "object" || data === null || !Array.isArray(data.contracts)) {
-      return false;
-    }
-    for (const contract of data.contracts) {
-      if (typeof contract !== "object" || contract === null) {
-        return false;
-      }
-      if (!Array.isArray(contract.address) || !Array.isArray(contract.functions)) {
-        return false;
-      }
-      if (!contract.address.every((addr: any) => typeof addr === "string" && addr === addr.trim())) {
-        return false;
-      }
-      if (!contract.functions.every((func: any) => typeof func === "string" && func === func.trim())) {
-        return false;
-      }
-    }
-    return true;
-  }
+  @Retryable({
+    maxAttempts: 5,
+    backOffPolicy: BackOffPolicy.ExponentialBackOffPolicy,
+    backOff: 5000,
+    exponentialOption: { maxInterval: 60000, multiplier: 2 },
+  })
+  private async fetchEvents(start: number, endBlock: number): Promise<Event[]> {
+    const acm = await ethers.getContract("AccessControlManager");
+    const acmAddress = acm.address;
 
-  private mapAddresses() {
-    try {
-      const jsonData = fs.readFileSync(this.jsonFilePath, "utf8");
-      const data = JSON.parse(jsonData);
+    const topics =
+      this.network === "bscmainnet"
+        ? [
+            ethers.utils.id("RoleGranted(bytes32,address,address)"),
+            ethers.utils.id("RoleRevoked(bytes32,address,address)"),
+          ]
+        : [
+            ethers.utils.id("PermissionGranted(address,address,string)"),
+            ethers.utils.id("PermissionRevoked(address,address,string)"),
+          ];
 
-      data.permissions.forEach((permission: { addresses: any[] }) => {
-        permission.addresses = permission.addresses.map(address => {
-          return addressMap[address] || address;
-        });
+    const eventFilter = {
+      acmAddress,
+      topics: [topics],
+    };
+
+    const events: NetworkEvent[] = await acm.queryFilter(eventFilter, start, endBlock);
+
+    if (this.network === "bscmainnet") {
+      let contractAddress: string;
+      let functionSig: string;
+
+      const newEvents: Event[] = [];
+
+      events.forEach(event => {
+        const role = ethers.utils.defaultAbiCoder.decode(["bytes32"], event.topics[1])[0];
+        const account = ethers.utils.defaultAbiCoder.decode(["address"], event.topics[2])[0];
+        const defaultAdminRole = "0x0000000000000000000000000000000000000000000000000000000000000000";
+        if (this.roleHashTable[role] !== undefined || role === defaultAdminRole) {
+          if (role === defaultAdminRole) {
+            contractAddress = acm.address;
+            functionSig = "DFAULT_ADMIN_ROLE";
+          } else {
+            contractAddress = this.roleHashTable[role].contractAddress;
+            functionSig = this.roleHashTable[role].functionSignature;
+          }
+          const eventType =
+            event.topics[0] === eventFilter.topics[0][0] ? PermissionsEnum.Granted : PermissionsEnum.Revoked;
+
+          newEvents.push({
+            contractAddress: contractAddress,
+            functionSignature: functionSig,
+            account: account,
+            type: eventType,
+          });
+        } else {
+          this.addMissingRole(role, event.transactionHash);
+        }
       });
 
-      fs.writeFileSync(this.jsonFilePath, JSON.stringify(data, null, 2), "utf8");
-      console.log(`File ${this.jsonFilePath} has been updated with mapped addresses!`);
-    } catch (error) {
-      console.error(`Error processing ${this.jsonFilePath}:`, error);
+      return newEvents;
     }
-  }
 
-  @Retryable({
-    maxAttempts: 3,
-    backOffPolicy: BackOffPolicy.ExponentialBackOffPolicy,
-    backOff: 1000,
-    exponentialOption: { maxInterval: 4000, multiplier: 2, backoffStrategy: ExponentialBackoffStrategy.FullJitter },
-  })
-  private async fetchEvents(
-    acm: Contract,
-    eventFilter: {
-      acmAddress: string;
-      topics: string[][];
-    },
-    start: number,
-    endBlock: number,
-  ): Promise<any> {
-    return await acm.queryFilter(eventFilter, start, endBlock);
+    return events.map(event => {
+      const data = event.data;
+      const { account, contractAddress, functionSignature } = this.decodeLogs(data);
+      const eventType =
+        event.topics[0] === eventFilter.topics[0][0] ? PermissionsEnum.Granted : PermissionsEnum.Revoked;
+      return {
+        contractAddress: contractAddress,
+        functionSignature: functionSignature,
+        account: account,
+        type: eventType,
+      };
+    });
   }
 
   private getPermissionsJson(): { permissions: Permission[]; height: string } {
@@ -332,7 +270,7 @@ export class PermissionFetcher {
       return JSON.parse(fileContent);
     } catch (error) {
       console.error(`Error parsing JSON file:`, error);
-      throw error;
+      throw new Error("Error parsing JSON file");
     }
   }
 
@@ -347,6 +285,7 @@ export class PermissionFetcher {
             data = JSON.parse(fileContent);
           } catch (error) {
             console.error("Error parsing JSON:", error);
+            throw new Error("Error parsing JSON");
           }
         }
       }
