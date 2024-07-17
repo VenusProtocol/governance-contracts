@@ -1,0 +1,2250 @@
+{
+  "id": "a14362755928cc8fc2e5a5af1604964e",
+  "_format": "hh-sol-build-info-1",
+  "solcVersion": "zkVM-0.5.16-1.0.1",
+  "solcLongVersion": "zkVM-0.5.16-1.0.1",
+  "input": {
+    "language": "Solidity",
+    "sources": {
+      "contracts/Governance/AccessControlledV5.sol": {
+        "content": "// SPDX-License-Identifier: BSD-3-Clause\npragma solidity 0.5.16;\n\nimport \"./IAccessControlManagerV5.sol\";\n\n/**\n * @title AccessControlledV5\n * @author Venus\n * @notice This contract is helper between access control manager and actual contract. This contract further inherited by other contract (using solidity 0.5.16)\n * to integrate access controlled mechanism. It provides initialise methods and verifying access methods.\n */\ncontract AccessControlledV5 {\n    /// @notice Access control manager contract\n    IAccessControlManagerV5 private _accessControlManager;\n\n    /**\n     * @dev This empty reserved space is put in place to allow future versions to add new\n     * variables without shifting down storage in the inheritance chain.\n     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps\n     */\n    uint256[49] private __gap;\n\n    /// @notice Emitted when access control manager contract address is changed\n    event NewAccessControlManager(address oldAccessControlManager, address newAccessControlManager);\n\n    /**\n     * @notice Returns the address of the access control manager contract\n     */\n    function accessControlManager() external view returns (IAccessControlManagerV5) {\n        return _accessControlManager;\n    }\n\n    /**\n     * @dev Internal function to set address of AccessControlManager\n     * @param accessControlManager_ The new address of the AccessControlManager\n     */\n    function _setAccessControlManager(address accessControlManager_) internal {\n        require(address(accessControlManager_) != address(0), \"invalid acess control manager address\");\n        address oldAccessControlManager = address(_accessControlManager);\n        _accessControlManager = IAccessControlManagerV5(accessControlManager_);\n        emit NewAccessControlManager(oldAccessControlManager, accessControlManager_);\n    }\n\n    /**\n     * @notice Reverts if the call is not allowed by AccessControlManager\n     * @param signature Method signature\n     */\n    function _checkAccessAllowed(string memory signature) internal view {\n        bool isAllowedToCall = _accessControlManager.isAllowedToCall(msg.sender, signature);\n\n        if (!isAllowedToCall) {\n            revert(\"Unauthorized\");\n        }\n    }\n}\n"
+      },
+      "contracts/Governance/IAccessControlManagerV5.sol": {
+        "content": "// SPDX-License-Identifier: BSD-3-Clause\npragma solidity 0.5.16;\n\n/**\n * @title IAccessControlManagerV5\n * @author Venus\n * @notice Interface implemented by the `AccessControlManagerV5` contract.\n */\ninterface IAccessControlManagerV5 {\n    /**\n     * @dev Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole`\n     *\n     * `DEFAULT_ADMIN_ROLE` is the starting admin for all roles, despite\n     * {RoleAdminChanged} not being emitted signaling this.\n     *\n     */\n    event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole);\n\n    /**\n     * @dev Emitted when `account` is granted `role`.\n     *\n     * `sender` is the account that originated the contract call, an admin role\n     * bearer except when using {AccessControl-_setupRole}.\n     */\n    event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender);\n\n    /**\n     * @dev Emitted when `account` is revoked `role`.\n     *\n     * `sender` is the account that originated the contract call:\n     *   - if using `revokeRole`, it is the admin role bearer\n     *   - if using `renounceRole`, it is the role bearer (i.e. `account`)\n     */\n    event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);\n\n    /**\n     * @dev Returns `true` if `account` has been granted `role`.\n     */\n    function hasRole(bytes32 role, address account) external view returns (bool);\n\n    /**\n     * @dev Returns the admin role that controls `role`. See {grantRole} and\n     * {revokeRole}.\n     *\n     * To change a role's admin, use {AccessControl-_setRoleAdmin}.\n     */\n    function getRoleAdmin(bytes32 role) external view returns (bytes32);\n\n    /**\n     * @dev Grants `role` to `account`.\n     *\n     * If `account` had not been already granted `role`, emits a {RoleGranted}\n     * event.\n     *\n     * Requirements:\n     *\n     * - the caller must have ``role``'s admin role.\n     */\n    function grantRole(bytes32 role, address account) external;\n\n    /**\n     * @dev Revokes `role` from `account`.\n     *\n     * If `account` had been granted `role`, emits a {RoleRevoked} event.\n     *\n     * Requirements:\n     *\n     * - the caller must have ``role``'s admin role.\n     */\n    function revokeRole(bytes32 role, address account) external;\n\n    /**\n     * @dev Revokes `role` from the calling account.\n     *\n     * Roles are often managed via {grantRole} and {revokeRole}: this function's\n     * purpose is to provide a mechanism for accounts to lose their privileges\n     * if they are compromised (such as when a trusted device is misplaced).\n     *\n     * If the calling account had been granted `role`, emits a {RoleRevoked}\n     * event.\n     *\n     * Requirements:\n     *\n     * - the caller must be `account`.\n     */\n    function renounceRole(bytes32 role, address account) external;\n\n    /**\n     * @notice Gives a function call permission to one single account\n     * @dev this function can be called only from Role Admin or DEFAULT_ADMIN_ROLE\n     * \t\tMay emit a {RoleGranted} event.\n     * @param contractAddress address of contract for which call permissions will be granted\n     * @param functionSig signature e.g. \"functionName(uint,bool)\"\n     */\n    function giveCallPermission(address contractAddress, string calldata functionSig, address accountToPermit) external;\n\n    /**\n     * @notice Revokes an account's permission to a particular function call\n     * @dev this function can be called only from Role Admin or DEFAULT_ADMIN_ROLE\n     * \t\tMay emit a {RoleRevoked} event.\n     * @param contractAddress address of contract for which call permissions will be revoked\n     * @param functionSig signature e.g. \"functionName(uint,bool)\"\n     */\n    function revokeCallPermission(\n        address contractAddress,\n        string calldata functionSig,\n        address accountToRevoke\n    ) external;\n\n    /**\n     * @notice Verifies if the given account can call a praticular contract's function\n     * @dev Since the contract is calling itself this function, we can get contracts address with msg.sender\n     * @param account address (eoa or contract) for which call permissions will be checked\n     * @param functionSig signature e.g. \"functionName(uint,bool)\"\n     * @return false if the user account cannot call the particular contract function\n     *\n     */\n    function isAllowedToCall(address account, string calldata functionSig) external view returns (bool);\n\n    function hasPermission(\n        address account,\n        address contractAddress,\n        string calldata functionSig\n    ) external view returns (bool);\n}\n"
+      }
+    },
+    "settings": {
+      "optimizer": { "enabled": true, "mode": "3" },
+      "outputSelection": {
+        "*": { "*": ["storageLayout", "abi", "evm.methodIdentifiers", "metadata", "devdoc", "userdoc"], "": ["ast"] }
+      },
+      "forceEVMLA": false,
+      "detectMissingLibraries": false,
+      "enableEraVMExtensions": false,
+      "libraries": {}
+    }
+  },
+  "output": {
+    "version": "0.5.16",
+    "long_version": "0.5.16+commit.b9534989.Linux.clang",
+    "zk_version": "1.5.1",
+    "sources": {
+      "contracts/Governance/AccessControlledV5.sol": {
+        "id": 0,
+        "ast": {
+          "absolutePath": "contracts/Governance/AccessControlledV5.sol",
+          "exportedSymbols": { "AccessControlledV5": [80] },
+          "id": 81,
+          "nodeType": "SourceUnit",
+          "nodes": [
+            { "id": 1, "literals": ["solidity", "0.5", ".16"], "nodeType": "PragmaDirective", "src": "41:23:0" },
+            {
+              "absolutePath": "contracts/Governance/IAccessControlManagerV5.sol",
+              "file": "./IAccessControlManagerV5.sol",
+              "id": 2,
+              "nodeType": "ImportDirective",
+              "scope": 81,
+              "sourceUnit": 183,
+              "src": "66:39:0",
+              "symbolAliases": [],
+              "unitAlias": ""
+            },
+            {
+              "baseContracts": [],
+              "contractDependencies": [],
+              "contractKind": "contract",
+              "documentation": "@title AccessControlledV5\n@author Venus\n@notice This contract is helper between access control manager and actual contract. This contract further inherited by other contract (using solidity 0.5.16)\nto integrate access controlled mechanism. It provides initialise methods and verifying access methods.",
+              "fullyImplemented": true,
+              "id": 80,
+              "linearizedBaseContracts": [80],
+              "name": "AccessControlledV5",
+              "nodeType": "ContractDefinition",
+              "nodes": [
+                {
+                  "constant": false,
+                  "id": 4,
+                  "name": "_accessControlManager",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 80,
+                  "src": "510:53:0",
+                  "stateVariable": true,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_contract$_IAccessControlManagerV5_$182",
+                    "typeString": "contract IAccessControlManagerV5"
+                  },
+                  "typeName": {
+                    "contractScope": null,
+                    "id": 3,
+                    "name": "IAccessControlManagerV5",
+                    "nodeType": "UserDefinedTypeName",
+                    "referencedDeclaration": 182,
+                    "src": "510:23:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_contract$_IAccessControlManagerV5_$182",
+                      "typeString": "contract IAccessControlManagerV5"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "private"
+                },
+                {
+                  "constant": false,
+                  "id": 8,
+                  "name": "__gap",
+                  "nodeType": "VariableDeclaration",
+                  "scope": 80,
+                  "src": "829:25:0",
+                  "stateVariable": true,
+                  "storageLocation": "default",
+                  "typeDescriptions": {
+                    "typeIdentifier": "t_array$_t_uint256_$49_storage",
+                    "typeString": "uint256[49]"
+                  },
+                  "typeName": {
+                    "baseType": {
+                      "id": 5,
+                      "name": "uint256",
+                      "nodeType": "ElementaryTypeName",
+                      "src": "829:7:0",
+                      "typeDescriptions": { "typeIdentifier": "t_uint256", "typeString": "uint256" }
+                    },
+                    "id": 7,
+                    "length": {
+                      "argumentTypes": null,
+                      "hexValue": "3439",
+                      "id": 6,
+                      "isConstant": false,
+                      "isLValue": false,
+                      "isPure": true,
+                      "kind": "number",
+                      "lValueRequested": false,
+                      "nodeType": "Literal",
+                      "src": "837:2:0",
+                      "subdenomination": null,
+                      "typeDescriptions": { "typeIdentifier": "t_rational_49_by_1", "typeString": "int_const 49" },
+                      "value": "49"
+                    },
+                    "nodeType": "ArrayTypeName",
+                    "src": "829:11:0",
+                    "typeDescriptions": {
+                      "typeIdentifier": "t_array$_t_uint256_$49_storage_ptr",
+                      "typeString": "uint256[49]"
+                    }
+                  },
+                  "value": null,
+                  "visibility": "private"
+                },
+                {
+                  "anonymous": false,
+                  "documentation": "@notice Emitted when access control manager contract address is changed",
+                  "id": 14,
+                  "name": "NewAccessControlManager",
+                  "nodeType": "EventDefinition",
+                  "parameters": {
+                    "id": 13,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 10,
+                        "indexed": false,
+                        "name": "oldAccessControlManager",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 14,
+                        "src": "971:31:0",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 9,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "971:7:0",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 12,
+                        "indexed": false,
+                        "name": "newAccessControlManager",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 14,
+                        "src": "1004:31:0",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 11,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1004:7:0",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "970:66:0"
+                  },
+                  "src": "941:96:0"
+                },
+                {
+                  "body": {
+                    "id": 21,
+                    "nodeType": "Block",
+                    "src": "1213:45:0",
+                    "statements": [
+                      {
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 19,
+                          "name": "_accessControlManager",
+                          "nodeType": "Identifier",
+                          "overloadedDeclarations": [],
+                          "referencedDeclaration": 4,
+                          "src": "1230:21:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_contract$_IAccessControlManagerV5_$182",
+                            "typeString": "contract IAccessControlManagerV5"
+                          }
+                        },
+                        "functionReturnParameters": 18,
+                        "id": 20,
+                        "nodeType": "Return",
+                        "src": "1223:28:0"
+                      }
+                    ]
+                  },
+                  "documentation": "@notice Returns the address of the access control manager contract",
+                  "id": 22,
+                  "implemented": true,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "accessControlManager",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": { "id": 15, "nodeType": "ParameterList", "parameters": [], "src": "1162:2:0" },
+                  "returnParameters": {
+                    "id": 18,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 17,
+                        "name": "",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 22,
+                        "src": "1188:23:0",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": {
+                          "typeIdentifier": "t_contract$_IAccessControlManagerV5_$182",
+                          "typeString": "contract IAccessControlManagerV5"
+                        },
+                        "typeName": {
+                          "contractScope": null,
+                          "id": 16,
+                          "name": "IAccessControlManagerV5",
+                          "nodeType": "UserDefinedTypeName",
+                          "referencedDeclaration": 182,
+                          "src": "1188:23:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_contract$_IAccessControlManagerV5_$182",
+                            "typeString": "contract IAccessControlManagerV5"
+                          }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "1187:25:0"
+                  },
+                  "scope": 80,
+                  "src": "1133:125:0",
+                  "stateMutability": "view",
+                  "superFunction": null,
+                  "visibility": "external"
+                },
+                {
+                  "body": {
+                    "id": 55,
+                    "nodeType": "Block",
+                    "src": "1503:351:0",
+                    "statements": [
+                      {
+                        "expression": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "commonType": { "typeIdentifier": "t_address", "typeString": "address" },
+                              "id": 34,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "leftExpression": {
+                                "argumentTypes": null,
+                                "arguments": [
+                                  {
+                                    "argumentTypes": null,
+                                    "id": 29,
+                                    "name": "accessControlManager_",
+                                    "nodeType": "Identifier",
+                                    "overloadedDeclarations": [],
+                                    "referencedDeclaration": 24,
+                                    "src": "1529:21:0",
+                                    "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                                  }
+                                ],
+                                "expression": {
+                                  "argumentTypes": [{ "typeIdentifier": "t_address", "typeString": "address" }],
+                                  "id": 28,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "nodeType": "ElementaryTypeNameExpression",
+                                  "src": "1521:7:0",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_type$_t_address_$",
+                                    "typeString": "type(address)"
+                                  },
+                                  "typeName": "address"
+                                },
+                                "id": 30,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": false,
+                                "kind": "typeConversion",
+                                "lValueRequested": false,
+                                "names": [],
+                                "nodeType": "FunctionCall",
+                                "src": "1521:30:0",
+                                "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                              },
+                              "nodeType": "BinaryOperation",
+                              "operator": "!=",
+                              "rightExpression": {
+                                "argumentTypes": null,
+                                "arguments": [
+                                  {
+                                    "argumentTypes": null,
+                                    "hexValue": "30",
+                                    "id": 32,
+                                    "isConstant": false,
+                                    "isLValue": false,
+                                    "isPure": true,
+                                    "kind": "number",
+                                    "lValueRequested": false,
+                                    "nodeType": "Literal",
+                                    "src": "1563:1:0",
+                                    "subdenomination": null,
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_rational_0_by_1",
+                                      "typeString": "int_const 0"
+                                    },
+                                    "value": "0"
+                                  }
+                                ],
+                                "expression": {
+                                  "argumentTypes": [
+                                    { "typeIdentifier": "t_rational_0_by_1", "typeString": "int_const 0" }
+                                  ],
+                                  "id": 31,
+                                  "isConstant": false,
+                                  "isLValue": false,
+                                  "isPure": true,
+                                  "lValueRequested": false,
+                                  "nodeType": "ElementaryTypeNameExpression",
+                                  "src": "1555:7:0",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_type$_t_address_$",
+                                    "typeString": "type(address)"
+                                  },
+                                  "typeName": "address"
+                                },
+                                "id": 33,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": true,
+                                "kind": "typeConversion",
+                                "lValueRequested": false,
+                                "names": [],
+                                "nodeType": "FunctionCall",
+                                "src": "1555:10:0",
+                                "typeDescriptions": {
+                                  "typeIdentifier": "t_address_payable",
+                                  "typeString": "address payable"
+                                }
+                              },
+                              "src": "1521:44:0",
+                              "typeDescriptions": { "typeIdentifier": "t_bool", "typeString": "bool" }
+                            },
+                            {
+                              "argumentTypes": null,
+                              "hexValue": "696e76616c696420616365737320636f6e74726f6c206d616e616765722061646472657373",
+                              "id": 35,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": true,
+                              "kind": "string",
+                              "lValueRequested": false,
+                              "nodeType": "Literal",
+                              "src": "1567:39:0",
+                              "subdenomination": null,
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_stringliteral_4fb90961f89e1ad09bee577e07c3323ef046bc07751bb17057bc82e05747edcb",
+                                "typeString": "literal_string \"invalid acess control manager address\""
+                              },
+                              "value": "invalid acess control manager address"
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              { "typeIdentifier": "t_bool", "typeString": "bool" },
+                              {
+                                "typeIdentifier": "t_stringliteral_4fb90961f89e1ad09bee577e07c3323ef046bc07751bb17057bc82e05747edcb",
+                                "typeString": "literal_string \"invalid acess control manager address\""
+                              }
+                            ],
+                            "id": 27,
+                            "name": "require",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [200, 201],
+                            "referencedDeclaration": 201,
+                            "src": "1513:7:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_require_pure$_t_bool_$_t_string_memory_ptr_$returns$__$",
+                              "typeString": "function (bool,string memory) pure"
+                            }
+                          },
+                          "id": 36,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1513:94:0",
+                          "typeDescriptions": { "typeIdentifier": "t_tuple$__$", "typeString": "tuple()" }
+                        },
+                        "id": 37,
+                        "nodeType": "ExpressionStatement",
+                        "src": "1513:94:0"
+                      },
+                      {
+                        "assignments": [39],
+                        "declarations": [
+                          {
+                            "constant": false,
+                            "id": 39,
+                            "name": "oldAccessControlManager",
+                            "nodeType": "VariableDeclaration",
+                            "scope": 55,
+                            "src": "1617:31:0",
+                            "stateVariable": false,
+                            "storageLocation": "default",
+                            "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                            "typeName": {
+                              "id": 38,
+                              "name": "address",
+                              "nodeType": "ElementaryTypeName",
+                              "src": "1617:7:0",
+                              "stateMutability": "nonpayable",
+                              "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                            },
+                            "value": null,
+                            "visibility": "internal"
+                          }
+                        ],
+                        "id": 43,
+                        "initialValue": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "id": 41,
+                              "name": "_accessControlManager",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 4,
+                              "src": "1659:21:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_contract$_IAccessControlManagerV5_$182",
+                                "typeString": "contract IAccessControlManagerV5"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              {
+                                "typeIdentifier": "t_contract$_IAccessControlManagerV5_$182",
+                                "typeString": "contract IAccessControlManagerV5"
+                              }
+                            ],
+                            "id": 40,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": true,
+                            "lValueRequested": false,
+                            "nodeType": "ElementaryTypeNameExpression",
+                            "src": "1651:7:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_type$_t_address_$",
+                              "typeString": "type(address)"
+                            },
+                            "typeName": "address"
+                          },
+                          "id": 42,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "typeConversion",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1651:30:0",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "nodeType": "VariableDeclarationStatement",
+                        "src": "1617:64:0"
+                      },
+                      {
+                        "expression": {
+                          "argumentTypes": null,
+                          "id": 48,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "leftHandSide": {
+                            "argumentTypes": null,
+                            "id": 44,
+                            "name": "_accessControlManager",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 4,
+                            "src": "1691:21:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_IAccessControlManagerV5_$182",
+                              "typeString": "contract IAccessControlManagerV5"
+                            }
+                          },
+                          "nodeType": "Assignment",
+                          "operator": "=",
+                          "rightHandSide": {
+                            "argumentTypes": null,
+                            "arguments": [
+                              {
+                                "argumentTypes": null,
+                                "id": 46,
+                                "name": "accessControlManager_",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 24,
+                                "src": "1739:21:0",
+                                "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                              }
+                            ],
+                            "expression": {
+                              "argumentTypes": [{ "typeIdentifier": "t_address", "typeString": "address" }],
+                              "id": 45,
+                              "name": "IAccessControlManagerV5",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 182,
+                              "src": "1715:23:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_type$_t_contract$_IAccessControlManagerV5_$182_$",
+                                "typeString": "type(contract IAccessControlManagerV5)"
+                              }
+                            },
+                            "id": 47,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "kind": "typeConversion",
+                            "lValueRequested": false,
+                            "names": [],
+                            "nodeType": "FunctionCall",
+                            "src": "1715:46:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_contract$_IAccessControlManagerV5_$182",
+                              "typeString": "contract IAccessControlManagerV5"
+                            }
+                          },
+                          "src": "1691:70:0",
+                          "typeDescriptions": {
+                            "typeIdentifier": "t_contract$_IAccessControlManagerV5_$182",
+                            "typeString": "contract IAccessControlManagerV5"
+                          }
+                        },
+                        "id": 49,
+                        "nodeType": "ExpressionStatement",
+                        "src": "1691:70:0"
+                      },
+                      {
+                        "eventCall": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "id": 51,
+                              "name": "oldAccessControlManager",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 39,
+                              "src": "1800:23:0",
+                              "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                            },
+                            {
+                              "argumentTypes": null,
+                              "id": 52,
+                              "name": "accessControlManager_",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 24,
+                              "src": "1825:21:0",
+                              "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              { "typeIdentifier": "t_address", "typeString": "address" },
+                              { "typeIdentifier": "t_address", "typeString": "address" }
+                            ],
+                            "id": 50,
+                            "name": "NewAccessControlManager",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 14,
+                            "src": "1776:23:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_event_nonpayable$_t_address_$_t_address_$returns$__$",
+                              "typeString": "function (address,address)"
+                            }
+                          },
+                          "id": 53,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "1776:71:0",
+                          "typeDescriptions": { "typeIdentifier": "t_tuple$__$", "typeString": "tuple()" }
+                        },
+                        "id": 54,
+                        "nodeType": "EmitStatement",
+                        "src": "1771:76:0"
+                      }
+                    ]
+                  },
+                  "documentation": "@dev Internal function to set address of AccessControlManager\n@param accessControlManager_ The new address of the AccessControlManager",
+                  "id": 56,
+                  "implemented": true,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "_setAccessControlManager",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 25,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 24,
+                        "name": "accessControlManager_",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 56,
+                        "src": "1463:29:0",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 23,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1463:7:0",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "1462:31:0"
+                  },
+                  "returnParameters": { "id": 26, "nodeType": "ParameterList", "parameters": [], "src": "1503:0:0" },
+                  "scope": 80,
+                  "src": "1429:425:0",
+                  "stateMutability": "nonpayable",
+                  "superFunction": null,
+                  "visibility": "internal"
+                },
+                {
+                  "body": {
+                    "id": 78,
+                    "nodeType": "Block",
+                    "src": "2059:179:0",
+                    "statements": [
+                      {
+                        "assignments": [62],
+                        "declarations": [
+                          {
+                            "constant": false,
+                            "id": 62,
+                            "name": "isAllowedToCall",
+                            "nodeType": "VariableDeclaration",
+                            "scope": 78,
+                            "src": "2069:20:0",
+                            "stateVariable": false,
+                            "storageLocation": "default",
+                            "typeDescriptions": { "typeIdentifier": "t_bool", "typeString": "bool" },
+                            "typeName": {
+                              "id": 61,
+                              "name": "bool",
+                              "nodeType": "ElementaryTypeName",
+                              "src": "2069:4:0",
+                              "typeDescriptions": { "typeIdentifier": "t_bool", "typeString": "bool" }
+                            },
+                            "value": null,
+                            "visibility": "internal"
+                          }
+                        ],
+                        "id": 69,
+                        "initialValue": {
+                          "argumentTypes": null,
+                          "arguments": [
+                            {
+                              "argumentTypes": null,
+                              "expression": {
+                                "argumentTypes": null,
+                                "id": 65,
+                                "name": "msg",
+                                "nodeType": "Identifier",
+                                "overloadedDeclarations": [],
+                                "referencedDeclaration": 197,
+                                "src": "2130:3:0",
+                                "typeDescriptions": { "typeIdentifier": "t_magic_message", "typeString": "msg" }
+                              },
+                              "id": 66,
+                              "isConstant": false,
+                              "isLValue": false,
+                              "isPure": false,
+                              "lValueRequested": false,
+                              "memberName": "sender",
+                              "nodeType": "MemberAccess",
+                              "referencedDeclaration": null,
+                              "src": "2130:10:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_address_payable",
+                                "typeString": "address payable"
+                              }
+                            },
+                            {
+                              "argumentTypes": null,
+                              "id": 67,
+                              "name": "signature",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 58,
+                              "src": "2142:9:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_string_memory_ptr",
+                                "typeString": "string memory"
+                              }
+                            }
+                          ],
+                          "expression": {
+                            "argumentTypes": [
+                              { "typeIdentifier": "t_address_payable", "typeString": "address payable" },
+                              { "typeIdentifier": "t_string_memory_ptr", "typeString": "string memory" }
+                            ],
+                            "expression": {
+                              "argumentTypes": null,
+                              "id": 63,
+                              "name": "_accessControlManager",
+                              "nodeType": "Identifier",
+                              "overloadedDeclarations": [],
+                              "referencedDeclaration": 4,
+                              "src": "2092:21:0",
+                              "typeDescriptions": {
+                                "typeIdentifier": "t_contract$_IAccessControlManagerV5_$182",
+                                "typeString": "contract IAccessControlManagerV5"
+                              }
+                            },
+                            "id": 64,
+                            "isConstant": false,
+                            "isLValue": false,
+                            "isPure": false,
+                            "lValueRequested": false,
+                            "memberName": "isAllowedToCall",
+                            "nodeType": "MemberAccess",
+                            "referencedDeclaration": 170,
+                            "src": "2092:37:0",
+                            "typeDescriptions": {
+                              "typeIdentifier": "t_function_external_view$_t_address_$_t_string_memory_ptr_$returns$_t_bool_$",
+                              "typeString": "function (address,string memory) view external returns (bool)"
+                            }
+                          },
+                          "id": 68,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "kind": "functionCall",
+                          "lValueRequested": false,
+                          "names": [],
+                          "nodeType": "FunctionCall",
+                          "src": "2092:60:0",
+                          "typeDescriptions": { "typeIdentifier": "t_bool", "typeString": "bool" }
+                        },
+                        "nodeType": "VariableDeclarationStatement",
+                        "src": "2069:83:0"
+                      },
+                      {
+                        "condition": {
+                          "argumentTypes": null,
+                          "id": 71,
+                          "isConstant": false,
+                          "isLValue": false,
+                          "isPure": false,
+                          "lValueRequested": false,
+                          "nodeType": "UnaryOperation",
+                          "operator": "!",
+                          "prefix": true,
+                          "src": "2167:16:0",
+                          "subExpression": {
+                            "argumentTypes": null,
+                            "id": 70,
+                            "name": "isAllowedToCall",
+                            "nodeType": "Identifier",
+                            "overloadedDeclarations": [],
+                            "referencedDeclaration": 62,
+                            "src": "2168:15:0",
+                            "typeDescriptions": { "typeIdentifier": "t_bool", "typeString": "bool" }
+                          },
+                          "typeDescriptions": { "typeIdentifier": "t_bool", "typeString": "bool" }
+                        },
+                        "falseBody": null,
+                        "id": 77,
+                        "nodeType": "IfStatement",
+                        "src": "2163:69:0",
+                        "trueBody": {
+                          "id": 76,
+                          "nodeType": "Block",
+                          "src": "2185:47:0",
+                          "statements": [
+                            {
+                              "expression": {
+                                "argumentTypes": null,
+                                "arguments": [
+                                  {
+                                    "argumentTypes": null,
+                                    "hexValue": "556e617574686f72697a6564",
+                                    "id": 73,
+                                    "isConstant": false,
+                                    "isLValue": false,
+                                    "isPure": true,
+                                    "kind": "string",
+                                    "lValueRequested": false,
+                                    "nodeType": "Literal",
+                                    "src": "2206:14:0",
+                                    "subdenomination": null,
+                                    "typeDescriptions": {
+                                      "typeIdentifier": "t_stringliteral_1b2638459828301e8cd6c7c02856073bacf975379e0867f689bb14feacb780c5",
+                                      "typeString": "literal_string \"Unauthorized\""
+                                    },
+                                    "value": "Unauthorized"
+                                  }
+                                ],
+                                "expression": {
+                                  "argumentTypes": [
+                                    {
+                                      "typeIdentifier": "t_stringliteral_1b2638459828301e8cd6c7c02856073bacf975379e0867f689bb14feacb780c5",
+                                      "typeString": "literal_string \"Unauthorized\""
+                                    }
+                                  ],
+                                  "id": 72,
+                                  "name": "revert",
+                                  "nodeType": "Identifier",
+                                  "overloadedDeclarations": [202, 203],
+                                  "referencedDeclaration": 203,
+                                  "src": "2199:6:0",
+                                  "typeDescriptions": {
+                                    "typeIdentifier": "t_function_revert_pure$_t_string_memory_ptr_$returns$__$",
+                                    "typeString": "function (string memory) pure"
+                                  }
+                                },
+                                "id": 74,
+                                "isConstant": false,
+                                "isLValue": false,
+                                "isPure": false,
+                                "kind": "functionCall",
+                                "lValueRequested": false,
+                                "names": [],
+                                "nodeType": "FunctionCall",
+                                "src": "2199:22:0",
+                                "typeDescriptions": { "typeIdentifier": "t_tuple$__$", "typeString": "tuple()" }
+                              },
+                              "id": 75,
+                              "nodeType": "ExpressionStatement",
+                              "src": "2199:22:0"
+                            }
+                          ]
+                        }
+                      }
+                    ]
+                  },
+                  "documentation": "@notice Reverts if the call is not allowed by AccessControlManager\n@param signature Method signature",
+                  "id": 79,
+                  "implemented": true,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "_checkAccessAllowed",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 59,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 58,
+                        "name": "signature",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 79,
+                        "src": "2020:23:0",
+                        "stateVariable": false,
+                        "storageLocation": "memory",
+                        "typeDescriptions": { "typeIdentifier": "t_string_memory_ptr", "typeString": "string" },
+                        "typeName": {
+                          "id": 57,
+                          "name": "string",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "2020:6:0",
+                          "typeDescriptions": { "typeIdentifier": "t_string_storage_ptr", "typeString": "string" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "2019:25:0"
+                  },
+                  "returnParameters": { "id": 60, "nodeType": "ParameterList", "parameters": [], "src": "2059:0:0" },
+                  "scope": 80,
+                  "src": "1991:247:0",
+                  "stateMutability": "view",
+                  "superFunction": null,
+                  "visibility": "internal"
+                }
+              ],
+              "scope": 81,
+              "src": "428:1812:0"
+            }
+          ],
+          "src": "41:2200:0"
+        }
+      },
+      "contracts/Governance/IAccessControlManagerV5.sol": {
+        "id": 1,
+        "ast": {
+          "absolutePath": "contracts/Governance/IAccessControlManagerV5.sol",
+          "exportedSymbols": { "IAccessControlManagerV5": [182] },
+          "id": 183,
+          "nodeType": "SourceUnit",
+          "nodes": [
+            { "id": 82, "literals": ["solidity", "0.5", ".16"], "nodeType": "PragmaDirective", "src": "41:23:1" },
+            {
+              "baseContracts": [],
+              "contractDependencies": [],
+              "contractKind": "interface",
+              "documentation": "@title IAccessControlManagerV5\n@author Venus\n@notice Interface implemented by the `AccessControlManagerV5` contract.",
+              "fullyImplemented": false,
+              "id": 182,
+              "linearizedBaseContracts": [182],
+              "name": "IAccessControlManagerV5",
+              "nodeType": "ContractDefinition",
+              "nodes": [
+                {
+                  "anonymous": false,
+                  "documentation": "@dev Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole`\n     * `DEFAULT_ADMIN_ROLE` is the starting admin for all roles, despite\n{RoleAdminChanged} not being emitted signaling this.\n     ",
+                  "id": 90,
+                  "name": "RoleAdminChanged",
+                  "nodeType": "EventDefinition",
+                  "parameters": {
+                    "id": 89,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 84,
+                        "indexed": true,
+                        "name": "role",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 90,
+                        "src": "529:20:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" },
+                        "typeName": {
+                          "id": 83,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "529:7:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 86,
+                        "indexed": true,
+                        "name": "previousAdminRole",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 90,
+                        "src": "551:33:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" },
+                        "typeName": {
+                          "id": 85,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "551:7:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 88,
+                        "indexed": true,
+                        "name": "newAdminRole",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 90,
+                        "src": "586:28:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" },
+                        "typeName": {
+                          "id": 87,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "586:7:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "528:87:1"
+                  },
+                  "src": "506:110:1"
+                },
+                {
+                  "anonymous": false,
+                  "documentation": "@dev Emitted when `account` is granted `role`.\n     * `sender` is the account that originated the contract call, an admin role\nbearer except when using {AccessControl-_setupRole}.",
+                  "id": 98,
+                  "name": "RoleGranted",
+                  "nodeType": "EventDefinition",
+                  "parameters": {
+                    "id": 97,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 92,
+                        "indexed": true,
+                        "name": "role",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 98,
+                        "src": "857:20:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" },
+                        "typeName": {
+                          "id": 91,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "857:7:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 94,
+                        "indexed": true,
+                        "name": "account",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 98,
+                        "src": "879:23:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 93,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "879:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 96,
+                        "indexed": true,
+                        "name": "sender",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 98,
+                        "src": "904:22:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 95,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "904:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "856:71:1"
+                  },
+                  "src": "839:89:1"
+                },
+                {
+                  "anonymous": false,
+                  "documentation": "@dev Emitted when `account` is revoked `role`.\n     * `sender` is the account that originated the contract call:\n  - if using `revokeRole`, it is the admin role bearer\n  - if using `renounceRole`, it is the role bearer (i.e. `account`)",
+                  "id": 106,
+                  "name": "RoleRevoked",
+                  "nodeType": "EventDefinition",
+                  "parameters": {
+                    "id": 105,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 100,
+                        "indexed": true,
+                        "name": "role",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 106,
+                        "src": "1232:20:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" },
+                        "typeName": {
+                          "id": 99,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1232:7:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 102,
+                        "indexed": true,
+                        "name": "account",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 106,
+                        "src": "1254:23:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 101,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1254:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 104,
+                        "indexed": true,
+                        "name": "sender",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 106,
+                        "src": "1279:22:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 103,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1279:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "1231:71:1"
+                  },
+                  "src": "1214:89:1"
+                },
+                {
+                  "body": null,
+                  "documentation": "@dev Returns `true` if `account` has been granted `role`.",
+                  "id": 115,
+                  "implemented": false,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "hasRole",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 111,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 108,
+                        "name": "role",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 115,
+                        "src": "1407:12:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" },
+                        "typeName": {
+                          "id": 107,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1407:7:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 110,
+                        "name": "account",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 115,
+                        "src": "1421:15:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 109,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1421:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "1406:31:1"
+                  },
+                  "returnParameters": {
+                    "id": 114,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 113,
+                        "name": "",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 115,
+                        "src": "1461:4:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bool", "typeString": "bool" },
+                        "typeName": {
+                          "id": 112,
+                          "name": "bool",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1461:4:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bool", "typeString": "bool" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "1460:6:1"
+                  },
+                  "scope": 182,
+                  "src": "1390:77:1",
+                  "stateMutability": "view",
+                  "superFunction": null,
+                  "visibility": "external"
+                },
+                {
+                  "body": null,
+                  "documentation": "@dev Returns the admin role that controls `role`. See {grantRole} and\n{revokeRole}.\n     * To change a role's admin, use {AccessControl-_setRoleAdmin}.",
+                  "id": 122,
+                  "implemented": false,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "getRoleAdmin",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 118,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 117,
+                        "name": "role",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 122,
+                        "src": "1684:12:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" },
+                        "typeName": {
+                          "id": 116,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1684:7:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "1683:14:1"
+                  },
+                  "returnParameters": {
+                    "id": 121,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 120,
+                        "name": "",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 122,
+                        "src": "1721:7:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" },
+                        "typeName": {
+                          "id": 119,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1721:7:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "1720:9:1"
+                  },
+                  "scope": 182,
+                  "src": "1662:68:1",
+                  "stateMutability": "view",
+                  "superFunction": null,
+                  "visibility": "external"
+                },
+                {
+                  "body": null,
+                  "documentation": "@dev Grants `role` to `account`.\n     * If `account` had not been already granted `role`, emits a {RoleGranted}\nevent.\n     * Requirements:\n     * - the caller must have ``role``'s admin role.",
+                  "id": 129,
+                  "implemented": false,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "grantRole",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 127,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 124,
+                        "name": "role",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 129,
+                        "src": "1999:12:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" },
+                        "typeName": {
+                          "id": 123,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "1999:7:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 126,
+                        "name": "account",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 129,
+                        "src": "2013:15:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 125,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "2013:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "1998:31:1"
+                  },
+                  "returnParameters": { "id": 128, "nodeType": "ParameterList", "parameters": [], "src": "2038:0:1" },
+                  "scope": 182,
+                  "src": "1980:59:1",
+                  "stateMutability": "nonpayable",
+                  "superFunction": null,
+                  "visibility": "external"
+                },
+                {
+                  "body": null,
+                  "documentation": "@dev Revokes `role` from `account`.\n     * If `account` had been granted `role`, emits a {RoleRevoked} event.\n     * Requirements:\n     * - the caller must have ``role``'s admin role.",
+                  "id": 136,
+                  "implemented": false,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "revokeRole",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 134,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 131,
+                        "name": "role",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 136,
+                        "src": "2293:12:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" },
+                        "typeName": {
+                          "id": 130,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "2293:7:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 133,
+                        "name": "account",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 136,
+                        "src": "2307:15:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 132,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "2307:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "2292:31:1"
+                  },
+                  "returnParameters": { "id": 135, "nodeType": "ParameterList", "parameters": [], "src": "2332:0:1" },
+                  "scope": 182,
+                  "src": "2273:60:1",
+                  "stateMutability": "nonpayable",
+                  "superFunction": null,
+                  "visibility": "external"
+                },
+                {
+                  "body": null,
+                  "documentation": "@dev Revokes `role` from the calling account.\n     * Roles are often managed via {grantRole} and {revokeRole}: this function's\npurpose is to provide a mechanism for accounts to lose their privileges\nif they are compromised (such as when a trusted device is misplaced).\n     * If the calling account had been granted `role`, emits a {RoleRevoked}\nevent.\n     * Requirements:\n     * - the caller must be `account`.",
+                  "id": 143,
+                  "implemented": false,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "renounceRole",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 141,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 138,
+                        "name": "role",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 143,
+                        "src": "2846:12:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" },
+                        "typeName": {
+                          "id": 137,
+                          "name": "bytes32",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "2846:7:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bytes32", "typeString": "bytes32" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 140,
+                        "name": "account",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 143,
+                        "src": "2860:15:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 139,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "2860:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "2845:31:1"
+                  },
+                  "returnParameters": { "id": 142, "nodeType": "ParameterList", "parameters": [], "src": "2885:0:1" },
+                  "scope": 182,
+                  "src": "2824:62:1",
+                  "stateMutability": "nonpayable",
+                  "superFunction": null,
+                  "visibility": "external"
+                },
+                {
+                  "body": null,
+                  "documentation": "@notice Gives a function call permission to one single account\n@dev this function can be called only from Role Admin or DEFAULT_ADMIN_ROLE\n\t\tMay emit a {RoleGranted} event.\n@param contractAddress address of contract for which call permissions will be granted\n@param functionSig signature e.g. \"functionName(uint,bool)\"",
+                  "id": 152,
+                  "implemented": false,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "giveCallPermission",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 150,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 145,
+                        "name": "contractAddress",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 152,
+                        "src": "3290:23:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 144,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "3290:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 147,
+                        "name": "functionSig",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 152,
+                        "src": "3315:27:1",
+                        "stateVariable": false,
+                        "storageLocation": "calldata",
+                        "typeDescriptions": { "typeIdentifier": "t_string_calldata_ptr", "typeString": "string" },
+                        "typeName": {
+                          "id": 146,
+                          "name": "string",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "3315:6:1",
+                          "typeDescriptions": { "typeIdentifier": "t_string_storage_ptr", "typeString": "string" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 149,
+                        "name": "accountToPermit",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 152,
+                        "src": "3344:23:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 148,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "3344:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "3289:79:1"
+                  },
+                  "returnParameters": { "id": 151, "nodeType": "ParameterList", "parameters": [], "src": "3377:0:1" },
+                  "scope": 182,
+                  "src": "3262:116:1",
+                  "stateMutability": "nonpayable",
+                  "superFunction": null,
+                  "visibility": "external"
+                },
+                {
+                  "body": null,
+                  "documentation": "@notice Revokes an account's permission to a particular function call\n@dev this function can be called only from Role Admin or DEFAULT_ADMIN_ROLE\n\t\tMay emit a {RoleRevoked} event.\n@param contractAddress address of contract for which call permissions will be revoked\n@param functionSig signature e.g. \"functionName(uint,bool)\"",
+                  "id": 161,
+                  "implemented": false,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "revokeCallPermission",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 159,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 154,
+                        "name": "contractAddress",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 161,
+                        "src": "3800:23:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 153,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "3800:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 156,
+                        "name": "functionSig",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 161,
+                        "src": "3833:27:1",
+                        "stateVariable": false,
+                        "storageLocation": "calldata",
+                        "typeDescriptions": { "typeIdentifier": "t_string_calldata_ptr", "typeString": "string" },
+                        "typeName": {
+                          "id": 155,
+                          "name": "string",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "3833:6:1",
+                          "typeDescriptions": { "typeIdentifier": "t_string_storage_ptr", "typeString": "string" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 158,
+                        "name": "accountToRevoke",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 161,
+                        "src": "3870:23:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 157,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "3870:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "3790:109:1"
+                  },
+                  "returnParameters": { "id": 160, "nodeType": "ParameterList", "parameters": [], "src": "3908:0:1" },
+                  "scope": 182,
+                  "src": "3761:148:1",
+                  "stateMutability": "nonpayable",
+                  "superFunction": null,
+                  "visibility": "external"
+                },
+                {
+                  "body": null,
+                  "documentation": "@notice Verifies if the given account can call a praticular contract's function\n@dev Since the contract is calling itself this function, we can get contracts address with msg.sender\n@param account address (eoa or contract) for which call permissions will be checked\n@param functionSig signature e.g. \"functionName(uint,bool)\"\n@return false if the user account cannot call the particular contract function\n     ",
+                  "id": 170,
+                  "implemented": false,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "isAllowedToCall",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 166,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 163,
+                        "name": "account",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 170,
+                        "src": "4403:15:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 162,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "4403:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 165,
+                        "name": "functionSig",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 170,
+                        "src": "4420:27:1",
+                        "stateVariable": false,
+                        "storageLocation": "calldata",
+                        "typeDescriptions": { "typeIdentifier": "t_string_calldata_ptr", "typeString": "string" },
+                        "typeName": {
+                          "id": 164,
+                          "name": "string",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "4420:6:1",
+                          "typeDescriptions": { "typeIdentifier": "t_string_storage_ptr", "typeString": "string" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "4402:46:1"
+                  },
+                  "returnParameters": {
+                    "id": 169,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 168,
+                        "name": "",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 170,
+                        "src": "4472:4:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bool", "typeString": "bool" },
+                        "typeName": {
+                          "id": 167,
+                          "name": "bool",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "4472:4:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bool", "typeString": "bool" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "4471:6:1"
+                  },
+                  "scope": 182,
+                  "src": "4378:100:1",
+                  "stateMutability": "view",
+                  "superFunction": null,
+                  "visibility": "external"
+                },
+                {
+                  "body": null,
+                  "documentation": null,
+                  "id": 181,
+                  "implemented": false,
+                  "kind": "function",
+                  "modifiers": [],
+                  "name": "hasPermission",
+                  "nodeType": "FunctionDefinition",
+                  "parameters": {
+                    "id": 177,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 172,
+                        "name": "account",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 181,
+                        "src": "4516:15:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 171,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "4516:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 174,
+                        "name": "contractAddress",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 181,
+                        "src": "4541:23:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" },
+                        "typeName": {
+                          "id": 173,
+                          "name": "address",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "4541:7:1",
+                          "stateMutability": "nonpayable",
+                          "typeDescriptions": { "typeIdentifier": "t_address", "typeString": "address" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      },
+                      {
+                        "constant": false,
+                        "id": 176,
+                        "name": "functionSig",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 181,
+                        "src": "4574:27:1",
+                        "stateVariable": false,
+                        "storageLocation": "calldata",
+                        "typeDescriptions": { "typeIdentifier": "t_string_calldata_ptr", "typeString": "string" },
+                        "typeName": {
+                          "id": 175,
+                          "name": "string",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "4574:6:1",
+                          "typeDescriptions": { "typeIdentifier": "t_string_storage_ptr", "typeString": "string" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "4506:101:1"
+                  },
+                  "returnParameters": {
+                    "id": 180,
+                    "nodeType": "ParameterList",
+                    "parameters": [
+                      {
+                        "constant": false,
+                        "id": 179,
+                        "name": "",
+                        "nodeType": "VariableDeclaration",
+                        "scope": 181,
+                        "src": "4631:4:1",
+                        "stateVariable": false,
+                        "storageLocation": "default",
+                        "typeDescriptions": { "typeIdentifier": "t_bool", "typeString": "bool" },
+                        "typeName": {
+                          "id": 178,
+                          "name": "bool",
+                          "nodeType": "ElementaryTypeName",
+                          "src": "4631:4:1",
+                          "typeDescriptions": { "typeIdentifier": "t_bool", "typeString": "bool" }
+                        },
+                        "value": null,
+                        "visibility": "internal"
+                      }
+                    ],
+                    "src": "4630:6:1"
+                  },
+                  "scope": 182,
+                  "src": "4484:153:1",
+                  "stateMutability": "view",
+                  "superFunction": null,
+                  "visibility": "external"
+                }
+              ],
+              "scope": 183,
+              "src": "200:4439:1"
+            }
+          ],
+          "src": "41:4599:1"
+        }
+      }
+    },
+    "contracts": {
+      "contracts/Governance/AccessControlledV5.sol": {
+        "AccessControlledV5": {
+          "abi": [
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": false, "internalType": "address", "name": "oldAccessControlManager", "type": "address" },
+                { "indexed": false, "internalType": "address", "name": "newAccessControlManager", "type": "address" }
+              ],
+              "name": "NewAccessControlManager",
+              "type": "event"
+            },
+            {
+              "constant": true,
+              "inputs": [],
+              "name": "accessControlManager",
+              "outputs": [{ "internalType": "contract IAccessControlManagerV5", "name": "", "type": "address" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            }
+          ],
+          "metadata": {
+            "llvm_options": [],
+            "optimizer_settings": {
+              "is_debug_logging_enabled": false,
+              "is_fallback_to_size_enabled": false,
+              "is_verify_each_enabled": false,
+              "level_back_end": "Aggressive",
+              "level_middle_end": "Aggressive",
+              "level_middle_end_size": "Zero"
+            },
+            "solc_metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.b9534989\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"oldAccessControlManager\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newAccessControlManager\",\"type\":\"address\"}],\"name\":\"NewAccessControlManager\",\"type\":\"event\"},{\"constant\":true,\"inputs\":[],\"name\":\"accessControlManager\",\"outputs\":[{\"internalType\":\"contract IAccessControlManagerV5\",\"name\":\"\",\"type\":\"address\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"author\":\"Venus\",\"methods\":{},\"title\":\"AccessControlledV5\"},\"userdoc\":{\"methods\":{\"accessControlManager()\":{\"notice\":\"Returns the address of the access control manager contract\"}},\"notice\":\"This contract is helper between access control manager and actual contract. This contract further inherited by other contract (using solidity 0.5.16) to integrate access controlled mechanism. It provides initialise methods and verifying access methods.\"}},\"settings\":{\"compilationTarget\":{\"contracts/Governance/AccessControlledV5.sol\":\"AccessControlledV5\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"details\":{\"constantOptimizer\":false,\"cse\":false,\"deduplicate\":false,\"jumpdestRemover\":false,\"orderLiterals\":false,\"peephole\":false,\"yul\":false},\"runs\":200},\"remappings\":[]},\"sources\":{\"contracts/Governance/AccessControlledV5.sol\":{\"keccak256\":\"0x4b724928650b944935bc91713782a8cf5bbd9cdb98b3e3fedf31e611c7e6df19\",\"urls\":[\"bzz-raw://63539a3c7dfa2d00498d288d0239d1cf5c34252998cd7086c92caf1920ec3b04\",\"dweb:/ipfs/QmSyfv9PvpBGTFGzZVHCAYxHCNoeHBaFPYFsDGGV8i3FZz\"]},\"contracts/Governance/IAccessControlManagerV5.sol\":{\"keccak256\":\"0x3563db4c75f7aa0b8a982bab591907dda192438a2368511b62a9c587a3e54226\",\"urls\":[\"bzz-raw://909fce56705c50c12b0cc4583caea97b97d7a31216c08681a0c5190ec3a996b4\",\"dweb:/ipfs/Qmd9Xfrk53zNDCmt1CUk6PqdZjPHe67ECYNL9FwpBYtEgf\"]}},\"version\":1}",
+            "solc_version": "0.5.16",
+            "solc_zkvm_edition": "1.0.1",
+            "zk_version": "1.5.1"
+          },
+          "devdoc": { "author": "Venus", "methods": {}, "title": "AccessControlledV5" },
+          "userdoc": {
+            "methods": {
+              "accessControlManager()": { "notice": "Returns the address of the access control manager contract" }
+            },
+            "notice": "This contract is helper between access control manager and actual contract. This contract further inherited by other contract (using solidity 0.5.16) to integrate access controlled mechanism. It provides initialise methods and verifying access methods."
+          },
+          "storageLayout": {
+            "storage": [
+              {
+                "astId": 4,
+                "contract": "contracts/Governance/AccessControlledV5.sol:AccessControlledV5",
+                "label": "_accessControlManager",
+                "offset": 0,
+                "slot": "0",
+                "type": "t_contract(IAccessControlManagerV5)182"
+              },
+              {
+                "astId": 8,
+                "contract": "contracts/Governance/AccessControlledV5.sol:AccessControlledV5",
+                "label": "__gap",
+                "offset": 0,
+                "slot": "1",
+                "type": "t_array(t_uint256)49_storage"
+              }
+            ],
+            "types": {
+              "t_array(t_uint256)49_storage": {
+                "base": "t_uint256",
+                "encoding": "inplace",
+                "label": "uint256[49]",
+                "numberOfBytes": "1568"
+              },
+              "t_contract(IAccessControlManagerV5)182": {
+                "encoding": "inplace",
+                "label": "contract IAccessControlManagerV5",
+                "numberOfBytes": "20"
+              },
+              "t_uint256": { "encoding": "inplace", "label": "uint256", "numberOfBytes": "32" }
+            }
+          },
+          "evm": {
+            "bytecode": {
+              "object": "0000008003000039000000400030043f00000000030004160000000100200190000000130000c13d000000000003004b0000001a0000c13d000000000201001900000009002001980000001a0000613d000000000101043b0000000a011001970000000b0010009c0000001a0000c13d000000000100041a0000000c01100197000000800010043f0000000d010000410000001d0001042e000000000003004b0000001a0000c13d00000020010000390000010000100443000001200000044300000008010000410000001d0001042e00000000010000190000001e000104300000001c000004320000001d0001042e0000001e000104300000000000000000000000020000000000000000000000000000004000000100000000000000000000000000000000000000000000000000fffffffc000000000000000000000000ffffffff00000000000000000000000000000000000000000000000000000000b4a0bdf300000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffffffffffffffffffffffffffff00000000000000000000000000000000000000200000008000000000000000006eff7b6273cfe8beba232f0b3fa86011892132651b839ba0a72b28469b2bc71a"
+            },
+            "methodIdentifiers": { "accessControlManager()": "b4a0bdf3" }
+          },
+          "hash": "0100000f3db2d4150455405d803d742f13d88d886f5410075ed7a57873a1457a",
+          "factoryDependencies": {}
+        }
+      },
+      "contracts/Governance/IAccessControlManagerV5.sol": {
+        "IAccessControlManagerV5": {
+          "abi": [
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "internalType": "bytes32", "name": "role", "type": "bytes32" },
+                { "indexed": true, "internalType": "bytes32", "name": "previousAdminRole", "type": "bytes32" },
+                { "indexed": true, "internalType": "bytes32", "name": "newAdminRole", "type": "bytes32" }
+              ],
+              "name": "RoleAdminChanged",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "internalType": "bytes32", "name": "role", "type": "bytes32" },
+                { "indexed": true, "internalType": "address", "name": "account", "type": "address" },
+                { "indexed": true, "internalType": "address", "name": "sender", "type": "address" }
+              ],
+              "name": "RoleGranted",
+              "type": "event"
+            },
+            {
+              "anonymous": false,
+              "inputs": [
+                { "indexed": true, "internalType": "bytes32", "name": "role", "type": "bytes32" },
+                { "indexed": true, "internalType": "address", "name": "account", "type": "address" },
+                { "indexed": true, "internalType": "address", "name": "sender", "type": "address" }
+              ],
+              "name": "RoleRevoked",
+              "type": "event"
+            },
+            {
+              "constant": true,
+              "inputs": [{ "internalType": "bytes32", "name": "role", "type": "bytes32" }],
+              "name": "getRoleAdmin",
+              "outputs": [{ "internalType": "bytes32", "name": "", "type": "bytes32" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "internalType": "address", "name": "contractAddress", "type": "address" },
+                { "internalType": "string", "name": "functionSig", "type": "string" },
+                { "internalType": "address", "name": "accountToPermit", "type": "address" }
+              ],
+              "name": "giveCallPermission",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+                { "internalType": "address", "name": "account", "type": "address" }
+              ],
+              "name": "grantRole",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [
+                { "internalType": "address", "name": "account", "type": "address" },
+                { "internalType": "address", "name": "contractAddress", "type": "address" },
+                { "internalType": "string", "name": "functionSig", "type": "string" }
+              ],
+              "name": "hasPermission",
+              "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [
+                { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+                { "internalType": "address", "name": "account", "type": "address" }
+              ],
+              "name": "hasRole",
+              "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": true,
+              "inputs": [
+                { "internalType": "address", "name": "account", "type": "address" },
+                { "internalType": "string", "name": "functionSig", "type": "string" }
+              ],
+              "name": "isAllowedToCall",
+              "outputs": [{ "internalType": "bool", "name": "", "type": "bool" }],
+              "payable": false,
+              "stateMutability": "view",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+                { "internalType": "address", "name": "account", "type": "address" }
+              ],
+              "name": "renounceRole",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "internalType": "address", "name": "contractAddress", "type": "address" },
+                { "internalType": "string", "name": "functionSig", "type": "string" },
+                { "internalType": "address", "name": "accountToRevoke", "type": "address" }
+              ],
+              "name": "revokeCallPermission",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            },
+            {
+              "constant": false,
+              "inputs": [
+                { "internalType": "bytes32", "name": "role", "type": "bytes32" },
+                { "internalType": "address", "name": "account", "type": "address" }
+              ],
+              "name": "revokeRole",
+              "outputs": [],
+              "payable": false,
+              "stateMutability": "nonpayable",
+              "type": "function"
+            }
+          ],
+          "metadata": "{\"compiler\":{\"version\":\"0.5.16+commit.b9534989\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"previousAdminRole\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"newAdminRole\",\"type\":\"bytes32\"}],\"name\":\"RoleAdminChanged\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleGranted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"}],\"name\":\"RoleRevoked\",\"type\":\"event\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"}],\"name\":\"getRoleAdmin\",\"outputs\":[{\"internalType\":\"bytes32\",\"name\":\"\",\"type\":\"bytes32\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"contractAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"functionSig\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"accountToPermit\",\"type\":\"address\"}],\"name\":\"giveCallPermission\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"grantRole\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"contractAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"functionSig\",\"type\":\"string\"}],\"name\":\"hasPermission\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"hasRole\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"functionSig\",\"type\":\"string\"}],\"name\":\"isAllowedToCall\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"renounceRole\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"address\",\"name\":\"contractAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"functionSig\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"accountToRevoke\",\"type\":\"address\"}],\"name\":\"revokeCallPermission\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":false,\"inputs\":[{\"internalType\":\"bytes32\",\"name\":\"role\",\"type\":\"bytes32\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"revokeRole\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"author\":\"Venus\",\"methods\":{\"getRoleAdmin(bytes32)\":{\"details\":\"Returns the admin role that controls `role`. See {grantRole} and {revokeRole}.     * To change a role's admin, use {AccessControl-_setRoleAdmin}.\"},\"giveCallPermission(address,string,address)\":{\"details\":\"this function can be called only from Role Admin or DEFAULT_ADMIN_ROLE\\t\\tMay emit a {RoleGranted} event.\",\"params\":{\"contractAddress\":\"address of contract for which call permissions will be granted\",\"functionSig\":\"signature e.g. \\\"functionName(uint,bool)\\\"\"}},\"grantRole(bytes32,address)\":{\"details\":\"Grants `role` to `account`.     * If `account` had not been already granted `role`, emits a {RoleGranted} event.     * Requirements:     * - the caller must have ``role``'s admin role.\"},\"hasRole(bytes32,address)\":{\"details\":\"Returns `true` if `account` has been granted `role`.\"},\"isAllowedToCall(address,string)\":{\"details\":\"Since the contract is calling itself this function, we can get contracts address with msg.sender\",\"params\":{\"account\":\"address (eoa or contract) for which call permissions will be checked\",\"functionSig\":\"signature e.g. \\\"functionName(uint,bool)\\\"\"},\"return\":\"false if the user account cannot call the particular contract function     \"},\"renounceRole(bytes32,address)\":{\"details\":\"Revokes `role` from the calling account.     * Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced).     * If the calling account had been granted `role`, emits a {RoleRevoked} event.     * Requirements:     * - the caller must be `account`.\"},\"revokeCallPermission(address,string,address)\":{\"details\":\"this function can be called only from Role Admin or DEFAULT_ADMIN_ROLE\\t\\tMay emit a {RoleRevoked} event.\",\"params\":{\"contractAddress\":\"address of contract for which call permissions will be revoked\",\"functionSig\":\"signature e.g. \\\"functionName(uint,bool)\\\"\"}},\"revokeRole(bytes32,address)\":{\"details\":\"Revokes `role` from `account`.     * If `account` had been granted `role`, emits a {RoleRevoked} event.     * Requirements:     * - the caller must have ``role``'s admin role.\"}},\"title\":\"IAccessControlManagerV5\"},\"userdoc\":{\"methods\":{\"giveCallPermission(address,string,address)\":{\"notice\":\"Gives a function call permission to one single account\"},\"isAllowedToCall(address,string)\":{\"notice\":\"Verifies if the given account can call a praticular contract's function\"},\"revokeCallPermission(address,string,address)\":{\"notice\":\"Revokes an account's permission to a particular function call\"}},\"notice\":\"Interface implemented by the `AccessControlManagerV5` contract.\"}},\"settings\":{\"compilationTarget\":{\"contracts/Governance/IAccessControlManagerV5.sol\":\"IAccessControlManagerV5\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"optimizer\":{\"details\":{\"constantOptimizer\":false,\"cse\":false,\"deduplicate\":false,\"jumpdestRemover\":false,\"orderLiterals\":false,\"peephole\":false,\"yul\":false},\"runs\":200},\"remappings\":[]},\"sources\":{\"contracts/Governance/IAccessControlManagerV5.sol\":{\"keccak256\":\"0x3563db4c75f7aa0b8a982bab591907dda192438a2368511b62a9c587a3e54226\",\"urls\":[\"bzz-raw://909fce56705c50c12b0cc4583caea97b97d7a31216c08681a0c5190ec3a996b4\",\"dweb:/ipfs/Qmd9Xfrk53zNDCmt1CUk6PqdZjPHe67ECYNL9FwpBYtEgf\"]}},\"version\":1}",
+          "devdoc": {
+            "author": "Venus",
+            "methods": {
+              "getRoleAdmin(bytes32)": {
+                "details": "Returns the admin role that controls `role`. See {grantRole} and {revokeRole}.     * To change a role's admin, use {AccessControl-_setRoleAdmin}."
+              },
+              "giveCallPermission(address,string,address)": {
+                "details": "this function can be called only from Role Admin or DEFAULT_ADMIN_ROLE\t\tMay emit a {RoleGranted} event.",
+                "params": {
+                  "contractAddress": "address of contract for which call permissions will be granted",
+                  "functionSig": "signature e.g. \"functionName(uint,bool)\""
+                }
+              },
+              "grantRole(bytes32,address)": {
+                "details": "Grants `role` to `account`.     * If `account` had not been already granted `role`, emits a {RoleGranted} event.     * Requirements:     * - the caller must have ``role``'s admin role."
+              },
+              "hasRole(bytes32,address)": { "details": "Returns `true` if `account` has been granted `role`." },
+              "isAllowedToCall(address,string)": {
+                "details": "Since the contract is calling itself this function, we can get contracts address with msg.sender",
+                "params": {
+                  "account": "address (eoa or contract) for which call permissions will be checked",
+                  "functionSig": "signature e.g. \"functionName(uint,bool)\""
+                },
+                "return": "false if the user account cannot call the particular contract function     "
+              },
+              "renounceRole(bytes32,address)": {
+                "details": "Revokes `role` from the calling account.     * Roles are often managed via {grantRole} and {revokeRole}: this function's purpose is to provide a mechanism for accounts to lose their privileges if they are compromised (such as when a trusted device is misplaced).     * If the calling account had been granted `role`, emits a {RoleRevoked} event.     * Requirements:     * - the caller must be `account`."
+              },
+              "revokeCallPermission(address,string,address)": {
+                "details": "this function can be called only from Role Admin or DEFAULT_ADMIN_ROLE\t\tMay emit a {RoleRevoked} event.",
+                "params": {
+                  "contractAddress": "address of contract for which call permissions will be revoked",
+                  "functionSig": "signature e.g. \"functionName(uint,bool)\""
+                }
+              },
+              "revokeRole(bytes32,address)": {
+                "details": "Revokes `role` from `account`.     * If `account` had been granted `role`, emits a {RoleRevoked} event.     * Requirements:     * - the caller must have ``role``'s admin role."
+              }
+            },
+            "title": "IAccessControlManagerV5"
+          },
+          "userdoc": {
+            "methods": {
+              "giveCallPermission(address,string,address)": {
+                "notice": "Gives a function call permission to one single account"
+              },
+              "isAllowedToCall(address,string)": {
+                "notice": "Verifies if the given account can call a praticular contract's function"
+              },
+              "revokeCallPermission(address,string,address)": {
+                "notice": "Revokes an account's permission to a particular function call"
+              }
+            },
+            "notice": "Interface implemented by the `AccessControlManagerV5` contract."
+          },
+          "storageLayout": { "storage": [], "types": null },
+          "evm": {
+            "methodIdentifiers": {
+              "getRoleAdmin(bytes32)": "248a9ca3",
+              "giveCallPermission(address,string,address)": "584f6b60",
+              "grantRole(bytes32,address)": "2f2ff15d",
+              "hasPermission(address,address,string)": "82bfd0f0",
+              "hasRole(bytes32,address)": "91d14854",
+              "isAllowedToCall(address,string)": "18c5e8ab",
+              "renounceRole(bytes32,address)": "36568abe",
+              "revokeCallPermission(address,string,address)": "545f7a32",
+              "revokeRole(bytes32,address)": "d547741f"
+            }
+          }
+        }
+      }
+    }
+  }
+}

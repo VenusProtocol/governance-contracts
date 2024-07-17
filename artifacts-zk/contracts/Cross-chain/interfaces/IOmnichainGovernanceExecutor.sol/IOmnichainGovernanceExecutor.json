@@ -1,0 +1,43 @@
+{
+  "_format": "hh-zksolc-artifact-1",
+  "contractName": "IOmnichainGovernanceExecutor",
+  "sourceName": "contracts/Cross-chain/interfaces/IOmnichainGovernanceExecutor.sol",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint16",
+          "name": "srcChainId_",
+          "type": "uint16"
+        },
+        {
+          "internalType": "bytes",
+          "name": "srcAddress_",
+          "type": "bytes"
+        }
+      ],
+      "name": "setTrustedRemoteAddress",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "addr",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "bytecode": "0x",
+  "deployedBytecode": "0x",
+  "linkReferences": {},
+  "deployedLinkReferences": {},
+  "factoryDeps": {}
+}

@@ -1,8 +1,9 @@
 import "module-alias/register";
 
+import "@matterlabs/hardhat-zksync-deploy";
+import "@matterlabs/hardhat-zksync-solc";
+import "@matterlabs/hardhat-zksync-verify";
 import "@nomicfoundation/hardhat-chai-matchers";
-import "@nomiclabs/hardhat-etherscan";
-import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
 import "hardhat-dependency-compiler";
 import "hardhat-deploy";
@@ -13,7 +14,6 @@ import "solidity-docgen";
 
 require("dotenv").config();
 
-const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY;
 const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
 
 extendConfig((config: HardhatConfig) => {
@@ -84,10 +84,12 @@ const config: HardhatUserConfig = {
       gasPrice: 10000000000, // 10 gwei
       gasMultiplier: 10,
       timeout: 12000000,
+      zksync: false,
     },
     bscmainnet: {
       url: process.env.ARCHIVE_NODE_bscmainnet || "https://bsc-dataseed.binance.org/",
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+      zksync: false,
     },
     sepolia: {
       url: process.env.ARCHIVE_NODE_sepolia || "https://ethereum-sepolia.blockpi.network/v1/rpc/public",
@@ -95,6 +97,7 @@ const config: HardhatUserConfig = {
       live: true,
       gasPrice: 20000000000, // 20 gwei
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+      zksync: false,
     },
     ethereum: {
       url: process.env.ARCHIVE_NODE_ethereum || "https://ethereum.blockpi.network/v1/rpc/public",
@@ -102,12 +105,14 @@ const config: HardhatUserConfig = {
       live: true,
       timeout: 1200000, // 20 minutes
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+      zksync: false,
     },
     opbnbtestnet: {
       url: process.env.ARCHIVE_NODE_opbnbtestnet || "https://opbnb-testnet-rpc.bnbchain.org",
       chainId: 5611,
       live: true,
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+      zksync: false,
     },
     opbnbmainnet: {
       url: process.env.ARCHIVE_NODE_opbnbmainnet || "https://opbnb-mainnet-rpc.bnbchain.org",
@@ -115,18 +120,28 @@ const config: HardhatUserConfig = {
       live: true,
       gasPrice: 10000000000, // 10 gwei
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+      zksync: false,
     },
     arbitrumsepolia: {
       url: process.env.ARCHIVE_NODE_arbitrumsepolia || "https://sepolia-rollup.arbitrum.io/rpc",
       chainId: 421614,
       live: true,
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+      zksync: false,
     },
     arbitrumone: {
       url: process.env.ARCHIVE_NODE_arbitrumone || "https://arb1.arbitrum.io/rpc",
       chainId: 42161,
       live: true,
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+      zksync: false,
+    },
+    zksyncsepolia: {
+      url: process.env.ARCHIVE_NODE_zksyncsepolia || "https://sepolia.era.zksync.dev",
+      ethNetwork: "sepolia",
+      verifyURL: "https://explorer.sepolia.era.zksync.dev/contract_verification",
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+      zksync: true,
     },
   },
   etherscan: {
