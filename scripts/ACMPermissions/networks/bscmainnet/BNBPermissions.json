@@ -1,0 +1,395 @@
+{
+  "contracts": [
+    {
+      "address": [
+        "0x6592b5DE802159F3E74B2486b091D11a8256ab8A",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": [
+        "pause()",
+        "unpause()",
+        "setOracle(address,address,uint8)",
+        "enableOracle(address,uint8,bool)",
+        "setTokenConfig(TokenConfig)"
+      ]
+    },
+    {
+      "address": [
+        "0x1B2103441A0A108daD8848D8F5d790e4D402921F",
+        "0x8455EFA4D7Ff63b8BFD96AdD889483Ea7d39B70a",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": [
+        "setTokenConfig(TokenConfig)",
+        "setDirectPrice(address,uint256)",
+        "setUnderlyingPrice(address,uint256)"
+      ]
+    },
+    {
+      "address": [
+        "0x594810b741d136f1960141C0d8Fb4a91bE78A820",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": ["setMaxStalePeriod(string,uint256)", "setSymbolOverride(string,string)"]
+    },
+    {
+      "address": [
+        "0x6E332fF0bB52475304494E4AE5063c1051c7d735",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": ["setValidateConfig(ValidateConfig)"]
+    },
+    {
+      "address": ["0xb893E38162f55fb80B18Aa44da76FaDf8E9B2262"],
+      "functions": ["setUnderlyingPythOracle(address)", "setTokenConfig(TokenConfig)"]
+    },
+    {
+      "address": ["0xea2f042e1A4f057EF8A5220e57733AD747ea8867"],
+      "functions": ["setTokenConfig(TokenConfig)"]
+    },
+
+    {
+      "address": [
+        "0x70d644877b7b73800E9073BCFCE981eAaB6Dbc21",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": [
+        "setSendVersion(uint16)",
+        "setReceiveVersion(uint16)",
+        "forceResumeReceive(uint16,bytes)",
+        "setOracle(address)",
+        "setMaxDailyLimit(uint16,uint256)",
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        "setMaxDailyReceiveLimit(uint16,uint256)",
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        "pause()",
+        "unpause()",
+        "removeTrustedRemote(uint16)",
+        "dropFailedMessage(uint16,bytes,uint64)",
+        "setPrecrime(address)",
+        "setMinDstGas(uint16,uint16,uint256)",
+        "setPayloadSizeLimit(uint16,uint256)",
+        "setWhitelist(address,bool)",
+        "setConfig(uint16,uint16,uint256,bytes)",
+        "sweepToken(address,address,uint256)",
+        "updateSendAndCallEnabled(bool)",
+        "setTrustedRemoteAddress(uint16,bytes)",
+        "transferBridgeOwnership(address)",
+        "fallbackWithdraw(address,uint256)",
+        "fallbackDeposit(address,uint256)"
+      ]
+    },
+    {
+      "address": [
+        "0xfD36E2c2a6789Db23113685031d7F16329158384",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": [
+        "_supportMarket(address)",
+        "seizeVenus(address[],address)",
+        "_setCollateralFactor(address,uint256)",
+        "_setLiquidationIncentive(uint256)",
+        "_setMarketBorrowCaps(address[],uint256[])",
+        "_setMarketSupplyCaps(address[],uint256[])",
+        "_setProtocolPaused(bool)",
+        "_setActionsPaused(address[],uint8[],bool)",
+        "_setForcedLiquidation(address,bool)",
+        "_setForcedLiquidationForUser(address,address,bool)"
+      ]
+    },
+    {
+      "address": [
+        "0x94c1495cD4c557f1560Cbd68EAB0d197e6291571",
+        "0x3344417c9360b963ca93A4e8305361AEde340Ab9",
+        "0x1b43ea8622e76627B81665B1eCeBB4867566B963",
+        "0xd933909A4a2b7A4638903028f44D1d38ce27c352",
+        "0x23b4404E4E5eC5FF5a6FFb70B7d14E3FabF237B0",
+        "0x33B6fa34cd23e5aeeD1B112d5988B026b8A5567d",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": [
+        "setCloseFactor(uint256)",
+        "setCollateralFactor(address,uint256,uint256)",
+        "setLiquidationIncentive(uint256)",
+        "setMarketBorrowCaps(address[],uint256[])",
+        "setMarketSupplyCaps(address[],uint256[])",
+        "setActionsPaused(address[],uint256[],bool)",
+        "setMinLiquidatableCollateral(uint256)",
+        "setForcedLiquidation(address,bool)",
+        "supportMarket(address)"
+      ]
+    },
+    {
+      "address": [
+        "0x26DA28954763B92139ED49283625ceCAf52C6f94",
+        "0x9A0AF7FDb2065Ce470D72664DE73cAE409dA28Ec",
+        "0x5F0388EBc2B94FA8E123F404b79cCF5f40b29176",
+        "0x972207A639CC1B374B893cc33Fa251b55CEB7c07",
+        "0xA07c5b74C9B40447a954e1466938b865b6BBea36",
+        "0x882C173bC7Ff3b7786CA16dfeD3DFFfb9Ee7847B",
+        "0x95c78222B3D6e262426483D42CfA53685A67Ab9D",
+        "0x86aC3974e2BD0d60825230fa6F355fF11409df5c",
+        "0x334b3eCB4DCa3593BCCC3c7EBD1A1C1d1780FBF1",
+        "0xec3422Ef92B2fb59e84c8B02Ba73F1fE84Ed8D71",
+        "0x1610bc33319e9398de5f57B33a5b184c806aD217",
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0xf508fCD89b8bd15579dc79A6827cB4686A3592c8",
+        "0xC4eF4229FEc74Ccfe17B2bdeF7715fAC740BA0ba",
+        "0xf91d58b5aE142DAcC749f58A49FCBac340Cb0343",
+        "0x650b940a1033B8A1b1873f78730FcFC73ec11f1f",
+        "0x57A5297F2cB2c0AaC9D554660acd6D385Ab50c6B",
+        "0xb91A659E88B51474767CD97EF3196A3e7cEDD2c8",
+        "0x5c9476FcD6a4F9a3654139721c949c2233bBbBc8",
+        "0x2fF3d0F6990a40261c66E1ff2017aCBc282EB6d0",
+        "0xC5D3466aA484B040eE977073fcF337f2c00071c1",
+        "0x61eDcFe8Dd6bA3c891CB9bEc2dc7657B3B422E93",
+        "0xBf762cd5991cA1DCdDaC9ae5C638F5B5Dc3Bee6E",
+        "0x08CEB3F4a7ed3500cA0982bcd0FC7816688084c3",
+        "0x27FF564707786720C71A2e5c1490A63266683612",
+        "0xecA88125a5ADbe82614ffC12D0DB554E2e2867C8",
+        "0xfD5840Cd36d94D7229439859C0112a4185BC0255",
+        "0x78366446547D062f45b4C0f320cDaa6d710D87bb",
+        "0x6CFdEc747f37DAf3b87a35a1D9c8AD3063A1A8A0",
+        "0xB248a295732e0225acd3337607cc01068e3b9c10",
+        "0x151B1e2635A717bcDc836ECd6FbB62B674FE3E1D"
+      ],
+
+      "functions": [
+        "_setReserveFactor(uint256)",
+        "_reduceReserves(uint256)",
+        "setReduceReservesBlockDelta(uint256)",
+        "_setInterestRateModel(address)"
+      ]
+    },
+    {
+      "address": [
+        "0x0000000000000000000000000000000000000000000000000000000000000000",
+        "0xCa2D81AA7C09A1a025De797600A7081146dceEd9",
+        "0xc3a45ad8812189cAb659aD99E64B1376f6aCD035",
+        "0x5e3072305F9caE1c7A82F6Fe9E38811c74922c3B",
+        "0x795DE779Be00Ea46eA97a28BDD38d9ED570BCF0F",
+        "0x8f657dFD3a1354DEB4545765fE6840cc54AFd379",
+        "0x02c5Fb0F26761093D297165e902e96D08576D344",
+        "0x1D8bBDE12B6b34140604E18e9f9c6e14deC16854",
+        "0xA615467caE6B9E0bb98BC04B4411d9296fd1dFa0",
+        "0x19CE11C8817a1828D1d357DFBF62dCf5b0B2A362",
+        "0x53728FD51060a85ac41974C6C3Eb1DaE42776723",
+        "0x736bf1D21A28b5DC19A1aC8cA71Fc2856C23c03F",
+        "0xFf1112ba7f88a53D4D23ED4e14A117A2aE17C6be",
+        "0xE5FE5527A5b76C75eedE77FdFA6B80D52444A465",
+        "0xc353B7a1E13dDba393B5E120D4169Da7185aA2cb",
+        "0x9f2FD23bd0A5E08C5f2b9DD6CF9C96Bfb5fA515C",
+        "0x4978591f17670A846137d9d613e333C38dc68A37",
+        "0xBfe25459BA784e70E2D7a718Be99a1f3521cA17f",
+        "0x5E21bF67a6af41c74C1773E4b473ca5ce8fd3791",
+        "0xcc5D9e502574cda17215E70bC0B4546663785227",
+        "0xd3CC9d8f3689B83c91b7B59cAB4946B063EB894A",
+        "0xe10E80B7FD3a29fE46E16C30CC8F4dd938B742e2",
+        "0x49c26e12959345472E2Fd95E5f79F8381058d3Ee",
+        "0x836beb2cB723C498136e1119248436A645845F4E",
+        "0xb114cfA615c828D88021a41bFc524B800E64a9D5",
+        "0xf1da185CCe5BeD1BeBbb3007Ef738Ea4224025F7",
+        "0x281E5378f99A4bc55b295ABc0A3E7eD32Deba059",
+        "0x52eD99Cd0a56d60451dD4314058854bc0845bbB5",
+        "0x4a9613D06a241B76b81d3777FCe3DDd1F61D4Bd0"
+      ],
+      "functions": [
+        "setProtocolSeizeShare(uint256)",
+        "setReserveFactor(uint256)",
+        "setInterestRateModel(address)",
+        "setReduceReservesBlockDelta(uint256)"
+      ]
+    },
+    {
+      "address": [
+        "0x9F7b01A536aFA00EF10310A162877fd792cD0666",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": [
+        "addPool(string,address,uint256,uint256,uint256)",
+        "addMarket(AddMarketInput)",
+        "setPoolName(address,string)",
+        "updatePoolMetadata(address,VenusPoolMetaData)",
+        "removeMarket(address,address)"
+      ]
+    },
+    {
+      "address": ["0x0000000000000000000000000000000000000000000000000000000000000000"],
+      "functions": [
+        "setRewardTokenSpeeds(address[],uint256[],uint256[])",
+        "setLastRewardingBlock(address[],uint32[],uint32[])",
+        "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])"
+      ]
+    },
+    {
+      "address": [
+        "0xA5622D276CcbB8d9BBE3D1ffd1BB11a0032E53F0",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": [
+        "setPoolsAssetsDirectTransfer(address[],address[][],bool[][])",
+        "setConversionConfig(address,address,ConversionConfig)",
+        "pauseConversion()",
+        "resumeConversion()",
+        "setMinAmountToConvert(uint256)"
+      ]
+    },
+    {
+      "address": [
+        "0x269ff7818DB317f60E386D2be0B259e1a324a40a",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": ["fundXVSVault(uint256)"]
+    },
+    {
+      "address": [
+        "0xD9f101AA67F3D72662609a2703387242452078C3",
+        "0xa758c9C215B6c4198F0a0e3FA46395Fa15Db691b",
+        "0xE8CeAa79f082768f99266dFd208d665d2Dd18f53",
+        "0xca430B8A97Ea918fF634162acb0b731445B8195E",
+        "0xd5b9AE835F4C59272032B3B954417179573331E0",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": [
+        "pauseConversion()",
+        "resumeConversion()",
+        "setMinAmountToConvert(uint256)",
+        "setConversionConfig(address,address,ConversionConfig)"
+      ]
+    },
+    {
+      "address": [
+        "0xF7Caad5CeB0209165f2dFE71c92aDe14d0F15995",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": ["addTokenConverter(address)", "removeTokenConverter(address)"]
+    },
+    {
+      "address": ["0x051100480289e704d20e9DB4804837068f3f9204"],
+      "functions": [
+        "pause()",
+        "resume()",
+        "add(address,uint256,address,uint256,uint256)",
+        "set(address,uint256,uint256)",
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
+        "setRewardAmountPerBlock(address,uint256)"
+      ]
+    },
+    {
+      "address": ["0x004065D34C6b18cE4370ced1CeBDE94865DbFAFE"],
+      "functions": [
+        "setBaseRate(uint256)",
+        "setFloatRate(uint256)",
+        "setMintCap(uint256)",
+        "toggleOnlyPrimeHolderMint()"
+      ]
+    },
+    {
+      "address": ["0x0870793286aada55d39ce7f82fb2766e8004cf43"],
+      "functions": [
+        "restrictLiquidation(address)",
+        "unrestrictLiquidation(address)",
+        "addToAllowlist(address,address)",
+        "removeFromAllowlist(address,address)",
+        "setTreasuryPercent(uint256)",
+        "setMinLiquidatableVAI(uint256)",
+        "setPendingRedeemChunkLength(uint256)",
+        "pauseForceVAILiquidate()",
+        "resumeForceVAILiquidate()"
+      ]
+    },
+    {
+      "address": ["0x0000000000000000000000000000000000000000000000000000000000000000"],
+      "functions": ["updateJumpRateModel(uint256,uint256,uint256,uint256)"]
+    },
+    {
+      "address": ["0x98bF4786D72AAEF6c714425126Dd92f149e3F334"],
+      "functions": ["pause()", "resume()", "withdrawBep20(address,address,uint256)", "setLastAccruingBlock(uint256)"]
+    },
+    {
+      "address": ["0x0667Eed0a0aAb930af74a3dfeDD263A73994f216"],
+      "functions": ["pause()", "resume()"]
+    },
+    {
+      "address": [
+        "0xC138aa4E424D1A8539e8F38Af5a754a2B7c3Cc36",
+        "0x0000000000000000000000000000000000000000000000000000000000000000"
+      ],
+      "functions": [
+        "pause()",
+        "resume()",
+        "setFeeIn(uint256)",
+        "setFeeOut(uint256)",
+        "setVAIMintCap(uint256)",
+        "setVenusTreasury(address)",
+        "setOracle(address)"
+      ]
+    },
+    {
+      "address": ["0x3344417c9360b963ca93A4e8305361AEde340Ab9"],
+      "functions": ["removeMarket(address)"]
+    },
+    {
+      "address": ["0xdF31a28D68A2AB381D42b380649Ead7ae2A76E42"],
+      "functions": [
+        "setMinAmountToConvert(uint256)",
+        "swapPoolsAssets(address[],uint256[],address[][],uint256)",
+        "setConvertibleBaseAsset(address)"
+      ]
+    },
+    {
+      "address": ["0xf37530A8a810Fcb501AA0Ecd0B0699388F0F2209"],
+      "functions": [
+        "updateNextBidderBlockLimit(uint256)",
+        "updateIncentiveBps(uint256)",
+        "updateMinimumPoolBadDebt(uint256)",
+        "updateWaitForFirstBidder(uint256)",
+        "pauseAuctions()",
+        "resumeAuctions()"
+      ]
+    },
+    {
+      "address": ["0xCa01D5A9A248a830E9D93231e791B1afFed7c446"],
+      "functions": ["addOrUpdateDistributionConfigs(DistributionConfig[])", "removeDistributionConfig(Schema,address)"]
+    },
+    {
+      "address": ["0x23c4F844ffDdC6161174eB32c770D4D8C07833F2"],
+      "functions": [
+        "setTokensDistributionSpeed(address[],uint256[])",
+        "setMaxTokensDistributionSpeed(address[],uint256[])",
+        "setMaxLoopsLimit(uint256)",
+        "pauseFundsTransfer()",
+        "resumeFundsTransfer()"
+      ]
+    },
+    {
+      "address": ["0xBbCD063efE506c3D42a0Fa2dB5C08430288C71FC"],
+      "functions": [
+        "updateAlpha(uint128,uint128)",
+        "updateMultipliers(address,uint256,uint256)",
+        "setStakedAt(address[],uint256[])",
+        "addMarket(address,address,uint256,uint256)",
+        "setLimit(uint256,uint256)",
+        "setMaxLoopsLimit(uint256)",
+        "issue(bool,address[])",
+        "burn(address)",
+        "togglePause()"
+      ]
+    },
+    {
+      "address": ["0x36a69dE601381be7b0DcAc5D5dD058825505F8f6"],
+      "functions": [
+        "removeTrustedRemote(uint16)",
+        "execute(uint16,bytes,bytes,address)",
+        "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
+        "setTrustedRemoteAddress(uint16,bytes)",
+        "setConfig(uint16,uint16,uint256,bytes)",
+        "setSendVersion(uint16)",
+        "setMaxDailyLimit(uint16,uint256)",
+        "pause()",
+        "unpause()"
+      ]
+    }
+  ]
+}
