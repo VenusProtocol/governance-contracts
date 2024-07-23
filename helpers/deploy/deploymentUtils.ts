@@ -4,7 +4,7 @@ import bscMainnetGovernanceDeployments from "../../deployments/bscmainnet.json";
 import bscTestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
 import { LZ_CHAINID, SUPPORTED_NETWORKS } from "./constants";
 
-export const testnetNetworks = ["sepolia", "opbnbtestnet", "arbitrumsepolia", "hardhat"];
+export const testnetNetworks = ["sepolia", "opbnbtestnet", "arbitrumsepolia", "zksyncsepolia", "hardhat"];
 const mainnetNetworks = ["ethereum", "opbnbmainnet", "arbitrumone", "hardhat"];
 
 export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<string> => {
