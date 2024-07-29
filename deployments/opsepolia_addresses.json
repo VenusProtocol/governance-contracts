@@ -1,0 +1,7 @@
+{
+  "name": "opsepolia",
+  "chainId": "11155420",
+  "addresses": {
+    "AccessControlManager": "0x1652E12C8ABE2f0D84466F0fc1fA4286491B3BC1"
+  }
+}
