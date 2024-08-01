@@ -67,7 +67,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const omnichainGovernanceExecutorAddress = (await ethers.getContract("OmnichainGovernanceExecutor")).address;
 
-  await deploy("NormalTimelock", {
+  await deploy(live ? "NormalTimelock" : "NormalTimelockRemote", {
     contract: live ? "TimelockV8" : "TestTimelockV8",
     from: deployer,
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].normal],
@@ -75,7 +75,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     autoMine: true,
   });
 
-  await deploy("FastTrackTimelock", {
+  await deploy(live ? "FastTrackTimelock" : "FastTrackTimelockRemote", {
     contract: live ? "TimelockV8" : "TestTimelockV8",
     from: deployer,
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].fast],
@@ -83,7 +83,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     autoMine: true,
   });
 
-  await deploy("CriticalTimelock", {
+  await deploy(live ? "CriticalTimelock" : "CriticalTimelockRemote", {
     contract: live ? "TimelockV8" : "TestTimelockV8",
     from: deployer,
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].critical],
