@@ -1,3 +1,12 @@
+## [2.3.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.2.0...v2.3.0-dev.1) (2024-08-01)
+
+
+### Features
+
+* add config for zksync ([9cb4c7c](https://github.com/VenusProtocol/governance-contracts/commit/9cb4c7cfdadd26bc6360a442c085b41391af3b21))
+* add configurations and deploy ACM on zksync sepolia ([7926c59](https://github.com/VenusProtocol/governance-contracts/commit/7926c59905fb6045caecf49bbe452feec484a3f4))
+* updating deployment files ([0549339](https://github.com/VenusProtocol/governance-contracts/commit/05493390059b7352a0b734c892436c767965206d))
+
 ## [2.2.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.1.0...v2.2.0) (2024-07-18)
 
 
