@@ -204,6 +204,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   );
 };
 func.tags = ["OmnichainExecutorOwner", "Remote"];
+func.id = "configure_remote_executor";
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
   hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet";
