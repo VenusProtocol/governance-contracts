@@ -34,7 +34,7 @@ export const LZ_CHAINID: Record<SUPPORTED_NETWORKS, number> = {
   opbnbtestnet: 10202,
   arbitrumsepolia: 10231,
   hardhat: 10102,
-  zksyncsepolia: 0, // TO-DO
+  zksyncsepolia: 10248,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
