@@ -1,0 +1,7 @@
+{
+  "name": "zksyncsepolia",
+  "chainId": "300",
+  "addresses": {
+    "AccessControlManager": "0xD07f543d47c3a8997D6079958308e981AC14CD01"
+  }
+}
