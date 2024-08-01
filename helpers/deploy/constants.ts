@@ -21,7 +21,7 @@ export const LZ_ENDPOINTS: Record<SUPPORTED_NETWORKS, string> = {
   opbnbtestnet: "0x83c73Da98cf733B03315aFa8758834b36a195b87",
   arbitrumsepolia: "0x6098e96a28E02f27B1e6BD381f870F1C8Bd169d3",
   hardhat: "0x6Fcb97553D41516Cb228ac03FdC8B9a0a9df04A1",
-  zksyncsepolia: "", //TO-DO
+  zksyncsepolia: "0x99b6359ce8E0eBdC27eBeDb76FE28F29303E78fF",
 };
 
 export const LZ_CHAINID: Record<SUPPORTED_NETWORKS, number> = {
