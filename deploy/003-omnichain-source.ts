@@ -3,7 +3,7 @@ import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
-import { LZ_ENDPOINTS, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
+import { SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
 import {
   OmnichainProposalSenderCriticalMethods,
   OmnichainProposalSenderFasttrackMethods,
@@ -11,6 +11,7 @@ import {
   OmnichainProposalSenderNormalMethods,
   config,
 } from "../helpers/deploy/deploymentConfig";
+import { getLzEndpoint } from "../helpers/deploy/deploymentUtils";
 import { getArgTypesFromSignature } from "../helpers/utils";
 
 const BNB_MAINNET_GUARDIAN = "0x1C2CAc6ec528c20800B2fe734820D87b581eAA6B";
@@ -76,7 +77,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const OmnichainProposalSender = await deploy("OmnichainProposalSender", {
     from: deployer,
-    args: [LZ_ENDPOINTS[hre.network.name as keyof typeof LZ_ENDPOINTS], acmAddress],
+    args: [await getLzEndpoint(hre.network.name as SUPPORTED_NETWORKS), acmAddress],
     log: true,
     autoMine: true,
   });
@@ -131,4 +132,6 @@ func.tags = ["OmnichainProposalSender"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
   !(hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet") && hre.network.name !== "hardhat";
+
+func.dependencies = ["mocks"];
 export default func;
