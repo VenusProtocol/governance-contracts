@@ -1,4 +1,5 @@
 import { ethers, getNamedAccounts } from "hardhat";
+import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import bscMainnetGovernanceDeployments from "../../deployments/bscmainnet.json";
 import bscTestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
@@ -64,6 +65,22 @@ export const getOmnichainProposalSender = async (network: SUPPORTED_NETWORKS) =>
   return "0x0000000000000000000000000000000000000001";
 };
 
+export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<string> => {
+  const lzEndpointMock = await ethers.getContractOrNull("LZEndpointMock");
+  return {
+    ethereum: "0x66A71Dcef29A0fFBDBE3c6a460a3B5BC225Cd675",
+    bscmainnet: "0x3c2269811836af69497E5F486A85D7316753cf62",
+    opbnbmainnet: "0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7",
+    arbitrumone: "0x3c2269811836af69497E5F486A85D7316753cf62",
+    sepolia: "0xae92d5aD7583AD66E49A0c67BAd18F6ba52dDDc1",
+    bsctestnet: "0x6Fcb97553D41516Cb228ac03FdC8B9a0a9df04A1",
+    opbnbtestnet: "0x83c73Da98cf733B03315aFa8758834b36a195b87",
+    arbitrumsepolia: "0x6098e96a28E02f27B1e6BD381f870F1C8Bd169d3",
+    zksyncsepolia: "0x99b6359ce8E0eBdC27eBeDb76FE28F29303E78fF",
+    hardhat: lzEndpointMock?.address || "",
+  }[networkName];
+};
+
 export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {
   if (testnetNetworks.includes(network as string)) {
     return LZ_CHAINID.bsctestnet;
@@ -71,6 +88,10 @@ export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {
     return LZ_CHAINID.bscmainnet;
   }
   return 1;
+};
+
+export const onlyHardhat = () => async (hre: HardhatRuntimeEnvironment) => {
+  return hre.network.name !== "hardhat";
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
