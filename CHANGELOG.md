@@ -1,3 +1,10 @@
+## [2.3.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.3.0-dev.1...v2.3.0-dev.2) (2024-08-02)
+
+
+### Bug Fixes
+
+* add id to configuration script to avoid duplicate execution ([5001d32](https://github.com/VenusProtocol/governance-contracts/commit/5001d3202b7845d4910255dbcf204aed99a2e920))
+
 ## [2.3.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.2.0...v2.3.0-dev.1) (2024-08-01)
 
 
