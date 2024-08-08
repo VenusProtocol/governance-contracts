@@ -1,3 +1,5 @@
+## [2.3.0-dev.3](https://github.com/VenusProtocol/governance-contracts/compare/v2.3.0-dev.2...v2.3.0-dev.3) (2024-08-08)
+
 ## [2.3.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.3.0-dev.1...v2.3.0-dev.2) (2024-08-02)
 
 
