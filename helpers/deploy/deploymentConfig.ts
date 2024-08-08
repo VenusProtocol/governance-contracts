@@ -9,7 +9,7 @@ export type AccessControlEntry = {
 export const OmnichainProposalSenderNormalMethods: string[] = [
   "setTrustedRemoteAddress(uint16,bytes)",
   "setMaxDailyLimit(uint16,uint256)",
-  "execute(uint16,bytes,bytes)",
+  "execute(uint16,bytes,bytes,address)",
   "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
   "pause()",
   "unpause()",
@@ -18,7 +18,7 @@ export const OmnichainProposalSenderNormalMethods: string[] = [
 ];
 export const OmnichainProposalSenderFasttrackMethods: string[] = [
   "setMaxDailyLimit(uint16,uint256)",
-  "execute(uint16,bytes,bytes)",
+  "execute(uint16,bytes,bytes,address)",
   "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
   "pause()",
   "unpause()",
@@ -27,7 +27,7 @@ export const OmnichainProposalSenderFasttrackMethods: string[] = [
 ];
 export const OmnichainProposalSenderCriticalMethods: string[] = [
   "setMaxDailyLimit(uint16,uint256)",
-  "execute(uint16,bytes,bytes)",
+  "execute(uint16,bytes,bytes,address)",
   "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
   "pause()",
   "unpause()",
