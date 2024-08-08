@@ -62,8 +62,8 @@ describe("TimelockV8 Tests", () => {
     await releaseImpersonation(timelock.address);
   });
 
-  it("Test Timelock returns 1 for constants", async () => {
-    expect(await testTimelock.GRACE_PERIOD()).to.equal("1");
+  it("Test Timelock returns correct for constants", async () => {
+    expect(await testTimelock.GRACE_PERIOD()).to.equal("3600");
     expect(await testTimelock.MINIMUM_DELAY()).to.equal("1");
     expect(await testTimelock.MAXIMUM_DELAY()).to.equal("3600");
   });
