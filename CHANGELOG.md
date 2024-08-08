@@ -1,3 +1,10 @@
+## [2.3.0-dev.4](https://github.com/VenusProtocol/governance-contracts/compare/v2.3.0-dev.3...v2.3.0-dev.4) (2024-08-08)
+
+
+### Bug Fixes
+
+* update execute signature used in assigning access controls ([16875e6](https://github.com/VenusProtocol/governance-contracts/commit/16875e61647a0ed6765632c4181e1dce2bedf99c))
+
 ## [2.3.0-dev.3](https://github.com/VenusProtocol/governance-contracts/compare/v2.3.0-dev.2...v2.3.0-dev.3) (2024-08-08)
 
 ## [2.3.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.3.0-dev.1...v2.3.0-dev.2) (2024-08-02)
