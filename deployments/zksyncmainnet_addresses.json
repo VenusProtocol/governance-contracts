@@ -1,0 +1,7 @@
+{
+  "name": "zksyncmainnet",
+  "chainId": "324",
+  "addresses": {
+    "AccessControlManager": "0x526159A92A82afE5327d37Ef446b68FD9a5cA914"
+  }
+}
