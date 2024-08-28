@@ -1,3 +1,16 @@
+## [2.3.0-dev.5](https://github.com/VenusProtocol/governance-contracts/compare/v2.3.0-dev.4...v2.3.0-dev.5) (2024-08-28)
+
+
+### Features
+
+* add ACM deployments on Zksync ([86c5b65](https://github.com/VenusProtocol/governance-contracts/commit/86c5b650ced89ebe7e914f12c40378ccb19d550a))
+* updating deployment files ([0169d08](https://github.com/VenusProtocol/governance-contracts/commit/0169d08e0a3bef449e00b1d3edc1c39fd6835013))
+
+
+### Bug Fixes
+
+* url ([3725109](https://github.com/VenusProtocol/governance-contracts/commit/3725109397c90bad956ff9b80dc3ad45cb28a222))
+
 ## [2.3.0-dev.4](https://github.com/VenusProtocol/governance-contracts/compare/v2.3.0-dev.3...v2.3.0-dev.4) (2024-08-08)
 
 
