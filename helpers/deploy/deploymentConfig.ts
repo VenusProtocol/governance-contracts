@@ -100,6 +100,7 @@ export const config: Config = {
       { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["ethereum"], 100] },
       { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["opbnbmainnet"], 100] },
       { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["arbitrumone"], 100] },
+      { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["zksyncmainnet"], 100] },
     ],
   },
   bsctestnet: {
@@ -107,6 +108,7 @@ export const config: Config = {
       { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["sepolia"], 100] },
       { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["opbnbtestnet"], 100] },
       { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["arbitrumsepolia"], 100] },
+      { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["zksyncsepolia"], 100] },
     ],
   },
 
@@ -149,6 +151,12 @@ export const config: Config = {
   zksyncsepolia: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bsctestnet"], 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+    ],
+  },
+  zksyncmainnet: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bscmainnet"], 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
     ],
   },

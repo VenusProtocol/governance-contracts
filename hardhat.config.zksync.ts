@@ -77,6 +77,14 @@ const config: HardhatUserConfig = {
       zksync: true,
       live: true,
     },
+    zksyncmainnet: {
+      url: process.env.ARCHIVE_NODE_zksyncmainnet || "https://mainnet.era.zksync.io",
+      ethNetwork: "mainnet",
+      verifyURL: "https://zksync2-mainnet-explorer.zksync.io/contract_verification",
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+      zksync: true,
+      live: true,
+    },
   },
   paths: {
     sources: "./contracts",

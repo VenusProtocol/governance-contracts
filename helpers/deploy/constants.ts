@@ -8,6 +8,7 @@ export enum SUPPORTED_NETWORKS {
   ARBITRUM_SEPOLIA = "arbitrumsepolia",
   ARBITRUM_ONE = "arbitrumone",
   ZKSYNC_SEPOLIA = "zksyncsepolia",
+  ZKSYNC_MAINNET = "zksyncmainnet",
   HARDHAT = "hardhat",
 }
 
@@ -20,8 +21,9 @@ export const LZ_CHAINID: Record<SUPPORTED_NETWORKS, number> = {
   bsctestnet: 10102,
   opbnbtestnet: 10202,
   arbitrumsepolia: 10231,
-  hardhat: 10102,
   zksyncsepolia: 10248,
+  zksyncmainnet: 165,
+  hardhat: 10102,
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
