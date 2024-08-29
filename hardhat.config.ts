@@ -13,7 +13,6 @@ import "solidity-docgen";
 
 require("dotenv").config();
 
-const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY;
 const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
 
 extendConfig((config: HardhatConfig) => {
