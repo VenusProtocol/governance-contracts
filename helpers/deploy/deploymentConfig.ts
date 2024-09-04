@@ -168,7 +168,10 @@ export const config: Config = {
   },
   opsepolia: {
     methods: [
-      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["opsepolia"], 0, 200000] },
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["sepolia"], 0, 200000] },
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bsctestnet"], 0, 200000] },
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["opbnbtestnet"], 0, 200000] },
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["arbitrumsepolia"], 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
     ],
   },
