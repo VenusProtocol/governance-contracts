@@ -31,6 +31,26 @@ jobs:
       - name: Lint solidity and ts files
         run: yarn lint
 
+  check-deployment:
+    name: Check hardhat deployments work on hardhat
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v2
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v2
+        with:
+          node-version: 18
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Check hardhat deploy
+        run: yarn hardhat deploy
+
   test:
     runs-on: "ubuntu-latest"
     steps:
@@ -103,6 +123,10 @@ jobs:
         run: |
           for NETWORK in bsctestnet bscmainnet ethereum sepolia opbnbtestnet opbnbmainnet arbitrumsepolia arbitrumone; do
             EXPORT=true yarn hardhat export --network ${NETWORK} --export ./deployments/${NETWORK}.json
+            jq -M '{name, chainId, addresses: .contracts | map_values(.address)}' ./deployments/${NETWORK}.json > ./deployments/${NETWORK}_addresses.json
+          done
+          for NETWORK in zksyncsepolia zksyncmainnet; do
+            EXPORT=true yarn hardhat export --network ${NETWORK} --export ./deployments/${NETWORK}.json --config hardhat.config.zksync.ts
             jq -M '{name, chainId, addresses: .contracts | map_values(.address)}' ./deployments/${NETWORK}.json > ./deployments/${NETWORK}_addresses.json
           done
           yarn prettier
