@@ -1,3 +1,21 @@
+## [2.3.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.2.0...v2.3.0) (2024-09-10)
+
+
+### Features
+
+* add ACM deployments on Zksync ([86c5b65](https://github.com/VenusProtocol/governance-contracts/commit/86c5b650ced89ebe7e914f12c40378ccb19d550a))
+* add config for zksync ([9cb4c7c](https://github.com/VenusProtocol/governance-contracts/commit/9cb4c7cfdadd26bc6360a442c085b41391af3b21))
+* add configurations and deploy ACM on zksync sepolia ([7926c59](https://github.com/VenusProtocol/governance-contracts/commit/7926c59905fb6045caecf49bbe452feec484a3f4))
+* updating deployment files ([0169d08](https://github.com/VenusProtocol/governance-contracts/commit/0169d08e0a3bef449e00b1d3edc1c39fd6835013))
+* updating deployment files ([0549339](https://github.com/VenusProtocol/governance-contracts/commit/05493390059b7352a0b734c892436c767965206d))
+
+
+### Bug Fixes
+
+* add id to configuration script to avoid duplicate execution ([5001d32](https://github.com/VenusProtocol/governance-contracts/commit/5001d3202b7845d4910255dbcf204aed99a2e920))
+* update execute signature used in assigning access controls ([16875e6](https://github.com/VenusProtocol/governance-contracts/commit/16875e61647a0ed6765632c4181e1dce2bedf99c))
+* url ([3725109](https://github.com/VenusProtocol/governance-contracts/commit/3725109397c90bad956ff9b80dc3ad45cb28a222))
+
 ## [2.3.0-dev.5](https://github.com/VenusProtocol/governance-contracts/compare/v2.3.0-dev.4...v2.3.0-dev.5) (2024-08-28)
 
 
