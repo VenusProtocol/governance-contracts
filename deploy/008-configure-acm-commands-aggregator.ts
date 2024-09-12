@@ -41,6 +41,13 @@ const ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN = "0xc94578caCC89a29B044a0a1D54d20d48A645
 const SEPOLIA_XVS_BRIDGE_ADMIN = "0xd3c6bdeeadB2359F726aD4cF42EAa8B7102DAd9B";
 const OPBNBTESTNET_XVS_BRIDGE_ADMIN = "0x19252AFD0B2F539C400aEab7d460CBFbf74c17ff";
 
+const ARBITRUMONE_XVS_VAULT_PROXY = "";
+const ETHEREUM_XVS_VAULT_PROXY = "";
+const OPBNBMAINNET_XVS_VAULT_PROXY = "";
+const ARBITRUMSEPOLIA_XVS_VAULT_PROXY = "";
+const SEPOLIA_XVS_VAULT_PROXY = "";
+const OPBNBTESTNET_XVS_VAULT_PROXY = "";
+
 enum PermissionType {
   Give = 0,
   Revoke = 1,
@@ -63,6 +70,74 @@ interface Permissions {
 
 const permissions: Permissions = {
   arbitrumone: [
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_XVS_VAULT_PROXY,
+        "add(address,uint256,address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_XVS_VAULT_PROXY,
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
     {
       permissionType: PermissionType.Give,
       params: [ARBITRUMONE_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
@@ -470,6 +545,70 @@ const permissions: Permissions = {
   ethereum: [
     {
       permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ETHEREUM_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ETHEREUM_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ETHEREUM_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ETHEREUM_XVS_VAULT_PROXY,
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
       params: [ETHEREUM_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
@@ -871,6 +1010,74 @@ const permissions: Permissions = {
   opbnbmainnet: [
     {
       permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_VAULT_PROXY,
+        "add(address,uint256,address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_VAULT_PROXY,
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
       params: [OPBNBMAINNET_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
@@ -1251,6 +1458,74 @@ const permissions: Permissions = {
     },
   ],
   arbitrumsepolia: [
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
+        "add(address,uint256,address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
     {
       permissionType: PermissionType.Give,
       params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
@@ -1683,6 +1958,70 @@ const permissions: Permissions = {
   sepolia: [
     {
       permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        SEPOLIA_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        SEPOLIA_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        SEPOLIA_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        SEPOLIA_XVS_VAULT_PROXY,
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
       params: [SEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
@@ -2082,6 +2421,74 @@ const permissions: Permissions = {
     },
   ],
   opbnbtestnet: [
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_VAULT_PROXY,
+        "add(address,uint256,address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_VAULT_PROXY,
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
     {
       permissionType: PermissionType.Give,
       params: [OPBNBTESTNET_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
