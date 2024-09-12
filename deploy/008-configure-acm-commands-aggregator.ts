@@ -55,6 +55,23 @@ const SEPOLIA_POOL_REGISTRY = "0x758f5715d817e02857Ba40889251201A5aE3E186";
 const OPBNBTESTNET_POOL_REGISTRY = "0x560eA4e1cC42591E9f5F5D83Ad2fd65F30128951";
 const ARBITRUMSEPOLIA_POOL_REGISTRY = "0xf93Df3135e0D555185c0BC888073374cA551C5fE";
 
+const ARBITRUMONE_PRIME = "";
+const ARBITRUMONE_PLP = "";
+const ARBITRUMONE_PSR = "";
+const ETHEREUM_CONVERTER_NETWORK = "";
+const ETHEREUM_PRIME = "";
+const ETHEREUM_PLP = "";
+const ETHEREUM_PSR = "";
+const OPBNBMAINNET_PSR = "";
+const ARBITRUMSEPOLIA_PRIME = "";
+const ARBITRUMSEPOLIA_PLP = "";
+const ARBITRUMSEPOLIA_PSR = "";
+const SEPOLIA_PRIME = "";
+const SEPOLIA_PLP = "";
+const SEPOLIA_PSR = "";
+const OPBNBTESTNET_PSR = "";
+const SEPOLIA_CONVERTER_NETWORK = "";
+
 enum PermissionType {
   Give = 0,
   Revoke = 1,
@@ -77,6 +94,234 @@ interface Permissions {
 
 const permissions: Permissions = {
   arbitrumone: [
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setRewardTokenSpeeds(address[],uint256[],uint256[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlocks(address[],uint32[],uint32[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "burn(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "togglePause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "burn(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PRIME, "togglePause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PLP, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_PSR,
+        "addOrUpdateDistributionConfigs(DistributionConfig[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
+    },
     {
       permissionType: PermissionType.Give,
       params: [
@@ -728,6 +973,310 @@ const permissions: Permissions = {
   ethereum: [
     {
       permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setConversionConfig(address,address,ConversionConfig)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setConversionConfig(address,address,ConversionConfig)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setConversionConfig(address,address,ConversionConfig)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setRewardTokenSpeeds(address[],uint256[],uint256[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlocks(address[],uint32[],uint32[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
+    },
+
+    // Grant permissions to fast track timelock
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+
+    // Grant permissions to critical timelock
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "burn(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "togglePause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "burn(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "togglePause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PLP, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PRIME, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -1363,6 +1912,42 @@ const permissions: Permissions = {
       permissionType: PermissionType.Give,
       params: [
         ethers.constants.AddressZero,
+        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_PSR,
+        "addOrUpdateDistributionConfigs(DistributionConfig[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
         AccountType.CRITICAL_TIMELOCK,
       ],
@@ -1985,6 +2570,250 @@ const permissions: Permissions = {
       permissionType: PermissionType.Give,
       params: [
         ethers.constants.AddressZero,
+        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setRewardTokenSpeeds(address[],uint256[],uint256[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlocks(address[],uint32[],uint32[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "burn(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "togglePause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_PLP,
+        "setMaxTokensDistributionSpeed(address[],uint256[])",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_PLP,
+        "setMaxTokensDistributionSpeed(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "burn(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PRIME, "togglePause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PLP, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_PSR,
+        "addOrUpdateDistributionConfigs(DistributionConfig[])",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_PSR,
+        "addOrUpdateDistributionConfigs(DistributionConfig[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_PSR,
+        "addOrUpdateDistributionConfigs(DistributionConfig[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
         AccountType.CRITICAL_TIMELOCK,
       ],
@@ -2131,7 +2960,11 @@ const permissions: Permissions = {
     },
     {
       permissionType: PermissionType.Give,
-      params: [ARBITRUMSEPOLIA_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
+      params: [
+        ARBITRUMSEPOLIA_POOL_REGISTRY,
+        "updatePoolMetadata(address,VenusPoolMetaData)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
     },
     {
       permissionType: PermissionType.Give,
@@ -2651,6 +3484,308 @@ const permissions: Permissions = {
     },
   ],
   sepolia: [
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setConversionConfig(address,address,ConversionConfig)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setConversionConfig(address,address,ConversionConfig)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setConversionConfig(address,address,ConversionConfig)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setRewardTokenSpeeds(address[],uint256[],uint256[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlocks(address[],uint32[],uint32[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
+    },
+
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "burn(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "togglePause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "burn(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PRIME, "togglePause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PLP, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
+    },
     {
       permissionType: PermissionType.Give,
       params: [
@@ -3284,6 +4419,42 @@ const permissions: Permissions = {
     },
   ],
   opbnbtestnet: [
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_PSR,
+        "addOrUpdateDistributionConfigs(DistributionConfig[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
+    },
     {
       permissionType: PermissionType.Give,
       params: [
