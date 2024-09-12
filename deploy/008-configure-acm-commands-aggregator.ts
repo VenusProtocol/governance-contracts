@@ -28,6 +28,19 @@ const OPBNBTESTNET_RESILIENT_ORACLE = "0xEF4e53a9A4565ef243A2f0ee9a7fc2410E1aA62
 const OPBNBTESTNET_BINANCE_ORACLE = "0x496B6b03469472572C47bdB407d5549b244a74F2";
 const OPBNBTESTNET_BOUND_VALIDATOR = "0x049537Bb065e6253e9D8D08B45Bf6b753657A746";
 
+const ARBITRUMONE_XVS = "0xc1Eb7689147C81aC840d4FF0D298489fc7986d52";
+const ETHEREUM_XVS = "0xd3CC9d8f3689B83c91b7B59cAB4946B063EB894A";
+const OPBNBMAINNET_XVS = "0x3E2e61F1c075881F3fB8dd568043d8c221fd5c61";
+const ARBITRUMSEPOLIA_XVS = "0x877Dc896e7b13096D3827872e396927BbE704407";
+const SEPOLIA_XVS = "0x66ebd019E86e0af5f228a0439EBB33f045CBe63E";
+const OPBNBTESTNET_XVS = "0xc2931B1fEa69b6D6dA65a50363A8D75d285e4da9";
+const ARBITRUMONE_XVS_BRIDGE_ADMIN = "0xf5d81C6F7DAA3F97A6265C8441f92eFda22Ad784";
+const ETHEREUM_XVS_BRIDGE_ADMIN = "0x9C6C95632A8FB3A74f2fB4B7FfC50B003c992b96";
+const OPBNBMAINNET_XVS_BRIDGE_ADMIN = "0x52fcE05aDbf6103d71ed2BA8Be7A317282731831";
+const ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN = "0xc94578caCC89a29B044a0a1D54d20d48A645E5C8";
+const SEPOLIA_XVS_BRIDGE_ADMIN = "0xd3c6bdeeadB2359F726aD4cF42EAa8B7102DAd9B";
+const OPBNBTESTNET_XVS_BRIDGE_ADMIN = "0x19252AFD0B2F539C400aEab7d460CBFbf74c17ff";
+
 enum PermissionType {
   Give = 0,
   Revoke = 1,
@@ -152,6 +165,307 @@ const permissions: Permissions = {
       permissionType: PermissionType.Give,
       params: [ARBITRUMONE_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_XVS_BRIDGE_ADMIN,
+        "setMaxDailyReceiveLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
+    },
   ],
   ethereum: [
     {
@@ -261,6 +575,298 @@ const permissions: Permissions = {
       permissionType: PermissionType.Give,
       params: [ETHEREUM_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxSingleTransactionLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ETHEREUM_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ETHEREUM_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ETHEREUM_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ETHEREUM_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ETHEREUM_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
+    },
   ],
   opbnbmainnet: [
     {
@@ -334,6 +940,314 @@ const permissions: Permissions = {
     {
       permissionType: PermissionType.Give,
       params: [OPBNBMAINNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
+        "setMaxDailyReceiveLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
+        "dropFailedMessage(uint16,bytes,uint64)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
+        "setConfig(uint16,uint16,uint256,bytes)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
     },
   ],
   arbitrumsepolia: [
@@ -432,6 +1346,338 @@ const permissions: Permissions = {
     {
       permissionType: PermissionType.Give,
       params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxDailyReceiveLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxDailyReceiveLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "dropFailedMessage(uint16,bytes,uint64)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setConfig(uint16,uint16,uint256,bytes)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxDailyReceiveLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "dropFailedMessage(uint16,bytes,uint64)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMinDstGas(uint16,uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setPayloadSizeLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
+        "setConfig(uint16,uint16,uint256,bytes)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
   ],
   sepolia: [
@@ -546,6 +1792,294 @@ const permissions: Permissions = {
       permissionType: PermissionType.Give,
       params: [SEPOLIA_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxSingleTransactionLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        SEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        SEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        SEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxSingleTransactionLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        SEPOLIA_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
+    },
   ],
   opbnbtestnet: [
     {
@@ -620,6 +2154,314 @@ const permissions: Permissions = {
       permissionType: PermissionType.Give,
       params: [OPBNBTESTNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.CRITICAL_TIMELOCK],
     },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
+        "setMaxDailyReceiveLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
+        "dropFailedMessage(uint16,bytes,uint64)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
+        "setConfig(uint16,uint16,uint256,bytes)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
+    },
   ],
 };
 
@@ -667,7 +2509,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   console.log("Permissions added with indexes: ", indexes.toString());
 };
 
-func.tags = ["ACMCommandsAggregatorConfigure", "ACMCommandsAggregatorTest"];
+func.tags = ["ACMCommandsAggregatorConfigure"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) => Object.keys(permissions).indexOf(hre.network.name) === -1;
 export default func;

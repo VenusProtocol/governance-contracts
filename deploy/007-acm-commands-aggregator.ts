@@ -18,6 +18,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   });
 };
 
-func.tags = ["ACMCommandsAggregator", "ACMCommandsAggregatorTest"];
+func.tags = ["ACMCommandsAggregator"];
 
 export default func;
