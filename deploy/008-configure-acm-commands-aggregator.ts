@@ -41,12 +41,19 @@ const ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN = "0xc94578caCC89a29B044a0a1D54d20d48A645
 const SEPOLIA_XVS_BRIDGE_ADMIN = "0xd3c6bdeeadB2359F726aD4cF42EAa8B7102DAd9B";
 const OPBNBTESTNET_XVS_BRIDGE_ADMIN = "0x19252AFD0B2F539C400aEab7d460CBFbf74c17ff";
 
-const ARBITRUMONE_XVS_VAULT_PROXY = "";
-const ETHEREUM_XVS_VAULT_PROXY = "";
-const OPBNBMAINNET_XVS_VAULT_PROXY = "";
-const ARBITRUMSEPOLIA_XVS_VAULT_PROXY = "";
-const SEPOLIA_XVS_VAULT_PROXY = "";
-const OPBNBTESTNET_XVS_VAULT_PROXY = "";
+const ARBITRUMONE_XVS_VAULT_PROXY = "0x8b79692AAB2822Be30a6382Eb04763A74752d5B4";
+const ETHEREUM_XVS_VAULT_PROXY = "0xA0882C2D5DF29233A092d2887A258C2b90e9b994";
+const OPBNBMAINNET_XVS_VAULT_PROXY = "0x7dc969122450749A8B0777c0e324522d67737988";
+const ARBITRUMSEPOLIA_XVS_VAULT_PROXY = "0x407507DC2809D3aa31D54EcA3BEde5C5c4C8A17F";
+const SEPOLIA_XVS_VAULT_PROXY = "0x1129f882eAa912aE6D4f6D445b2E2b1eCbA99fd5";
+const OPBNBTESTNET_XVS_VAULT_PROXY = "0xB14A0e72C5C202139F78963C9e89252c1ad16f01";
+
+const ETHEREUM_POOL_REGISTRY = "0x61CAff113CCaf05FFc6540302c37adcf077C5179";
+const ARBITRUMONE_POOL_REGISTRY = "0x382238f07Bc4Fe4aA99e561adE8A4164b5f815DA";
+const OPBNBMAINNET_POOL_REGISTRY = "0x345a030Ad22e2317ac52811AC41C1A63cfa13aEe";
+const SEPOLIA_POOL_REGISTRY = "0x758f5715d817e02857Ba40889251201A5aE3E186";
+const OPBNBTESTNET_POOL_REGISTRY = "0x560eA4e1cC42591E9f5F5D83Ad2fd65F30128951";
+const ARBITRUMSEPOLIA_POOL_REGISTRY = "0xf93Df3135e0D555185c0BC888073374cA551C5fE";
 
 enum PermissionType {
   Give = 0,
@@ -70,6 +77,182 @@ interface Permissions {
 
 const permissions: Permissions = {
   arbitrumone: [
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setActionsPaused(address[],uint256[],bool)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setMarketBorrowCaps(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setMarketSupplyCaps(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setActionsPaused(address[],uint256[],bool)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMONE_POOL_REGISTRY,
+        "addPool(string,address,uint256,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMONE_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
+    },
     {
       permissionType: PermissionType.Give,
       params: [ARBITRUMONE_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
@@ -545,6 +728,174 @@ const permissions: Permissions = {
   ethereum: [
     {
       permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setActionsPaused(address[],uint256[],bool)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setMarketBorrowCaps(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setMarketSupplyCaps(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setActionsPaused(address[],uint256[],bool)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ETHEREUM_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
       params: [ETHEREUM_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
@@ -1010,6 +1361,178 @@ const permissions: Permissions = {
   opbnbmainnet: [
     {
       permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setActionsPaused(address[],uint256[],bool)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setMarketBorrowCaps(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setMarketSupplyCaps(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setActionsPaused(address[],uint256[],bool)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_POOL_REGISTRY,
+        "addPool(string,address,uint256,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBMAINNET_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBMAINNET_POOL_REGISTRY,
+        "updatePoolMetadata(address,VenusPoolMetaData)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
       params: [OPBNBMAINNET_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
@@ -1458,6 +1981,178 @@ const permissions: Permissions = {
     },
   ],
   arbitrumsepolia: [
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setActionsPaused(address[],uint256[],bool)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setMarketBorrowCaps(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setMarketSupplyCaps(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setActionsPaused(address[],uint256[],bool)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ARBITRUMSEPOLIA_POOL_REGISTRY,
+        "addPool(string,address,uint256,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ARBITRUMSEPOLIA_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
+    },
     {
       permissionType: PermissionType.Give,
       params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
@@ -1958,6 +2653,174 @@ const permissions: Permissions = {
   sepolia: [
     {
       permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setActionsPaused(address[],uint256[],bool)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setMarketBorrowCaps(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setMarketSupplyCaps(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setActionsPaused(address[],uint256[],bool)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [SEPOLIA_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
       params: [SEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
@@ -2421,6 +3284,182 @@ const permissions: Permissions = {
     },
   ],
   opbnbtestnet: [
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setActionsPaused(address[],uint256[],bool)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setMarketBorrowCaps(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setMarketSupplyCaps(address[],uint256[])",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setActionsPaused(address[],uint256[],bool)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        ethers.constants.AddressZero,
+        "setCollateralFactor(address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_POOL_REGISTRY,
+        "addPool(string,address,uint256,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [OPBNBTESTNET_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [
+        OPBNBTESTNET_POOL_REGISTRY,
+        "updatePoolMetadata(address,VenusPoolMetaData)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      permissionType: PermissionType.Give,
+      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
+    },
     {
       permissionType: PermissionType.Give,
       params: [OPBNBTESTNET_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
