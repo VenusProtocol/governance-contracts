@@ -2,6 +2,148 @@
   "name": "sepolia",
   "chainId": "11155111",
   "contracts": {
+    "ACMCommandsAggregator": {
+      "address": "0x736c66489D8ebA0279D3518429C6cEd6450B1Cc9",
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "contract IAccessControlManagerV8",
+              "name": "_acm",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "PermissionsAdded",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "PermissionsExecuted",
+          "type": "event"
+        },
+        {
+          "inputs": [],
+          "name": "ACM",
+          "outputs": [
+            {
+              "internalType": "contract IAccessControlManagerV8",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "enum ACMCommandsAggregator.PermissionType",
+                  "name": "permissionType",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "address",
+                  "name": "contractAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "string",
+                  "name": "functionSig",
+                  "type": "string"
+                },
+                {
+                  "internalType": "address",
+                  "name": "account",
+                  "type": "address"
+                }
+              ],
+              "internalType": "struct ACMCommandsAggregator.Permission[]",
+              "name": "_permissions",
+              "type": "tuple[]"
+            }
+          ],
+          "name": "addPermissions",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "executePermissions",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "name": "permissions",
+          "outputs": [
+            {
+              "internalType": "enum ACMCommandsAggregator.PermissionType",
+              "name": "permissionType",
+              "type": "uint8"
+            },
+            {
+              "internalType": "address",
+              "name": "contractAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "functionSig",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ]
+    },
     "AccessControlManager": {
       "address": "0xbf705C00578d43B6147ab4eaE04DBBEd1ccCdc96",
       "abi": [
