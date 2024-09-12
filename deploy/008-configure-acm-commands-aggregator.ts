@@ -55,22 +55,22 @@ const SEPOLIA_POOL_REGISTRY = "0x758f5715d817e02857Ba40889251201A5aE3E186";
 const OPBNBTESTNET_POOL_REGISTRY = "0x560eA4e1cC42591E9f5F5D83Ad2fd65F30128951";
 const ARBITRUMSEPOLIA_POOL_REGISTRY = "0xf93Df3135e0D555185c0BC888073374cA551C5fE";
 
-const ARBITRUMONE_PRIME = "";
-const ARBITRUMONE_PLP = "";
-const ARBITRUMONE_PSR = "";
-const ETHEREUM_CONVERTER_NETWORK = "";
-const ETHEREUM_PRIME = "";
-const ETHEREUM_PLP = "";
-const ETHEREUM_PSR = "";
-const OPBNBMAINNET_PSR = "";
-const ARBITRUMSEPOLIA_PRIME = "";
-const ARBITRUMSEPOLIA_PLP = "";
-const ARBITRUMSEPOLIA_PSR = "";
-const SEPOLIA_PRIME = "";
-const SEPOLIA_PLP = "";
-const SEPOLIA_PSR = "";
-const OPBNBTESTNET_PSR = "";
-const SEPOLIA_CONVERTER_NETWORK = "";
+const ARBITRUMONE_PRIME = "0xFE69720424C954A2da05648a0FAC84f9bf11Ef49";
+const ARBITRUMONE_PLP = "0x86bf21dB200f29F21253080942Be8af61046Ec29";
+const ARBITRUMONE_PSR = "0xF9263eaF7eB50815194f26aCcAB6765820B13D41";
+const ETHEREUM_CONVERTER_NETWORK = "0x232CC47AECCC55C2CAcE4372f5B268b27ef7cac8";
+const ETHEREUM_PRIME = "0x14C4525f47A7f7C984474979c57a2Dccb8EACB39";
+const ETHEREUM_PLP = "0x8ba6aFfd0e7Bcd0028D1639225C84DdCf53D8872";
+const ETHEREUM_PSR = "0x8c8c8530464f7D95552A11eC31Adbd4dC4AC4d3E";
+const OPBNBMAINNET_PSR = "0xA2EDD515B75aBD009161B15909C19959484B0C1e";
+const ARBITRUMSEPOLIA_PRIME = "0xadb04ac4942683bc41e27d18234c8dc884786e89";
+const ARBITRUMSEPOLIA_PLP = "0xe82c2c10f55d3268126c29ec813dc6f086904694";
+const ARBITRUMSEPOLIA_PSR = "0x09267d30798B59c581ce54E861A084C6FC298666";
+const SEPOLIA_PRIME = "0x2Ec432F123FEbb114e6fbf9f4F14baF0B1F14AbC";
+const SEPOLIA_PLP = "0x15242a55Ad1842A1aEa09c59cf8366bD2f3CE9B4";
+const SEPOLIA_PSR = "0xbea70755cc3555708ca11219adB0db4C80F6721B";
+const OPBNBTESTNET_PSR = "0xc355dEb1A9289f8C58CFAa076EEdBf51F3A8Da7F";
+const SEPOLIA_CONVERTER_NETWORK = "0xB5A4208bFC4cC2C4670744849B8fC35B21A690Fa";
 
 enum PermissionType {
   Give = 0,
@@ -417,10 +417,6 @@ const permissions: Permissions = {
     {
       permissionType: PermissionType.Give,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      permissionType: PermissionType.Give,
-      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
       permissionType: PermissionType.Give,
@@ -5097,6 +5093,18 @@ function splitPermissions(
 }
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
+  const map: any = {}
+  permissions.arbitrumone.forEach(permission => {
+    const key = permission.params[0] + permission.params[1] + permission.params[2]
+    if (map[key] == true) {
+      console.log("duplicate permission", permission.params[1])
+    } else {
+      map[key] = true
+    }
+  })
+  return;
+
+
   const acmCommandsAggregator: ACMCommandsAggregator = await ethers.getContract("ACMCommandsAggregator");
   const networkPermissions = permissions[hre.network.name];
 
