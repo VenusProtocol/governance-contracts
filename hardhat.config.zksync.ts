@@ -108,6 +108,8 @@ const config: HardhatUserConfig = {
       "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVaultProxy.sol",
       "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVaultStorage.sol",
       "@venusprotocol/venus-protocol/contracts/Tokens/XVS/XVS.sol",
+      "hardhat-deploy/solc_0.8/proxy/OptimizedTransparentUpgradeableProxy.sol",
+      "hardhat-deploy/solc_0.8/openzeppelin/proxy/transparent/ProxyAdmin.sol",
     ],
   },
 };
