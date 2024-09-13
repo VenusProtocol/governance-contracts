@@ -5093,18 +5093,6 @@ function splitPermissions(
 }
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const map: any = {}
-  permissions.arbitrumone.forEach(permission => {
-    const key = permission.params[0] + permission.params[1] + permission.params[2]
-    if (map[key] == true) {
-      console.log("duplicate permission", permission.params[1])
-    } else {
-      map[key] = true
-    }
-  })
-  return;
-
-
   const acmCommandsAggregator: ACMCommandsAggregator = await ethers.getContract("ACMCommandsAggregator");
   const networkPermissions = permissions[hre.network.name];
 
