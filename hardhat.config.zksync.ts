@@ -23,7 +23,7 @@ task("accounts", "Prints the list of accounts", async (taskArgs, hre) => {
 const config: HardhatUserConfig = {
   defaultNetwork: "hardhat",
   zksolc: {
-    version: "1.5.1",
+    version: "1.5.3",
     compilerSource: "binary",
     settings: {
       metadata: {
