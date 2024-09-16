@@ -1,3 +1,16 @@
+## [2.4.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.3.0...v2.4.0-dev.1) (2024-09-12)
+
+
+### Features
+
+* updating deployment files ([194fc07](https://github.com/VenusProtocol/governance-contracts/commit/194fc07ee8e061e72a07f2d628266d1119636ec9))
+
+
+### Bug Fixes
+
+* failing checks ([460bbf1](https://github.com/VenusProtocol/governance-contracts/commit/460bbf151421fcb1a1d960af8b104e10055e288b))
+* pr comments ([26146d8](https://github.com/VenusProtocol/governance-contracts/commit/26146d8556611d524a03f663eda792ef668c91fd))
+
 ## [2.3.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.2.0...v2.3.0) (2024-09-10)
 
 
