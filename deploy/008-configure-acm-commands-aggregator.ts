@@ -72,11 +72,6 @@ const SEPOLIA_PSR = "0xbea70755cc3555708ca11219adB0db4C80F6721B";
 const OPBNBTESTNET_PSR = "0xc355dEb1A9289f8C58CFAa076EEdBf51F3A8Da7F";
 const SEPOLIA_CONVERTER_NETWORK = "0xB5A4208bFC4cC2C4670744849B8fC35B21A690Fa";
 
-enum PermissionType {
-  Give = 0,
-  Revoke = 1,
-}
-
 enum AccountType {
   NORMAL_TIMELOCK = "NormalTimelock",
   FAST_TRACK_TIMELOCK = "FastTrackTimelock",
@@ -84,7 +79,7 @@ enum AccountType {
 }
 
 interface Permission {
-  permissionType: PermissionType;
+  permissionType: boolean;
   params: string[];
 }
 
@@ -95,7 +90,7 @@ interface Permissions {
 const permissions: Permissions = {
   arbitrumone: [
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "updateJumpRateModel(uint256,uint256,uint256,uint256)",
@@ -103,7 +98,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setRewardTokenSpeeds(address[],uint256[],uint256[])",
@@ -111,7 +106,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setLastRewardingBlocks(address[],uint32[],uint32[])",
@@ -119,7 +114,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
@@ -127,187 +122,187 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "burn(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "togglePause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "burn(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PRIME, "togglePause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PLP, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_PSR,
         "addOrUpdateDistributionConfigs(DistributionConfig[])",
@@ -315,15 +310,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -331,15 +326,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setActionsPaused(address[],uint256[],bool)",
@@ -347,27 +342,27 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -375,7 +370,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setMarketBorrowCaps(address[],uint256[])",
@@ -383,7 +378,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setMarketSupplyCaps(address[],uint256[])",
@@ -391,7 +386,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setActionsPaused(address[],uint256[],bool)",
@@ -399,27 +394,27 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -427,35 +422,35 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_POOL_REGISTRY,
         "addPool(string,address,uint256,uint256,uint256)",
@@ -463,47 +458,47 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -511,15 +506,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -527,15 +522,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_XVS_VAULT_PROXY,
         "add(address,uint256,address,uint256,uint256)",
@@ -543,11 +538,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -555,7 +550,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_XVS_VAULT_PROXY,
         "setWithdrawalLockingPeriod(address,uint256,uint256)",
@@ -563,185 +558,185 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_RESILIENT_ORACLE, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_RESILIENT_ORACLE, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_RESILIENT_ORACLE, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
 
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_RESILIENT_ORACLE, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_RESILIENT_ORACLE, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_RESILIENT_ORACLE, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
 
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -749,11 +744,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -761,75 +756,75 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -837,11 +832,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -849,7 +844,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_XVS_BRIDGE_ADMIN,
         "setMaxDailyReceiveLimit(uint16,uint256)",
@@ -857,56 +852,56 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
 
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -914,11 +909,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMONE_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -926,61 +921,61 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
     },
   ],
   ethereum: [
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setConversionConfig(address,address,ConversionConfig)",
@@ -988,19 +983,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setConversionConfig(address,address,ConversionConfig)",
@@ -1008,19 +1003,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setConversionConfig(address,address,ConversionConfig)",
@@ -1028,7 +1023,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "updateJumpRateModel(uint256,uint256,uint256,uint256)",
@@ -1036,7 +1031,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setRewardTokenSpeeds(address[],uint256[],uint256[])",
@@ -1044,7 +1039,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setLastRewardingBlocks(address[],uint32[],uint32[])",
@@ -1052,227 +1047,227 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
     },
 
     // Grant permissions to fast track timelock
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
 
     // Grant permissions to critical timelock
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "burn(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "togglePause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "burn(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "togglePause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PLP, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PRIME, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -1280,15 +1275,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setActionsPaused(address[],uint256[],bool)",
@@ -1296,27 +1291,27 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -1324,7 +1319,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setMarketBorrowCaps(address[],uint256[])",
@@ -1332,7 +1327,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setMarketSupplyCaps(address[],uint256[])",
@@ -1340,7 +1335,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setActionsPaused(address[],uint256[],bool)",
@@ -1348,27 +1343,27 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -1376,79 +1371,79 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ETHEREUM_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -1456,15 +1451,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ETHEREUM_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -1472,23 +1467,23 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ETHEREUM_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -1496,7 +1491,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ETHEREUM_XVS_VAULT_PROXY,
         "setWithdrawalLockingPeriod(address,uint256,uint256)",
@@ -1504,198 +1499,198 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_RESILIENT_ORACLE, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_RESILIENT_ORACLE, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
 
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
 
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_RESILIENT_ORACLE, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_RESILIENT_ORACLE, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
 
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxSingleTransactionLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ETHEREUM_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -1703,75 +1698,75 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ETHEREUM_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -1779,11 +1774,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ETHEREUM_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -1791,59 +1786,59 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ETHEREUM_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -1851,11 +1846,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ETHEREUM_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -1863,49 +1858,49 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ETHEREUM_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
     },
   ],
   opbnbmainnet: [
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "updateJumpRateModel(uint256,uint256,uint256,uint256)",
@@ -1913,19 +1908,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_PSR,
         "addOrUpdateDistributionConfigs(DistributionConfig[])",
@@ -1933,15 +1928,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -1949,15 +1944,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setActionsPaused(address[],uint256[],bool)",
@@ -1965,27 +1960,27 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -1993,7 +1988,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setMarketBorrowCaps(address[],uint256[])",
@@ -2001,7 +1996,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setMarketSupplyCaps(address[],uint256[])",
@@ -2009,7 +2004,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setActionsPaused(address[],uint256[],bool)",
@@ -2017,27 +2012,27 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -2045,35 +2040,35 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_POOL_REGISTRY,
         "addPool(string,address,uint256,uint256,uint256)",
@@ -2081,15 +2076,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_POOL_REGISTRY,
         "updatePoolMetadata(address,VenusPoolMetaData)",
@@ -2097,31 +2092,31 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -2129,15 +2124,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -2145,15 +2140,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_VAULT_PROXY,
         "add(address,uint256,address,uint256,uint256)",
@@ -2161,11 +2156,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -2173,7 +2168,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_VAULT_PROXY,
         "setWithdrawalLockingPeriod(address,uint256,uint256)",
@@ -2181,155 +2176,155 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_RESILIENT_ORACLE, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_RESILIENT_ORACLE, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_RESILIENT_ORACLE, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_RESILIENT_ORACLE, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_RESILIENT_ORACLE, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -2337,11 +2332,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -2349,75 +2344,75 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -2425,11 +2420,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -2437,7 +2432,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_BRIDGE_ADMIN,
         "setMaxDailyReceiveLimit(uint16,uint256)",
@@ -2445,19 +2440,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_BRIDGE_ADMIN,
         "dropFailedMessage(uint16,bytes,uint64)",
@@ -2465,19 +2460,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_BRIDGE_ADMIN,
         "setConfig(uint16,uint16,uint256,bytes)",
@@ -2485,23 +2480,23 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -2509,11 +2504,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBMAINNET_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -2521,49 +2516,49 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
     },
   ],
   arbitrumsepolia: [
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "updateJumpRateModel(uint256,uint256,uint256,uint256)",
@@ -2571,7 +2566,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setRewardTokenSpeeds(address[],uint256[],uint256[])",
@@ -2579,7 +2574,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setLastRewardingBlocks(address[],uint32[],uint32[])",
@@ -2587,7 +2582,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
@@ -2595,47 +2590,47 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "burn(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "togglePause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_PLP,
         "setMaxTokensDistributionSpeed(address[],uint256[])",
@@ -2643,59 +2638,59 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_PLP,
         "setMaxTokensDistributionSpeed(address[],uint256[])",
@@ -2703,79 +2698,79 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "burn(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PRIME, "togglePause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PLP, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_PSR,
         "addOrUpdateDistributionConfigs(DistributionConfig[])",
@@ -2783,11 +2778,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_PSR,
         "addOrUpdateDistributionConfigs(DistributionConfig[])",
@@ -2795,11 +2790,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_PSR,
         "addOrUpdateDistributionConfigs(DistributionConfig[])",
@@ -2807,7 +2802,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -2815,15 +2810,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setActionsPaused(address[],uint256[],bool)",
@@ -2831,27 +2826,27 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -2859,7 +2854,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setMarketBorrowCaps(address[],uint256[])",
@@ -2867,7 +2862,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setMarketSupplyCaps(address[],uint256[])",
@@ -2875,7 +2870,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setActionsPaused(address[],uint256[],bool)",
@@ -2883,27 +2878,27 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -2911,35 +2906,35 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_POOL_REGISTRY,
         "addPool(string,address,uint256,uint256,uint256)",
@@ -2947,15 +2942,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_POOL_REGISTRY,
         "updatePoolMetadata(address,VenusPoolMetaData)",
@@ -2963,35 +2958,35 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -2999,15 +2994,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -3015,15 +3010,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
         "add(address,uint256,address,uint256,uint256)",
@@ -3031,11 +3026,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -3043,7 +3038,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
         "setWithdrawalLockingPeriod(address,uint256,uint256)",
@@ -3051,179 +3046,179 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUM_SEPOLIA_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -3231,11 +3226,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -3243,7 +3238,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxDailyReceiveLimit(uint16,uint256)",
@@ -3251,71 +3246,71 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -3323,11 +3318,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -3335,7 +3330,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxDailyReceiveLimit(uint16,uint256)",
@@ -3343,19 +3338,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "dropFailedMessage(uint16,bytes,uint64)",
@@ -3363,19 +3358,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setConfig(uint16,uint16,uint256,bytes)",
@@ -3383,23 +3378,23 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -3407,11 +3402,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -3419,7 +3414,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxDailyReceiveLimit(uint16,uint256)",
@@ -3427,19 +3422,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "dropFailedMessage(uint16,bytes,uint64)",
@@ -3447,7 +3442,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setMinDstGas(uint16,uint16,uint256)",
@@ -3455,7 +3450,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setPayloadSizeLimit(uint16,uint256)",
@@ -3463,11 +3458,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
         "setConfig(uint16,uint16,uint256,bytes)",
@@ -3475,25 +3470,25 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
   ],
   sepolia: [
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setConversionConfig(address,address,ConversionConfig)",
@@ -3501,19 +3496,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setConversionConfig(address,address,ConversionConfig)",
@@ -3521,19 +3516,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setConversionConfig(address,address,ConversionConfig)",
@@ -3541,7 +3536,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "updateJumpRateModel(uint256,uint256,uint256,uint256)",
@@ -3549,7 +3544,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setRewardTokenSpeeds(address[],uint256[],uint256[])",
@@ -3557,7 +3552,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setLastRewardingBlocks(address[],uint32[],uint32[])",
@@ -3565,225 +3560,225 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
     },
 
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
 
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "burn(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "togglePause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "burn(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PRIME, "togglePause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PLP, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -3791,15 +3786,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setActionsPaused(address[],uint256[],bool)",
@@ -3807,27 +3802,27 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -3835,7 +3830,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setMarketBorrowCaps(address[],uint256[])",
@@ -3843,7 +3838,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setMarketSupplyCaps(address[],uint256[])",
@@ -3851,7 +3846,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setActionsPaused(address[],uint256[],bool)",
@@ -3859,27 +3854,27 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -3887,79 +3882,79 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         SEPOLIA_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -3967,15 +3962,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         SEPOLIA_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -3983,23 +3978,23 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         SEPOLIA_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -4007,7 +4002,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         SEPOLIA_XVS_VAULT_PROXY,
         "setWithdrawalLockingPeriod(address,uint256,uint256)",
@@ -4015,202 +4010,202 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_RESILIENT_ORACLE, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_RESILIENT_ORACLE, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
 
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
 
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_RESILIENT_ORACLE, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
 
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxSingleTransactionLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         SEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -4218,75 +4213,75 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         SEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -4294,11 +4289,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         SEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -4306,67 +4301,67 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxSingleTransactionLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         SEPOLIA_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -4374,49 +4369,49 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [SEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
     },
   ],
   opbnbtestnet: [
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "updateJumpRateModel(uint256,uint256,uint256,uint256)",
@@ -4424,19 +4419,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_PSR,
         "addOrUpdateDistributionConfigs(DistributionConfig[])",
@@ -4444,15 +4439,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -4460,15 +4455,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setActionsPaused(address[],uint256[],bool)",
@@ -4476,27 +4471,27 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -4504,7 +4499,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setMarketBorrowCaps(address[],uint256[])",
@@ -4512,7 +4507,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setMarketSupplyCaps(address[],uint256[])",
@@ -4520,7 +4515,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setActionsPaused(address[],uint256[],bool)",
@@ -4528,27 +4523,27 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -4556,35 +4551,35 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_POOL_REGISTRY,
         "addPool(string,address,uint256,uint256,uint256)",
@@ -4592,15 +4587,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_POOL_REGISTRY,
         "updatePoolMetadata(address,VenusPoolMetaData)",
@@ -4608,35 +4603,35 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -4644,15 +4639,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -4660,15 +4655,15 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_VAULT_PROXY,
         "add(address,uint256,address,uint256,uint256)",
@@ -4676,11 +4671,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_VAULT_PROXY,
         "setRewardAmountPerBlockOrSecond(address,uint256)",
@@ -4688,7 +4683,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_VAULT_PROXY,
         "setWithdrawalLockingPeriod(address,uint256,uint256)",
@@ -4696,155 +4691,155 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_RESILIENT_ORACLE, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_RESILIENT_ORACLE, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_RESILIENT_ORACLE, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_RESILIENT_ORACLE, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_RESILIENT_ORACLE, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -4852,11 +4847,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -4864,75 +4859,75 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -4940,11 +4935,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -4952,7 +4947,7 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_BRIDGE_ADMIN,
         "setMaxDailyReceiveLimit(uint16,uint256)",
@@ -4960,19 +4955,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_BRIDGE_ADMIN,
         "dropFailedMessage(uint16,bytes,uint64)",
@@ -4980,19 +4975,19 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_BRIDGE_ADMIN,
         "setConfig(uint16,uint16,uint256,bytes)",
@@ -5000,23 +4995,23 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_BRIDGE_ADMIN,
         "setMaxSingleTransactionLimit(uint16,uint256)",
@@ -5024,11 +5019,11 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [
         OPBNBTESTNET_XVS_BRIDGE_ADMIN,
         "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
@@ -5036,43 +5031,43 @@ const permissions: Permissions = {
       ],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      permissionType: PermissionType.Give,
+      permissionType: false,
       params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
     },
   ],

@@ -5,21 +5,13 @@ import { IAccessControlManagerV8 } from "../Governance/IAccessControlManagerV8.s
 
 contract ACMCommandsAggregator {
     /*
-     * @notice Enum to differentiate between giving and revoking permissions
-     */
-    enum PermissionType {
-        GIVE,
-        REVOKE
-    }
-
-    /*
      * @notice Struct to store permission details
      */
     struct Permission {
         /*
-         * @notice Type of permission
+         * @notice Type of permission (Give(false)/Revoke(true))
          */
-        PermissionType permissionType;
+        bool permissionType;
         /*
          * @notice Address of the contract
          */
@@ -100,7 +92,7 @@ contract ACMCommandsAggregator {
     function executePermissions(uint256 index) external {
         uint256 length = permissions[index].length;
         for (uint256 i = 0; i < length; i++) {
-            if (permissions[index][i].permissionType == PermissionType.GIVE) {
+            if (permissions[index][i].permissionType == false) {
                 ACM.giveCallPermission(
                     permissions[index][i].contractAddress,
                     permissions[index][i].functionSig,
