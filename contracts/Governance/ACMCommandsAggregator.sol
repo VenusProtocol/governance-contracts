@@ -53,7 +53,7 @@ contract ACMCommandsAggregator {
      * @notice Event emitted when permissions are executed
      */
     event PermissionsExecuted(uint256 index);
-    
+
     /*
      * @notice Error to be thrown when permissions are empty
      */
@@ -75,7 +75,7 @@ contract ACMCommandsAggregator {
         if (_permissions.length == 0) {
             revert EmptyPermissions();
         }
-        
+
         uint256 index = permissions.length;
         permissions.push();
 
@@ -98,7 +98,8 @@ contract ACMCommandsAggregator {
      * @param index Index of the permissions array
      */
     function executePermissions(uint256 index) external {
-        for (uint256 i = 0; i < permissions[index].length; i++) {
+        uint256 length = permissions[index].length;
+        for (uint256 i = 0; i < length; i++) {
             if (permissions[index][i].permissionType == PermissionType.GIVE) {
                 ACM.giveCallPermission(
                     permissions[index][i].contractAddress,
