@@ -53,6 +53,11 @@ contract ACMCommandsAggregator {
      * @notice Event emitted when permissions are executed
      */
     event PermissionsExecuted(uint256 index);
+    
+    /*
+     * @notice Error to be thrown when permissions are empty
+     */
+    error EmptyPermissions();
 
     /*
      * @notice Constructor to set the access control manager
@@ -67,6 +72,10 @@ contract ACMCommandsAggregator {
      * @param _permissions Array of permissions
      */
     function addPermissions(Permission[] memory _permissions) external {
+        if (_permissions.length == 0) {
+            revert EmptyPermissions();
+        }
+        
         uint256 index = permissions.length;
         permissions.push();
 
