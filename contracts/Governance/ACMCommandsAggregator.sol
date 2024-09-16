@@ -40,14 +40,9 @@ contract ACMCommandsAggregator {
     IAccessControlManagerV8 public immutable ACM;
 
     /*
-     * @notice Mapping to store permissions
+     * @notice 2D array to store permissions in batches
      */
-    mapping(uint256 => Permission[]) public permissions;
-
-    /*
-     * @notice Index for the next permissions
-     */
-    uint256 public nextIndex;
+    Permission[][] public permissions;
 
     /*
      * @notice Event emitted when permissions are added
@@ -72,8 +67,11 @@ contract ACMCommandsAggregator {
      * @param _permissions Array of permissions
      */
     function addPermissions(Permission[] memory _permissions) external {
+        uint256 index = permissions.length;
+        permissions.push();
+
         for (uint256 i = 0; i < _permissions.length; i++) {
-            permissions[nextIndex].push(
+            permissions[index].push(
                 Permission(
                     _permissions[i].permissionType,
                     _permissions[i].contractAddress,
@@ -83,8 +81,7 @@ contract ACMCommandsAggregator {
             );
         }
 
-        emit PermissionsAdded(nextIndex);
-        nextIndex++;
+        emit PermissionsAdded(index);
     }
 
     /*
