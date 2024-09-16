@@ -62,6 +62,7 @@ contract ACMCommandsAggregator {
     /*
      * @notice Function to add permissions
      * @param _permissions Array of permissions
+     * @custom:event Emits PermissionsAdded event
      */
     function addPermissions(Permission[] memory _permissions) external {
         if (_permissions.length == 0) {
@@ -88,6 +89,7 @@ contract ACMCommandsAggregator {
     /*
      * @notice Function to execute permissions
      * @param index Index of the permissions array
+     * @custom:event Emits PermissionsExecuted event
      */
     function executePermissions(uint256 index) external {
         uint256 length = permissions[index].length;
