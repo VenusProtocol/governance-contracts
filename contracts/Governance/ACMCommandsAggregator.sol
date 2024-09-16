@@ -9,10 +9,6 @@ contract ACMCommandsAggregator {
      */
     struct Permission {
         /*
-         * @notice Type of permission (Give(false)/Revoke(true))
-         */
-        bool permissionType;
-        /*
          * @notice Address of the contract
          */
         address contractAddress;
@@ -32,19 +28,34 @@ contract ACMCommandsAggregator {
     IAccessControlManagerV8 public immutable ACM;
 
     /*
-     * @notice 2D array to store permissions in batches
+     * @notice 2D array to store grant permissions in batches
      */
-    Permission[][] public permissions;
+    Permission[][] public grantPermissions;
 
     /*
-     * @notice Event emitted when permissions are added
+     * @notice 2D array to store revoke permissions in batches
      */
-    event PermissionsAdded(uint256 index);
+    Permission[][] public revokePermissions;
 
     /*
-     * @notice Event emitted when permissions are executed
+     * @notice Event emitted when grant permissions are added
      */
-    event PermissionsExecuted(uint256 index);
+    event GrantPermissionsAdded(uint256 index);
+
+    /*
+     * @notice Event emitted when revoke permissions are added
+     */
+    event RevokePermissionsAdded(uint256 index);
+
+    /*
+     * @notice Event emitted when grant permissions are executed
+     */
+    event GrantPermissionsExecuted(uint256 index);
+
+    /*
+     * @notice Event emitted when revoke permissions are executed
+     */
+    event RevokePermissionsExecuted(uint256 index);
 
     /*
      * @notice Error to be thrown when permissions are empty
@@ -60,55 +71,82 @@ contract ACMCommandsAggregator {
     }
 
     /*
-     * @notice Function to add permissions
+     * @notice Function to add grant permissions
      * @param _permissions Array of permissions
-     * @custom:event Emits PermissionsAdded event
+     * @custom:event Emits GrantPermissionsAdded event
      */
-    function addPermissions(Permission[] memory _permissions) external {
+    function addGrantPermissions(Permission[] memory _permissions) external {
         if (_permissions.length == 0) {
             revert EmptyPermissions();
         }
 
-        uint256 index = permissions.length;
-        permissions.push();
+        uint256 index = grantPermissions.length;
+        grantPermissions.push();
 
         for (uint256 i = 0; i < _permissions.length; i++) {
-            permissions[index].push(
-                Permission(
-                    _permissions[i].permissionType,
-                    _permissions[i].contractAddress,
-                    _permissions[i].functionSig,
-                    _permissions[i].account
-                )
+            grantPermissions[index].push(
+                Permission(_permissions[i].contractAddress, _permissions[i].functionSig, _permissions[i].account)
             );
         }
 
-        emit PermissionsAdded(index);
+        emit GrantPermissionsAdded(index);
     }
 
     /*
-     * @notice Function to execute permissions
-     * @param index Index of the permissions array
-     * @custom:event Emits PermissionsExecuted event
+     * @notice Function to add revoke permissions
+     * @param _permissions Array of permissions
+     * @custom:event Emits RevokePermissionsAdded event
      */
-    function executePermissions(uint256 index) external {
-        uint256 length = permissions[index].length;
-        for (uint256 i = 0; i < length; i++) {
-            if (permissions[index][i].permissionType == false) {
-                ACM.giveCallPermission(
-                    permissions[index][i].contractAddress,
-                    permissions[index][i].functionSig,
-                    permissions[index][i].account
-                );
-            } else {
-                ACM.revokeCallPermission(
-                    permissions[index][i].contractAddress,
-                    permissions[index][i].functionSig,
-                    permissions[index][i].account
-                );
-            }
+    function addRevokePermissions(Permission[] memory _permissions) external {
+        if (_permissions.length == 0) {
+            revert EmptyPermissions();
         }
 
-        emit PermissionsExecuted(index);
+        uint256 index = revokePermissions.length;
+        revokePermissions.push();
+
+        for (uint256 i = 0; i < _permissions.length; i++) {
+            revokePermissions[index].push(
+                Permission(_permissions[i].contractAddress, _permissions[i].functionSig, _permissions[i].account)
+            );
+        }
+
+        emit RevokePermissionsAdded(index);
+    }
+
+    /*
+     * @notice Function to execute grant permissions
+     * @param index Index of the permissions array
+     * @custom:event Emits GrantPermissionsExecuted event
+     */
+    function executeGrantPermissions(uint256 index) external {
+        uint256 length = grantPermissions[index].length;
+        for (uint256 i = 0; i < length; i++) {
+            ACM.giveCallPermission(
+                grantPermissions[index][i].contractAddress,
+                grantPermissions[index][i].functionSig,
+                grantPermissions[index][i].account
+            );
+        }
+
+        emit GrantPermissionsExecuted(index);
+    }
+
+    /*
+     * @notice Function to execute revoke permissions
+     * @param index Index of the permissions array
+     * @custom:event Emits RevokePermissionsExecuted event
+     */
+    function executeRevokePermissions(uint256 index) external {
+        uint256 length = revokePermissions[index].length;
+        for (uint256 i = 0; i < length; i++) {
+            ACM.revokeCallPermission(
+                revokePermissions[index][i].contractAddress,
+                revokePermissions[index][i].functionSig,
+                revokePermissions[index][i].account
+            );
+        }
+
+        emit RevokePermissionsExecuted(index);
     }
 }
