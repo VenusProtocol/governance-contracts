@@ -72,6 +72,30 @@ const SEPOLIA_PSR = "0xbea70755cc3555708ca11219adB0db4C80F6721B";
 const OPBNBTESTNET_PSR = "0xc355dEb1A9289f8C58CFAa076EEdBf51F3A8Da7F";
 const SEPOLIA_CONVERTER_NETWORK = "0xB5A4208bFC4cC2C4670744849B8fC35B21A690Fa";
 
+const ARBITRUMONE_GUARDIAN = "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0";
+const ETHEREUM_GUARDIAN = "0x285960C5B22fD66A736C7136967A3eB15e93CC67";
+const OPBNBMAINNET_GUARDIAN = "0xC46796a21a3A9FAB6546aF3434F2eBfFd0604207";
+const SEPOLIA_GUARDIAN = "0x94fa6078b6b8a26f0b6edffbe6501b22a10470fb";
+const OPBNBTESTNET_GUARDIAN = "0xb15f6EfEbC276A3b9805df81b5FB3D50C2A62BDf";
+const ARBITRUMSEPOLIA_GUARDIAN = "0x1426A5Ae009c4443188DA8793751024E358A61C2";
+
+const ETHEREUM_CONVERTERS: string[] = [
+  "0xaE39C38AF957338b3cEE2b3E5d825ea88df02EfE",
+  "0x4f55cb0a24D5542a3478B0E284259A6B850B06BD",
+  "0xcEB9503f10B781E30213c0b320bCf3b3cE54216E",
+  "0xDcCDE673Cd8988745dA384A7083B0bd22085dEA0",
+  "0xb8fD67f215117FADeF06447Af31590309750529D",
+  "0x1FD30e761C3296fE36D9067b1e398FD97B4C0407",
+];
+const SEPOLIA_CONVERTERS: string[] = [
+  "0xCCB08e5107b406E67Ad8356023dd489CEbc79B40",
+  "0x3716C24EA86A67cAf890d7C9e4C4505cDDC2F8A2",
+  "0x511a559a699cBd665546a1F75908f7E9454Bfc67",
+  "0x8a3937F27921e859db3FDA05729CbCea8cfd82AE",
+  "0x274a834eFFA8D5479502dD6e78925Bc04ae82B46",
+  "0xc203bfA9dCB0B5fEC510Db644A494Ff7f4968ed2",
+];
+
 enum AccountType {
   NORMAL_TIMELOCK = "NormalTimelock",
   FAST_TRACK_TIMELOCK = "FastTrackTimelock",
@@ -3989,7 +4013,686 @@ const grantPermissions: Permissions = {
   ],
 };
 
-const revokePermissions: Permissions = {};
+const revokePermissions: Permissions = {
+  arbitrumone: [
+    {
+      params: [ARBITRUMONE_PRIME, "setTokensDistributionSpeed(address[],uint256[])", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_PRIME, "setMaxTokensDistributionSpeed(address[],uint256[])", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_PRIME, "setMaxLoopsLimit(uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_PLP, "updateAlpha(uint128,uint128)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_PLP, "updateMultipliers(address,uint256,uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_PLP, "setStakedAt(address[],uint256[])", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_PLP, "addMarket(address,address,uint256,uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_PLP, "setLimit(uint256,uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_PLP, "setMaxLoopsLimit(uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_PLP, "issue(bool,address[])", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_PLP, "burn(address)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_RESILIENT_ORACLE, "setOracle(address,address,uint8)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", ARBITRUMONE_GUARDIAN],
+    },
+
+    {
+      params: [ARBITRUMONE_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_XVS_VAULT_PROXY, "set(address,uint256,uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_XVS_VAULT_PROXY, "setRewardAmountPerBlockOrSecond(address,uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [
+        ARBITRUMONE_XVS_VAULT_PROXY,
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
+        ARBITRUMONE_GUARDIAN,
+      ],
+    },
+
+    {
+      params: [ARBITRUMONE_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_POOL_REGISTRY, "addMarket(AddMarketInput)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_POOL_REGISTRY, "setPoolName(address,string)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMONE_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+        ARBITRUMONE_GUARDIAN,
+      ],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", ARBITRUMONE_GUARDIAN],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setRewardTokenSpeeds(address[],uint256[],uint256[])",
+        ARBITRUMONE_GUARDIAN,
+      ],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlock(address[],uint32[],uint32[])",
+        ARBITRUMONE_GUARDIAN,
+      ],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlocks(address[],uint32[],uint32[])",
+        ARBITRUMONE_GUARDIAN,
+      ],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
+        ARBITRUMONE_GUARDIAN,
+      ],
+    },
+  ],
+  ethereum: [
+    {
+      params: [ETHEREUM_PRIME, "setTokensDistributionSpeed(address[],uint256[])", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_PRIME, "setMaxTokensDistributionSpeed(address[],uint256[])", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_PRIME, "setMaxLoopsLimit(uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_PLP, "updateAlpha(uint128,uint128)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_PLP, "updateMultipliers(address,uint256,uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_PLP, "setStakedAt(address[],uint256[])", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_PLP, "addMarket(address,address,uint256,uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_PLP, "setLimit(uint256,uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_PLP, "setMaxLoopsLimit(uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_PLP, "issue(bool,address[])", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_PLP, "burn(address)", ETHEREUM_GUARDIAN],
+    },
+
+    {
+      params: [ETHEREUM_CONVERTER_NETWORK, "addTokenConverter(address)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_CONVERTER_NETWORK, "removeTokenConverter(address)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_RESILIENT_ORACLE, "setOracle(address,address,uint8)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", ETHEREUM_GUARDIAN],
+    },
+
+    {
+      params: [ETHEREUM_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_XVS_VAULT_PROXY, "set(address,uint256,uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_XVS_VAULT_PROXY, "setRewardAmountPerBlockOrSecond(address,uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_XVS_VAULT_PROXY, "setWithdrawalLockingPeriod(address,uint256,uint256)", ETHEREUM_GUARDIAN],
+    },
+
+    {
+      params: [ETHEREUM_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_POOL_REGISTRY, "addMarket(AddMarketInput)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_POOL_REGISTRY, "setPoolName(address,string)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ETHEREUM_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setLastRewardingBlock(address[],uint32[],uint32[])", ETHEREUM_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setLastRewardingBlocks(address[],uint32[],uint32[])", ETHEREUM_GUARDIAN],
+    },
+
+    {
+      params: [ethers.constants.AddressZero, "updateJumpRateModel(uint256,uint256,uint256,uint256)", ETHEREUM_GUARDIAN],
+    },
+    ...ETHEREUM_CONVERTERS.map(converter => ({
+      params: [converter, "setMinAmountToConvert(uint256)", ETHEREUM_GUARDIAN],
+    })),
+    ...ETHEREUM_CONVERTERS.map(converter => ({
+      params: [converter, "setConversionConfig(address,address,ConversionConfig)", ETHEREUM_GUARDIAN],
+    })),
+  ],
+  opbnbmainnet: [
+    {
+      params: [OPBNBMAINNET_RESILIENT_ORACLE, "setOracle(address,address,uint8)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBMAINNET_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBMAINNET_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "set(address,uint256,uint256)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "setRewardAmountPerBlockOrSecond(address,uint256)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [
+        OPBNBMAINNET_XVS_VAULT_PROXY,
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
+        OPBNBMAINNET_GUARDIAN,
+      ],
+    },
+
+    {
+      params: [OPBNBMAINNET_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBMAINNET_POOL_REGISTRY, "addMarket(AddMarketInput)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBMAINNET_POOL_REGISTRY, "setPoolName(address,string)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBMAINNET_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", OPBNBMAINNET_GUARDIAN],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+        OPBNBMAINNET_GUARDIAN,
+      ],
+    },
+  ],
+  opbnbtestnet: [
+    {
+      params: [OPBNBTESTNET_RESILIENT_ORACLE, "setOracle(address,address,uint8)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBTESTNET_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBTESTNET_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "set(address,uint256,uint256)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "setRewardAmountPerBlockOrSecond(address,uint256)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [
+        OPBNBTESTNET_XVS_VAULT_PROXY,
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
+        OPBNBTESTNET_GUARDIAN,
+      ],
+    },
+
+    {
+      params: [OPBNBTESTNET_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBTESTNET_POOL_REGISTRY, "addMarket(AddMarketInput)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBTESTNET_POOL_REGISTRY, "setPoolName(address,string)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [OPBNBTESTNET_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", OPBNBTESTNET_GUARDIAN],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+        OPBNBTESTNET_GUARDIAN,
+      ],
+    },
+  ],
+  sepolia: [
+    {
+      params: [SEPOLIA_PRIME, "setTokensDistributionSpeed(address[],uint256[])", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_PRIME, "setMaxTokensDistributionSpeed(address[],uint256[])", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_PLP, "updateAlpha(uint128,uint128)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_PLP, "updateMultipliers(address,uint256,uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_PLP, "setStakedAt(address[],uint256[])", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_PLP, "addMarket(address,address,uint256,uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_PLP, "setLimit(uint256,uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_PLP, "setMaxLoopsLimit(uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_PLP, "issue(bool,address[])", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_PLP, "burn(address)", SEPOLIA_GUARDIAN],
+    },
+
+    {
+      params: [SEPOLIA_CONVERTER_NETWORK, "addTokenConverter(address)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_CONVERTER_NETWORK, "removeTokenConverter(address)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_RESILIENT_ORACLE, "setOracle(address,address,uint8)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", SEPOLIA_GUARDIAN],
+    },
+
+    {
+      params: [SEPOLIA_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_XVS_VAULT_PROXY, "set(address,uint256,uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_XVS_VAULT_PROXY, "setRewardAmountPerBlockOrSecond(address,uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_XVS_VAULT_PROXY, "setWithdrawalLockingPeriod(address,uint256,uint256)", SEPOLIA_GUARDIAN],
+    },
+
+    {
+      params: [SEPOLIA_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_POOL_REGISTRY, "addMarket(AddMarketInput)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_POOL_REGISTRY, "setPoolName(address,string)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [SEPOLIA_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setLastRewardingBlock(address[],uint32[],uint32[])", SEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "updateJumpRateModel(uint256,uint256,uint256,uint256)", SEPOLIA_GUARDIAN],
+    },
+    ...SEPOLIA_CONVERTERS.map(converter => ({
+      params: [converter, "setMinAmountToConvert(uint256)", SEPOLIA_GUARDIAN],
+    })),
+    ...SEPOLIA_CONVERTERS.map(converter => ({
+      params: [converter, "setConversionConfig(address,address,ConversionConfig)", SEPOLIA_GUARDIAN],
+    })),
+  ],
+  arbitrumsepolia: [
+    {
+      params: [ARBITRUMSEPOLIA_PRIME, "setTokensDistributionSpeed(address[],uint256[])", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_PRIME, "setMaxTokensDistributionSpeed(address[],uint256[])", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_PLP, "updateAlpha(uint128,uint128)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_PLP, "updateMultipliers(address,uint256,uint256)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_PLP, "setStakedAt(address[],uint256[])", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_PLP, "addMarket(address,address,uint256,uint256)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_PLP, "setLimit(uint256,uint256)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_PLP, "setMaxLoopsLimit(uint256)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_PLP, "issue(bool,address[])", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_PLP, "burn(address)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "setOracle(address,address,uint8)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUM_SEPOLIA_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+
+    {
+      params: [
+        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
+        "add(address,uint256,address,uint256,uint256)",
+        ARBITRUMSEPOLIA_GUARDIAN,
+      ],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "set(address,uint256,uint256)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [
+        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        ARBITRUMSEPOLIA_GUARDIAN,
+      ],
+    },
+    {
+      params: [
+        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
+        ARBITRUMSEPOLIA_GUARDIAN,
+      ],
+    },
+
+    {
+      params: [
+        ARBITRUMSEPOLIA_POOL_REGISTRY,
+        "addPool(string,address,uint256,uint256,uint256)",
+        ARBITRUMSEPOLIA_GUARDIAN,
+      ],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_POOL_REGISTRY, "addMarket(AddMarketInput)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ARBITRUMSEPOLIA_POOL_REGISTRY, "setPoolName(address,string)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [
+        ARBITRUMSEPOLIA_POOL_REGISTRY,
+        "updatePoolMetadata(address,VenusPoolMetaData)",
+        ARBITRUMSEPOLIA_GUARDIAN,
+      ],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", ARBITRUMSEPOLIA_GUARDIAN],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setRewardTokenSpeeds(address[],uint256[],uint256[])",
+        ARBITRUMSEPOLIA_GUARDIAN,
+      ],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlock(address[],uint32[],uint32[])",
+        ARBITRUMSEPOLIA_GUARDIAN,
+      ],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlocks(address[],uint32[],uint32[])",
+        ARBITRUMSEPOLIA_GUARDIAN,
+      ],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
+        ARBITRUMSEPOLIA_GUARDIAN,
+      ],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+        ARBITRUMSEPOLIA_GUARDIAN,
+      ],
+    },
+  ],
+};
 
 function splitPermissions(
   array: ACMCommandsAggregator.PermissionStruct[],
