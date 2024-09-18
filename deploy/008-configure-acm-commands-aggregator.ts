@@ -110,7 +110,7 @@ interface Permissions {
   [key: string]: Permission[];
 }
 
-const getResilientOracleGrantPermissions = (resilientOracle: string): Permission[] => {
+const getResilientOraclePermissions = (resilientOracle: string): Permission[] => {
   return [
     {
       params: [resilientOracle, "pause()", AccountType.NORMAL_TIMELOCK],
@@ -242,166 +242,466 @@ const getBinanceOraclePermissions = (binanceOracle: string): Permission[] => {
   ]
 }
 
-const grantPermissions: Permissions = {
-  arbitrumone: [
-    ...getResilientOracleGrantPermissions(ARBITRUMONE_RESILIENT_ORACLE),
-    ...getChainlinkOraclePermissions(ARBITRUMONE_CHAINLINK_ORACLE),
-    ...getRedstoneOraclePermissions(ARBITRUMONE_REDSTONE_ORACLE),
-    ...getBoundValidatorPermissions(ARBITRUMONE_BOUND_VALIDATOR),
+const getXVSPermissions = (xvs: string): Permission[] => {
+  return [
+    {
+      params: [xvs, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvs, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvs, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvs, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvs, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvs, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvs, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvs, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvs, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvs, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvs, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvs, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvs, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvs, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvs, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+  ]
+}
+
+const getXVSBridgeAdminPermissions = (xvsBridgeAdmin: string): Permission[] => {
+  return [
+    {
+      params: [xvsBridgeAdmin, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
+    },
     {
       params: [
-        ethers.constants.AddressZero,
-        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+        xvsBridgeAdmin,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      params: [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [
+        xvsBridgeAdmin,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      params: [xvsBridgeAdmin, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [
+        xvsBridgeAdmin,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      params: [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [
+        xvsBridgeAdmin,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      params: [
+        xvsBridgeAdmin,
+        "setMaxDailyReceiveLimit(uint16,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      params: [xvsBridgeAdmin, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+
+    {
+      params: [xvsBridgeAdmin, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [
+        xvsBridgeAdmin,
+        "setMaxSingleTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      params: [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [
+        xvsBridgeAdmin,
+        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      params: [xvsBridgeAdmin, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
+    },
+  ]
+}
+
+const getXVSVaultPermissions = (xvsVault: string): Permission[] => {
+  return [
+    {
+      params: [xvsVault, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [xvsVault, "resume()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [
+        xvsVault,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.CRITICAL_TIMELOCK,
+      ],
+    },
+    {
+      params: [xvsVault, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [xvsVault, "resume()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [
+        xvsVault,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
+        AccountType.FAST_TRACK_TIMELOCK,
+      ],
+    },
+    {
+      params: [xvsVault, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [xvsVault, "resume()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [
+        xvsVault,
+        "add(address,uint256,address,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      params: [xvsVault, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [
+        xvsVault,
+        "setRewardAmountPerBlockOrSecond(address,uint256)",
         AccountType.NORMAL_TIMELOCK,
       ],
     },
     {
       params: [
-        ethers.constants.AddressZero,
-        "setRewardTokenSpeeds(address[],uint256[],uint256[])",
+        xvsVault,
+        "setWithdrawalLockingPeriod(address,uint256,uint256)",
         AccountType.NORMAL_TIMELOCK,
       ],
     },
+  ]
+}
+
+const getPoolRegistryPermissions = (poolRegistry: string): Permission[] => {
+  return [
     {
-      params: [
-        ethers.constants.AddressZero,
-        "setLastRewardingBlocks(address[],uint32[],uint32[])",
-        AccountType.NORMAL_TIMELOCK,
-      ],
+      params: [poolRegistry, "addPool(string,address,uint256,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [
-        ethers.constants.AddressZero,
-        "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
-        AccountType.NORMAL_TIMELOCK,
-      ],
+      params: [poolRegistry, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
+      params: [poolRegistry, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+      params: [poolRegistry, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
+    },
+  ];
+}
+
+const getPrimePermissions = (prime: string): Permission[] => {
+  return [
+    {
+      params: [prime, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+      params: [prime, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+      params: [prime, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
+      params: [prime, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
+      params: [prime, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
+      params: [prime, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "burn(address)", AccountType.CRITICAL_TIMELOCK],
+      params: [prime, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "togglePause()", AccountType.CRITICAL_TIMELOCK],
+      params: [prime, "burn(address)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+      params: [prime, "togglePause()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
+      params: [prime, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
+      params: [prime, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
+      params: [prime, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
+      params: [prime, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "burn(address)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
+      params: [prime, "togglePause()", AccountType.NORMAL_TIMELOCK],
+    },
+  ]
+}
+
+const getPrimeLiquidityProviderPermissions = (primeLiquidityProvider: string): Permission[] => {
+  return [
+    {
+      params: [primeLiquidityProvider, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
+    },
+    
+    {
+      params: [primeLiquidityProvider, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "burn(address)", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PRIME, "togglePause()", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ARBITRUMONE_PLP, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
+      params: [primeLiquidityProvider, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
     },
-    {
-      params: [ARBITRUMONE_PLP, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
-    },
+  ]
+}
+
+const getProtocolShareReservePermissions = (protocolShareReserve: string): Permission[] => {
+  return [
     {
       params: [ARBITRUMONE_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
     },
@@ -424,6 +724,78 @@ const grantPermissions: Permissions = {
     {
       params: [ARBITRUMONE_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
     },
+  ]
+}
+
+const getConverterNetworkPermissions = (converterNetwork: string): Permission[] => {
+  return [
+    {
+      params: [converterNetwork, "addTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [converterNetwork, "removeTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
+    },
+
+    {
+      params: [converterNetwork, "addTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [converterNetwork, "removeTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+
+    {
+      params: [converterNetwork, "addTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [converterNetwork, "removeTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
+    },
+  ];
+}
+
+const grantPermissions: Permissions = {
+  arbitrumone: [
+    ...getResilientOraclePermissions(ARBITRUMONE_RESILIENT_ORACLE),
+    ...getChainlinkOraclePermissions(ARBITRUMONE_CHAINLINK_ORACLE),
+    ...getRedstoneOraclePermissions(ARBITRUMONE_REDSTONE_ORACLE),
+    ...getBoundValidatorPermissions(ARBITRUMONE_BOUND_VALIDATOR),
+    ...getXVSPermissions(ARBITRUMONE_XVS),
+    ...getXVSBridgeAdminPermissions(ARBITRUMONE_XVS_BRIDGE_ADMIN),
+    ...getXVSVaultPermissions(ARBITRUMONE_XVS_VAULT_PROXY),
+    ...getPoolRegistryPermissions(ARBITRUMONE_POOL_REGISTRY),
+    ...getPrimePermissions(ARBITRUMONE_PRIME),
+    ...getPrimeLiquidityProviderPermissions(ARBITRUMONE_PLP),
+    ...getProtocolShareReservePermissions(ARBITRUMONE_PSR),
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setRewardTokenSpeeds(address[],uint256[],uint256[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlocks(address[],uint32[],uint32[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+   
+    
+    
     {
       params: [
         ethers.constants.AddressZero,
@@ -531,22 +903,6 @@ const grantPermissions: Permissions = {
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [
-        ARBITRUMONE_POOL_REGISTRY,
-        "addPool(string,address,uint256,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMONE_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
@@ -561,302 +917,24 @@ const grantPermissions: Permissions = {
     {
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
     },
-    {
-      params: [ARBITRUMONE_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMONE_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMONE_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_VAULT_PROXY,
-        "add(address,uint256,address,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMONE_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_VAULT_PROXY,
-        "setWithdrawalLockingPeriod(address,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_BRIDGE_ADMIN,
-        "setMaxDailyReceiveLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
-    },
+    
+    
+ 
   ],
   ethereum: [
-    ...getResilientOracleGrantPermissions(ETHEREUM_RESILIENT_ORACLE),
+    ...getResilientOraclePermissions(ETHEREUM_RESILIENT_ORACLE),
     ...getChainlinkOraclePermissions(ETHEREUM_CHAINLINK_ORACLE),
     ...getRedstoneOraclePermissions(ETHEREUM_REDSTONE_ORACLE),
     ...getBoundValidatorPermissions(ETHEREUM_BOUND_VALIDATOR),
     ...getSFrxETHOraclePermissions(ETHEREUM_sFrxETH_ORACLE),
+    ...getXVSPermissions(ETHEREUM_XVS),
+    ...getXVSBridgeAdminPermissions(ETHEREUM_XVS_BRIDGE_ADMIN),
+    ...getXVSVaultPermissions(ETHEREUM_XVS_VAULT_PROXY),
+    ...getPoolRegistryPermissions(ETHEREUM_POOL_REGISTRY),
+    ...getPrimePermissions(ETHEREUM_PRIME),
+    ...getPrimeLiquidityProviderPermissions(ETHEREUM_PLP),
+    ...getProtocolShareReservePermissions(ETHEREUM_PSR),
+    ...getConverterNetworkPermissions(ETHEREUM_CONVERTER_NETWORK),
     {
       params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.CRITICAL_TIMELOCK],
     },
@@ -926,172 +1004,7 @@ const grantPermissions: Permissions = {
         AccountType.NORMAL_TIMELOCK,
       ],
     },
-    {
-      params: [ETHEREUM_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
-    },
-
-    // Grant permissions to fast track timelock
-    {
-      params: [ETHEREUM_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-
-    // Grant permissions to critical timelock
-    {
-      params: [ETHEREUM_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "burn(address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "togglePause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "burn(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "togglePause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PLP, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PRIME, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
-    },
+   
     {
       params: [
         ethers.constants.AddressZero,
@@ -1198,18 +1111,7 @@ const grantPermissions: Permissions = {
     {
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
-    {
-      params: [ETHEREUM_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
-    },
+    
     {
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
     },
@@ -1225,323 +1127,22 @@ const grantPermissions: Permissions = {
     {
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
     },
-    {
-      params: [ETHEREUM_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ETHEREUM_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ETHEREUM_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ETHEREUM_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ETHEREUM_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        ETHEREUM_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ETHEREUM_XVS_VAULT_PROXY,
-        "setWithdrawalLockingPeriod(address,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-
-    {
-      params: [ETHEREUM_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxSingleTransactionLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        ETHEREUM_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ETHEREUM_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ETHEREUM_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ETHEREUM_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ETHEREUM_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
-    },
   ],
   opbnbmainnet: [
-    ...getResilientOracleGrantPermissions(OPBNBMAINNET_RESILIENT_ORACLE),
+    ...getResilientOraclePermissions(OPBNBMAINNET_RESILIENT_ORACLE),
     ...getBoundValidatorPermissions(OPBNBMAINNET_BOUND_VALIDATOR),
     ...getBinanceOraclePermissions(OPBNBMAINNET_BINANCE_ORACLE),
+    ...getXVSPermissions(OPBNBMAINNET_XVS),
+    ...getXVSBridgeAdminPermissions(OPBNBMAINNET_XVS_BRIDGE_ADMIN),
+    ...getXVSVaultPermissions(OPBNBMAINNET_XVS_VAULT_PROXY),
+    ...getPoolRegistryPermissions(OPBNBMAINNET_POOL_REGISTRY),
+    ...getProtocolShareReservePermissions(OPBNBMAINNET_PSR),
     {
       params: [
         ethers.constants.AddressZero,
         "updateJumpRateModel(uint256,uint256,uint256,uint256)",
         AccountType.NORMAL_TIMELOCK,
       ],
-    },
-    {
-      params: [OPBNBMAINNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_PSR,
-        "addOrUpdateDistributionConfigs(DistributionConfig[])",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
     },
     {
       params: [
@@ -1650,26 +1251,6 @@ const grantPermissions: Permissions = {
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [
-        OPBNBMAINNET_POOL_REGISTRY,
-        "addPool(string,address,uint256,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_POOL_REGISTRY,
-        "updatePoolMetadata(address,VenusPoolMetaData)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
@@ -1681,309 +1262,19 @@ const grantPermissions: Permissions = {
     {
       params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
     },
-    {
-      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_VAULT_PROXY,
-        "add(address,uint256,address,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_VAULT_PROXY,
-        "setWithdrawalLockingPeriod(address,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    
-    {
-      params: [OPBNBMAINNET_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
-        "setMaxDailyReceiveLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
-        "dropFailedMessage(uint16,bytes,uint64)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
-        "setConfig(uint16,uint16,uint256,bytes)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
-    },
   ],
   arbitrumsepolia: [
-    ...getResilientOracleGrantPermissions(ARBITRUMSEPOLIA_RESILIENT_ORACLE),
+    ...getResilientOraclePermissions(ARBITRUMSEPOLIA_RESILIENT_ORACLE),
     ...getChainlinkOraclePermissions(ARBITRUMSEPOLIA_CHAINLINK_ORACLE),
     ...getRedstoneOraclePermissions(ARBITRUMSEPOLIA_REDSTONE_ORACLE),
     ...getBoundValidatorPermissions(ARBITRUMSEPOLIA_BOUND_VALIDATOR),
+    ...getXVSPermissions(ARBITRUMSEPOLIA_XVS),
+    ...getXVSBridgeAdminPermissions(ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN),
+    ...getXVSVaultPermissions(ARBITRUMSEPOLIA_XVS_VAULT_PROXY),
+    ...getPoolRegistryPermissions(ARBITRUMSEPOLIA_POOL_REGISTRY),
+    ...getPrimePermissions(ARBITRUMSEPOLIA_PRIME),
+    ...getPrimeLiquidityProviderPermissions(ARBITRUMSEPOLIA_PLP),
+    ...getProtocolShareReservePermissions(ARBITRUMSEPOLIA_PSR),
     {
       params: [
         ethers.constants.AddressZero,
@@ -2013,170 +1304,6 @@ const grantPermissions: Permissions = {
       ],
     },
     {
-      params: [ARBITRUMSEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "burn(address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "togglePause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_PLP,
-        "setMaxTokensDistributionSpeed(address[],uint256[])",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_PLP,
-        "setMaxTokensDistributionSpeed(address[],uint256[])",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "burn(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "togglePause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_PSR,
-        "addOrUpdateDistributionConfigs(DistributionConfig[])",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_PSR,
-        "addOrUpdateDistributionConfigs(DistributionConfig[])",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_PSR,
-        "addOrUpdateDistributionConfigs(DistributionConfig[])",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -2283,26 +1410,6 @@ const grantPermissions: Permissions = {
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [
-        ARBITRUMSEPOLIA_POOL_REGISTRY,
-        "addPool(string,address,uint256,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_POOL_REGISTRY,
-        "updatePoolMetadata(address,VenusPoolMetaData)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
@@ -2317,333 +1424,21 @@ const grantPermissions: Permissions = {
     {
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
     },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
-        "add(address,uint256,address,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
-        "setWithdrawalLockingPeriod(address,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxDailyReceiveLimit(uint16,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxDailyReceiveLimit(uint16,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "dropFailedMessage(uint16,bytes,uint64)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setConfig(uint16,uint16,uint256,bytes)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxDailyReceiveLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "dropFailedMessage(uint16,bytes,uint64)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMinDstGas(uint16,uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setPayloadSizeLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN,
-        "setConfig(uint16,uint16,uint256,bytes)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
   ],
   sepolia: [
-    ...getResilientOracleGrantPermissions(SEPOLIA_RESILIENT_ORACLE),
-    ...getResilientOracleGrantPermissions(SEPOLIA_CHAINLINK_ORACLE),
+    ...getResilientOraclePermissions(SEPOLIA_RESILIENT_ORACLE),
+    ...getResilientOraclePermissions(SEPOLIA_CHAINLINK_ORACLE),
     ...getRedstoneOraclePermissions(SEPOLIA_REDSTONE_ORACLE),
     ...getBoundValidatorPermissions(SEPOLIA_BOUND_VALIDATOR),
     ...getSFrxETHOraclePermissions(SEPOLIA_sFrxETH_ORACLE),
+    ...getXVSPermissions(SEPOLIA_XVS),
+    ...getXVSBridgeAdminPermissions(SEPOLIA_XVS_BRIDGE_ADMIN),
+    ...getXVSVaultPermissions(SEPOLIA_XVS_VAULT_PROXY),
+    ...getPoolRegistryPermissions(SEPOLIA_POOL_REGISTRY),
+    ...getPrimePermissions(SEPOLIA_PRIME),
+    ...getPrimeLiquidityProviderPermissions(SEPOLIA_PLP),
+    ...getProtocolShareReservePermissions(SEPOLIA_PSR),
+    ...getConverterNetworkPermissions(SEPOLIA_CONVERTER_NETWORK),
     {
       params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.CRITICAL_TIMELOCK],
     },
@@ -2714,170 +1509,6 @@ const grantPermissions: Permissions = {
       ],
     },
     {
-      params: [SEPOLIA_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
-    },
-
-    {
-      params: [SEPOLIA_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-
-    {
-      params: [SEPOLIA_CONVERTER_NETWORK, "addTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_CONVERTER_NETWORK, "removeTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "burn(address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "togglePause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "burn(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PRIME, "togglePause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "setMaxTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PLP, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -2984,18 +1615,6 @@ const grantPermissions: Permissions = {
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [SEPOLIA_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_POOL_REGISTRY, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
@@ -3010,283 +1629,16 @@ const grantPermissions: Permissions = {
     {
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
     },
-    {
-      params: [SEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        SEPOLIA_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [SEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        SEPOLIA_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [SEPOLIA_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        SEPOLIA_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        SEPOLIA_XVS_VAULT_PROXY,
-        "setWithdrawalLockingPeriod(address,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [SEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxSingleTransactionLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        SEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        SEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        SEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxSingleTransactionLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        SEPOLIA_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
-    },
   ],
   opbnbtestnet: [
-    ...getResilientOracleGrantPermissions(OPBNBTESTNET_RESILIENT_ORACLE),
-    ...getResilientOracleGrantPermissions(OPBNBTESTNET_BOUND_VALIDATOR),
+    ...getResilientOraclePermissions(OPBNBTESTNET_RESILIENT_ORACLE),
+    ...getResilientOraclePermissions(OPBNBTESTNET_BOUND_VALIDATOR),
     ...getBinanceOraclePermissions(OPBNBTESTNET_BINANCE_ORACLE),
+    ...getXVSPermissions(OPBNBTESTNET_XVS),
+    ...getXVSBridgeAdminPermissions(OPBNBTESTNET_XVS_BRIDGE_ADMIN),
+    ...getXVSVaultPermissions(OPBNBTESTNET_XVS_VAULT_PROXY),
+    ...getPoolRegistryPermissions(OPBNBTESTNET_POOL_REGISTRY),
+    ...getProtocolShareReservePermissions(OPBNBTESTNET_PSR),
     {
       params: [
         ethers.constants.AddressZero,
@@ -3295,28 +1647,6 @@ const grantPermissions: Permissions = {
       ],
     },
     {
-      params: [OPBNBTESTNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_PSR,
-        "addOrUpdateDistributionConfigs(DistributionConfig[])",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_PSR, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_PSR, "addOrUpdateDistributionConfigs(DistributionConfig[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
       params: [
         ethers.constants.AddressZero,
         "setCollateralFactor(address,uint256,uint256)",
@@ -3423,26 +1753,6 @@ const grantPermissions: Permissions = {
       params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [
-        OPBNBTESTNET_POOL_REGISTRY,
-        "addPool(string,address,uint256,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_POOL_REGISTRY, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_POOL_REGISTRY, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_POOL_REGISTRY,
-        "updatePoolMetadata(address,VenusPoolMetaData)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
@@ -3456,302 +1766,6 @@ const grantPermissions: Permissions = {
     },
     {
       params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "resume()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "resume()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "resume()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_VAULT_PROXY,
-        "add(address,uint256,address,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_VAULT_PROXY,
-        "setWithdrawalLockingPeriod(address,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
-        "setMaxDailyReceiveLimit(uint16,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
-        "dropFailedMessage(uint16,bytes,uint64)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
-        "setConfig(uint16,uint16,uint256,bytes)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
-        "setMaxSingleTransactionLimit(uint16,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_BRIDGE_ADMIN,
-        "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_BRIDGE_ADMIN, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
     },
   ],
 };
@@ -3962,7 +1976,6 @@ const revokePermissions: Permissions = {
     {
       params: [ETHEREUM_XVS_VAULT_PROXY, "setWithdrawalLockingPeriod(address,uint256,uint256)", ETHEREUM_GUARDIAN],
     },
-
     {
       params: [ETHEREUM_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", ETHEREUM_GUARDIAN],
     },
