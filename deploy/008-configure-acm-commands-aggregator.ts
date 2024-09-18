@@ -18,7 +18,7 @@ const OPBNBMAINNET_BOUND_VALIDATOR = "0xd1f80C371C6E2Fa395A5574DB3E3b4dAf43dadCE
 const ARBITRUMSEPOLIA_RESILIENT_ORACLE = "0x6708bAd042916B47311c8078b29d7f432342102F";
 const ARBITRUMSEPOLIA_CHAINLINK_ORACLE = "0xeDd02c7FfA31490b4107e8f2c25e9198a04F9E45";
 const ARBITRUMSEPOLIA_REDSTONE_ORACLE = "0x15058891ca0c71Bd724b873c41596A682420613C";
-const ARBITRUM_SEPOLIA_BOUND_VALIDATOR = "0xfe6bc1545Cc14C131bacA97476D6035ffcC0b889";
+const ARBITRUMSEPOLIA_BOUND_VALIDATOR = "0xfe6bc1545Cc14C131bacA97476D6035ffcC0b889";
 const SEPOLIA_RESILIENT_ORACLE = "0x8000eca36201dddf5805Aa4BeFD73d1EB4D23264";
 const SEPOLIA_CHAINLINK_ORACLE = "0x102F0b714E5d321187A4b6E5993358448f7261cE";
 const SEPOLIA_REDSTONE_ORACLE = "0x4e6269Ef406B4CEE6e67BA5B5197c2FfD15099AE";
@@ -110,8 +110,144 @@ interface Permissions {
   [key: string]: Permission[];
 }
 
+const getResilientOracleGrantPermissions = (resilientOracle: string): Permission[] => {
+  return [
+    {
+      params: [resilientOracle, "pause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [resilientOracle, "unpause()", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [resilientOracle, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [resilientOracle, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [resilientOracle, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [resilientOracle, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [resilientOracle, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [resilientOracle, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [resilientOracle, "pause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [resilientOracle, "unpause()", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [resilientOracle, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
+    },
+  ];
+};
+
+const getChainlinkOraclePermissions = (chainlinkOracle: string): Permission[] => {
+  return [
+    {
+      params: [chainlinkOracle, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [chainlinkOracle, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [chainlinkOracle, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [chainlinkOracle, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [chainlinkOracle, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [chainlinkOracle, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+  ];
+};
+
+const getRedstoneOraclePermissions = (redstoneOracle: string): Permission[] => {
+  return [
+    {
+      params: [redstoneOracle, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [redstoneOracle, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+
+    {
+      params: [redstoneOracle, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [redstoneOracle, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+
+    {
+      params: [redstoneOracle, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [redstoneOracle, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+  ];
+};
+
+const getBoundValidatorPermissions = (boundValidator: string): Permission[] => {
+  return [
+    {
+      params: [boundValidator, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
+    },
+  ];
+};
+
+const getSFrxETHOraclePermissions = (sFrxETHOracle: string): Permission[] => {
+  return [
+    {
+      params: [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+
+    {
+      params: [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+  ];
+};
+
+const getBinanceOraclePermissions = (binanceOracle: string): Permission[] => {
+  return [
+    {
+      params: [OPBNBMAINNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [OPBNBMAINNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.NORMAL_TIMELOCK],
+    },
+    {
+      params: [OPBNBMAINNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [OPBNBMAINNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.FAST_TRACK_TIMELOCK],
+    },
+    {
+      params: [OPBNBMAINNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.CRITICAL_TIMELOCK],
+    },
+    {
+      params: [OPBNBMAINNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.CRITICAL_TIMELOCK],
+    },
+  ]
+}
+
 const grantPermissions: Permissions = {
   arbitrumone: [
+    ...getResilientOracleGrantPermissions(ARBITRUMONE_RESILIENT_ORACLE),
+    ...getChainlinkOraclePermissions(ARBITRUMONE_CHAINLINK_ORACLE),
+    ...getRedstoneOraclePermissions(ARBITRUMONE_REDSTONE_ORACLE),
+    ...getBoundValidatorPermissions(ARBITRUMONE_BOUND_VALIDATOR),
     {
       params: [
         ethers.constants.AddressZero,
@@ -482,83 +618,6 @@ const grantPermissions: Permissions = {
       ],
     },
     {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-
-    {
-      params: [ARBITRUMONE_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-
-    {
-      params: [ARBITRUMONE_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMONE_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
       params: [ARBITRUMONE_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
@@ -793,6 +852,11 @@ const grantPermissions: Permissions = {
     },
   ],
   ethereum: [
+    ...getResilientOracleGrantPermissions(ETHEREUM_RESILIENT_ORACLE),
+    ...getChainlinkOraclePermissions(ETHEREUM_CHAINLINK_ORACLE),
+    ...getRedstoneOraclePermissions(ETHEREUM_REDSTONE_ORACLE),
+    ...getBoundValidatorPermissions(ETHEREUM_BOUND_VALIDATOR),
+    ...getSFrxETHOraclePermissions(ETHEREUM_sFrxETH_ORACLE),
     {
       params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.CRITICAL_TIMELOCK],
     },
@@ -1213,87 +1277,14 @@ const grantPermissions: Permissions = {
         AccountType.NORMAL_TIMELOCK,
       ],
     },
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
 
-    {
-      params: [ETHEREUM_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
     {
       params: [ETHEREUM_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
     },
     {
       params: [ETHEREUM_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
     },
-    {
-      params: [ETHEREUM_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
 
-    {
-      params: [ETHEREUM_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-
-    {
-      params: [ETHEREUM_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ETHEREUM_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
     {
       params: [ETHEREUM_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
     },
@@ -1520,6 +1511,9 @@ const grantPermissions: Permissions = {
     },
   ],
   opbnbmainnet: [
+    ...getResilientOracleGrantPermissions(OPBNBMAINNET_RESILIENT_ORACLE),
+    ...getBoundValidatorPermissions(OPBNBMAINNET_BOUND_VALIDATOR),
+    ...getBinanceOraclePermissions(OPBNBMAINNET_BINANCE_ORACLE),
     {
       params: [
         ethers.constants.AddressZero,
@@ -1743,60 +1737,7 @@ const grantPermissions: Permissions = {
         AccountType.NORMAL_TIMELOCK,
       ],
     },
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBMAINNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.CRITICAL_TIMELOCK],
-    },
+    
     {
       params: [OPBNBMAINNET_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
     },
@@ -2039,6 +1980,10 @@ const grantPermissions: Permissions = {
     },
   ],
   arbitrumsepolia: [
+    ...getResilientOracleGrantPermissions(ARBITRUMSEPOLIA_RESILIENT_ORACLE),
+    ...getChainlinkOraclePermissions(ARBITRUMSEPOLIA_CHAINLINK_ORACLE),
+    ...getRedstoneOraclePermissions(ARBITRUMSEPOLIA_REDSTONE_ORACLE),
+    ...getBoundValidatorPermissions(ARBITRUMSEPOLIA_BOUND_VALIDATOR),
     {
       params: [
         ethers.constants.AddressZero,
@@ -2429,78 +2374,6 @@ const grantPermissions: Permissions = {
       ],
     },
     {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUM_SEPOLIA_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
       params: [ARBITRUMSEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
@@ -2766,6 +2639,11 @@ const grantPermissions: Permissions = {
     },
   ],
   sepolia: [
+    ...getResilientOracleGrantPermissions(SEPOLIA_RESILIENT_ORACLE),
+    ...getResilientOracleGrantPermissions(SEPOLIA_CHAINLINK_ORACLE),
+    ...getRedstoneOraclePermissions(SEPOLIA_REDSTONE_ORACLE),
+    ...getBoundValidatorPermissions(SEPOLIA_BOUND_VALIDATOR),
+    ...getSFrxETHOraclePermissions(SEPOLIA_sFrxETH_ORACLE),
     {
       params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.CRITICAL_TIMELOCK],
     },
@@ -3185,90 +3063,6 @@ const grantPermissions: Permissions = {
       ],
     },
     {
-      params: [SEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_RESILIENT_ORACLE, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_RESILIENT_ORACLE, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-
-    {
-      params: [SEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-
-    {
-      params: [SEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_RESILIENT_ORACLE, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_RESILIENT_ORACLE, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_CHAINLINK_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_CHAINLINK_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-
-    {
-      params: [SEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [SEPOLIA_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
       params: [SEPOLIA_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
     },
     {
@@ -3490,6 +3284,9 @@ const grantPermissions: Permissions = {
     },
   ],
   opbnbtestnet: [
+    ...getResilientOracleGrantPermissions(OPBNBTESTNET_RESILIENT_ORACLE),
+    ...getResilientOracleGrantPermissions(OPBNBTESTNET_BOUND_VALIDATOR),
+    ...getBinanceOraclePermissions(OPBNBTESTNET_BINANCE_ORACLE),
     {
       params: [
         ethers.constants.AddressZero,
@@ -3715,60 +3512,6 @@ const grantPermissions: Permissions = {
         "setWithdrawalLockingPeriod(address,uint256,uint256)",
         AccountType.NORMAL_TIMELOCK,
       ],
-    },
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_BINANCE_ORACLE, "setMaxStalePeriod(string,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [OPBNBTESTNET_BINANCE_ORACLE, "setSymbolOverride(string,string)", AccountType.CRITICAL_TIMELOCK],
     },
     {
       params: [OPBNBTESTNET_XVS, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
