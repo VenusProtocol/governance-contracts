@@ -954,6 +954,85 @@ const getConverterPermissions = (): Permission[] => {
   ];
 };
 
+const getPrimeRevokePermissions = (prime: string, guardian: string): Permission[] => {
+  return [
+    {
+      params: [prime, "setTokensDistributionSpeed(address[],uint256[])", guardian],
+    },
+    {
+      params: [prime, "setMaxTokensDistributionSpeed(address[],uint256[])", guardian],
+    },
+    {
+      params: [prime, "setMaxLoopsLimit(uint256)", guardian],
+    },
+  ];
+};
+
+const getPrimeLiquidityProviderRevokePermissions = (primeLiquidityProvider: string, guardian: string): Permission[] => {
+  return [
+    {
+      params: [primeLiquidityProvider, "updateAlpha(uint128,uint128)", guardian],
+    },
+    {
+      params: [primeLiquidityProvider, "updateMultipliers(address,uint256,uint256)", guardian],
+    },
+    {
+      params: [primeLiquidityProvider, "setStakedAt(address[],uint256[])", guardian],
+    },
+    {
+      params: [primeLiquidityProvider, "addMarket(address,address,uint256,uint256)", guardian],
+    },
+    {
+      params: [primeLiquidityProvider, "setLimit(uint256,uint256)", guardian],
+    },
+    {
+      params: [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", guardian],
+    },
+    {
+      params: [primeLiquidityProvider, "issue(bool,address[])", guardian],
+    },
+    {
+      params: [primeLiquidityProvider, "burn(address)", guardian],
+    },
+  ];
+};
+
+const getResilientOracleRevokePermissions = (resilientOracle: string, guardian: string): Permission[] => {
+  return [
+    {
+      params: [resilientOracle, "setOracle(address,address,uint8)", guardian],
+    },
+    {
+      params: [resilientOracle, "enableOracle(address,uint8,bool)", guardian],
+    },
+  ];
+};
+
+const getBoundValidatorRevokePermissions = (boundValidator: string, guardian: string): Permission[] => {
+  return [
+    {
+      params: [boundValidator, "setValidateConfig(ValidateConfig)", guardian],
+    },
+  ];
+};
+
+const getXVSVaultRevokePermissions = (xvsVault: string, guardian: string): Permission[] => {
+  return [
+    {
+      params: [xvsVault, "add(address,uint256,address,uint256,uint256)", guardian],
+    },
+    {
+      params: [xvsVault, "set(address,uint256,uint256)", guardian],
+    },
+    {
+      params: [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", guardian],
+    },
+    {
+      params: [xvsVault, "setWithdrawalLockingPeriod(address,uint256,uint256)", guardian],
+    },
+  ];
+};
+
 const grantPermissions: Permissions = {
   arbitrumone: [
     ...getResilientOraclePermissions(ARBITRUMONE_RESILIENT_ORACLE),
@@ -1059,66 +1138,11 @@ const grantPermissions: Permissions = {
 
 const revokePermissions: Permissions = {
   arbitrumone: [
-    {
-      params: [ARBITRUMONE_PRIME, "setTokensDistributionSpeed(address[],uint256[])", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_PRIME, "setMaxTokensDistributionSpeed(address[],uint256[])", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_PRIME, "setMaxLoopsLimit(uint256)", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_PLP, "updateAlpha(uint128,uint128)", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_PLP, "updateMultipliers(address,uint256,uint256)", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_PLP, "setStakedAt(address[],uint256[])", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_PLP, "addMarket(address,address,uint256,uint256)", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_PLP, "setLimit(uint256,uint256)", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_PLP, "setMaxLoopsLimit(uint256)", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_PLP, "issue(bool,address[])", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_PLP, "burn(address)", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "setOracle(address,address,uint8)", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", ARBITRUMONE_GUARDIAN],
-    },
-
-    {
-      params: [ARBITRUMONE_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_XVS_VAULT_PROXY, "set(address,uint256,uint256)", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMONE_XVS_VAULT_PROXY, "setRewardAmountPerBlockOrSecond(address,uint256)", ARBITRUMONE_GUARDIAN],
-    },
-    {
-      params: [
-        ARBITRUMONE_XVS_VAULT_PROXY,
-        "setWithdrawalLockingPeriod(address,uint256,uint256)",
-        ARBITRUMONE_GUARDIAN,
-      ],
-    },
-
+    ...getPrimeRevokePermissions(ARBITRUMONE_PRIME, ARBITRUMONE_GUARDIAN),
+    ...getPrimeLiquidityProviderRevokePermissions(ARBITRUMONE_PLP, ARBITRUMONE_GUARDIAN),
+    ...getResilientOracleRevokePermissions(ARBITRUMONE_RESILIENT_ORACLE, ARBITRUMONE_GUARDIAN),
+    ...getBoundValidatorRevokePermissions(ARBITRUMONE_BOUND_VALIDATOR, ARBITRUMONE_GUARDIAN),
+    ...getXVSVaultRevokePermissions(ARBITRUMONE_XVS, ARBITRUMONE_GUARDIAN),
     {
       params: [ARBITRUMONE_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", ARBITRUMONE_GUARDIAN],
     },
@@ -1185,51 +1209,16 @@ const revokePermissions: Permissions = {
     },
   ],
   ethereum: [
-    {
-      params: [ETHEREUM_PRIME, "setTokensDistributionSpeed(address[],uint256[])", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_PRIME, "setMaxTokensDistributionSpeed(address[],uint256[])", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_PRIME, "setMaxLoopsLimit(uint256)", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_PLP, "updateAlpha(uint128,uint128)", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_PLP, "updateMultipliers(address,uint256,uint256)", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_PLP, "setStakedAt(address[],uint256[])", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_PLP, "addMarket(address,address,uint256,uint256)", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_PLP, "setLimit(uint256,uint256)", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_PLP, "setMaxLoopsLimit(uint256)", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_PLP, "issue(bool,address[])", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_PLP, "burn(address)", ETHEREUM_GUARDIAN],
-    },
-
+    ...getPrimeRevokePermissions(ETHEREUM_PRIME, ETHEREUM_GUARDIAN),
+    ...getPrimeLiquidityProviderRevokePermissions(ETHEREUM_PLP, ETHEREUM_GUARDIAN),
+    ...getResilientOracleRevokePermissions(ETHEREUM_RESILIENT_ORACLE, ETHEREUM_GUARDIAN),
+    ...getBoundValidatorRevokePermissions(ETHEREUM_BOUND_VALIDATOR, ETHEREUM_GUARDIAN),
+    ...getXVSVaultRevokePermissions(ETHEREUM_XVS, ETHEREUM_GUARDIAN),
     {
       params: [ETHEREUM_CONVERTER_NETWORK, "addTokenConverter(address)", ETHEREUM_GUARDIAN],
     },
     {
       params: [ETHEREUM_CONVERTER_NETWORK, "removeTokenConverter(address)", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "setOracle(address,address,uint8)", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", ETHEREUM_GUARDIAN],
     },
     {
       params: [ETHEREUM_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", ETHEREUM_GUARDIAN],
@@ -1238,24 +1227,9 @@ const revokePermissions: Permissions = {
       params: [ETHEREUM_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", ETHEREUM_GUARDIAN],
     },
     {
-      params: [ETHEREUM_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", ETHEREUM_GUARDIAN],
-    },
-    {
       params: [ETHEREUM_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", ETHEREUM_GUARDIAN],
     },
 
-    {
-      params: [ETHEREUM_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_XVS_VAULT_PROXY, "set(address,uint256,uint256)", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_XVS_VAULT_PROXY, "setRewardAmountPerBlockOrSecond(address,uint256)", ETHEREUM_GUARDIAN],
-    },
-    {
-      params: [ETHEREUM_XVS_VAULT_PROXY, "setWithdrawalLockingPeriod(address,uint256,uint256)", ETHEREUM_GUARDIAN],
-    },
     {
       params: [ETHEREUM_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", ETHEREUM_GUARDIAN],
     },
@@ -1313,31 +1287,9 @@ const revokePermissions: Permissions = {
     })),
   ],
   opbnbmainnet: [
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "setOracle(address,address,uint8)", OPBNBMAINNET_GUARDIAN],
-    },
-    {
-      params: [OPBNBMAINNET_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", OPBNBMAINNET_GUARDIAN],
-    },
-    {
-      params: [OPBNBMAINNET_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", OPBNBMAINNET_GUARDIAN],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", OPBNBMAINNET_GUARDIAN],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "set(address,uint256,uint256)", OPBNBMAINNET_GUARDIAN],
-    },
-    {
-      params: [OPBNBMAINNET_XVS_VAULT_PROXY, "setRewardAmountPerBlockOrSecond(address,uint256)", OPBNBMAINNET_GUARDIAN],
-    },
-    {
-      params: [
-        OPBNBMAINNET_XVS_VAULT_PROXY,
-        "setWithdrawalLockingPeriod(address,uint256,uint256)",
-        OPBNBMAINNET_GUARDIAN,
-      ],
-    },
+    ...getResilientOracleRevokePermissions(OPBNBMAINNET_RESILIENT_ORACLE, OPBNBMAINNET_GUARDIAN),
+    ...getBoundValidatorRevokePermissions(OPBNBMAINNET_BOUND_VALIDATOR, OPBNBMAINNET_GUARDIAN),
+    ...getXVSVaultRevokePermissions(OPBNBMAINNET_XVS, OPBNBMAINNET_GUARDIAN),
 
     {
       params: [OPBNBMAINNET_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", OPBNBMAINNET_GUARDIAN],
@@ -1384,31 +1336,9 @@ const revokePermissions: Permissions = {
     },
   ],
   opbnbtestnet: [
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "setOracle(address,address,uint8)", OPBNBTESTNET_GUARDIAN],
-    },
-    {
-      params: [OPBNBTESTNET_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", OPBNBTESTNET_GUARDIAN],
-    },
-    {
-      params: [OPBNBTESTNET_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", OPBNBTESTNET_GUARDIAN],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", OPBNBTESTNET_GUARDIAN],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "set(address,uint256,uint256)", OPBNBTESTNET_GUARDIAN],
-    },
-    {
-      params: [OPBNBTESTNET_XVS_VAULT_PROXY, "setRewardAmountPerBlockOrSecond(address,uint256)", OPBNBTESTNET_GUARDIAN],
-    },
-    {
-      params: [
-        OPBNBTESTNET_XVS_VAULT_PROXY,
-        "setWithdrawalLockingPeriod(address,uint256,uint256)",
-        OPBNBTESTNET_GUARDIAN,
-      ],
-    },
+    ...getResilientOracleRevokePermissions(OPBNBTESTNET_RESILIENT_ORACLE, OPBNBTESTNET_GUARDIAN),
+    ...getBoundValidatorRevokePermissions(OPBNBTESTNET_BOUND_VALIDATOR, OPBNBTESTNET_GUARDIAN),
+    ...getXVSVaultRevokePermissions(OPBNBTESTNET_XVS, OPBNBTESTNET_GUARDIAN),
 
     {
       params: [OPBNBTESTNET_POOL_REGISTRY, "addPool(string,address,uint256,uint256,uint256)", OPBNBTESTNET_GUARDIAN],
@@ -1455,51 +1385,16 @@ const revokePermissions: Permissions = {
     },
   ],
   sepolia: [
-    {
-      params: [SEPOLIA_PRIME, "setTokensDistributionSpeed(address[],uint256[])", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_PRIME, "setMaxTokensDistributionSpeed(address[],uint256[])", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_PLP, "updateAlpha(uint128,uint128)", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_PLP, "updateMultipliers(address,uint256,uint256)", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_PLP, "setStakedAt(address[],uint256[])", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_PLP, "addMarket(address,address,uint256,uint256)", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_PLP, "setLimit(uint256,uint256)", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_PLP, "setMaxLoopsLimit(uint256)", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_PLP, "issue(bool,address[])", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_PLP, "burn(address)", SEPOLIA_GUARDIAN],
-    },
-
+    ...getPrimeRevokePermissions(SEPOLIA_PRIME, SEPOLIA_GUARDIAN),
+    ...getPrimeLiquidityProviderRevokePermissions(SEPOLIA_PLP, SEPOLIA_GUARDIAN),
+    ...getResilientOracleRevokePermissions(SEPOLIA_RESILIENT_ORACLE, SEPOLIA_GUARDIAN),
+    ...getBoundValidatorRevokePermissions(SEPOLIA_BOUND_VALIDATOR, SEPOLIA_GUARDIAN),
+    ...getXVSVaultRevokePermissions(SEPOLIA_XVS, SEPOLIA_GUARDIAN),
     {
       params: [SEPOLIA_CONVERTER_NETWORK, "addTokenConverter(address)", SEPOLIA_GUARDIAN],
     },
     {
       params: [SEPOLIA_CONVERTER_NETWORK, "removeTokenConverter(address)", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_RESILIENT_ORACLE, "setOracle(address,address,uint8)", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", SEPOLIA_GUARDIAN],
     },
     {
       params: [SEPOLIA_REDSTONE_ORACLE, "setTokenConfig(TokenConfig)", SEPOLIA_GUARDIAN],
@@ -1508,23 +1403,7 @@ const revokePermissions: Permissions = {
       params: [SEPOLIA_REDSTONE_ORACLE, "setDirectPrice(address,uint256)", SEPOLIA_GUARDIAN],
     },
     {
-      params: [SEPOLIA_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", SEPOLIA_GUARDIAN],
-    },
-    {
       params: [SEPOLIA_sFrxETH_ORACLE, "setMaxAllowedPriceDifference(uint256)", SEPOLIA_GUARDIAN],
-    },
-
-    {
-      params: [SEPOLIA_XVS_VAULT_PROXY, "add(address,uint256,address,uint256,uint256)", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_XVS_VAULT_PROXY, "set(address,uint256,uint256)", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_XVS_VAULT_PROXY, "setRewardAmountPerBlockOrSecond(address,uint256)", SEPOLIA_GUARDIAN],
-    },
-    {
-      params: [SEPOLIA_XVS_VAULT_PROXY, "setWithdrawalLockingPeriod(address,uint256,uint256)", SEPOLIA_GUARDIAN],
     },
 
     {
@@ -1580,73 +1459,11 @@ const revokePermissions: Permissions = {
     })),
   ],
   arbitrumsepolia: [
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "setTokensDistributionSpeed(address[],uint256[])", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "setMaxTokensDistributionSpeed(address[],uint256[])", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PRIME, "setMaxLoopsLimit(uint256)", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "updateAlpha(uint128,uint128)", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "updateMultipliers(address,uint256,uint256)", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "setStakedAt(address[],uint256[])", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "addMarket(address,address,uint256,uint256)", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "setLimit(uint256,uint256)", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "setMaxLoopsLimit(uint256)", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "issue(bool,address[])", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_PLP, "burn(address)", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "setOracle(address,address,uint8)", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_RESILIENT_ORACLE, "enableOracle(address,uint8,bool)", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_BOUND_VALIDATOR, "setValidateConfig(ValidateConfig)", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
-        "add(address,uint256,address,uint256,uint256)",
-        ARBITRUMSEPOLIA_GUARDIAN,
-      ],
-    },
-    {
-      params: [ARBITRUMSEPOLIA_XVS_VAULT_PROXY, "set(address,uint256,uint256)", ARBITRUMSEPOLIA_GUARDIAN],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
-        "setRewardAmountPerBlockOrSecond(address,uint256)",
-        ARBITRUMSEPOLIA_GUARDIAN,
-      ],
-    },
-    {
-      params: [
-        ARBITRUMSEPOLIA_XVS_VAULT_PROXY,
-        "setWithdrawalLockingPeriod(address,uint256,uint256)",
-        ARBITRUMSEPOLIA_GUARDIAN,
-      ],
-    },
+    ...getPrimeRevokePermissions(ARBITRUMSEPOLIA_PRIME, ARBITRUMSEPOLIA_GUARDIAN),
+    ...getPrimeLiquidityProviderRevokePermissions(ARBITRUMSEPOLIA_PLP, ARBITRUMSEPOLIA_GUARDIAN),
+    ...getResilientOracleRevokePermissions(ARBITRUMSEPOLIA_RESILIENT_ORACLE, ARBITRUMSEPOLIA_GUARDIAN),
+    ...getBoundValidatorRevokePermissions(ARBITRUMSEPOLIA_BOUND_VALIDATOR, ARBITRUMSEPOLIA_GUARDIAN),
+    ...getXVSVaultRevokePermissions(ARBITRUMSEPOLIA_XVS, ARBITRUMSEPOLIA_GUARDIAN),
 
     {
       params: [
