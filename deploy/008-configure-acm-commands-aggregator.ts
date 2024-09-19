@@ -110,89 +110,63 @@ interface Permissions {
   [key: string]: Permission[];
 }
 
+const accounts = [AccountType.NORMAL_TIMELOCK]
+  .concat(AccountType.CRITICAL_TIMELOCK)
+  .concat(AccountType.FAST_TRACK_TIMELOCK);
+
 const getResilientOraclePermissions = (resilientOracle: string): Permission[] => {
   return [
-    {
-      params: [resilientOracle, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [resilientOracle, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [resilientOracle, "pause()", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [resilientOracle, "unpause()", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [resilientOracle, "setTokenConfig(TokenConfig)", timelock],
+      };
+    }),
     {
       params: [resilientOracle, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
     },
     {
       params: [resilientOracle, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
     },
-    {
-      params: [resilientOracle, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [resilientOracle, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [resilientOracle, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [resilientOracle, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [resilientOracle, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [resilientOracle, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [resilientOracle, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
   ];
 };
 
 const getChainlinkOraclePermissions = (chainlinkOracle: string): Permission[] => {
   return [
-    {
-      params: [chainlinkOracle, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [chainlinkOracle, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [chainlinkOracle, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [chainlinkOracle, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [chainlinkOracle, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [chainlinkOracle, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [chainlinkOracle, "setTokenConfig(TokenConfig)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [chainlinkOracle, "setDirectPrice(address,uint256)", timelock],
+      };
+    }),
   ];
 };
 
 const getRedstoneOraclePermissions = (redstoneOracle: string): Permission[] => {
   return [
-    {
-      params: [redstoneOracle, "setTokenConfig(TokenConfig)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [redstoneOracle, "setDirectPrice(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-
-    {
-      params: [redstoneOracle, "setTokenConfig(TokenConfig)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [redstoneOracle, "setDirectPrice(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-
-    {
-      params: [redstoneOracle, "setTokenConfig(TokenConfig)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [redstoneOracle, "setDirectPrice(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [redstoneOracle, "setTokenConfig(TokenConfig)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [redstoneOracle, "setDirectPrice(address,uint256)", timelock],
+      };
+    }),
   ];
 };
 
@@ -206,253 +180,155 @@ const getBoundValidatorPermissions = (boundValidator: string): Permission[] => {
 
 const getSFrxETHOraclePermissions = (sFrxETHOracle: string): Permission[] => {
   return [
-    {
-      params: [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-
-    {
-      params: [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", timelock],
+      };
+    }),
   ];
 };
 
 const getBinanceOraclePermissions = (binanceOracle: string): Permission[] => {
   return [
-    {
-      params: [binanceOracle, "setMaxStalePeriod(string,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [binanceOracle, "setSymbolOverride(string,string)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [binanceOracle, "setMaxStalePeriod(string,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [binanceOracle, "setSymbolOverride(string,string)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [binanceOracle, "setMaxStalePeriod(string,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [binanceOracle, "setSymbolOverride(string,string)", AccountType.CRITICAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [binanceOracle, "setMaxStalePeriod(string,uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [binanceOracle, "setSymbolOverride(string,string)", timelock],
+      };
+    }),
   ];
 };
 
 const getXVSPermissions = (xvs: string): Permission[] => {
   return [
-    {
-      params: [xvs, "migrateMinterTokens(address,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvs, "setMintCap(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvs, "updateBlacklist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvs, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvs, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvs, "migrateMinterTokens(address,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvs, "setMintCap(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvs, "updateBlacklist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvs, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvs, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvs, "migrateMinterTokens(address,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvs, "setMintCap(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvs, "updateBlacklist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvs, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvs, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [xvs, "migrateMinterTokens(address,address)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvs, "setMintCap(address,uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvs, "updateBlacklist(address,bool)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvs, "pause()", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvs, "unpause()", timelock],
+      };
+    }),
   ];
 };
 
 const getXVSBridgeAdminPermissions = (xvsBridgeAdmin: string): Permission[] => {
   return [
-    {
-      params: [xvsBridgeAdmin, "setSendVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setReceiveVersion(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "setSendVersion(uint16)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "setReceiveVersion(uint16)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "setMaxSingleTransactionLimit(uint16,uint256)", timelock],
+      };
+    }),
     {
       params: [xvsBridgeAdmin, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
     },
-    {
-      params: [xvsBridgeAdmin, "setMaxSingleTransactionLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMaxSingleReceiveTransactionLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "unpause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "removeTrustedRemote(uint16)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", AccountType.NORMAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "setMaxSingleReceiveTransactionLimit(uint16,uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "setMaxDailyReceiveLimit(uint16,uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "pause()", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "unpause()", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "removeTrustedRemote(uint16)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", timelock],
+      };
+    }),
     {
       params: [xvsBridgeAdmin, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
     },
-    {
-      params: [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setWhitelist(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "setWhitelist(address,bool)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", timelock],
+      };
+    }),
     {
       params: [xvsBridgeAdmin, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
     },
-    {
-      params: [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", AccountType.NORMAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", timelock],
+      };
+    }),
     {
       params: [xvsBridgeAdmin, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     },
     {
       params: [xvsBridgeAdmin, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setSendVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setReceiveVersion(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMaxSingleTransactionLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMaxSingleReceiveTransactionLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "unpause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "removeTrustedRemote(uint16)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setWhitelist(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-
-    {
-      params: [xvsBridgeAdmin, "setSendVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setReceiveVersion(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMaxSingleTransactionLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMaxSingleReceiveTransactionLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMaxDailyReceiveLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "unpause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "removeTrustedRemote(uint16)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setWhitelist(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", AccountType.CRITICAL_TIMELOCK],
     },
   ];
 };
@@ -517,284 +393,146 @@ const getPoolRegistryPermissions = (poolRegistry: string): Permission[] => {
 
 const getPrimePermissions = (prime: string): Permission[] => {
   return [
-    {
-      params: [prime, "updateAlpha(uint128,uint128)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [prime, "updateMultipliers(address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [prime, "setStakedAt(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [prime, "addMarket(address,address,uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [prime, "setLimit(uint256,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [prime, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [prime, "issue(bool,address[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [prime, "burn(address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [prime, "togglePause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [prime, "updateAlpha(uint128,uint128)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [prime, "updateMultipliers(address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [prime, "setStakedAt(address[],uint256[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [prime, "addMarket(address,address,uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [prime, "setLimit(uint256,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [prime, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [prime, "issue(bool,address[])", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [prime, "burn(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [prime, "togglePause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [prime, "updateAlpha(uint128,uint128)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [prime, "updateMultipliers(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [prime, "setStakedAt(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [prime, "addMarket(address,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [prime, "setLimit(uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [prime, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [prime, "issue(bool,address[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [prime, "burn(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [prime, "togglePause()", AccountType.NORMAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [prime, "updateAlpha(uint128,uint128)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [prime, "updateMultipliers(address,uint256,uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [prime, "setStakedAt(address[],uint256[])", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [prime, "addMarket(address,address,uint256,uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [prime, "setLimit(uint256,uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [prime, "setMaxLoopsLimit(uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [prime, "issue(bool,address[])", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [prime, "issue(bool,address[])", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [prime, "burn(address)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [prime, "togglePause()", timelock],
+      };
+    }),
   ];
 };
 
 const getPrimeLiquidityProviderPermissions = (primeLiquidityProvider: string): Permission[] => {
   return [
-    {
-      params: [
-        primeLiquidityProvider,
-        "setTokensDistributionSpeed(address[],uint256[])",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        primeLiquidityProvider,
-        "setMaxTokensDistributionSpeed(address[],uint256[])",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [primeLiquidityProvider, "pauseFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [primeLiquidityProvider, "resumeFundsTransfer()", AccountType.CRITICAL_TIMELOCK],
-    },
-
-    {
-      params: [
-        primeLiquidityProvider,
-        "setTokensDistributionSpeed(address[],uint256[])",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        primeLiquidityProvider,
-        "setMaxTokensDistributionSpeed(address[],uint256[])",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [primeLiquidityProvider, "pauseFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [primeLiquidityProvider, "resumeFundsTransfer()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [primeLiquidityProvider, "setTokensDistributionSpeed(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        primeLiquidityProvider,
-        "setMaxTokensDistributionSpeed(address[],uint256[])",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [primeLiquidityProvider, "pauseFundsTransfer()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [primeLiquidityProvider, "resumeFundsTransfer()", AccountType.NORMAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [primeLiquidityProvider, "setTokensDistributionSpeed(address[],uint256[])", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [primeLiquidityProvider, "setMaxTokensDistributionSpeed(address[],uint256[])", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [primeLiquidityProvider, "pauseFundsTransfer()", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [primeLiquidityProvider, "resumeFundsTransfer()", timelock],
+      };
+    }),
   ];
 };
 
 const getProtocolShareReservePermissions = (protocolShareReserve: string): Permission[] => {
   return [
-    {
-      params: [protocolShareReserve, "removeDistributionConfig(Schema,address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        protocolShareReserve,
-        "addOrUpdateDistributionConfigs(DistributionConfig[])",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [protocolShareReserve, "removeDistributionConfig(Schema,address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        protocolShareReserve,
-        "addOrUpdateDistributionConfigs(DistributionConfig[])",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [protocolShareReserve, "removeDistributionConfig(Schema,address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [
-        protocolShareReserve,
-        "addOrUpdateDistributionConfigs(DistributionConfig[])",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [protocolShareReserve, "addOrUpdateDistributionConfigs(DistributionConfig[])", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [protocolShareReserve, "removeDistributionConfig(Schema,address)", timelock],
+      };
+    }),
   ];
 };
 
 const getConverterNetworkPermissions = (converterNetwork: string): Permission[] => {
   return [
-    {
-      params: [converterNetwork, "addTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [converterNetwork, "removeTokenConverter(address)", AccountType.NORMAL_TIMELOCK],
-    },
-
-    {
-      params: [converterNetwork, "addTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [converterNetwork, "removeTokenConverter(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-
-    {
-      params: [converterNetwork, "addTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [converterNetwork, "removeTokenConverter(address)", AccountType.CRITICAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [converterNetwork, "addTokenConverter(address)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [converterNetwork, "removeTokenConverter(address)", timelock],
+      };
+    }),
   ];
 };
 
 const getComptrollerPermissions = (): Permission[] => {
   return [
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setCollateralFactor(address,uint256,uint256)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setActionsPaused(address[],uint256[],bool)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setCollateralFactor(address,uint256,uint256)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setMarketBorrowCaps(address[],uint256[])",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setMarketSupplyCaps(address[],uint256[])",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setActionsPaused(address[],uint256[],bool)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setCollateralFactor(address,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [ethers.constants.AddressZero, "setCollateralFactor(address,uint256,uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [ethers.constants.AddressZero, "unlistMarket(address)", timelock],
+      };
+    }),
     {
       params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     },
@@ -802,63 +540,30 @@ const getComptrollerPermissions = (): Permission[] => {
       params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
     },
     {
-      params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
       params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "unlistMarket(address)", AccountType.NORMAL_TIMELOCK],
     },
   ];
 };
 
 const getVTokenPermissions = (): Permission[] => {
   return [
+    ...accounts.map(timelock => {
+      return {
+        params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [ethers.constants.AddressZero, "setInterestRateModel(address)", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", timelock],
+      };
+    }),
     {
       params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", AccountType.FAST_TRACK_TIMELOCK],
     },
   ];
 };
@@ -903,47 +608,21 @@ const getIRMPermissions = (): Permission[] => {
 
 const getConverterPermissions = (): Permission[] => {
   return [
-    {
-      params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setConversionConfig(address,address,ConversionConfig)",
-        AccountType.CRITICAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setConversionConfig(address,address,ConversionConfig)",
-        AccountType.FAST_TRACK_TIMELOCK,
-      ],
-    },
-    {
-      params: [ethers.constants.AddressZero, "pauseConversion()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "resumeConversion()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => {
+      return {
+        params: [ethers.constants.AddressZero, "pauseConversion()", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [ethers.constants.AddressZero, "resumeConversion()", timelock],
+      };
+    }),
+    ...accounts.map(timelock => {
+      return {
+        params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", timelock],
+      };
+    }),
     {
       params: [
         ethers.constants.AddressZero,
