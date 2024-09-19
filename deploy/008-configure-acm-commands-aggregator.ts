@@ -568,7 +568,26 @@ const getVTokenPermissions = (): Permission[] => {
   ];
 };
 
-const getRewardDistributorPermissions = (): Permission[] => {
+const getRewardDistributorPermissionsTimebased = (): Permission[] => {
+  return [
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setRewardTokenSpeeds(address[],uint256[],uint256[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+    {
+      params: [
+        ethers.constants.AddressZero,
+        "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
+        AccountType.NORMAL_TIMELOCK,
+      ],
+    },
+  ];
+};
+
+const getRewardDistributorPermissionsBlockbased = (): Permission[] => {
   return [
     {
       params: [
@@ -581,13 +600,6 @@ const getRewardDistributorPermissions = (): Permission[] => {
       params: [
         ethers.constants.AddressZero,
         "setLastRewardingBlocks(address[],uint32[],uint32[])",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
         AccountType.NORMAL_TIMELOCK,
       ],
     },
@@ -848,7 +860,7 @@ const grantPermissions: Permissions = {
     ...getProtocolShareReservePermissions(ARBITRUMONE_PSR),
     ...getComptrollerPermissions(),
     ...getVTokenPermissions(),
-    ...getRewardDistributorPermissions(),
+    ...getRewardDistributorPermissionsTimebased(),
     ...getIRMPermissions(),
   ],
   ethereum: [
@@ -867,7 +879,7 @@ const grantPermissions: Permissions = {
     ...getConverterNetworkPermissions(ETHEREUM_CONVERTER_NETWORK),
     ...getComptrollerPermissions(),
     ...getVTokenPermissions(),
-    ...getRewardDistributorPermissions(),
+    ...getRewardDistributorPermissionsBlockbased(),
     ...getIRMPermissions(),
     ...getConverterPermissions(),
   ],
@@ -898,7 +910,7 @@ const grantPermissions: Permissions = {
     ...getProtocolShareReservePermissions(ARBITRUMSEPOLIA_PSR),
     ...getComptrollerPermissions(),
     ...getVTokenPermissions(),
-    ...getRewardDistributorPermissions(),
+    ...getRewardDistributorPermissionsTimebased(),
     ...getIRMPermissions(),
   ],
   sepolia: [
@@ -917,7 +929,7 @@ const grantPermissions: Permissions = {
     ...getConverterNetworkPermissions(SEPOLIA_CONVERTER_NETWORK),
     ...getComptrollerPermissions(),
     ...getVTokenPermissions(),
-    ...getRewardDistributorPermissions(),
+    ...getRewardDistributorPermissionsBlockbased(),
     ...getIRMPermissions(),
     ...getConverterPermissions(),
   ],

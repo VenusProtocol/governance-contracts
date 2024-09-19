@@ -123,11 +123,7 @@ contract ACMCommandsAggregator {
         uint256 length = grantPermissions[index].length;
         for (uint256 i; i < length; ++i) {
             Permission memory permission = grantPermissions[index][i];
-            ACM.giveCallPermission(
-                permission.contractAddress,
-                permission.functionSig,
-                permission.account
-            );
+            ACM.giveCallPermission(permission.contractAddress, permission.functionSig, permission.account);
         }
 
         emit GrantPermissionsExecuted(index);
@@ -142,11 +138,7 @@ contract ACMCommandsAggregator {
         uint256 length = revokePermissions[index].length;
         for (uint256 i; i < length; ++i) {
             Permission memory permission = revokePermissions[index][i];
-            ACM.revokeCallPermission(
-                permission.contractAddress,
-                permission.functionSig,
-                permission.account
-            );
+            ACM.revokeCallPermission(permission.contractAddress, permission.functionSig, permission.account);
         }
 
         emit RevokePermissionsExecuted(index);
