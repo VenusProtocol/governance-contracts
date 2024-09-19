@@ -83,7 +83,7 @@ contract ACMCommandsAggregator {
         uint256 index = grantPermissions.length;
         grantPermissions.push();
 
-        for (uint256 i = 0; i < _permissions.length; i++) {
+        for (uint256 i; i < _permissions.length; ++i) {
             grantPermissions[index].push(
                 Permission(_permissions[i].contractAddress, _permissions[i].functionSig, _permissions[i].account)
             );
@@ -105,7 +105,7 @@ contract ACMCommandsAggregator {
         uint256 index = revokePermissions.length;
         revokePermissions.push();
 
-        for (uint256 i = 0; i < _permissions.length; i++) {
+        for (uint256 i; i < _permissions.length; ++i) {
             revokePermissions[index].push(
                 Permission(_permissions[i].contractAddress, _permissions[i].functionSig, _permissions[i].account)
             );
@@ -121,11 +121,12 @@ contract ACMCommandsAggregator {
      */
     function executeGrantPermissions(uint256 index) external {
         uint256 length = grantPermissions[index].length;
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i; i < length; ++i) {
+            Permission memory permission = grantPermissions[index][i];
             ACM.giveCallPermission(
-                grantPermissions[index][i].contractAddress,
-                grantPermissions[index][i].functionSig,
-                grantPermissions[index][i].account
+                permission.contractAddress,
+                permission.functionSig,
+                permission.account
             );
         }
 
@@ -139,11 +140,12 @@ contract ACMCommandsAggregator {
      */
     function executeRevokePermissions(uint256 index) external {
         uint256 length = revokePermissions[index].length;
-        for (uint256 i = 0; i < length; i++) {
+        for (uint256 i; i < length; ++i) {
+            Permission memory permission = revokePermissions[index][i];
             ACM.revokeCallPermission(
-                revokePermissions[index][i].contractAddress,
-                revokePermissions[index][i].functionSig,
-                revokePermissions[index][i].account
+                permission.contractAddress,
+                permission.functionSig,
+                permission.account
             );
         }
 
