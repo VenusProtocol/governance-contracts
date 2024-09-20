@@ -112,9 +112,9 @@ const accounts = [AccountType.NORMAL_TIMELOCK]
 
 const getResilientOraclePermissions = (resilientOracle: string): string[][] => {
   return [
-    ...accounts.map(timelock => [resilientOracle, "pause()", timelock]),
-    ...accounts.map(timelock => [resilientOracle, "unpause()", timelock]),
-    ...accounts.map(timelock => [resilientOracle, "setTokenConfig(TokenConfig)", timelock]),
+    accounts.flatMap(timelock => [resilientOracle, "pause()", timelock]),
+    accounts.flatMap(timelock => [resilientOracle, "unpause()", timelock]),
+    accounts.flatMap(timelock => [resilientOracle, "setTokenConfig(TokenConfig)", timelock]),
     [resilientOracle, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
     [resilientOracle, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
   ];
@@ -122,15 +122,15 @@ const getResilientOraclePermissions = (resilientOracle: string): string[][] => {
 
 const getChainlinkOraclePermissions = (chainlinkOracle: string): string[][] => {
   return [
-    ...accounts.map(timelock => [chainlinkOracle, "setTokenConfig(TokenConfig)", timelock]),
-    ...accounts.map(timelock => [chainlinkOracle, "setDirectPrice(address,uint256)", timelock]),
+    accounts.flatMap(timelock => [chainlinkOracle, "setTokenConfig(TokenConfig)", timelock]),
+    accounts.flatMap(timelock => [chainlinkOracle, "setDirectPrice(address,uint256)", timelock]),
   ];
 };
 
 const getRedstoneOraclePermissions = (redstoneOracle: string): string[][] => {
   return [
-    ...accounts.map(timelock => [redstoneOracle, "setTokenConfig(TokenConfig)", timelock]),
-    ...accounts.map(timelock => [redstoneOracle, "setDirectPrice(address,uint256)", timelock]),
+    accounts.flatMap(timelock => [redstoneOracle, "setTokenConfig(TokenConfig)", timelock]),
+    accounts.flatMap(timelock => [redstoneOracle, "setDirectPrice(address,uint256)", timelock]),
   ];
 };
 
@@ -139,47 +139,47 @@ const getBoundValidatorPermissions = (boundValidator: string): string[][] => {
 };
 
 const getSFrxETHOraclePermissions = (sFrxETHOracle: string): string[][] => {
-  return [...accounts.map(timelock => [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", timelock])];
+  return [accounts.flatMap(timelock => [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", timelock])];
 };
 
 const getBinanceOraclePermissions = (binanceOracle: string): string[][] => {
   return [
-    ...accounts.map(timelock => [binanceOracle, "setMaxStalePeriod(string,uint256)", timelock]),
-    ...accounts.map(timelock => [binanceOracle, "setSymbolOverride(string,string)", timelock]),
+    accounts.flatMap(timelock => [binanceOracle, "setMaxStalePeriod(string,uint256)", timelock]),
+    accounts.flatMap(timelock => [binanceOracle, "setSymbolOverride(string,string)", timelock]),
   ];
 };
 
 const getXVSPermissions = (xvs: string): string[][] => {
   return [
-    ...accounts.map(timelock => [xvs, "migrateMinterTokens(address,address)", timelock]),
-    ...accounts.map(timelock => [xvs, "setMintCap(address,uint256)", timelock]),
-    ...accounts.map(timelock => [xvs, "updateBlacklist(address,bool)", timelock]),
-    ...accounts.map(timelock => [xvs, "pause()", timelock]),
-    ...accounts.map(timelock => [xvs, "unpause()", timelock]),
+    accounts.flatMap(timelock => [xvs, "migrateMinterTokens(address,address)", timelock]),
+    accounts.flatMap(timelock => [xvs, "setMintCap(address,uint256)", timelock]),
+    accounts.flatMap(timelock => [xvs, "updateBlacklist(address,bool)", timelock]),
+    accounts.flatMap(timelock => [xvs, "pause()", timelock]),
+    accounts.flatMap(timelock => [xvs, "unpause()", timelock]),
   ];
 };
 
 const getXVSBridgeAdminPermissions = (xvsBridgeAdmin: string): string[][] => {
   return [
-    ...accounts.map(timelock => [xvsBridgeAdmin, "setSendVersion(uint16)", timelock]),
-    ...accounts.map(timelock => [xvsBridgeAdmin, "setReceiveVersion(uint16)", timelock]),
-    ...accounts.map(timelock => [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", timelock]),
-    ...accounts.map(timelock => [xvsBridgeAdmin, "setMaxSingleTransactionLimit(uint16,uint256)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "setSendVersion(uint16)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "setReceiveVersion(uint16)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "setMaxSingleTransactionLimit(uint16,uint256)", timelock]),
     [xvsBridgeAdmin, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
-    ...accounts.map(timelock => [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", timelock]),
-    ...accounts.map(timelock => [xvsBridgeAdmin, "setMaxSingleReceiveTransactionLimit(uint16,uint256)", timelock]),
-    ...accounts.map(timelock => [xvsBridgeAdmin, "setMaxDailyReceiveLimit(uint16,uint256)", timelock]),
-    ...accounts.map(timelock => [xvsBridgeAdmin, "pause()", timelock]),
-    ...accounts.map(timelock => [xvsBridgeAdmin, "unpause()", timelock]),
-    ...accounts.map(timelock => [xvsBridgeAdmin, "removeTrustedRemote(uint16)", timelock]),
-    ...accounts.map(timelock => [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "setMaxSingleReceiveTransactionLimit(uint16,uint256)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "setMaxDailyReceiveLimit(uint16,uint256)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "pause()", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "unpause()", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "removeTrustedRemote(uint16)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", timelock]),
     [xvsBridgeAdmin, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
-    ...accounts.map(timelock => [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", timelock]),
-    ...accounts.map(timelock => [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", timelock]),
-    ...accounts.map(timelock => [xvsBridgeAdmin, "setWhitelist(address,bool)", timelock]),
-    ...accounts.map(timelock => [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "setWhitelist(address,bool)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", timelock]),
     [xvsBridgeAdmin, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
-    ...accounts.map(timelock => [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", timelock]),
+    accounts.flatMap(timelock => [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", timelock]),
     [xvsBridgeAdmin, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
     [xvsBridgeAdmin, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
   ];
@@ -213,62 +213,66 @@ const getPoolRegistryPermissions = (poolRegistry: string): string[][] => {
 
 const getPrimePermissions = (prime: string): string[][] => {
   return [
-    ...accounts.map(timelock => [prime, "updateAlpha(uint128,uint128)", timelock]),
-    ...accounts.map(timelock => [prime, "updateMultipliers(address,uint256,uint256)", timelock]),
-    ...accounts.map(timelock => [prime, "setStakedAt(address[],uint256[])", timelock]),
-    ...accounts.map(timelock => [prime, "addMarket(address,address,uint256,uint256)", timelock]),
-    ...accounts.map(timelock => [prime, "setLimit(uint256,uint256)", timelock]),
-    ...accounts.map(timelock => [prime, "setMaxLoopsLimit(uint256)", timelock]),
-    ...accounts.map(timelock => [prime, "issue(bool,address[])", timelock]),
-    ...accounts.map(timelock => [prime, "issue(bool,address[])", timelock]),
-    ...accounts.map(timelock => [prime, "burn(address)", timelock]),
-    ...accounts.map(timelock => [prime, "togglePause()", timelock]),
+    accounts.flatMap(timelock => [prime, "updateAlpha(uint128,uint128)", timelock]),
+    accounts.flatMap(timelock => [prime, "updateMultipliers(address,uint256,uint256)", timelock]),
+    accounts.flatMap(timelock => [prime, "setStakedAt(address[],uint256[])", timelock]),
+    accounts.flatMap(timelock => [prime, "addMarket(address,address,uint256,uint256)", timelock]),
+    accounts.flatMap(timelock => [prime, "setLimit(uint256,uint256)", timelock]),
+    accounts.flatMap(timelock => [prime, "setMaxLoopsLimit(uint256)", timelock]),
+    accounts.flatMap(timelock => [prime, "issue(bool,address[])", timelock]),
+    accounts.flatMap(timelock => [prime, "issue(bool,address[])", timelock]),
+    accounts.flatMap(timelock => [prime, "burn(address)", timelock]),
+    accounts.flatMap(timelock => [prime, "togglePause()", timelock]),
   ];
 };
 
 const getPrimeLiquidityProviderPermissions = (primeLiquidityProvider: string): string[][] => {
   return [
-    ...accounts.map(timelock => [primeLiquidityProvider, "setTokensDistributionSpeed(address[],uint256[])", timelock]),
-    ...accounts.map(timelock => [
+    accounts.flatMap(timelock => [primeLiquidityProvider, "setTokensDistributionSpeed(address[],uint256[])", timelock]),
+    accounts.flatMap(timelock => [
       primeLiquidityProvider,
       "setMaxTokensDistributionSpeed(address[],uint256[])",
       timelock,
     ]),
-    ...accounts.map(timelock => [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", timelock]),
-    ...accounts.map(timelock => [primeLiquidityProvider, "pauseFundsTransfer()", timelock]),
-    ...accounts.map(timelock => [primeLiquidityProvider, "resumeFundsTransfer()", timelock]),
+    accounts.flatMap(timelock => [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", timelock]),
+    accounts.flatMap(timelock => [primeLiquidityProvider, "pauseFundsTransfer()", timelock]),
+    accounts.flatMap(timelock => [primeLiquidityProvider, "resumeFundsTransfer()", timelock]),
   ];
 };
 
 const getProtocolShareReservePermissions = (protocolShareReserve: string): string[][] => {
   return [
-    ...accounts.map(timelock => [
+    accounts.flatMap(timelock => [
       protocolShareReserve,
       "addOrUpdateDistributionConfigs(DistributionConfig[])",
       timelock,
     ]),
-    ...accounts.map(timelock => [protocolShareReserve, "removeDistributionConfig(Schema,address)", timelock]),
+    accounts.flatMap(timelock => [protocolShareReserve, "removeDistributionConfig(Schema,address)", timelock]),
   ];
 };
 
 const getConverterNetworkPermissions = (converterNetwork: string): string[][] => {
   return [
-    ...accounts.map(timelock => [converterNetwork, "addTokenConverter(address)", timelock]),
-    ...accounts.map(timelock => [converterNetwork, "removeTokenConverter(address)", timelock]),
+    accounts.flatMap(timelock => [converterNetwork, "addTokenConverter(address)", timelock]),
+    accounts.flatMap(timelock => [converterNetwork, "removeTokenConverter(address)", timelock]),
   ];
 };
 
 const getComptrollerPermissions = (): string[][] => {
   return [
-    ...accounts.map(timelock => [
+    accounts.flatMap(timelock => [
       ethers.constants.AddressZero,
       "setCollateralFactor(address,uint256,uint256)",
       timelock,
     ]),
-    ...accounts.map(timelock => [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", timelock]),
-    ...accounts.map(timelock => [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", timelock]),
-    ...accounts.map(timelock => [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", timelock]),
-    ...accounts.map(timelock => [ethers.constants.AddressZero, "unlistMarket(address)", timelock]),
+    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", timelock]),
+    accounts.flatMap(timelock => [
+      ethers.constants.AddressZero,
+      "setActionsPaused(address[],uint256[],bool)",
+      timelock,
+    ]),
+    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", timelock]),
+    accounts.flatMap(timelock => [ethers.constants.AddressZero, "unlistMarket(address)", timelock]),
     [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
     [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
     [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
@@ -277,9 +281,9 @@ const getComptrollerPermissions = (): string[][] => {
 
 const getVTokenPermissions = (): string[][] => {
   return [
-    ...accounts.map(timelock => [ethers.constants.AddressZero, "setReserveFactor(uint256)", timelock]),
-    ...accounts.map(timelock => [ethers.constants.AddressZero, "setInterestRateModel(address)", timelock]),
-    ...accounts.map(timelock => [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", timelock]),
+    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setReserveFactor(uint256)", timelock]),
+    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setInterestRateModel(address)", timelock]),
+    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", timelock]),
     [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
   ];
 };
@@ -310,9 +314,9 @@ const getIRMPermissions = (): string[][] => {
 
 const getConverterPermissions = (): string[][] => {
   return [
-    ...accounts.map(timelock => [ethers.constants.AddressZero, "pauseConversion()", timelock]),
-    ...accounts.map(timelock => [ethers.constants.AddressZero, "resumeConversion()", timelock]),
-    ...accounts.map(timelock => [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", timelock]),
+    accounts.flatMap(timelock => [ethers.constants.AddressZero, "pauseConversion()", timelock]),
+    accounts.flatMap(timelock => [ethers.constants.AddressZero, "resumeConversion()", timelock]),
+    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", timelock]),
     [
       ethers.constants.AddressZero,
       "setConversionConfig(address,address,ConversionConfig)",
@@ -422,8 +426,8 @@ const getSFrxETHOracleRevokePermissions = (sFrxETHOracle: string, guardian: stri
 
 const getConvertersRevokePermissions = (converters: string[], guardian: string): string[][] => {
   return [
-    ...converters.map(converter => [converter, "setMinAmountToConvert(uint256)", guardian]),
-    ...converters.map(converter => [converter, "setConversionConfig(address,address,ConversionConfig)", guardian]),
+    converters.flatMap(converter => [converter, "setMinAmountToConvert(uint256)", guardian]),
+    converters.flatMap(converter => [converter, "setConversionConfig(address,address,ConversionConfig)", guardian]),
   ];
 };
 
