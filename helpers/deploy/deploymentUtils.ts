@@ -30,6 +30,8 @@ export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<s
     return "0x751Aa759cfBB6CE71A43b48e40e1cCcFC66Ba4aa"; // ZKSYNC MAINNET MULTISIG
   } else if (network === "opsepolia") {
     return "0xd57365EE4E850e881229e2F8Aa405822f289e78d"; // OPSEPOLIA MULTISIG
+  } else if (network === "opmainnet") {
+    return "0x2e94dd14E81999CdBF5deDE31938beD7308354b3"; // OPMAINNET MULTISIG
   }
 
   const normalTimelock = await ethers.getContract("NormalTimelock");
@@ -58,6 +60,8 @@ export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => 
     return "0x751Aa759cfBB6CE71A43b48e40e1cCcFC66Ba4aa"; // ZKSYNC MAINNET MULTISIG
   } else if (network === "opsepolia") {
     return "0xd57365EE4E850e881229e2F8Aa405822f289e78d"; // OPSEPOLIA MULTISIG
+  } else if (network === "opmainnet") {
+    return "0x2e94dd14E81999CdBF5deDE31938beD7308354b3"; // OPMAINNET MULTISIG
   }
 
   return deployer;

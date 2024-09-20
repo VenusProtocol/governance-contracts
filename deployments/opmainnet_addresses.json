@@ -1,5 +1,7 @@
 {
   "name": "opmainnet",
   "chainId": "10",
-  "addresses": {}
+  "addresses": {
+    "AccessControlManager": "0xD71b1F33f6B0259683f11174EE4Ddc2bb9cE4eD6"
+  }
 }
