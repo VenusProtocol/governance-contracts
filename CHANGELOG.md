@@ -1,3 +1,11 @@
+## [2.4.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.4.0-dev.1...v2.4.0-dev.2) (2024-09-20)
+
+
+### Features
+
+* deployment files for acm on op mainnet ([19caebf](https://github.com/VenusProtocol/governance-contracts/commit/19caebf1b202a3cf29eac0a209604ff658ab3152))
+* updating deployment files ([a7bbf89](https://github.com/VenusProtocol/governance-contracts/commit/a7bbf89228fabe6e8bf02436dc24ea8d769e61a2))
+
 ## [2.4.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.3.0...v2.4.0-dev.1) (2024-09-12)
 
 
