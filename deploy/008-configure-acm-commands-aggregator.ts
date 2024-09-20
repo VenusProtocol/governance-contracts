@@ -102,746 +102,328 @@ enum AccountType {
   CRITICAL_TIMELOCK = "CriticalTimelock",
 }
 
-interface Permission {
-  params: string[];
-}
-
 interface Permissions {
-  [key: string]: Permission[];
+  [key: string]: string[][];
 }
 
 const accounts = [AccountType.NORMAL_TIMELOCK]
   .concat(AccountType.CRITICAL_TIMELOCK)
   .concat(AccountType.FAST_TRACK_TIMELOCK);
 
-const getResilientOraclePermissions = (resilientOracle: string): Permission[] => {
+const getResilientOraclePermissions = (resilientOracle: string): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [resilientOracle, "pause()", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [resilientOracle, "unpause()", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [resilientOracle, "setTokenConfig(TokenConfig)", timelock],
-      };
-    }),
-    {
-      params: [resilientOracle, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [resilientOracle, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => [resilientOracle, "pause()", timelock]),
+    ...accounts.map(timelock => [resilientOracle, "unpause()", timelock]),
+    ...accounts.map(timelock => [resilientOracle, "setTokenConfig(TokenConfig)", timelock]),
+    [resilientOracle, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
+    [resilientOracle, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
   ];
 };
 
-const getChainlinkOraclePermissions = (chainlinkOracle: string): Permission[] => {
+const getChainlinkOraclePermissions = (chainlinkOracle: string): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [chainlinkOracle, "setTokenConfig(TokenConfig)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [chainlinkOracle, "setDirectPrice(address,uint256)", timelock],
-      };
-    }),
+    ...accounts.map(timelock => [chainlinkOracle, "setTokenConfig(TokenConfig)", timelock]),
+    ...accounts.map(timelock => [chainlinkOracle, "setDirectPrice(address,uint256)", timelock]),
   ];
 };
 
-const getRedstoneOraclePermissions = (redstoneOracle: string): Permission[] => {
+const getRedstoneOraclePermissions = (redstoneOracle: string): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [redstoneOracle, "setTokenConfig(TokenConfig)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [redstoneOracle, "setDirectPrice(address,uint256)", timelock],
-      };
-    }),
+    ...accounts.map(timelock => [redstoneOracle, "setTokenConfig(TokenConfig)", timelock]),
+    ...accounts.map(timelock => [redstoneOracle, "setDirectPrice(address,uint256)", timelock]),
   ];
 };
 
-const getBoundValidatorPermissions = (boundValidator: string): Permission[] => {
+const getBoundValidatorPermissions = (boundValidator: string): string[][] => {
+  return [[boundValidator, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK]];
+};
+
+const getSFrxETHOraclePermissions = (sFrxETHOracle: string): string[][] => {
+  return [...accounts.map(timelock => [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", timelock])];
+};
+
+const getBinanceOraclePermissions = (binanceOracle: string): string[][] => {
   return [
-    {
-      params: [boundValidator, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => [binanceOracle, "setMaxStalePeriod(string,uint256)", timelock]),
+    ...accounts.map(timelock => [binanceOracle, "setSymbolOverride(string,string)", timelock]),
   ];
 };
 
-const getSFrxETHOraclePermissions = (sFrxETHOracle: string): Permission[] => {
+const getXVSPermissions = (xvs: string): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", timelock],
-      };
-    }),
+    ...accounts.map(timelock => [xvs, "migrateMinterTokens(address,address)", timelock]),
+    ...accounts.map(timelock => [xvs, "setMintCap(address,uint256)", timelock]),
+    ...accounts.map(timelock => [xvs, "updateBlacklist(address,bool)", timelock]),
+    ...accounts.map(timelock => [xvs, "pause()", timelock]),
+    ...accounts.map(timelock => [xvs, "unpause()", timelock]),
   ];
 };
 
-const getBinanceOraclePermissions = (binanceOracle: string): Permission[] => {
+const getXVSBridgeAdminPermissions = (xvsBridgeAdmin: string): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [binanceOracle, "setMaxStalePeriod(string,uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [binanceOracle, "setSymbolOverride(string,string)", timelock],
-      };
-    }),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "setSendVersion(uint16)", timelock]),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "setReceiveVersion(uint16)", timelock]),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", timelock]),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "setMaxSingleTransactionLimit(uint16,uint256)", timelock]),
+    [xvsBridgeAdmin, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
+    ...accounts.map(timelock => [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", timelock]),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "setMaxSingleReceiveTransactionLimit(uint16,uint256)", timelock]),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "setMaxDailyReceiveLimit(uint16,uint256)", timelock]),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "pause()", timelock]),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "unpause()", timelock]),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "removeTrustedRemote(uint16)", timelock]),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", timelock]),
+    [xvsBridgeAdmin, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
+    ...accounts.map(timelock => [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", timelock]),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", timelock]),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "setWhitelist(address,bool)", timelock]),
+    ...accounts.map(timelock => [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", timelock]),
+    [xvsBridgeAdmin, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
+    ...accounts.map(timelock => [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", timelock]),
+    [xvsBridgeAdmin, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
+    [xvsBridgeAdmin, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
   ];
 };
 
-const getXVSPermissions = (xvs: string): Permission[] => {
+const getXVSVaultPermissions = (xvsVault: string): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [xvs, "migrateMinterTokens(address,address)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvs, "setMintCap(address,uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvs, "updateBlacklist(address,bool)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvs, "pause()", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvs, "unpause()", timelock],
-      };
-    }),
+    [xvsVault, "pause()", AccountType.CRITICAL_TIMELOCK],
+    [xvsVault, "resume()", AccountType.CRITICAL_TIMELOCK],
+    [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", AccountType.CRITICAL_TIMELOCK],
+    [xvsVault, "pause()", AccountType.FAST_TRACK_TIMELOCK],
+    [xvsVault, "resume()", AccountType.FAST_TRACK_TIMELOCK],
+    [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
+    [xvsVault, "pause()", AccountType.NORMAL_TIMELOCK],
+    [xvsVault, "resume()", AccountType.NORMAL_TIMELOCK],
+    [xvsVault, "add(address,uint256,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    [xvsVault, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", AccountType.NORMAL_TIMELOCK],
+    [xvsVault, "setWithdrawalLockingPeriod(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
   ];
 };
 
-const getXVSBridgeAdminPermissions = (xvsBridgeAdmin: string): Permission[] => {
+const getPoolRegistryPermissions = (poolRegistry: string): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "setSendVersion(uint16)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "setReceiveVersion(uint16)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "setMaxSingleTransactionLimit(uint16,uint256)", timelock],
-      };
-    }),
-    {
-      params: [xvsBridgeAdmin, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "setMaxSingleReceiveTransactionLimit(uint16,uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "setMaxDailyReceiveLimit(uint16,uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "pause()", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "unpause()", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "removeTrustedRemote(uint16)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", timelock],
-      };
-    }),
-    {
-      params: [xvsBridgeAdmin, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
-    },
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "setWhitelist(address,bool)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", timelock],
-      };
-    }),
-    {
-      params: [xvsBridgeAdmin, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    ...accounts.map(timelock => {
-      return {
-        params: [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", timelock],
-      };
-    }),
-    {
-      params: [xvsBridgeAdmin, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsBridgeAdmin, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
-    },
+    [poolRegistry, "addPool(string,address,uint256,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
+    [poolRegistry, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
+    [poolRegistry, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
+    [poolRegistry, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
   ];
 };
 
-const getXVSVaultPermissions = (xvsVault: string): Permission[] => {
+const getPrimePermissions = (prime: string): string[][] => {
   return [
-    {
-      params: [xvsVault, "pause()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsVault, "resume()", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    },
-    {
-      params: [xvsVault, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsVault, "resume()", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    },
-    {
-      params: [xvsVault, "pause()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsVault, "resume()", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsVault, "add(address,uint256,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsVault, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [xvsVault, "setWithdrawalLockingPeriod(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => [prime, "updateAlpha(uint128,uint128)", timelock]),
+    ...accounts.map(timelock => [prime, "updateMultipliers(address,uint256,uint256)", timelock]),
+    ...accounts.map(timelock => [prime, "setStakedAt(address[],uint256[])", timelock]),
+    ...accounts.map(timelock => [prime, "addMarket(address,address,uint256,uint256)", timelock]),
+    ...accounts.map(timelock => [prime, "setLimit(uint256,uint256)", timelock]),
+    ...accounts.map(timelock => [prime, "setMaxLoopsLimit(uint256)", timelock]),
+    ...accounts.map(timelock => [prime, "issue(bool,address[])", timelock]),
+    ...accounts.map(timelock => [prime, "issue(bool,address[])", timelock]),
+    ...accounts.map(timelock => [prime, "burn(address)", timelock]),
+    ...accounts.map(timelock => [prime, "togglePause()", timelock]),
   ];
 };
 
-const getPoolRegistryPermissions = (poolRegistry: string): Permission[] => {
+const getPrimeLiquidityProviderPermissions = (primeLiquidityProvider: string): string[][] => {
   return [
-    {
-      params: [poolRegistry, "addPool(string,address,uint256,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [poolRegistry, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [poolRegistry, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [poolRegistry, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
-    },
+    ...accounts.map(timelock => [primeLiquidityProvider, "setTokensDistributionSpeed(address[],uint256[])", timelock]),
+    ...accounts.map(timelock => [
+      primeLiquidityProvider,
+      "setMaxTokensDistributionSpeed(address[],uint256[])",
+      timelock,
+    ]),
+    ...accounts.map(timelock => [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", timelock]),
+    ...accounts.map(timelock => [primeLiquidityProvider, "pauseFundsTransfer()", timelock]),
+    ...accounts.map(timelock => [primeLiquidityProvider, "resumeFundsTransfer()", timelock]),
   ];
 };
 
-const getPrimePermissions = (prime: string): Permission[] => {
+const getProtocolShareReservePermissions = (protocolShareReserve: string): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [prime, "updateAlpha(uint128,uint128)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [prime, "updateMultipliers(address,uint256,uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [prime, "setStakedAt(address[],uint256[])", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [prime, "addMarket(address,address,uint256,uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [prime, "setLimit(uint256,uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [prime, "setMaxLoopsLimit(uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [prime, "issue(bool,address[])", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [prime, "issue(bool,address[])", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [prime, "burn(address)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [prime, "togglePause()", timelock],
-      };
-    }),
+    ...accounts.map(timelock => [
+      protocolShareReserve,
+      "addOrUpdateDistributionConfigs(DistributionConfig[])",
+      timelock,
+    ]),
+    ...accounts.map(timelock => [protocolShareReserve, "removeDistributionConfig(Schema,address)", timelock]),
   ];
 };
 
-const getPrimeLiquidityProviderPermissions = (primeLiquidityProvider: string): Permission[] => {
+const getConverterNetworkPermissions = (converterNetwork: string): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [primeLiquidityProvider, "setTokensDistributionSpeed(address[],uint256[])", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [primeLiquidityProvider, "setMaxTokensDistributionSpeed(address[],uint256[])", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [primeLiquidityProvider, "pauseFundsTransfer()", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [primeLiquidityProvider, "resumeFundsTransfer()", timelock],
-      };
-    }),
+    ...accounts.map(timelock => [converterNetwork, "addTokenConverter(address)", timelock]),
+    ...accounts.map(timelock => [converterNetwork, "removeTokenConverter(address)", timelock]),
   ];
 };
 
-const getProtocolShareReservePermissions = (protocolShareReserve: string): Permission[] => {
+const getComptrollerPermissions = (): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [protocolShareReserve, "addOrUpdateDistributionConfigs(DistributionConfig[])", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [protocolShareReserve, "removeDistributionConfig(Schema,address)", timelock],
-      };
-    }),
+    ...accounts.map(timelock => [
+      ethers.constants.AddressZero,
+      "setCollateralFactor(address,uint256,uint256)",
+      timelock,
+    ]),
+    ...accounts.map(timelock => [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", timelock]),
+    ...accounts.map(timelock => [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", timelock]),
+    ...accounts.map(timelock => [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", timelock]),
+    ...accounts.map(timelock => [ethers.constants.AddressZero, "unlistMarket(address)", timelock]),
+    [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
+    [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
+    [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
   ];
 };
 
-const getConverterNetworkPermissions = (converterNetwork: string): Permission[] => {
+const getVTokenPermissions = (): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [converterNetwork, "addTokenConverter(address)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [converterNetwork, "removeTokenConverter(address)", timelock],
-      };
-    }),
+    ...accounts.map(timelock => [ethers.constants.AddressZero, "setReserveFactor(uint256)", timelock]),
+    ...accounts.map(timelock => [ethers.constants.AddressZero, "setInterestRateModel(address)", timelock]),
+    ...accounts.map(timelock => [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", timelock]),
+    [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
   ];
 };
 
-const getComptrollerPermissions = (): Permission[] => {
+const getRewardDistributorPermissionsTimebased = (): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [ethers.constants.AddressZero, "setCollateralFactor(address,uint256,uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [ethers.constants.AddressZero, "unlistMarket(address)", timelock],
-      };
-    }),
-    {
-      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
+    [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    [
+      ethers.constants.AddressZero,
+      "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
+      AccountType.NORMAL_TIMELOCK,
+    ],
   ];
 };
 
-const getVTokenPermissions = (): Permission[] => {
+const getRewardDistributorPermissionsBlockbased = (): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [ethers.constants.AddressZero, "setInterestRateModel(address)", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", timelock],
-      };
-    }),
-    {
-      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
-    },
+    [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", AccountType.NORMAL_TIMELOCK],
+    [ethers.constants.AddressZero, "setLastRewardingBlocks(address[],uint32[],uint32[])", AccountType.NORMAL_TIMELOCK],
   ];
 };
 
-const getRewardDistributorPermissionsTimebased = (): Permission[] => {
+const getIRMPermissions = (): string[][] => {
   return [
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setRewardTokenSpeeds(address[],uint256[],uint256[])",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
+    [ethers.constants.AddressZero, "updateJumpRateModel(uint256,uint256,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
   ];
 };
 
-const getRewardDistributorPermissionsBlockbased = (): Permission[] => {
+const getConverterPermissions = (): string[][] => {
   return [
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setRewardTokenSpeeds(address[],uint256[],uint256[])",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setLastRewardingBlocks(address[],uint32[],uint32[])",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
+    ...accounts.map(timelock => [ethers.constants.AddressZero, "pauseConversion()", timelock]),
+    ...accounts.map(timelock => [ethers.constants.AddressZero, "resumeConversion()", timelock]),
+    ...accounts.map(timelock => [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", timelock]),
+    [
+      ethers.constants.AddressZero,
+      "setConversionConfig(address,address,ConversionConfig)",
+      AccountType.NORMAL_TIMELOCK,
+    ],
   ];
 };
 
-const getIRMPermissions = (): Permission[] => {
+const getPrimeRevokePermissions = (prime: string, guardian: string): string[][] => {
   return [
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "updateJumpRateModel(uint256,uint256,uint256,uint256)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
+    [prime, "setTokensDistributionSpeed(address[],uint256[])", guardian],
+    [prime, "setMaxTokensDistributionSpeed(address[],uint256[])", guardian],
+    [prime, "setMaxLoopsLimit(uint256)", guardian],
   ];
 };
 
-const getConverterPermissions = (): Permission[] => {
+const getPrimeLiquidityProviderRevokePermissions = (primeLiquidityProvider: string, guardian: string): string[][] => {
   return [
-    ...accounts.map(timelock => {
-      return {
-        params: [ethers.constants.AddressZero, "pauseConversion()", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [ethers.constants.AddressZero, "resumeConversion()", timelock],
-      };
-    }),
-    ...accounts.map(timelock => {
-      return {
-        params: [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", timelock],
-      };
-    }),
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setConversionConfig(address,address,ConversionConfig)",
-        AccountType.NORMAL_TIMELOCK,
-      ],
-    },
+    [primeLiquidityProvider, "updateAlpha(uint128,uint128)", guardian],
+    [primeLiquidityProvider, "updateMultipliers(address,uint256,uint256)", guardian],
+    [primeLiquidityProvider, "setStakedAt(address[],uint256[])", guardian],
+    [primeLiquidityProvider, "addMarket(address,address,uint256,uint256)", guardian],
+    [primeLiquidityProvider, "setLimit(uint256,uint256)", guardian],
+    [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", guardian],
+    [primeLiquidityProvider, "issue(bool,address[])", guardian],
+    [primeLiquidityProvider, "burn(address)", guardian],
   ];
 };
 
-const getPrimeRevokePermissions = (prime: string, guardian: string): Permission[] => {
+const getResilientOracleRevokePermissions = (resilientOracle: string, guardian: string): string[][] => {
   return [
-    {
-      params: [prime, "setTokensDistributionSpeed(address[],uint256[])", guardian],
-    },
-    {
-      params: [prime, "setMaxTokensDistributionSpeed(address[],uint256[])", guardian],
-    },
-    {
-      params: [prime, "setMaxLoopsLimit(uint256)", guardian],
-    },
+    [resilientOracle, "setOracle(address,address,uint8)", guardian],
+    [resilientOracle, "enableOracle(address,uint8,bool)", guardian],
   ];
 };
 
-const getPrimeLiquidityProviderRevokePermissions = (primeLiquidityProvider: string, guardian: string): Permission[] => {
+const getBoundValidatorRevokePermissions = (boundValidator: string, guardian: string): string[][] => {
+  return [[boundValidator, "setValidateConfig(ValidateConfig)", guardian]];
+};
+
+const getXVSVaultRevokePermissions = (xvsVault: string, guardian: string): string[][] => {
   return [
-    {
-      params: [primeLiquidityProvider, "updateAlpha(uint128,uint128)", guardian],
-    },
-    {
-      params: [primeLiquidityProvider, "updateMultipliers(address,uint256,uint256)", guardian],
-    },
-    {
-      params: [primeLiquidityProvider, "setStakedAt(address[],uint256[])", guardian],
-    },
-    {
-      params: [primeLiquidityProvider, "addMarket(address,address,uint256,uint256)", guardian],
-    },
-    {
-      params: [primeLiquidityProvider, "setLimit(uint256,uint256)", guardian],
-    },
-    {
-      params: [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", guardian],
-    },
-    {
-      params: [primeLiquidityProvider, "issue(bool,address[])", guardian],
-    },
-    {
-      params: [primeLiquidityProvider, "burn(address)", guardian],
-    },
+    [xvsVault, "add(address,uint256,address,uint256,uint256)", guardian],
+    [xvsVault, "set(address,uint256,uint256)", guardian],
+    [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", guardian],
+    [xvsVault, "setWithdrawalLockingPeriod(address,uint256,uint256)", guardian],
   ];
 };
 
-const getResilientOracleRevokePermissions = (resilientOracle: string, guardian: string): Permission[] => {
+const getRewardDistributorRevokePermissions = (guardian: string): string[][] => {
   return [
-    {
-      params: [resilientOracle, "setOracle(address,address,uint8)", guardian],
-    },
-    {
-      params: [resilientOracle, "enableOracle(address,uint8,bool)", guardian],
-    },
+    [ethers.constants.AddressZero, "setLastRewardingBlock(address[],uint32[],uint32[])", guardian],
+    [ethers.constants.AddressZero, "setLastRewardingBlocks(address[],uint32[],uint32[])", guardian],
+    [ethers.constants.AddressZero, "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])", guardian],
+    [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", ETHEREUM_GUARDIAN],
   ];
 };
 
-const getBoundValidatorRevokePermissions = (boundValidator: string, guardian: string): Permission[] => {
+const getIRMRevokePermissions = (guardian: string): string[][] => {
+  return [[ethers.constants.AddressZero, "updateJumpRateModel(uint256,uint256,uint256,uint256)", guardian]];
+};
+
+const getPoolRegistryRevokePermissions = (poolRegistry: string, guardian: string): string[][] => {
   return [
-    {
-      params: [boundValidator, "setValidateConfig(ValidateConfig)", guardian],
-    },
+    [poolRegistry, "addPool(string,address,uint256,uint256,uint256)", guardian],
+    [poolRegistry, "addMarket(AddMarketInput)", guardian],
+    [poolRegistry, "setPoolName(address,string)", guardian],
+    [poolRegistry, "updatePoolMetadata(address,VenusPoolMetaData)", guardian],
   ];
 };
 
-const getXVSVaultRevokePermissions = (xvsVault: string, guardian: string): Permission[] => {
+const getComptrollerRevokePermissions = (guardian: string): string[][] => {
   return [
-    {
-      params: [xvsVault, "add(address,uint256,address,uint256,uint256)", guardian],
-    },
-    {
-      params: [xvsVault, "set(address,uint256,uint256)", guardian],
-    },
-    {
-      params: [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", guardian],
-    },
-    {
-      params: [xvsVault, "setWithdrawalLockingPeriod(address,uint256,uint256)", guardian],
-    },
+    [ethers.constants.AddressZero, "setCloseFactor(uint256)", guardian],
+    [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", guardian],
+    [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", guardian],
+    [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", guardian],
   ];
 };
 
-const getRewardDistributorRevokePermissions = (guardian: string): Permission[] => {
+const getVTokenRevokePermissions = (guardian: string): string[][] => {
   return [
-    {
-      params: [ethers.constants.AddressZero, "setLastRewardingBlock(address[],uint32[],uint32[])", guardian],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setLastRewardingBlocks(address[],uint32[],uint32[])", guardian],
-    },
-    {
-      params: [
-        ethers.constants.AddressZero,
-        "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
-        guardian,
-      ],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", ETHEREUM_GUARDIAN],
-    },
+    [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", guardian],
+    [ethers.constants.AddressZero, "setReserveFactor(uint256)", guardian],
+    [ethers.constants.AddressZero, "setInterestRateModel(address)", guardian],
+    [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", guardian],
   ];
 };
 
-const getIRMRevokePermissions = (guardian: string): Permission[] => {
+const getRedstoneOracleRevokePermissions = (redstoneOracle: string, guardian: string): string[][] => {
   return [
-    {
-      params: [ethers.constants.AddressZero, "updateJumpRateModel(uint256,uint256,uint256,uint256)", guardian],
-    },
+    [redstoneOracle, "setTokenConfig(TokenConfig)", guardian],
+    [redstoneOracle, "setDirectPrice(address,uint256)", guardian],
   ];
 };
 
-const getPoolRegistryRevokePermissions = (poolRegistry: string, guardian: string): Permission[] => {
+const getConverterNetworkRevokePermissions = (converterNetwork: string, guardian: string): string[][] => {
   return [
-    {
-      params: [poolRegistry, "addPool(string,address,uint256,uint256,uint256)", guardian],
-    },
-    {
-      params: [poolRegistry, "addMarket(AddMarketInput)", guardian],
-    },
-    {
-      params: [poolRegistry, "setPoolName(address,string)", guardian],
-    },
-    {
-      params: [poolRegistry, "updatePoolMetadata(address,VenusPoolMetaData)", guardian],
-    },
+    [converterNetwork, "addTokenConverter(address)", guardian],
+    [converterNetwork, "removeTokenConverter(address)", guardian],
   ];
 };
 
-const getComptrollerRevokePermissions = (guardian: string): Permission[] => {
-  return [
-    {
-      params: [ethers.constants.AddressZero, "setCloseFactor(uint256)", guardian],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", guardian],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", guardian],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", guardian],
-    },
-  ];
+const getSFrxETHOracleRevokePermissions = (sFrxETHOracle: string, guardian: string): string[][] => {
+  return [[sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", guardian]];
 };
 
-const getVTokenRevokePermissions = (guardian: string): Permission[] => {
+const getConvertersRevokePermissions = (converters: string[], guardian: string): string[][] => {
   return [
-    {
-      params: [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", guardian],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setReserveFactor(uint256)", guardian],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setInterestRateModel(address)", guardian],
-    },
-    {
-      params: [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", guardian],
-    },
-  ];
-};
-
-const getRedstoneOracleRevokePermissions = (redstoneOracle: string, guardian: string): Permission[] => {
-  return [
-    {
-      params: [redstoneOracle, "setTokenConfig(TokenConfig)", guardian],
-    },
-    {
-      params: [redstoneOracle, "setDirectPrice(address,uint256)", guardian],
-    },
-  ];
-};
-
-const getConverterNetworkRevokePermissions = (converterNetwork: string, guardian: string): Permission[] => {
-  return [
-    {
-      params: [converterNetwork, "addTokenConverter(address)", guardian],
-    },
-    {
-      params: [converterNetwork, "removeTokenConverter(address)", guardian],
-    },
-  ];
-};
-
-const getSFrxETHOracleRevokePermissions = (sFrxETHOracle: string, guardian: string): Permission[] => {
-  return [
-    {
-      params: [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", guardian],
-    },
-  ];
-};
-
-const getConvertersRevokePermissions = (converters: string[], guardian: string): Permission[] => {
-  return [
-    ...converters.map(converter => ({
-      params: [converter, "setMinAmountToConvert(uint256)", guardian],
-    })),
-    ...converters.map(converter => ({
-      params: [converter, "setConversionConfig(address,address,ConversionConfig)", guardian],
-    })),
+    ...converters.map(converter => [converter, "setMinAmountToConvert(uint256)", guardian]),
+    ...converters.map(converter => [converter, "setConversionConfig(address,address,ConversionConfig)", guardian]),
   ];
 };
 
@@ -1044,19 +626,19 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const networkGrantPermissions = grantPermissions[hre.network.name];
 
   for (const permission of networkGrantPermissions) {
-    const timelock = await ethers.getContract(permission.params[2]);
-    permission.params[2] = timelock.address;
+    const timelock = await ethers.getContract(permission[2]);
+    permission[2] = timelock.address;
   }
 
   for (const permission of revokePermissions[hre.network.name]) {
-    const timelock = await ethers.getContract(permission.params[2]);
-    permission.params[2] = timelock.address;
+    const timelock = await ethers.getContract(permission[2]);
+    permission[2] = timelock.address;
   }
 
   const _grantPermissions: ACMCommandsAggregator.PermissionStruct[] = networkGrantPermissions.map(permission => ({
-    contractAddress: permission.params[0],
-    functionSig: permission.params[1],
-    account: permission.params[2],
+    contractAddress: permission[0],
+    functionSig: permission[1],
+    account: permission[2],
   }));
 
   const grantChunks = splitPermissions(_grantPermissions);
@@ -1074,9 +656,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const _revokePermissions: ACMCommandsAggregator.PermissionStruct[] = revokePermissions[hre.network.name].map(
     permission => ({
-      contractAddress: permission.params[0],
-      functionSig: permission.params[1],
-      account: permission.params[2],
+      contractAddress: permission[0],
+      functionSig: permission[1],
+      account: permission[2],
     }),
   );
 
