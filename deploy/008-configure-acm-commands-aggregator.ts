@@ -327,22 +327,22 @@ const getConverterPermissions = (): string[][] => {
 
 const getPrimeRevokePermissions = (prime: string, guardian: string): string[][] => {
   return [
-    [prime, "setTokensDistributionSpeed(address[],uint256[])", guardian],
-    [prime, "setMaxTokensDistributionSpeed(address[],uint256[])", guardian],
+    [prime, "updateAlpha(uint128,uint128)", guardian],
+    [prime, "updateMultipliers(address,uint256,uint256)", guardian],
+    [prime, "setStakedAt(address[],uint256[])", guardian],
+    [prime, "addMarket(address,address,uint256,uint256)", guardian],
+    [prime, "setLimit(uint256,uint256)", guardian],
     [prime, "setMaxLoopsLimit(uint256)", guardian],
+    [prime, "issue(bool,address[])", guardian],
+    [prime, "burn(address)", guardian],
   ];
 };
 
 const getPrimeLiquidityProviderRevokePermissions = (primeLiquidityProvider: string, guardian: string): string[][] => {
   return [
-    [primeLiquidityProvider, "updateAlpha(uint128,uint128)", guardian],
-    [primeLiquidityProvider, "updateMultipliers(address,uint256,uint256)", guardian],
-    [primeLiquidityProvider, "setStakedAt(address[],uint256[])", guardian],
-    [primeLiquidityProvider, "addMarket(address,address,uint256,uint256)", guardian],
-    [primeLiquidityProvider, "setLimit(uint256,uint256)", guardian],
+    [primeLiquidityProvider, "setTokensDistributionSpeed(address[],uint256[])", guardian],
+    [primeLiquidityProvider, "setMaxTokensDistributionSpeed(address[],uint256[])", guardian],
     [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", guardian],
-    [primeLiquidityProvider, "issue(bool,address[])", guardian],
-    [primeLiquidityProvider, "burn(address)", guardian],
   ];
 };
 
