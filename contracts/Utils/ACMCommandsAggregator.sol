@@ -3,6 +3,11 @@ pragma solidity 0.8.25;
 
 import { IAccessControlManagerV8 } from "../Governance/IAccessControlManagerV8.sol";
 
+/**
+ * @title ACMCommandsAggregator
+ * @author Venus
+ * @notice This contract is helper to aggregate multiple grant and revoke permissions in batches and execute them in one go.
+ */
 contract ACMCommandsAggregator {
     /*
      * @notice Struct to store permission details
@@ -75,7 +80,7 @@ contract ACMCommandsAggregator {
         if (address(_acm) == address(0)) {
             revert InvalidACM();
         }
-        
+
         ACM = _acm;
     }
 
