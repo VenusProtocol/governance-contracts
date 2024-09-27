@@ -6,7 +6,7 @@ import { IAccessControlManagerV8 } from "../Governance/IAccessControlManagerV8.s
 /**
  * @title ACMCommandsAggregator
  * @author Venus
- * @notice This contract is helper to aggregate multiple grant and revoke permissions in batches and execute them in one go.
+ * @notice This contract is a helper to aggregate multiple grant and revoke permissions in batches and execute them in one go.
  */
 contract ACMCommandsAggregator {
     /*
