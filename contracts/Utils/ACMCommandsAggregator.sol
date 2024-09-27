@@ -27,6 +27,11 @@ contract ACMCommandsAggregator {
         address account;
     }
 
+    /*
+     * @notice Default admin role
+     */
+    bytes32 public constant DEFAULT_ADMIN_ROLE = 0x00;
+
     /**
      * @notice Access control manager contract
      */
@@ -140,6 +145,7 @@ contract ACMCommandsAggregator {
             ACM.giveCallPermission(permission.contractAddress, permission.functionSig, permission.account);
         }
 
+        ACM.renounceRole(DEFAULT_ADMIN_ROLE, address(this));
         emit GrantPermissionsExecuted(index);
     }
 
@@ -155,6 +161,7 @@ contract ACMCommandsAggregator {
             ACM.revokeCallPermission(permission.contractAddress, permission.functionSig, permission.account);
         }
 
+        ACM.renounceRole(DEFAULT_ADMIN_ROLE, address(this));
         emit RevokePermissionsExecuted(index);
     }
 }
