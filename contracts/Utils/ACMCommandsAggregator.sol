@@ -63,10 +63,19 @@ contract ACMCommandsAggregator {
     error EmptyPermissions();
 
     /*
+     * @notice Error to be thrown when invalid access control manager
+     */
+    error InvalidACM();
+
+    /*
      * @notice Constructor to set the access control manager
      * @param _acm Address of the access control manager
      */
     constructor(IAccessControlManagerV8 _acm) {
+        if (address(_acm) == address(0)) {
+            revert InvalidACM();
+        }
+        
         ACM = _acm;
     }
 
