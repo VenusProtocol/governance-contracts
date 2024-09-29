@@ -78,7 +78,7 @@ contract ACMCommandsAggregator {
      * @param _acm Address of the access control manager
      */
     constructor(IAccessControlManagerV8 _acm) {
-        ensureNonzeroAddress(address(ACM));
+        ensureNonzeroAddress(address(_acm));
         ACM = _acm;
     }
 
