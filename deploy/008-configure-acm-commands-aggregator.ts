@@ -634,11 +634,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     permission[2] = timelock.address;
   }
 
-  for (const permission of revokePermissions[hre.network.name]) {
-    const timelock = await ethers.getContract(permission[2]);
-    permission[2] = timelock.address;
-  }
-
   const _grantPermissions: ACMCommandsAggregator.PermissionStruct[] = networkGrantPermissions.map(permission => ({
     contractAddress: permission[0],
     functionSig: permission[1],
