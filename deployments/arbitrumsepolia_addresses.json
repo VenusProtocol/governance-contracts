@@ -2,6 +2,7 @@
   "name": "arbitrumsepolia",
   "chainId": "421614",
   "addresses": {
+    "ACMCommandsAggregator": "0x4fCbfE445396f31005b3Fd2F6DE2A986d6E2dCB5",
     "AccessControlManager": "0xa36AD96441cB931D8dFEAAaC97D3FaB4B39E590F",
     "CriticalTimelock": "0x0b32Be083f7041608E023007e7802430396a2123",
     "DefaultProxyAdmin": "0xA78A1Df376c3CEeBC5Fab574fe6EdDbbF76fd03e",
