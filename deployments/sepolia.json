@@ -3,7 +3,7 @@
   "chainId": "11155111",
   "contracts": {
     "ACMCommandsAggregator": {
-      "address": "0x736c66489D8ebA0279D3518429C6cEd6450B1Cc9",
+      "address": "0x0653830c55035d678e1287b2d4550519fd263d0e",
       "abi": [
         {
           "inputs": [
@@ -17,6 +17,16 @@
           "type": "constructor"
         },
         {
+          "inputs": [],
+          "name": "EmptyPermissions",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "ZeroAddressNotAllowed",
+          "type": "error"
+        },
+        {
           "anonymous": false,
           "inputs": [
             {
@@ -26,7 +36,7 @@
               "type": "uint256"
             }
           ],
-          "name": "PermissionsAdded",
+          "name": "GrantPermissionsAdded",
           "type": "event"
         },
         {
@@ -39,7 +49,33 @@
               "type": "uint256"
             }
           ],
-          "name": "PermissionsExecuted",
+          "name": "GrantPermissionsExecuted",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "RevokePermissionsAdded",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "RevokePermissionsExecuted",
           "type": "event"
         },
         {
@@ -59,11 +95,6 @@
           "inputs": [
             {
               "components": [
-                {
-                  "internalType": "enum ACMCommandsAggregator.PermissionType",
-                  "name": "permissionType",
-                  "type": "uint8"
-                },
                 {
                   "internalType": "address",
                   "name": "contractAddress",
@@ -85,7 +116,37 @@
               "type": "tuple[]"
             }
           ],
-          "name": "addPermissions",
+          "name": "addGrantPermissions",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "contractAddress",
+                  "type": "address"
+                },
+                {
+                  "internalType": "string",
+                  "name": "functionSig",
+                  "type": "string"
+                },
+                {
+                  "internalType": "address",
+                  "name": "account",
+                  "type": "address"
+                }
+              ],
+              "internalType": "struct ACMCommandsAggregator.Permission[]",
+              "name": "_permissions",
+              "type": "tuple[]"
+            }
+          ],
+          "name": "addRevokePermissions",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -98,7 +159,20 @@
               "type": "uint256"
             }
           ],
-          "name": "executePermissions",
+          "name": "executeGrantPermissions",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "executeRevokePermissions",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -116,13 +190,42 @@
               "type": "uint256"
             }
           ],
-          "name": "permissions",
+          "name": "grantPermissions",
           "outputs": [
             {
-              "internalType": "enum ACMCommandsAggregator.PermissionType",
-              "name": "permissionType",
-              "type": "uint8"
+              "internalType": "address",
+              "name": "contractAddress",
+              "type": "address"
             },
+            {
+              "internalType": "string",
+              "name": "functionSig",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "name": "revokePermissions",
+          "outputs": [
             {
               "internalType": "address",
               "name": "contractAddress",
