@@ -96,6 +96,12 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const fastTrackTimelockAddress = (await ethers.getContract("FastTrackTimelock")).address;
   const criticalTimelockAddress = (await ethers.getContract("CriticalTimelock")).address;
 
+  // Explicitly mentioning Default Proxy Admin contract path to fetch it from hardhat-deploy instead of OpenZeppelin
+  // as zksync doesnot compile OpenZeppelin contracts using zksolc. It is backward compatible for all networks as well.
+  const defaultProxyAdmin = await hre.artifacts.readArtifact(
+    "hardhat-deploy/solc_0.8/openzeppelin/proxy/transparent/ProxyAdmin.sol:ProxyAdmin",
+  );
+
   const omnichainGovernanceExecutorAddress = (await ethers.getContract("OmnichainGovernanceExecutor")).address;
   const OmnichainExecutorOwner = await deploy("OmnichainExecutorOwner", {
     from: deployer,
@@ -103,10 +109,14 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     contract: "OmnichainExecutorOwner",
     proxy: {
       owner: hre.network.live ? Guardian : deployer, // Guardian will be replaced by normalTimelock once ownership of DefaultProxyAdmin is transferred to normalTimelock.
-      proxyContract: "OpenZeppelinTransparentProxy",
+      proxyContract: "OptimizedTransparentUpgradeableProxy",
       execute: {
         methodName: "initialize",
         args: [acmAddress],
+      },
+      viaAdminContract: {
+        name: "DefaultProxyAdmin",
+        artifact: defaultProxyAdmin,
       },
       upgradeIndex: 0,
     },
