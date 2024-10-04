@@ -48,6 +48,9 @@ const ARBITRUMSEPOLIA_XVS_VAULT_PROXY = "0x407507DC2809D3aa31D54EcA3BEde5C5c4C8A
 const SEPOLIA_XVS_VAULT_PROXY = "0x1129f882eAa912aE6D4f6D445b2E2b1eCbA99fd5";
 const OPBNBTESTNET_XVS_VAULT_PROXY = "0xB14A0e72C5C202139F78963C9e89252c1ad16f01";
 
+const ETHEREUM_XVS_VAULT_TREASURY = "0xaE39C38AF957338b3cEE2b3E5d825ea88df02EfE";
+const SEPOLIA_XVS_VAULT_TREASURY = "0xCCB08e5107b406E67Ad8356023dd489CEbc79B40";
+
 const ETHEREUM_POOL_REGISTRY = "0x61CAff113CCaf05FFc6540302c37adcf077C5179";
 const ARBITRUMONE_POOL_REGISTRY = "0x382238f07Bc4Fe4aA99e561adE8A4164b5f815DA";
 const OPBNBMAINNET_POOL_REGISTRY = "0x345a030Ad22e2317ac52811AC41C1A63cfa13aEe";
@@ -220,7 +223,6 @@ const getPrimePermissions = (prime: string): string[][] => {
     accounts.flatMap(timelock => [prime, "setLimit(uint256,uint256)", timelock]),
     accounts.flatMap(timelock => [prime, "setMaxLoopsLimit(uint256)", timelock]),
     accounts.flatMap(timelock => [prime, "issue(bool,address[])", timelock]),
-    accounts.flatMap(timelock => [prime, "issue(bool,address[])", timelock]),
     accounts.flatMap(timelock => [prime, "burn(address)", timelock]),
     accounts.flatMap(timelock => [prime, "togglePause()", timelock]),
   ];
@@ -266,6 +268,7 @@ const getComptrollerPermissions = (): string[][] => {
       timelock,
     ]),
     accounts.flatMap(timelock => [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", timelock]),
+    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", timelock]),
     accounts.flatMap(timelock => [
       ethers.constants.AddressZero,
       "setActionsPaused(address[],uint256[],bool)",
@@ -317,12 +320,16 @@ const getConverterPermissions = (): string[][] => {
     accounts.flatMap(timelock => [ethers.constants.AddressZero, "pauseConversion()", timelock]),
     accounts.flatMap(timelock => [ethers.constants.AddressZero, "resumeConversion()", timelock]),
     accounts.flatMap(timelock => [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", timelock]),
-    [
+    accounts.flatMap(timelock => [
       ethers.constants.AddressZero,
       "setConversionConfig(address,address,ConversionConfig)",
-      AccountType.NORMAL_TIMELOCK,
-    ],
+      timelock,
+    ]),
   ];
+};
+
+const getXVSVaultTreasuryPermissions = (xvsVaultTreasury: string): string[][] => {
+  return [accounts.flatMap(timelock => [xvsVaultTreasury, "fundXVSVault(uint256)", timelock])];
 };
 
 const getPrimeRevokePermissions = (prime: string, guardian: string): string[][] => {
@@ -468,6 +475,7 @@ const grantPermissions: Permissions = {
     ...getRewardDistributorPermissionsBlockbased(),
     ...getIRMPermissions(),
     ...getConverterPermissions(),
+    ...getXVSVaultTreasuryPermissions(ETHEREUM_XVS_VAULT_TREASURY),
   ],
   opbnbmainnet: [
     ...getResilientOraclePermissions(OPBNBMAINNET_RESILIENT_ORACLE),
@@ -518,6 +526,7 @@ const grantPermissions: Permissions = {
     ...getRewardDistributorPermissionsBlockbased(),
     ...getIRMPermissions(),
     ...getConverterPermissions(),
+    ...getXVSVaultTreasuryPermissions(SEPOLIA_XVS_VAULT_TREASURY),
   ],
   opbnbtestnet: [
     ...getResilientOraclePermissions(OPBNBTESTNET_RESILIENT_ORACLE),
