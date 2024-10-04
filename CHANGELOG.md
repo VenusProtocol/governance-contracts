@@ -1,3 +1,16 @@
+## [2.4.0-dev.3](https://github.com/VenusProtocol/governance-contracts/compare/v2.4.0-dev.2...v2.4.0-dev.3) (2024-10-04)
+
+
+### Features
+
+* add multichain governance deployments on zksyncsepolia ([22629a3](https://github.com/VenusProtocol/governance-contracts/commit/22629a3e89523efdc89011e1288f1f2f83907982))
+* updating deployment files ([f4d95b6](https://github.com/VenusProtocol/governance-contracts/commit/f4d95b6c3c889e02c486ce94dd9569208936e313))
+
+
+### Bug Fixes
+
+* add proxyAdmin depency in hardhat config ([d0cbfdb](https://github.com/VenusProtocol/governance-contracts/commit/d0cbfdb71d42c2acbeac49875fdcea3986ab4867))
+
 ## [2.4.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.4.0-dev.1...v2.4.0-dev.2) (2024-09-20)
 
 
