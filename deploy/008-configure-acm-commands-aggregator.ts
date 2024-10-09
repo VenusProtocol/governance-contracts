@@ -418,12 +418,21 @@ const getIRMRevokePermissions = (guardian: string): string[][] => {
 };
 
 const getPoolRegistryRevokePermissions = (poolRegistry: string, guardian: string): string[][] => {
-  return [
-    [poolRegistry, "addPool(string,address,uint256,uint256,uint256)", guardian],
-    [poolRegistry, "addMarket(AddMarketInput)", guardian],
-    [poolRegistry, "setPoolName(address,string)", guardian],
-    [poolRegistry, "updatePoolMetadata(address,VenusPoolMetaData)", guardian],
-  ];
+  if (poolRegistry === OPBNBTESTNET_POOL_REGISTRY || poolRegistry === ARBITRUMSEPOLIA_POOL_REGISTRY) {
+    return [
+      [ethers.constants.AddressZero, "addPool(string,address,uint256,uint256,uint256)", guardian],
+      [ethers.constants.AddressZero, "addMarket(AddMarketInput)", guardian],
+      [ethers.constants.AddressZero, "setPoolName(address,string)", guardian],
+      [ethers.constants.AddressZero, "updatePoolMetadata(address,VenusPoolMetaData)", guardian],
+    ];
+  } else {
+    return [
+      [poolRegistry, "addPool(string,address,uint256,uint256,uint256)", guardian],
+      [poolRegistry, "addMarket(AddMarketInput)", guardian],
+      [poolRegistry, "setPoolName(address,string)", guardian],
+      [poolRegistry, "updatePoolMetadata(address,VenusPoolMetaData)", guardian],
+    ];
+  }
 };
 
 const getComptrollerRevokePermissions = (guardian: string): string[][] => {
