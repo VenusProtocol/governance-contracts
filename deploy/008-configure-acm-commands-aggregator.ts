@@ -82,6 +82,10 @@ const SEPOLIA_GUARDIAN = "0x94fa6078b6b8a26f0b6edffbe6501b22a10470fb";
 const OPBNBTESTNET_GUARDIAN = "0xb15f6EfEbC276A3b9805df81b5FB3D50C2A62BDf";
 const ARBITRUMSEPOLIA_GUARDIAN = "0x1426A5Ae009c4443188DA8793751024E358A61C2";
 
+const ARBITRUMSEPOLIA_OMNICHAIN_EXECUTOR_OWNER = "0xfCA70dd553b7dF6eB8F813CFEA6a9DD039448878";
+const SEPOLIA_OMNICHAIN_EXECUTOR_OWNER = "0xf964158C67439D01e5f17F0A3F39DfF46823F27A";
+const OPBNBTESTNET_OMNICHAIN_EXECUTOR_OWNER = "0x4F570240FF6265Fbb1C79cE824De6408F1948913";
+
 const ETHEREUM_CONVERTERS: string[] = [
   "0xaE39C38AF957338b3cEE2b3E5d825ea88df02EfE",
   "0x4f55cb0a24D5542a3478B0E284259A6B850B06BD",
@@ -332,6 +336,14 @@ const getXVSVaultTreasuryPermissions = (xvsVaultTreasury: string): string[][] =>
   return [accounts.flatMap(timelock => [xvsVaultTreasury, "fundXVSVault(uint256)", timelock])];
 };
 
+const getOmniChainExecutorOwnerPermissions = (omniChainExecutor: string, guardian: string): string[][] => {
+  return [
+    [omniChainExecutor, "setSrcChainId(uint16)", AccountType.NORMAL_TIMELOCK],
+    [omniChainExecutor, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
+    [omniChainExecutor, "setSrcChainId(uint16)", guardian],
+    [omniChainExecutor, "transferBridgeOwnership(address)", guardian],
+  ];
+};
 
 const getXVSBridgeAdminRevokePermissions = (xvsBridgeAdmin: string, guardian: string): string[][] => {
   return [
@@ -409,9 +421,13 @@ const getRewardDistributorRevokePermissions = (guardian: string, lastRewardingBl
     [ethers.constants.AddressZero, "setLastRewardingBlock(address[],uint32[],uint32[])", guardian],
     [ethers.constants.AddressZero, "setLastRewardingBlocks(address[],uint32[],uint32[])", guardian],
     [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", guardian],
-  ]
+  ];
   if (lastRewardingBlockTimestamp) {
-    permissions.push([ethers.constants.AddressZero, "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])", guardian])
+    permissions.push([
+      ethers.constants.AddressZero,
+      "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
+      guardian,
+    ]);
   }
   return permissions;
 };
@@ -478,6 +494,21 @@ const getConvertersRevokePermissions = (converters: string[], guardian: string):
   return [
     converters.flatMap(converter => [converter, "setMinAmountToConvert(uint256)", guardian]),
     converters.flatMap(converter => [converter, "setConversionConfig(address,address,ConversionConfig)", guardian]),
+  ];
+};
+
+const getOmniChainExecutorOwnerRevokePermissions = (omniChainExecutor: string, guardian: string): string[][] => {
+  return [
+    [omniChainExecutor, "setTrustedRemoteAddress(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
+    [omniChainExecutor, "setTimelockPendingAdmin(address,uint8)", AccountType.CRITICAL_TIMELOCK],
+    [omniChainExecutor, "setGuardian(address)", AccountType.CRITICAL_TIMELOCK],
+    [omniChainExecutor, "setTrustedRemoteAddress(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    [omniChainExecutor, "setTimelockPendingAdmin(address,uint8)", AccountType.FAST_TRACK_TIMELOCK],
+    [omniChainExecutor, "setGuardian(address)", AccountType.FAST_TRACK_TIMELOCK],
+    [omniChainExecutor, "setSendVersion(uint16)", guardian],
+    [omniChainExecutor, "setPrecrime(address)", guardian],
+    [omniChainExecutor, "setMinDstGas(uint16,uint16,uint256)", guardian],
+    [omniChainExecutor, "setPayloadSizeLimit(uint16,uint256)", guardian],
   ];
 };
 
@@ -549,6 +580,7 @@ const grantPermissions: Permissions = {
     ...getVTokenPermissions(),
     ...getRewardDistributorPermissionsTimebased(),
     ...getIRMPermissions(),
+    ...getOmniChainExecutorOwnerPermissions(ARBITRUMSEPOLIA_OMNICHAIN_EXECUTOR_OWNER, ARBITRUMSEPOLIA_GUARDIAN),
   ],
   sepolia: [
     ...getResilientOraclePermissions(SEPOLIA_RESILIENT_ORACLE),
@@ -570,6 +602,7 @@ const grantPermissions: Permissions = {
     ...getIRMPermissions(),
     ...getConverterPermissions(),
     ...getXVSVaultTreasuryPermissions(SEPOLIA_XVS_VAULT_TREASURY),
+    ...getOmniChainExecutorOwnerPermissions(SEPOLIA_OMNICHAIN_EXECUTOR_OWNER, SEPOLIA_GUARDIAN),
   ],
   opbnbtestnet: [
     ...getResilientOraclePermissions(OPBNBTESTNET_RESILIENT_ORACLE),
@@ -583,6 +616,7 @@ const grantPermissions: Permissions = {
     ...getComptrollerPermissions(),
     ...getVTokenPermissions(),
     ...getIRMPermissions(),
+    ...getOmniChainExecutorOwnerPermissions(OPBNBTESTNET_OMNICHAIN_EXECUTOR_OWNER, OPBNBTESTNET_GUARDIAN),
   ],
 };
 
@@ -639,6 +673,7 @@ const revokePermissions: Permissions = {
     ...getVTokenRevokePermissions(OPBNBTESTNET_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(OPBNBTESTNET_XVS_BRIDGE_ADMIN, OPBNBTESTNET_GUARDIAN),
     ...getRewardDistributorRevokePermissions(OPBNBTESTNET_GUARDIAN, false),
+    ...getOmniChainExecutorOwnerRevokePermissions(OPBNBTESTNET_OMNICHAIN_EXECUTOR_OWNER, OPBNBTESTNET_GUARDIAN),
   ],
   sepolia: [
     ...getPrimeRevokePermissions(SEPOLIA_PRIME, SEPOLIA_GUARDIAN),
@@ -657,6 +692,7 @@ const revokePermissions: Permissions = {
     ...getConvertersRevokePermissions(SEPOLIA_CONVERTERS, SEPOLIA_GUARDIAN),
     ...getXVSVaultTreasuryRevokePermissions(SEPOLIA_XVS_VAULT_TREASURY, SEPOLIA_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(SEPOLIA_XVS_BRIDGE_ADMIN, SEPOLIA_GUARDIAN),
+    ...getOmniChainExecutorOwnerRevokePermissions(SEPOLIA_OMNICHAIN_EXECUTOR_OWNER, SEPOLIA_GUARDIAN),
   ],
   arbitrumsepolia: [
     ...getPrimeRevokePermissions(ARBITRUMSEPOLIA_PRIME, ARBITRUMSEPOLIA_GUARDIAN),
@@ -671,6 +707,7 @@ const revokePermissions: Permissions = {
     ...getVTokenRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, ARBITRUMSEPOLIA_GUARDIAN),
     ...getRedstoneOracleRevokePermissions(ARBITRUMSEPOLIA_REDSTONE_ORACLE, ARBITRUMSEPOLIA_GUARDIAN),
+    ...getOmniChainExecutorOwnerRevokePermissions(ARBITRUMSEPOLIA_OMNICHAIN_EXECUTOR_OWNER, ARBITRUMSEPOLIA_GUARDIAN),
   ],
 };
 
@@ -693,8 +730,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const networkGrantPermissions = grantPermissions[hre.network.name];
 
   for (const permission of networkGrantPermissions) {
-    const timelock = await ethers.getContract(permission[2]);
-    permission[2] = timelock.address;
+    if (Object.values(AccountType).includes(permission[2] as AccountType)) {
+      const timelock = await ethers.getContract(permission[2]);
+      permission[2] = timelock.address;
+    }
   }
 
   const _grantPermissions: ACMCommandsAggregator.PermissionStruct[] = networkGrantPermissions.map(permission => ({
@@ -716,13 +755,20 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   console.log("Grant Permissions added with indexes: ", grantIndexes.toString());
 
-  const _revokePermissions: ACMCommandsAggregator.PermissionStruct[] = revokePermissions[hre.network.name].map(
-    permission => ({
-      contractAddress: permission[0],
-      functionSig: permission[1],
-      account: permission[2],
-    }),
-  );
+  const networkRevokePermissions = revokePermissions[hre.network.name];
+
+  for (const permission of networkRevokePermissions) {
+    if (Object.values(AccountType).includes(permission[2] as AccountType)) {
+      const timelock = await ethers.getContract(permission[2]);
+      permission[2] = timelock.address;
+    }
+  }
+
+  const _revokePermissions: ACMCommandsAggregator.PermissionStruct[] = networkRevokePermissions.map(permission => ({
+    contractAddress: permission[0],
+    functionSig: permission[1],
+    account: permission[2],
+  }));
 
   const revokeChunks = splitPermissions(_revokePermissions);
   const revokeIndexes: string[] = [];
