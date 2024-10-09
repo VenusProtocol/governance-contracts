@@ -638,6 +638,7 @@ const revokePermissions: Permissions = {
     ...getComptrollerRevokePermissions(OPBNBTESTNET_GUARDIAN),
     ...getVTokenRevokePermissions(OPBNBTESTNET_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(OPBNBTESTNET_XVS_BRIDGE_ADMIN, OPBNBTESTNET_GUARDIAN),
+    ...getRewardDistributorRevokePermissions(OPBNBTESTNET_GUARDIAN, false),
   ],
   sepolia: [
     ...getPrimeRevokePermissions(SEPOLIA_PRIME, SEPOLIA_GUARDIAN),
