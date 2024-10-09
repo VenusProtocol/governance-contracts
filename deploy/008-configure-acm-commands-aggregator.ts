@@ -409,7 +409,7 @@ const getRewardDistributorRevokePermissions = (guardian: string): string[][] => 
     [ethers.constants.AddressZero, "setLastRewardingBlock(address[],uint32[],uint32[])", guardian],
     [ethers.constants.AddressZero, "setLastRewardingBlocks(address[],uint32[],uint32[])", guardian],
     [ethers.constants.AddressZero, "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])", guardian],
-    [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", ETHEREUM_GUARDIAN],
+    [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", guardian],
   ];
 };
 
