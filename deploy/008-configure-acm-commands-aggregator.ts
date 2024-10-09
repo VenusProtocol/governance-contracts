@@ -404,13 +404,16 @@ const getXVSVaultRevokePermissions = (xvsVault: string, guardian: string): strin
   ];
 };
 
-const getRewardDistributorRevokePermissions = (guardian: string): string[][] => {
-  return [
+const getRewardDistributorRevokePermissions = (guardian: string, lastRewardingBlockTimestamp: boolean): string[][] => {
+  const permissions = [
     [ethers.constants.AddressZero, "setLastRewardingBlock(address[],uint32[],uint32[])", guardian],
     [ethers.constants.AddressZero, "setLastRewardingBlocks(address[],uint32[],uint32[])", guardian],
-    [ethers.constants.AddressZero, "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])", guardian],
     [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", guardian],
-  ];
+  ]
+  if (lastRewardingBlockTimestamp) {
+    permissions.push([ethers.constants.AddressZero, "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])", guardian])
+  }
+  return permissions;
 };
 
 const getIRMRevokePermissions = (guardian: string): string[][] => {
@@ -590,7 +593,7 @@ const revokePermissions: Permissions = {
     ...getResilientOracleRevokePermissions(ARBITRUMONE_RESILIENT_ORACLE, ARBITRUMONE_GUARDIAN),
     ...getBoundValidatorRevokePermissions(ARBITRUMONE_BOUND_VALIDATOR, ARBITRUMONE_GUARDIAN),
     ...getXVSVaultRevokePermissions(ARBITRUMONE_XVS, ARBITRUMONE_GUARDIAN),
-    ...getRewardDistributorRevokePermissions(ARBITRUMONE_GUARDIAN),
+    ...getRewardDistributorRevokePermissions(ARBITRUMONE_GUARDIAN, true),
     ...getIRMRevokePermissions(ARBITRUMONE_GUARDIAN),
     ...getPoolRegistryRevokePermissions(ARBITRUMONE_POOL_REGISTRY, ARBITRUMONE_GUARDIAN),
     ...getComptrollerRevokePermissions(ARBITRUMONE_GUARDIAN),
@@ -603,7 +606,7 @@ const revokePermissions: Permissions = {
     ...getResilientOracleRevokePermissions(ETHEREUM_RESILIENT_ORACLE, ETHEREUM_GUARDIAN),
     ...getBoundValidatorRevokePermissions(ETHEREUM_BOUND_VALIDATOR, ETHEREUM_GUARDIAN),
     ...getXVSVaultRevokePermissions(ETHEREUM_XVS, ETHEREUM_GUARDIAN),
-    ...getRewardDistributorRevokePermissions(ETHEREUM_GUARDIAN),
+    ...getRewardDistributorRevokePermissions(ETHEREUM_GUARDIAN, false),
     ...getIRMRevokePermissions(ETHEREUM_GUARDIAN),
     ...getPoolRegistryRevokePermissions(ETHEREUM_POOL_REGISTRY, ETHEREUM_GUARDIAN),
     ...getComptrollerRevokePermissions(ETHEREUM_GUARDIAN),
@@ -641,7 +644,7 @@ const revokePermissions: Permissions = {
     ...getResilientOracleRevokePermissions(SEPOLIA_RESILIENT_ORACLE, SEPOLIA_GUARDIAN),
     ...getBoundValidatorRevokePermissions(SEPOLIA_BOUND_VALIDATOR, SEPOLIA_GUARDIAN),
     ...getXVSVaultRevokePermissions(SEPOLIA_XVS, SEPOLIA_GUARDIAN),
-    ...getRewardDistributorRevokePermissions(SEPOLIA_GUARDIAN),
+    ...getRewardDistributorRevokePermissions(SEPOLIA_GUARDIAN, false),
     ...getIRMRevokePermissions(SEPOLIA_GUARDIAN),
     ...getPoolRegistryRevokePermissions(SEPOLIA_POOL_REGISTRY, SEPOLIA_GUARDIAN),
     ...getComptrollerRevokePermissions(SEPOLIA_GUARDIAN),
@@ -659,7 +662,7 @@ const revokePermissions: Permissions = {
     ...getResilientOracleRevokePermissions(ARBITRUMSEPOLIA_RESILIENT_ORACLE, ARBITRUMSEPOLIA_GUARDIAN),
     ...getBoundValidatorRevokePermissions(ARBITRUMSEPOLIA_BOUND_VALIDATOR, ARBITRUMSEPOLIA_GUARDIAN),
     ...getXVSVaultRevokePermissions(ARBITRUMSEPOLIA_XVS, ARBITRUMSEPOLIA_GUARDIAN),
-    ...getRewardDistributorRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
+    ...getRewardDistributorRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN, true),
     ...getIRMRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
     ...getPoolRegistryRevokePermissions(ARBITRUMSEPOLIA_POOL_REGISTRY, ARBITRUMSEPOLIA_GUARDIAN),
     ...getComptrollerRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
