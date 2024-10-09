@@ -599,6 +599,7 @@ const revokePermissions: Permissions = {
     ...getComptrollerRevokePermissions(ARBITRUMONE_GUARDIAN),
     ...getVTokenRevokePermissions(ARBITRUMONE_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(ARBITRUMONE_XVS_BRIDGE_ADMIN, ARBITRUMONE_GUARDIAN),
+    ...getRedstoneOracleRevokePermissions(ARBITRUMONE_REDSTONE_ORACLE, ARBITRUMONE_GUARDIAN),
   ],
   ethereum: [
     ...getPrimeRevokePermissions(ETHEREUM_PRIME, ETHEREUM_GUARDIAN),
@@ -668,6 +669,7 @@ const revokePermissions: Permissions = {
     ...getComptrollerRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
     ...getVTokenRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, ARBITRUMSEPOLIA_GUARDIAN),
+    ...getRedstoneOracleRevokePermissions(ARBITRUMSEPOLIA_REDSTONE_ORACLE, ARBITRUMSEPOLIA_GUARDIAN),
   ],
 };
 
