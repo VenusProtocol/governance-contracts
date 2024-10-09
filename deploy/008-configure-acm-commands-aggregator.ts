@@ -332,6 +332,33 @@ const getXVSVaultTreasuryPermissions = (xvsVaultTreasury: string): string[][] =>
   return [accounts.flatMap(timelock => [xvsVaultTreasury, "fundXVSVault(uint256)", timelock])];
 };
 
+
+const getXVSBridgeAdminRevokePermissions = (xvsBridgeAdmin: string, guardian: string): string[][] => {
+  return [
+    [xvsBridgeAdmin, "setSendVersion(uint16)", guardian],
+    [xvsBridgeAdmin, "setReceiveVersion(uint16)", guardian],
+    [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", guardian],
+    [xvsBridgeAdmin, "setMaxSingleTransactionLimit(uint16,uint256)", guardian],
+    [xvsBridgeAdmin, "setOracle(address)", guardian],
+    [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", guardian],
+    [xvsBridgeAdmin, "setMaxSingleReceiveTransactionLimit(uint16,uint256)", guardian],
+    [xvsBridgeAdmin, "setMaxDailyReceiveLimit(uint16,uint256)", guardian],
+    [xvsBridgeAdmin, "pause()", guardian],
+    [xvsBridgeAdmin, "unpause()", guardian],
+    [xvsBridgeAdmin, "removeTrustedRemote(uint16)", guardian],
+    [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", guardian],
+    [xvsBridgeAdmin, "setPrecrime(address)", guardian],
+    [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", guardian],
+    [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", guardian],
+    [xvsBridgeAdmin, "setWhitelist(address,bool)", guardian],
+    [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", guardian],
+    [xvsBridgeAdmin, "sweepToken(address,address,uint256)", guardian],
+    [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", guardian],
+    [xvsBridgeAdmin, "setTrustedRemoteAddress(uint16,bytes)", guardian],
+    [xvsBridgeAdmin, "transferBridgeOwnership(address)", guardian],
+  ];
+};
+
 const getXVSVaultTreasuryRevokePermissions = (xvsVaultTreasury: string, guardian: string): string[][] => {
   return [[xvsVaultTreasury, "fundXVSVault(uint256)", guardian]];
 };
@@ -559,6 +586,7 @@ const revokePermissions: Permissions = {
     ...getPoolRegistryRevokePermissions(ARBITRUMONE_POOL_REGISTRY, ARBITRUMONE_GUARDIAN),
     ...getComptrollerRevokePermissions(ARBITRUMONE_GUARDIAN),
     ...getVTokenRevokePermissions(ARBITRUMONE_GUARDIAN),
+    ...getXVSBridgeAdminRevokePermissions(ARBITRUMONE_XVS_BRIDGE_ADMIN, ARBITRUMONE_GUARDIAN),
   ],
   ethereum: [
     ...getPrimeRevokePermissions(ETHEREUM_PRIME, ETHEREUM_GUARDIAN),
@@ -576,6 +604,7 @@ const revokePermissions: Permissions = {
     ...getSFrxETHOracleRevokePermissions(ETHEREUM_sFrxETH_ORACLE, ETHEREUM_GUARDIAN),
     ...getConvertersRevokePermissions(ETHEREUM_CONVERTERS, ETHEREUM_GUARDIAN),
     ...getXVSVaultTreasuryRevokePermissions(ETHEREUM_XVS_VAULT_TREASURY, ETHEREUM_GUARDIAN),
+    ...getXVSBridgeAdminRevokePermissions(ETHEREUM_XVS_BRIDGE_ADMIN, ETHEREUM_GUARDIAN),
   ],
   opbnbmainnet: [
     ...getResilientOracleRevokePermissions(OPBNBMAINNET_RESILIENT_ORACLE, OPBNBMAINNET_GUARDIAN),
@@ -585,6 +614,7 @@ const revokePermissions: Permissions = {
     ...getPoolRegistryRevokePermissions(OPBNBMAINNET_POOL_REGISTRY, OPBNBMAINNET_GUARDIAN),
     ...getComptrollerRevokePermissions(OPBNBMAINNET_GUARDIAN),
     ...getVTokenRevokePermissions(OPBNBMAINNET_GUARDIAN),
+    ...getXVSBridgeAdminRevokePermissions(OPBNBMAINNET_XVS_BRIDGE_ADMIN, OPBNBMAINNET_GUARDIAN),
   ],
   opbnbtestnet: [
     ...getResilientOracleRevokePermissions(OPBNBTESTNET_RESILIENT_ORACLE, OPBNBTESTNET_GUARDIAN),
@@ -594,6 +624,7 @@ const revokePermissions: Permissions = {
     ...getPoolRegistryRevokePermissions(OPBNBTESTNET_POOL_REGISTRY, OPBNBTESTNET_GUARDIAN),
     ...getComptrollerRevokePermissions(OPBNBTESTNET_GUARDIAN),
     ...getVTokenRevokePermissions(OPBNBTESTNET_GUARDIAN),
+    ...getXVSBridgeAdminRevokePermissions(OPBNBTESTNET_XVS_BRIDGE_ADMIN, OPBNBTESTNET_GUARDIAN),
   ],
   sepolia: [
     ...getPrimeRevokePermissions(SEPOLIA_PRIME, SEPOLIA_GUARDIAN),
@@ -611,6 +642,7 @@ const revokePermissions: Permissions = {
     ...getSFrxETHOracleRevokePermissions(SEPOLIA_sFrxETH_ORACLE, SEPOLIA_GUARDIAN),
     ...getConvertersRevokePermissions(SEPOLIA_CONVERTERS, SEPOLIA_GUARDIAN),
     ...getXVSVaultTreasuryRevokePermissions(SEPOLIA_XVS_VAULT_TREASURY, SEPOLIA_GUARDIAN),
+    ...getXVSBridgeAdminRevokePermissions(SEPOLIA_XVS_BRIDGE_ADMIN, SEPOLIA_GUARDIAN),
   ],
   arbitrumsepolia: [
     ...getPrimeRevokePermissions(ARBITRUMSEPOLIA_PRIME, ARBITRUMSEPOLIA_GUARDIAN),
@@ -623,6 +655,7 @@ const revokePermissions: Permissions = {
     ...getPoolRegistryRevokePermissions(ARBITRUMSEPOLIA_POOL_REGISTRY, ARBITRUMSEPOLIA_GUARDIAN),
     ...getComptrollerRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
     ...getVTokenRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
+    ...getXVSBridgeAdminRevokePermissions(ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, ARBITRUMSEPOLIA_GUARDIAN),
   ],
 };
 
