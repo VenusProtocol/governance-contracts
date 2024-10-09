@@ -332,6 +332,10 @@ const getXVSVaultTreasuryPermissions = (xvsVaultTreasury: string): string[][] =>
   return [accounts.flatMap(timelock => [xvsVaultTreasury, "fundXVSVault(uint256)", timelock])];
 };
 
+const getXVSVaultTreasuryRevokePermissions = (xvsVaultTreasury: string, guardian: string): string[][] => {
+  return [[xvsVaultTreasury, "fundXVSVault(uint256)", guardian]];
+};
+
 const getPrimeRevokePermissions = (prime: string, guardian: string): string[][] => {
   return [
     [prime, "updateAlpha(uint128,uint128)", guardian],
@@ -571,6 +575,7 @@ const revokePermissions: Permissions = {
     ...getConverterNetworkRevokePermissions(ETHEREUM_CONVERTER_NETWORK, ETHEREUM_GUARDIAN),
     ...getSFrxETHOracleRevokePermissions(ETHEREUM_sFrxETH_ORACLE, ETHEREUM_GUARDIAN),
     ...getConvertersRevokePermissions(ETHEREUM_CONVERTERS, ETHEREUM_GUARDIAN),
+    ...getXVSVaultTreasuryRevokePermissions(ETHEREUM_XVS_VAULT_TREASURY, ETHEREUM_GUARDIAN),
   ],
   opbnbmainnet: [
     ...getResilientOracleRevokePermissions(OPBNBMAINNET_RESILIENT_ORACLE, OPBNBMAINNET_GUARDIAN),
@@ -605,6 +610,7 @@ const revokePermissions: Permissions = {
     ...getConverterNetworkRevokePermissions(SEPOLIA_CONVERTER_NETWORK, SEPOLIA_GUARDIAN),
     ...getSFrxETHOracleRevokePermissions(SEPOLIA_sFrxETH_ORACLE, SEPOLIA_GUARDIAN),
     ...getConvertersRevokePermissions(SEPOLIA_CONVERTERS, SEPOLIA_GUARDIAN),
+    ...getXVSVaultTreasuryRevokePermissions(SEPOLIA_XVS_VAULT_TREASURY, SEPOLIA_GUARDIAN),
   ],
   arbitrumsepolia: [
     ...getPrimeRevokePermissions(ARBITRUMSEPOLIA_PRIME, ARBITRUMSEPOLIA_GUARDIAN),
