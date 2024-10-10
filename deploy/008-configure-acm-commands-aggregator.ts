@@ -350,7 +350,6 @@ const getXVSBridgeAdminRevokePermissions = (xvsBridgeAdmin: string, guardian: st
     [xvsBridgeAdmin, "setSendVersion(uint16)", guardian],
     [xvsBridgeAdmin, "setReceiveVersion(uint16)", guardian],
     [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", guardian],
-    [xvsBridgeAdmin, "setMaxSingleTransactionLimit(uint16,uint256)", guardian],
     [xvsBridgeAdmin, "setOracle(address)", guardian],
     [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", guardian],
     [xvsBridgeAdmin, "setMaxSingleReceiveTransactionLimit(uint16,uint256)", guardian],
