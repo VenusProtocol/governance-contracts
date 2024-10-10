@@ -48,6 +48,9 @@ const ARBITRUMSEPOLIA_XVS_VAULT_PROXY = "0x407507DC2809D3aa31D54EcA3BEde5C5c4C8A
 const SEPOLIA_XVS_VAULT_PROXY = "0x1129f882eAa912aE6D4f6D445b2E2b1eCbA99fd5";
 const OPBNBTESTNET_XVS_VAULT_PROXY = "0xB14A0e72C5C202139F78963C9e89252c1ad16f01";
 
+const ETHEREUM_XVS_VAULT_TREASURY = "0xaE39C38AF957338b3cEE2b3E5d825ea88df02EfE";
+const SEPOLIA_XVS_VAULT_TREASURY = "0xCCB08e5107b406E67Ad8356023dd489CEbc79B40";
+
 const ETHEREUM_POOL_REGISTRY = "0x61CAff113CCaf05FFc6540302c37adcf077C5179";
 const ARBITRUMONE_POOL_REGISTRY = "0x382238f07Bc4Fe4aA99e561adE8A4164b5f815DA";
 const OPBNBMAINNET_POOL_REGISTRY = "0x345a030Ad22e2317ac52811AC41C1A63cfa13aEe";
@@ -78,6 +81,10 @@ const OPBNBMAINNET_GUARDIAN = "0xC46796a21a3A9FAB6546aF3434F2eBfFd0604207";
 const SEPOLIA_GUARDIAN = "0x94fa6078b6b8a26f0b6edffbe6501b22a10470fb";
 const OPBNBTESTNET_GUARDIAN = "0xb15f6EfEbC276A3b9805df81b5FB3D50C2A62BDf";
 const ARBITRUMSEPOLIA_GUARDIAN = "0x1426A5Ae009c4443188DA8793751024E358A61C2";
+
+const ARBITRUMSEPOLIA_OMNICHAIN_EXECUTOR_OWNER = "0xfCA70dd553b7dF6eB8F813CFEA6a9DD039448878";
+const SEPOLIA_OMNICHAIN_EXECUTOR_OWNER = "0xf964158C67439D01e5f17F0A3F39DfF46823F27A";
+const OPBNBTESTNET_OMNICHAIN_EXECUTOR_OWNER = "0x4F570240FF6265Fbb1C79cE824De6408F1948913";
 
 const ETHEREUM_CONVERTERS: string[] = [
   "0xaE39C38AF957338b3cEE2b3E5d825ea88df02EfE",
@@ -220,7 +227,6 @@ const getPrimePermissions = (prime: string): string[][] => {
     accounts.flatMap(timelock => [prime, "setLimit(uint256,uint256)", timelock]),
     accounts.flatMap(timelock => [prime, "setMaxLoopsLimit(uint256)", timelock]),
     accounts.flatMap(timelock => [prime, "issue(bool,address[])", timelock]),
-    accounts.flatMap(timelock => [prime, "issue(bool,address[])", timelock]),
     accounts.flatMap(timelock => [prime, "burn(address)", timelock]),
     accounts.flatMap(timelock => [prime, "togglePause()", timelock]),
   ];
@@ -266,6 +272,7 @@ const getComptrollerPermissions = (): string[][] => {
       timelock,
     ]),
     accounts.flatMap(timelock => [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", timelock]),
+    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", timelock]),
     accounts.flatMap(timelock => [
       ethers.constants.AddressZero,
       "setActionsPaused(address[],uint256[],bool)",
@@ -317,12 +324,49 @@ const getConverterPermissions = (): string[][] => {
     accounts.flatMap(timelock => [ethers.constants.AddressZero, "pauseConversion()", timelock]),
     accounts.flatMap(timelock => [ethers.constants.AddressZero, "resumeConversion()", timelock]),
     accounts.flatMap(timelock => [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", timelock]),
-    [
+    accounts.flatMap(timelock => [
       ethers.constants.AddressZero,
       "setConversionConfig(address,address,ConversionConfig)",
-      AccountType.NORMAL_TIMELOCK,
-    ],
+      timelock,
+    ]),
   ];
+};
+
+const getXVSVaultTreasuryPermissions = (xvsVaultTreasury: string): string[][] => {
+  return [accounts.flatMap(timelock => [xvsVaultTreasury, "fundXVSVault(uint256)", timelock])];
+};
+
+const getOmniChainExecutorOwnerPermissions = (omniChainExecutor: string, guardian: string): string[][] => {
+  return [
+    [omniChainExecutor, "setSrcChainId(uint16)", AccountType.NORMAL_TIMELOCK],
+    [omniChainExecutor, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
+    [omniChainExecutor, "setSrcChainId(uint16)", guardian],
+    [omniChainExecutor, "transferBridgeOwnership(address)", guardian],
+  ];
+};
+
+const getXVSBridgeAdminRevokePermissions = (xvsBridgeAdmin: string, guardian: string): string[][] => {
+  return [
+    [xvsBridgeAdmin, "setSendVersion(uint16)", guardian],
+    [xvsBridgeAdmin, "setReceiveVersion(uint16)", guardian],
+    [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", guardian],
+    [xvsBridgeAdmin, "setOracle(address)", guardian],
+    [xvsBridgeAdmin, "removeTrustedRemote(uint16)", guardian],
+    [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", guardian],
+    [xvsBridgeAdmin, "setPrecrime(address)", guardian],
+    [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", guardian],
+    [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", guardian],
+    [xvsBridgeAdmin, "setWhitelist(address,bool)", guardian],
+    [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", guardian],
+    [xvsBridgeAdmin, "sweepToken(address,address,uint256)", guardian],
+    [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", guardian],
+    [xvsBridgeAdmin, "setTrustedRemoteAddress(uint16,bytes)", guardian],
+    [xvsBridgeAdmin, "transferBridgeOwnership(address)", guardian],
+  ];
+};
+
+const getXVSVaultTreasuryRevokePermissions = (xvsVaultTreasury: string, guardian: string): string[][] => {
+  return [[xvsVaultTreasury, "fundXVSVault(uint256)", guardian]];
 };
 
 const getPrimeRevokePermissions = (prime: string, guardian: string): string[][] => {
@@ -366,13 +410,20 @@ const getXVSVaultRevokePermissions = (xvsVault: string, guardian: string): strin
   ];
 };
 
-const getRewardDistributorRevokePermissions = (guardian: string): string[][] => {
-  return [
+const getRewardDistributorRevokePermissions = (guardian: string, lastRewardingBlockTimestamp: boolean): string[][] => {
+  const permissions = [
     [ethers.constants.AddressZero, "setLastRewardingBlock(address[],uint32[],uint32[])", guardian],
     [ethers.constants.AddressZero, "setLastRewardingBlocks(address[],uint32[],uint32[])", guardian],
-    [ethers.constants.AddressZero, "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])", guardian],
-    [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", ETHEREUM_GUARDIAN],
+    [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", guardian],
   ];
+  if (lastRewardingBlockTimestamp) {
+    permissions.push([
+      ethers.constants.AddressZero,
+      "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
+      guardian,
+    ]);
+  }
+  return permissions;
 };
 
 const getIRMRevokePermissions = (guardian: string): string[][] => {
@@ -380,12 +431,21 @@ const getIRMRevokePermissions = (guardian: string): string[][] => {
 };
 
 const getPoolRegistryRevokePermissions = (poolRegistry: string, guardian: string): string[][] => {
-  return [
-    [poolRegistry, "addPool(string,address,uint256,uint256,uint256)", guardian],
-    [poolRegistry, "addMarket(AddMarketInput)", guardian],
-    [poolRegistry, "setPoolName(address,string)", guardian],
-    [poolRegistry, "updatePoolMetadata(address,VenusPoolMetaData)", guardian],
-  ];
+  if (poolRegistry === OPBNBTESTNET_POOL_REGISTRY || poolRegistry === ARBITRUMSEPOLIA_POOL_REGISTRY) {
+    return [
+      [ethers.constants.AddressZero, "addPool(string,address,uint256,uint256,uint256)", guardian],
+      [ethers.constants.AddressZero, "addMarket(AddMarketInput)", guardian],
+      [ethers.constants.AddressZero, "setPoolName(address,string)", guardian],
+      [ethers.constants.AddressZero, "updatePoolMetadata(address,VenusPoolMetaData)", guardian],
+    ];
+  } else {
+    return [
+      [poolRegistry, "addPool(string,address,uint256,uint256,uint256)", guardian],
+      [poolRegistry, "addMarket(AddMarketInput)", guardian],
+      [poolRegistry, "setPoolName(address,string)", guardian],
+      [poolRegistry, "updatePoolMetadata(address,VenusPoolMetaData)", guardian],
+    ];
+  }
 };
 
 const getComptrollerRevokePermissions = (guardian: string): string[][] => {
@@ -431,6 +491,21 @@ const getConvertersRevokePermissions = (converters: string[], guardian: string):
   ];
 };
 
+const getOmniChainExecutorOwnerRevokePermissions = (omniChainExecutor: string, guardian: string): string[][] => {
+  return [
+    [omniChainExecutor, "setTrustedRemoteAddress(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
+    [omniChainExecutor, "setTimelockPendingAdmin(address,uint8)", AccountType.CRITICAL_TIMELOCK],
+    [omniChainExecutor, "setGuardian(address)", AccountType.CRITICAL_TIMELOCK],
+    [omniChainExecutor, "setTrustedRemoteAddress(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
+    [omniChainExecutor, "setTimelockPendingAdmin(address,uint8)", AccountType.FAST_TRACK_TIMELOCK],
+    [omniChainExecutor, "setGuardian(address)", AccountType.FAST_TRACK_TIMELOCK],
+    [omniChainExecutor, "setSendVersion(uint16)", guardian],
+    [omniChainExecutor, "setPrecrime(address)", guardian],
+    [omniChainExecutor, "setMinDstGas(uint16,uint16,uint256)", guardian],
+    [omniChainExecutor, "setPayloadSizeLimit(uint16,uint256)", guardian],
+  ];
+};
+
 const grantPermissions: Permissions = {
   arbitrumone: [
     ...getResilientOraclePermissions(ARBITRUMONE_RESILIENT_ORACLE),
@@ -468,6 +543,7 @@ const grantPermissions: Permissions = {
     ...getRewardDistributorPermissionsBlockbased(),
     ...getIRMPermissions(),
     ...getConverterPermissions(),
+    ...getXVSVaultTreasuryPermissions(ETHEREUM_XVS_VAULT_TREASURY),
   ],
   opbnbmainnet: [
     ...getResilientOraclePermissions(OPBNBMAINNET_RESILIENT_ORACLE),
@@ -498,6 +574,7 @@ const grantPermissions: Permissions = {
     ...getVTokenPermissions(),
     ...getRewardDistributorPermissionsTimebased(),
     ...getIRMPermissions(),
+    ...getOmniChainExecutorOwnerPermissions(ARBITRUMSEPOLIA_OMNICHAIN_EXECUTOR_OWNER, ARBITRUMSEPOLIA_GUARDIAN),
   ],
   sepolia: [
     ...getResilientOraclePermissions(SEPOLIA_RESILIENT_ORACLE),
@@ -518,6 +595,8 @@ const grantPermissions: Permissions = {
     ...getRewardDistributorPermissionsBlockbased(),
     ...getIRMPermissions(),
     ...getConverterPermissions(),
+    ...getXVSVaultTreasuryPermissions(SEPOLIA_XVS_VAULT_TREASURY),
+    ...getOmniChainExecutorOwnerPermissions(SEPOLIA_OMNICHAIN_EXECUTOR_OWNER, SEPOLIA_GUARDIAN),
   ],
   opbnbtestnet: [
     ...getResilientOraclePermissions(OPBNBTESTNET_RESILIENT_ORACLE),
@@ -531,6 +610,7 @@ const grantPermissions: Permissions = {
     ...getComptrollerPermissions(),
     ...getVTokenPermissions(),
     ...getIRMPermissions(),
+    ...getOmniChainExecutorOwnerPermissions(OPBNBTESTNET_OMNICHAIN_EXECUTOR_OWNER, OPBNBTESTNET_GUARDIAN),
   ],
 };
 
@@ -541,11 +621,13 @@ const revokePermissions: Permissions = {
     ...getResilientOracleRevokePermissions(ARBITRUMONE_RESILIENT_ORACLE, ARBITRUMONE_GUARDIAN),
     ...getBoundValidatorRevokePermissions(ARBITRUMONE_BOUND_VALIDATOR, ARBITRUMONE_GUARDIAN),
     ...getXVSVaultRevokePermissions(ARBITRUMONE_XVS, ARBITRUMONE_GUARDIAN),
-    ...getRewardDistributorRevokePermissions(ARBITRUMONE_GUARDIAN),
+    ...getRewardDistributorRevokePermissions(ARBITRUMONE_GUARDIAN, true),
     ...getIRMRevokePermissions(ARBITRUMONE_GUARDIAN),
     ...getPoolRegistryRevokePermissions(ARBITRUMONE_POOL_REGISTRY, ARBITRUMONE_GUARDIAN),
     ...getComptrollerRevokePermissions(ARBITRUMONE_GUARDIAN),
     ...getVTokenRevokePermissions(ARBITRUMONE_GUARDIAN),
+    ...getXVSBridgeAdminRevokePermissions(ARBITRUMONE_XVS_BRIDGE_ADMIN, ARBITRUMONE_GUARDIAN),
+    ...getRedstoneOracleRevokePermissions(ARBITRUMONE_REDSTONE_ORACLE, ARBITRUMONE_GUARDIAN),
   ],
   ethereum: [
     ...getPrimeRevokePermissions(ETHEREUM_PRIME, ETHEREUM_GUARDIAN),
@@ -553,7 +635,7 @@ const revokePermissions: Permissions = {
     ...getResilientOracleRevokePermissions(ETHEREUM_RESILIENT_ORACLE, ETHEREUM_GUARDIAN),
     ...getBoundValidatorRevokePermissions(ETHEREUM_BOUND_VALIDATOR, ETHEREUM_GUARDIAN),
     ...getXVSVaultRevokePermissions(ETHEREUM_XVS, ETHEREUM_GUARDIAN),
-    ...getRewardDistributorRevokePermissions(ETHEREUM_GUARDIAN),
+    ...getRewardDistributorRevokePermissions(ETHEREUM_GUARDIAN, false),
     ...getIRMRevokePermissions(ETHEREUM_GUARDIAN),
     ...getPoolRegistryRevokePermissions(ETHEREUM_POOL_REGISTRY, ETHEREUM_GUARDIAN),
     ...getComptrollerRevokePermissions(ETHEREUM_GUARDIAN),
@@ -562,6 +644,8 @@ const revokePermissions: Permissions = {
     ...getConverterNetworkRevokePermissions(ETHEREUM_CONVERTER_NETWORK, ETHEREUM_GUARDIAN),
     ...getSFrxETHOracleRevokePermissions(ETHEREUM_sFrxETH_ORACLE, ETHEREUM_GUARDIAN),
     ...getConvertersRevokePermissions(ETHEREUM_CONVERTERS, ETHEREUM_GUARDIAN),
+    ...getXVSVaultTreasuryRevokePermissions(ETHEREUM_XVS_VAULT_TREASURY, ETHEREUM_GUARDIAN),
+    ...getXVSBridgeAdminRevokePermissions(ETHEREUM_XVS_BRIDGE_ADMIN, ETHEREUM_GUARDIAN),
   ],
   opbnbmainnet: [
     ...getResilientOracleRevokePermissions(OPBNBMAINNET_RESILIENT_ORACLE, OPBNBMAINNET_GUARDIAN),
@@ -571,6 +655,7 @@ const revokePermissions: Permissions = {
     ...getPoolRegistryRevokePermissions(OPBNBMAINNET_POOL_REGISTRY, OPBNBMAINNET_GUARDIAN),
     ...getComptrollerRevokePermissions(OPBNBMAINNET_GUARDIAN),
     ...getVTokenRevokePermissions(OPBNBMAINNET_GUARDIAN),
+    ...getXVSBridgeAdminRevokePermissions(OPBNBMAINNET_XVS_BRIDGE_ADMIN, OPBNBMAINNET_GUARDIAN),
   ],
   opbnbtestnet: [
     ...getResilientOracleRevokePermissions(OPBNBTESTNET_RESILIENT_ORACLE, OPBNBTESTNET_GUARDIAN),
@@ -580,6 +665,9 @@ const revokePermissions: Permissions = {
     ...getPoolRegistryRevokePermissions(OPBNBTESTNET_POOL_REGISTRY, OPBNBTESTNET_GUARDIAN),
     ...getComptrollerRevokePermissions(OPBNBTESTNET_GUARDIAN),
     ...getVTokenRevokePermissions(OPBNBTESTNET_GUARDIAN),
+    ...getXVSBridgeAdminRevokePermissions(OPBNBTESTNET_XVS_BRIDGE_ADMIN, OPBNBTESTNET_GUARDIAN),
+    ...getRewardDistributorRevokePermissions(OPBNBTESTNET_GUARDIAN, false),
+    ...getOmniChainExecutorOwnerRevokePermissions(OPBNBTESTNET_OMNICHAIN_EXECUTOR_OWNER, OPBNBTESTNET_GUARDIAN),
   ],
   sepolia: [
     ...getPrimeRevokePermissions(SEPOLIA_PRIME, SEPOLIA_GUARDIAN),
@@ -587,7 +675,7 @@ const revokePermissions: Permissions = {
     ...getResilientOracleRevokePermissions(SEPOLIA_RESILIENT_ORACLE, SEPOLIA_GUARDIAN),
     ...getBoundValidatorRevokePermissions(SEPOLIA_BOUND_VALIDATOR, SEPOLIA_GUARDIAN),
     ...getXVSVaultRevokePermissions(SEPOLIA_XVS, SEPOLIA_GUARDIAN),
-    ...getRewardDistributorRevokePermissions(SEPOLIA_GUARDIAN),
+    ...getRewardDistributorRevokePermissions(SEPOLIA_GUARDIAN, false),
     ...getIRMRevokePermissions(SEPOLIA_GUARDIAN),
     ...getPoolRegistryRevokePermissions(SEPOLIA_POOL_REGISTRY, SEPOLIA_GUARDIAN),
     ...getComptrollerRevokePermissions(SEPOLIA_GUARDIAN),
@@ -596,6 +684,9 @@ const revokePermissions: Permissions = {
     ...getConverterNetworkRevokePermissions(SEPOLIA_CONVERTER_NETWORK, SEPOLIA_GUARDIAN),
     ...getSFrxETHOracleRevokePermissions(SEPOLIA_sFrxETH_ORACLE, SEPOLIA_GUARDIAN),
     ...getConvertersRevokePermissions(SEPOLIA_CONVERTERS, SEPOLIA_GUARDIAN),
+    ...getXVSVaultTreasuryRevokePermissions(SEPOLIA_XVS_VAULT_TREASURY, SEPOLIA_GUARDIAN),
+    ...getXVSBridgeAdminRevokePermissions(SEPOLIA_XVS_BRIDGE_ADMIN, SEPOLIA_GUARDIAN),
+    ...getOmniChainExecutorOwnerRevokePermissions(SEPOLIA_OMNICHAIN_EXECUTOR_OWNER, SEPOLIA_GUARDIAN),
   ],
   arbitrumsepolia: [
     ...getPrimeRevokePermissions(ARBITRUMSEPOLIA_PRIME, ARBITRUMSEPOLIA_GUARDIAN),
@@ -603,11 +694,14 @@ const revokePermissions: Permissions = {
     ...getResilientOracleRevokePermissions(ARBITRUMSEPOLIA_RESILIENT_ORACLE, ARBITRUMSEPOLIA_GUARDIAN),
     ...getBoundValidatorRevokePermissions(ARBITRUMSEPOLIA_BOUND_VALIDATOR, ARBITRUMSEPOLIA_GUARDIAN),
     ...getXVSVaultRevokePermissions(ARBITRUMSEPOLIA_XVS, ARBITRUMSEPOLIA_GUARDIAN),
-    ...getRewardDistributorRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
+    ...getRewardDistributorRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN, true),
     ...getIRMRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
     ...getPoolRegistryRevokePermissions(ARBITRUMSEPOLIA_POOL_REGISTRY, ARBITRUMSEPOLIA_GUARDIAN),
     ...getComptrollerRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
     ...getVTokenRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
+    ...getXVSBridgeAdminRevokePermissions(ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, ARBITRUMSEPOLIA_GUARDIAN),
+    ...getRedstoneOracleRevokePermissions(ARBITRUMSEPOLIA_REDSTONE_ORACLE, ARBITRUMSEPOLIA_GUARDIAN),
+    ...getOmniChainExecutorOwnerRevokePermissions(ARBITRUMSEPOLIA_OMNICHAIN_EXECUTOR_OWNER, ARBITRUMSEPOLIA_GUARDIAN),
   ],
 };
 
@@ -630,8 +724,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const networkGrantPermissions = grantPermissions[hre.network.name];
 
   for (const permission of networkGrantPermissions) {
-    const timelock = await ethers.getContract(permission[2]);
-    permission[2] = timelock.address;
+    if (Object.values(AccountType).includes(permission[2] as AccountType)) {
+      const timelock = await ethers.getContract(permission[2]);
+      permission[2] = timelock.address;
+    }
   }
 
   const _grantPermissions: ACMCommandsAggregator.PermissionStruct[] = networkGrantPermissions.map(permission => ({
@@ -653,13 +749,20 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   console.log("Grant Permissions added with indexes: ", grantIndexes.toString());
 
-  const _revokePermissions: ACMCommandsAggregator.PermissionStruct[] = revokePermissions[hre.network.name].map(
-    permission => ({
-      contractAddress: permission[0],
-      functionSig: permission[1],
-      account: permission[2],
-    }),
-  );
+  const networkRevokePermissions = revokePermissions[hre.network.name];
+
+  for (const permission of networkRevokePermissions) {
+    if (Object.values(AccountType).includes(permission[2] as AccountType)) {
+      const timelock = await ethers.getContract(permission[2]);
+      permission[2] = timelock.address;
+    }
+  }
+
+  const _revokePermissions: ACMCommandsAggregator.PermissionStruct[] = networkRevokePermissions.map(permission => ({
+    contractAddress: permission[0],
+    functionSig: permission[1],
+    account: permission[2],
+  }));
 
   const revokeChunks = splitPermissions(_revokePermissions);
   const revokeIndexes: string[] = [];
