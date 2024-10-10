@@ -2,6 +2,14 @@
   "name": "zksyncsepolia",
   "chainId": "300",
   "addresses": {
-    "AccessControlManager": "0xD07f543d47c3a8997D6079958308e981AC14CD01"
+    "AccessControlManager": "0xD07f543d47c3a8997D6079958308e981AC14CD01",
+    "CriticalTimelock": "0x0E6138bE0FA1915efC73670a20A10EFd720a6Cc8",
+    "DefaultProxyAdmin": "0x18E44f588a4DcF2F7145d35A5C226e129040b6D3",
+    "FastTrackTimelock": "0xb055e028b27d53a455a6c040a6952e44E9E615c4",
+    "NormalTimelock": "0x1730527a0f0930269313D77A317361b42971a67E",
+    "OmnichainExecutorOwner": "0xa34607D58146FA02aF5f920f29C3D916acAb0bC5",
+    "OmnichainExecutorOwner_Implementation": "0x5B42CD8Aff1b81FD12080b1Dd230c08062e6c2C2",
+    "OmnichainExecutorOwner_Proxy": "0xa34607D58146FA02aF5f920f29C3D916acAb0bC5",
+    "OmnichainGovernanceExecutor": "0x83F79CfbaEee738173c0dfd866796743F4E25C9e"
   }
 }
