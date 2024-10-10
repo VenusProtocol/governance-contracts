@@ -2,6 +2,7 @@
   "name": "opbnbtestnet",
   "chainId": "5611",
   "addresses": {
+    "ACMCommandsAggregator": "0xbDd501dB1B0D6aab299CE69ef5B86C8578947AD0",
     "AccessControlManager": "0x049f77F7046266d27C3bC96376f53C17Ef09c986",
     "CriticalTimelock": "0xBd06aCDEF38230F4EdA0c6FD392905Ad463e42E3",
     "DefaultProxyAdmin": "0xB1281ADC816fba7df64B798D7A0BC4bd2a6d42f4",

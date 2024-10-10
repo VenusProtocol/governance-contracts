@@ -2,6 +2,7 @@
   "name": "sepolia",
   "chainId": "11155111",
   "addresses": {
+    "ACMCommandsAggregator": "0x0653830c55035d678e1287b2d4550519fd263d0e",
     "AccessControlManager": "0xbf705C00578d43B6147ab4eaE04DBBEd1ccCdc96",
     "CriticalTimelock": "0xA24A7A65b8968a749841988Bd7d05F6a94329fDe",
     "DefaultProxyAdmin": "0x01435866babd91311b1355cf3af488cca36db68e",
