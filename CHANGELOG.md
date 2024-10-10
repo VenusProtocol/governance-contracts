@@ -1,3 +1,37 @@
+## [2.4.0-dev.3](https://github.com/VenusProtocol/governance-contracts/compare/v2.4.0-dev.2...v2.4.0-dev.3) (2024-10-04)
+
+
+### Features
+
+* add multichain governance deployments on zksyncsepolia ([22629a3](https://github.com/VenusProtocol/governance-contracts/commit/22629a3e89523efdc89011e1288f1f2f83907982))
+* updating deployment files ([f4d95b6](https://github.com/VenusProtocol/governance-contracts/commit/f4d95b6c3c889e02c486ce94dd9569208936e313))
+
+
+### Bug Fixes
+
+* add proxyAdmin depency in hardhat config ([d0cbfdb](https://github.com/VenusProtocol/governance-contracts/commit/d0cbfdb71d42c2acbeac49875fdcea3986ab4867))
+
+## [2.4.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.4.0-dev.1...v2.4.0-dev.2) (2024-09-20)
+
+
+### Features
+
+* deployment files for acm on op mainnet ([19caebf](https://github.com/VenusProtocol/governance-contracts/commit/19caebf1b202a3cf29eac0a209604ff658ab3152))
+* updating deployment files ([a7bbf89](https://github.com/VenusProtocol/governance-contracts/commit/a7bbf89228fabe6e8bf02436dc24ea8d769e61a2))
+
+## [2.4.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.3.0...v2.4.0-dev.1) (2024-09-12)
+
+
+### Features
+
+* updating deployment files ([194fc07](https://github.com/VenusProtocol/governance-contracts/commit/194fc07ee8e061e72a07f2d628266d1119636ec9))
+
+
+### Bug Fixes
+
+* failing checks ([460bbf1](https://github.com/VenusProtocol/governance-contracts/commit/460bbf151421fcb1a1d960af8b104e10055e288b))
+* pr comments ([26146d8](https://github.com/VenusProtocol/governance-contracts/commit/26146d8556611d524a03f663eda792ef668c91fd))
+
 ## [2.3.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.2.0...v2.3.0) (2024-09-10)
 
 
