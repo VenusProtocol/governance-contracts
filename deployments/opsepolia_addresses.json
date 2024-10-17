@@ -2,6 +2,14 @@
   "name": "opsepolia",
   "chainId": "11155420",
   "addresses": {
-    "AccessControlManager": "0x1652E12C8ABE2f0D84466F0fc1fA4286491B3BC1"
+    "AccessControlManager": "0x1652E12C8ABE2f0D84466F0fc1fA4286491B3BC1",
+    "CriticalTimelock": "0x45d2263c6E0dbF84eBffB1Ee0b80aC740607990B",
+    "DefaultProxyAdmin": "0xa9aaf2A1cCf2C3a87997942abaA740887cC89241",
+    "FastTrackTimelock": "0xe0Fa35b6279dd802C382ae54c50C8B16deaC0885",
+    "NormalTimelock": "0xdDe31d7eEEAD7Cf9790F833C4FF4c6e61404402a",
+    "OmnichainExecutorOwner": "0xE92E31df479BC1031B866063F65CF71B6bAC4FC6",
+    "OmnichainExecutorOwner_Implementation": "0xE7441bF9a22FA1F9a81FcEA26d622a2A60F0f407",
+    "OmnichainExecutorOwner_Proxy": "0xE92E31df479BC1031B866063F65CF71B6bAC4FC6",
+    "OmnichainGovernanceExecutor": "0xC7D6D33adcdBfccD416C3aAB1878360ea8b79ac6"
   }
 }
