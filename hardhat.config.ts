@@ -247,7 +247,7 @@ const config: HardhatUserConfig = {
           apiURL: "https://sepolia.base.org",
           browserURL: "https://sepolia.basescan.org/",
         },
-      }
+      },
     ],
   },
   paths: {
