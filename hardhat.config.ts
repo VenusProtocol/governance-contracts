@@ -234,6 +234,14 @@ const config: HardhatUserConfig = {
           browserURL: "https://optimistic.etherscan.io/",
         },
       },
+      {
+        network: "basesepolia",
+        chainId: 84532,
+        urls: {
+          apiURL: "https://sepolia.base.org",
+          browserURL: "https://sepolia.basescan.org/",
+        },
+      }
     ],
   },
   paths: {

@@ -32,6 +32,8 @@ export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<s
     return "0xd57365EE4E850e881229e2F8Aa405822f289e78d"; // OPSEPOLIA MULTISIG
   } else if (network === "opmainnet") {
     return "0x2e94dd14E81999CdBF5deDE31938beD7308354b3"; // OPMAINNET MULTISIG
+  } else if (network === "basesepolia") {
+    return "0xdf3b635d2b535f906BB02abb22AED71346E36a00"; // BASE SEPOLIA MULTISIG
   }
 
   const normalTimelock = await ethers.getContract("NormalTimelock");
@@ -62,6 +64,8 @@ export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => 
     return "0xd57365EE4E850e881229e2F8Aa405822f289e78d"; // OPSEPOLIA MULTISIG
   } else if (network === "opmainnet") {
     return "0x2e94dd14E81999CdBF5deDE31938beD7308354b3"; // OPMAINNET MULTISIG
+  } else if (network === "basesepolia") {
+    return "0xdf3b635d2b535f906BB02abb22AED71346E36a00"; // BASE SEPOLIA MULTISIG
   }
 
   return deployer;
@@ -94,6 +98,7 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
     zksyncmainnet: "0x9b896c0e23220469C7AE69cb4BbAE391eAa4C8da",
     opmainnet: "0x3c2269811836af69497E5F486A85D7316753cf62",
     opsepolia: "0x55370E0fBB5f5b8dAeD978BA1c075a499eB107B8",
+    basesepolia: "0x55370E0fBB5f5b8dAeD978BA1c075a499eB107B8",
     hardhat: lzEndpointMock?.address || "",
   }[networkName];
 };
