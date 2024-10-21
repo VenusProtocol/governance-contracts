@@ -2,6 +2,7 @@
   "name": "opsepolia",
   "chainId": "11155420",
   "addresses": {
+    "ACMCommandsAggregator": "0xEEeF13364fD22b8eA6932A9ed337e2638f8E0eD6",
     "AccessControlManager": "0x1652E12C8ABE2f0D84466F0fc1fA4286491B3BC1",
     "CriticalTimelock": "0x45d2263c6E0dbF84eBffB1Ee0b80aC740607990B",
     "DefaultProxyAdmin": "0xa9aaf2A1cCf2C3a87997942abaA740887cC89241",
