@@ -273,11 +273,7 @@ const getComptrollerPermissions = (): string[][] => {
     ]),
     ...accounts.map(timelock => [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", timelock]),
     ...accounts.map(timelock => [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", timelock]),
-    ...accounts.map(timelock => [
-      ethers.constants.AddressZero,
-      "setActionsPaused(address[],uint256[],bool)",
-      timelock,
-    ]),
+    ...accounts.map(timelock => [ethers.constants.AddressZero, "setActionsPaused(address[],uint256[],bool)", timelock]),
     ...accounts.map(timelock => [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", timelock]),
     ...accounts.map(timelock => [ethers.constants.AddressZero, "unlistMarket(address)", timelock]),
     [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
