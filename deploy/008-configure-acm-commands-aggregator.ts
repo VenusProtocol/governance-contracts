@@ -703,7 +703,7 @@ const revokePermissions: Permissions = {
 
 function splitPermissions(
   array: ACMCommandsAggregator.PermissionStruct[],
-  chunkSize: number = 100,
+  chunkSize: number = 200,
 ): ACMCommandsAggregator.PermissionStruct[][] {
   const result: ACMCommandsAggregator.PermissionStruct[][] = [];
 
