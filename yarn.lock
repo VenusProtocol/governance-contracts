@@ -3104,18 +3104,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@venusprotocol/governance-contracts@npm:^2.0.0, @venusprotocol/governance-contracts@npm:^2.4.0":
-  version: 2.4.0
-  resolution: "@venusprotocol/governance-contracts@npm:2.4.0"
-  dependencies:
-    "@venusprotocol/solidity-utilities": 2.0.0
-    hardhat-deploy-ethers: ^0.3.0-beta.13
-    module-alias: ^2.2.2
-  checksum: 2a754a05a655bc7b24c33685f86c9bd616a6e7cba4b048315b11eca67a8c1e37c033f04e1b4394e7326251b6af49ab257275cef72727c8976ae16c7f2c2ff0e7
-  languageName: node
-  linkType: hard
-
-"@venusprotocol/governance-contracts@workspace:.":
+"@venusprotocol/governance-contracts@^2.0.0, @venusprotocol/governance-contracts@^2.4.0, @venusprotocol/governance-contracts@workspace:.":
   version: 0.0.0-use.local
   resolution: "@venusprotocol/governance-contracts@workspace:."
   dependencies:
