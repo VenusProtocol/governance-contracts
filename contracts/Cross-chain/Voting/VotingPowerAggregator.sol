@@ -27,7 +27,7 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
     mapping(uint16 => bool) public isSupportedRemote;
 
     // Address of XVS vault wrt to chain Id
-    mapping(uint16 => address) public  xvsVault;
+    mapping(uint16 => address) public xvsVault;
 
     /**
      * @notice Emitted when proposal failed
@@ -47,6 +47,22 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
     constructor(address endpoint, address warehouseAddress) NonblockingLzApp(endpoint) {
         ensureNonzeroAddress(warehouseAddress);
         warehouse = IDataWarehouse(warehouseAddress);
+    }
+
+    /**
+     * @notice Triggers the paused state of the aggregator
+     * @custom:access Only owner
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @notice Triggers the resume state of the aggregator
+     * @custom:access Only owner
+     */
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
     /**
