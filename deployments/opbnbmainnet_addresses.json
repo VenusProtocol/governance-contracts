@@ -2,6 +2,7 @@
   "name": "opbnbmainnet",
   "chainId": "204",
   "addresses": {
+    "ACMCommandsAggregator": "0x6dB5e303289fea2E83F7d442470210045592AD93",
     "AccessControlManager": "0xA60Deae5344F1152426cA440fb6552eA0e3005D6",
     "CriticalTimelock": "0xA7DD2b15B24377296F11c702e758cd9141AB34AA",
     "DefaultProxyAdmin": "0xF77bD1D893F67b3EB2Cd256239c98Ba3F238fb52",
