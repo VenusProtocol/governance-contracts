@@ -245,7 +245,7 @@ const grantPermissions: Permissions = {
   ],
   opbnbtestnet: [
     ...getResilientOraclePermissions(OPBNBTESTNET_RESILIENT_ORACLE),
-    ...getChainlinkOraclePermissions(OPBNBTESTNET_BOUND_VALIDATOR),
+    ...getBoundValidatorPermissions(OPBNBTESTNET_BOUND_VALIDATOR),
     ...getBinanceOraclePermissions(OPBNBTESTNET_BINANCE_ORACLE),
     ...getXVSPermissions(OPBNBTESTNET_XVS),
     ...getXVSBridgeAdminPermissions(OPBNBTESTNET_XVS_BRIDGE_ADMIN),
