@@ -109,14 +109,14 @@ const func: DeployFunction = async function () {
 
     const receipt = await tx.wait();
     const events = receipt.events?.filter(event => event.event === "GrantPermissionsAdded");
-    console.log("Grant Permissions for ZKsync added with indexes: ", events?.[0].args?.index.toString());
+    console.log(`Grant Permissions for ${network.name} added with indexes: `, events?.[0].args?.index.toString());
   } catch (error) {
     console.error("Error adding grant permissions:", error);
   }
 };
-func.tags = ["zksync-permissions"];
+func.tags = ["multichain-governance-permissions"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
-  hre.network.name != "zksyncsepolia" && hre.network.name != "zksyncmainnet";
+  hre.network.name === "bsctetnet" || hre.network.name === "bscmainnet";
 
 export default func;
