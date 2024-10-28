@@ -117,6 +117,6 @@ const func: DeployFunction = async function () {
 func.tags = ["multichain-governance-permissions"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
-  hre.network.name === "bsctetnet" || hre.network.name === "bscmainnet";
+  hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet";
 
 export default func;
