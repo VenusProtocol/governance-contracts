@@ -3,6 +3,50 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { ACMCommandsAggregator } from "typechain";
 
+import {
+  AccountType,
+  getBinanceOraclePermissions,
+  getBoundValidatorPermissions,
+  getBoundValidatorRevokePermissions,
+  getChainlinkOraclePermissions,
+  getComptrollerPermissions,
+  getComptrollerRevokePermissions,
+  getConverterNetworkPermissions,
+  getConverterNetworkRevokePermissions,
+  getConverterPermissions,
+  getConvertersRevokePermissions,
+  getIRMPermissions,
+  getIRMRevokePermissions,
+  getOmniChainExecutorOwnerPermissions,
+  getOmniChainExecutorOwnerRevokePermissions,
+  getPoolRegistryPermissions,
+  getPoolRegistryRevokePermissions,
+  getPoolRegistryRevokePermissionsForWildcard,
+  getPrimeLiquidityProviderPermissions,
+  getPrimeLiquidityProviderRevokePermissions,
+  getPrimePermissions,
+  getPrimeRevokePermissions,
+  getProtocolShareReservePermissions,
+  getRedstoneOraclePermissions,
+  getRedstoneOracleRevokePermissions,
+  getResilientOraclePermissions,
+  getResilientOracleRevokePermissions,
+  getRewardDistributorPermissionsBlockbased,
+  getRewardDistributorPermissionsTimebased,
+  getRewardDistributorRevokePermissions,
+  getSFrxETHOraclePermissions,
+  getSFrxETHOracleRevokePermissions,
+  getVTokenPermissions,
+  getVTokenRevokePermissions,
+  getXVSBridgeAdminPermissions,
+  getXVSBridgeAdminRevokePermissions,
+  getXVSPermissions,
+  getXVSVaultPermissions,
+  getXVSVaultRevokePermissions,
+  getXVSVaultTreasuryPermissions,
+  getXVSVaultTreasuryRevokePermissions,
+} from "../helpers/permissions";
+
 const ARBITRUMONE_RESILIENT_ORACLE = "0xd55A98150e0F9f5e3F6280FC25617A5C93d96007";
 const ARBITRUMONE_CHAINLINK_ORACLE = "0x9cd9Fcc7E3dEDA360de7c080590AaD377ac9F113";
 const ARBITRUMONE_REDSTONE_ORACLE = "0xF792C4D3BdeF534D6d1dcC305056D00C95453dD6";
@@ -103,408 +147,9 @@ const SEPOLIA_CONVERTERS: string[] = [
   "0xc203bfA9dCB0B5fEC510Db644A494Ff7f4968ed2",
 ];
 
-enum AccountType {
-  NORMAL_TIMELOCK = "NormalTimelock",
-  FAST_TRACK_TIMELOCK = "FastTrackTimelock",
-  CRITICAL_TIMELOCK = "CriticalTimelock",
-}
-
 interface Permissions {
   [key: string]: string[][];
 }
-
-const accounts = [AccountType.NORMAL_TIMELOCK]
-  .concat(AccountType.CRITICAL_TIMELOCK)
-  .concat(AccountType.FAST_TRACK_TIMELOCK);
-
-const getResilientOraclePermissions = (resilientOracle: string): string[][] => {
-  return [
-    accounts.flatMap(timelock => [resilientOracle, "pause()", timelock]),
-    accounts.flatMap(timelock => [resilientOracle, "unpause()", timelock]),
-    accounts.flatMap(timelock => [resilientOracle, "setTokenConfig(TokenConfig)", timelock]),
-    [resilientOracle, "setOracle(address,address,uint8)", AccountType.NORMAL_TIMELOCK],
-    [resilientOracle, "enableOracle(address,uint8,bool)", AccountType.NORMAL_TIMELOCK],
-  ];
-};
-
-const getChainlinkOraclePermissions = (chainlinkOracle: string): string[][] => {
-  return [
-    accounts.flatMap(timelock => [chainlinkOracle, "setTokenConfig(TokenConfig)", timelock]),
-    accounts.flatMap(timelock => [chainlinkOracle, "setDirectPrice(address,uint256)", timelock]),
-  ];
-};
-
-const getRedstoneOraclePermissions = (redstoneOracle: string): string[][] => {
-  return [
-    accounts.flatMap(timelock => [redstoneOracle, "setTokenConfig(TokenConfig)", timelock]),
-    accounts.flatMap(timelock => [redstoneOracle, "setDirectPrice(address,uint256)", timelock]),
-  ];
-};
-
-const getBoundValidatorPermissions = (boundValidator: string): string[][] => {
-  return [[boundValidator, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK]];
-};
-
-const getSFrxETHOraclePermissions = (sFrxETHOracle: string): string[][] => {
-  return [accounts.flatMap(timelock => [sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", timelock])];
-};
-
-const getBinanceOraclePermissions = (binanceOracle: string): string[][] => {
-  return [
-    accounts.flatMap(timelock => [binanceOracle, "setMaxStalePeriod(string,uint256)", timelock]),
-    accounts.flatMap(timelock => [binanceOracle, "setSymbolOverride(string,string)", timelock]),
-  ];
-};
-
-const getXVSPermissions = (xvs: string): string[][] => {
-  return [
-    accounts.flatMap(timelock => [xvs, "migrateMinterTokens(address,address)", timelock]),
-    accounts.flatMap(timelock => [xvs, "setMintCap(address,uint256)", timelock]),
-    accounts.flatMap(timelock => [xvs, "updateBlacklist(address,bool)", timelock]),
-    accounts.flatMap(timelock => [xvs, "pause()", timelock]),
-    accounts.flatMap(timelock => [xvs, "unpause()", timelock]),
-  ];
-};
-
-const getXVSBridgeAdminPermissions = (xvsBridgeAdmin: string): string[][] => {
-  return [
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "setSendVersion(uint16)", timelock]),
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "setReceiveVersion(uint16)", timelock]),
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", timelock]),
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "setMaxSingleTransactionLimit(uint16,uint256)", timelock]),
-    [xvsBridgeAdmin, "setOracle(address)", AccountType.NORMAL_TIMELOCK],
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "setMaxDailyLimit(uint16,uint256)", timelock]),
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "setMaxSingleReceiveTransactionLimit(uint16,uint256)", timelock]),
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "setMaxDailyReceiveLimit(uint16,uint256)", timelock]),
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "pause()", timelock]),
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "unpause()", timelock]),
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "removeTrustedRemote(uint16)", timelock]),
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", timelock]),
-    [xvsBridgeAdmin, "setPrecrime(address)", AccountType.NORMAL_TIMELOCK],
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", timelock]),
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", timelock]),
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "setWhitelist(address,bool)", timelock]),
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", timelock]),
-    [xvsBridgeAdmin, "sweepToken(address,address,uint256)", AccountType.NORMAL_TIMELOCK],
-    accounts.flatMap(timelock => [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", timelock]),
-    [xvsBridgeAdmin, "setTrustedRemoteAddress(uint16,bytes)", AccountType.NORMAL_TIMELOCK],
-    [xvsBridgeAdmin, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
-  ];
-};
-
-const getXVSVaultPermissions = (xvsVault: string): string[][] => {
-  return [
-    [xvsVault, "pause()", AccountType.CRITICAL_TIMELOCK],
-    [xvsVault, "resume()", AccountType.CRITICAL_TIMELOCK],
-    [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", AccountType.CRITICAL_TIMELOCK],
-    [xvsVault, "pause()", AccountType.FAST_TRACK_TIMELOCK],
-    [xvsVault, "resume()", AccountType.FAST_TRACK_TIMELOCK],
-    [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", AccountType.FAST_TRACK_TIMELOCK],
-    [xvsVault, "pause()", AccountType.NORMAL_TIMELOCK],
-    [xvsVault, "resume()", AccountType.NORMAL_TIMELOCK],
-    [xvsVault, "add(address,uint256,address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    [xvsVault, "set(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", AccountType.NORMAL_TIMELOCK],
-    [xvsVault, "setWithdrawalLockingPeriod(address,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-  ];
-};
-
-const getPoolRegistryPermissions = (poolRegistry: string): string[][] => {
-  return [
-    [poolRegistry, "addPool(string,address,uint256,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-    [poolRegistry, "addMarket(AddMarketInput)", AccountType.NORMAL_TIMELOCK],
-    [poolRegistry, "setPoolName(address,string)", AccountType.NORMAL_TIMELOCK],
-    [poolRegistry, "updatePoolMetadata(address,VenusPoolMetaData)", AccountType.NORMAL_TIMELOCK],
-  ];
-};
-
-const getPrimePermissions = (prime: string): string[][] => {
-  return [
-    accounts.flatMap(timelock => [prime, "updateAlpha(uint128,uint128)", timelock]),
-    accounts.flatMap(timelock => [prime, "updateMultipliers(address,uint256,uint256)", timelock]),
-    accounts.flatMap(timelock => [prime, "setStakedAt(address[],uint256[])", timelock]),
-    accounts.flatMap(timelock => [prime, "addMarket(address,address,uint256,uint256)", timelock]),
-    accounts.flatMap(timelock => [prime, "setLimit(uint256,uint256)", timelock]),
-    accounts.flatMap(timelock => [prime, "setMaxLoopsLimit(uint256)", timelock]),
-    accounts.flatMap(timelock => [prime, "issue(bool,address[])", timelock]),
-    accounts.flatMap(timelock => [prime, "burn(address)", timelock]),
-    accounts.flatMap(timelock => [prime, "togglePause()", timelock]),
-  ];
-};
-
-const getPrimeLiquidityProviderPermissions = (primeLiquidityProvider: string): string[][] => {
-  return [
-    accounts.flatMap(timelock => [primeLiquidityProvider, "setTokensDistributionSpeed(address[],uint256[])", timelock]),
-    accounts.flatMap(timelock => [
-      primeLiquidityProvider,
-      "setMaxTokensDistributionSpeed(address[],uint256[])",
-      timelock,
-    ]),
-    accounts.flatMap(timelock => [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", timelock]),
-    accounts.flatMap(timelock => [primeLiquidityProvider, "pauseFundsTransfer()", timelock]),
-    accounts.flatMap(timelock => [primeLiquidityProvider, "resumeFundsTransfer()", timelock]),
-  ];
-};
-
-const getProtocolShareReservePermissions = (protocolShareReserve: string): string[][] => {
-  return [
-    accounts.flatMap(timelock => [
-      protocolShareReserve,
-      "addOrUpdateDistributionConfigs(DistributionConfig[])",
-      timelock,
-    ]),
-    accounts.flatMap(timelock => [protocolShareReserve, "removeDistributionConfig(Schema,address)", timelock]),
-  ];
-};
-
-const getConverterNetworkPermissions = (converterNetwork: string): string[][] => {
-  return [
-    accounts.flatMap(timelock => [converterNetwork, "addTokenConverter(address)", timelock]),
-    accounts.flatMap(timelock => [converterNetwork, "removeTokenConverter(address)", timelock]),
-  ];
-};
-
-const getComptrollerPermissions = (): string[][] => {
-  return [
-    accounts.flatMap(timelock => [
-      ethers.constants.AddressZero,
-      "setCollateralFactor(address,uint256,uint256)",
-      timelock,
-    ]),
-    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setMarketBorrowCaps(address[],uint256[])", timelock]),
-    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setMarketSupplyCaps(address[],uint256[])", timelock]),
-    accounts.flatMap(timelock => [
-      ethers.constants.AddressZero,
-      "setActionsPaused(address[],uint256[],bool)",
-      timelock,
-    ]),
-    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", timelock]),
-    accounts.flatMap(timelock => [ethers.constants.AddressZero, "unlistMarket(address)", timelock]),
-    [ethers.constants.AddressZero, "setCloseFactor(uint256)", AccountType.NORMAL_TIMELOCK],
-    [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", AccountType.NORMAL_TIMELOCK],
-    [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", AccountType.NORMAL_TIMELOCK],
-  ];
-};
-
-const getVTokenPermissions = (): string[][] => {
-  return [
-    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setReserveFactor(uint256)", timelock]),
-    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setInterestRateModel(address)", timelock]),
-    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", timelock]),
-    [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", AccountType.NORMAL_TIMELOCK],
-  ];
-};
-
-const getRewardDistributorPermissionsTimebased = (): string[][] => {
-  return [
-    [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    [
-      ethers.constants.AddressZero,
-      "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
-      AccountType.NORMAL_TIMELOCK,
-    ],
-  ];
-};
-
-const getRewardDistributorPermissionsBlockbased = (): string[][] => {
-  return [
-    [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", AccountType.NORMAL_TIMELOCK],
-    [ethers.constants.AddressZero, "setLastRewardingBlocks(address[],uint32[],uint32[])", AccountType.NORMAL_TIMELOCK],
-  ];
-};
-
-const getIRMPermissions = (): string[][] => {
-  return [
-    [ethers.constants.AddressZero, "updateJumpRateModel(uint256,uint256,uint256,uint256)", AccountType.NORMAL_TIMELOCK],
-  ];
-};
-
-const getConverterPermissions = (): string[][] => {
-  return [
-    accounts.flatMap(timelock => [ethers.constants.AddressZero, "pauseConversion()", timelock]),
-    accounts.flatMap(timelock => [ethers.constants.AddressZero, "resumeConversion()", timelock]),
-    accounts.flatMap(timelock => [ethers.constants.AddressZero, "setMinAmountToConvert(uint256)", timelock]),
-    accounts.flatMap(timelock => [
-      ethers.constants.AddressZero,
-      "setConversionConfig(address,address,ConversionConfig)",
-      timelock,
-    ]),
-  ];
-};
-
-const getXVSVaultTreasuryPermissions = (xvsVaultTreasury: string): string[][] => {
-  return [accounts.flatMap(timelock => [xvsVaultTreasury, "fundXVSVault(uint256)", timelock])];
-};
-
-const getOmniChainExecutorOwnerPermissions = (omniChainExecutor: string, guardian: string): string[][] => {
-  return [
-    [omniChainExecutor, "setSrcChainId(uint16)", AccountType.NORMAL_TIMELOCK],
-    [omniChainExecutor, "transferBridgeOwnership(address)", AccountType.NORMAL_TIMELOCK],
-    [omniChainExecutor, "setSrcChainId(uint16)", guardian],
-    [omniChainExecutor, "transferBridgeOwnership(address)", guardian],
-  ];
-};
-
-const getXVSBridgeAdminRevokePermissions = (xvsBridgeAdmin: string, guardian: string): string[][] => {
-  return [
-    [xvsBridgeAdmin, "setSendVersion(uint16)", guardian],
-    [xvsBridgeAdmin, "setReceiveVersion(uint16)", guardian],
-    [xvsBridgeAdmin, "forceResumeReceive(uint16,bytes)", guardian],
-    [xvsBridgeAdmin, "setOracle(address)", guardian],
-    [xvsBridgeAdmin, "removeTrustedRemote(uint16)", guardian],
-    [xvsBridgeAdmin, "dropFailedMessage(uint16,bytes,uint64)", guardian],
-    [xvsBridgeAdmin, "setPrecrime(address)", guardian],
-    [xvsBridgeAdmin, "setMinDstGas(uint16,uint16,uint256)", guardian],
-    [xvsBridgeAdmin, "setPayloadSizeLimit(uint16,uint256)", guardian],
-    [xvsBridgeAdmin, "setWhitelist(address,bool)", guardian],
-    [xvsBridgeAdmin, "setConfig(uint16,uint16,uint256,bytes)", guardian],
-    [xvsBridgeAdmin, "sweepToken(address,address,uint256)", guardian],
-    [xvsBridgeAdmin, "updateSendAndCallEnabled(bool)", guardian],
-    [xvsBridgeAdmin, "setTrustedRemoteAddress(uint16,bytes)", guardian],
-    [xvsBridgeAdmin, "transferBridgeOwnership(address)", guardian],
-  ];
-};
-
-const getXVSVaultTreasuryRevokePermissions = (xvsVaultTreasury: string, guardian: string): string[][] => {
-  return [[xvsVaultTreasury, "fundXVSVault(uint256)", guardian]];
-};
-
-const getPrimeRevokePermissions = (prime: string, guardian: string): string[][] => {
-  return [
-    [prime, "updateAlpha(uint128,uint128)", guardian],
-    [prime, "updateMultipliers(address,uint256,uint256)", guardian],
-    [prime, "setStakedAt(address[],uint256[])", guardian],
-    [prime, "addMarket(address,address,uint256,uint256)", guardian],
-    [prime, "setLimit(uint256,uint256)", guardian],
-    [prime, "setMaxLoopsLimit(uint256)", guardian],
-    [prime, "issue(bool,address[])", guardian],
-    [prime, "burn(address)", guardian],
-  ];
-};
-
-const getPrimeLiquidityProviderRevokePermissions = (primeLiquidityProvider: string, guardian: string): string[][] => {
-  return [
-    [primeLiquidityProvider, "setTokensDistributionSpeed(address[],uint256[])", guardian],
-    [primeLiquidityProvider, "setMaxTokensDistributionSpeed(address[],uint256[])", guardian],
-    [primeLiquidityProvider, "setMaxLoopsLimit(uint256)", guardian],
-  ];
-};
-
-const getResilientOracleRevokePermissions = (resilientOracle: string, guardian: string): string[][] => {
-  return [
-    [resilientOracle, "setOracle(address,address,uint8)", guardian],
-    [resilientOracle, "enableOracle(address,uint8,bool)", guardian],
-  ];
-};
-
-const getBoundValidatorRevokePermissions = (boundValidator: string, guardian: string): string[][] => {
-  return [[boundValidator, "setValidateConfig(ValidateConfig)", guardian]];
-};
-
-const getXVSVaultRevokePermissions = (xvsVault: string, guardian: string): string[][] => {
-  return [
-    [xvsVault, "add(address,uint256,address,uint256,uint256)", guardian],
-    [xvsVault, "set(address,uint256,uint256)", guardian],
-    [xvsVault, "setRewardAmountPerBlockOrSecond(address,uint256)", guardian],
-    [xvsVault, "setWithdrawalLockingPeriod(address,uint256,uint256)", guardian],
-  ];
-};
-
-const getRewardDistributorRevokePermissions = (guardian: string, lastRewardingBlockTimestamp: boolean): string[][] => {
-  const permissions = [
-    [ethers.constants.AddressZero, "setLastRewardingBlock(address[],uint32[],uint32[])", guardian],
-    [ethers.constants.AddressZero, "setLastRewardingBlocks(address[],uint32[],uint32[])", guardian],
-    [ethers.constants.AddressZero, "setRewardTokenSpeeds(address[],uint256[],uint256[])", guardian],
-  ];
-  if (lastRewardingBlockTimestamp) {
-    permissions.push([
-      ethers.constants.AddressZero,
-      "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
-      guardian,
-    ]);
-  }
-  return permissions;
-};
-
-const getIRMRevokePermissions = (guardian: string): string[][] => {
-  return [[ethers.constants.AddressZero, "updateJumpRateModel(uint256,uint256,uint256,uint256)", guardian]];
-};
-
-const getPoolRegistryRevokePermissions = (poolRegistry: string, guardian: string): string[][] => {
-  if (poolRegistry === OPBNBTESTNET_POOL_REGISTRY || poolRegistry === ARBITRUMSEPOLIA_POOL_REGISTRY) {
-    return [
-      [ethers.constants.AddressZero, "addPool(string,address,uint256,uint256,uint256)", guardian],
-      [ethers.constants.AddressZero, "addMarket(AddMarketInput)", guardian],
-      [ethers.constants.AddressZero, "setPoolName(address,string)", guardian],
-      [ethers.constants.AddressZero, "updatePoolMetadata(address,VenusPoolMetaData)", guardian],
-    ];
-  } else {
-    return [
-      [poolRegistry, "addPool(string,address,uint256,uint256,uint256)", guardian],
-      [poolRegistry, "addMarket(AddMarketInput)", guardian],
-      [poolRegistry, "setPoolName(address,string)", guardian],
-      [poolRegistry, "updatePoolMetadata(address,VenusPoolMetaData)", guardian],
-    ];
-  }
-};
-
-const getComptrollerRevokePermissions = (guardian: string): string[][] => {
-  return [
-    [ethers.constants.AddressZero, "setCloseFactor(uint256)", guardian],
-    [ethers.constants.AddressZero, "setLiquidationIncentive(uint256)", guardian],
-    [ethers.constants.AddressZero, "setMinLiquidatableCollateral(uint256)", guardian],
-    [ethers.constants.AddressZero, "setForcedLiquidation(address,bool)", guardian],
-  ];
-};
-
-const getVTokenRevokePermissions = (guardian: string): string[][] => {
-  return [
-    [ethers.constants.AddressZero, "setProtocolSeizeShare(uint256)", guardian],
-    [ethers.constants.AddressZero, "setReserveFactor(uint256)", guardian],
-    [ethers.constants.AddressZero, "setInterestRateModel(address)", guardian],
-    [ethers.constants.AddressZero, "setReduceReservesBlockDelta(uint256)", guardian],
-  ];
-};
-
-const getRedstoneOracleRevokePermissions = (redstoneOracle: string, guardian: string): string[][] => {
-  return [
-    [redstoneOracle, "setTokenConfig(TokenConfig)", guardian],
-    [redstoneOracle, "setDirectPrice(address,uint256)", guardian],
-  ];
-};
-
-const getConverterNetworkRevokePermissions = (converterNetwork: string, guardian: string): string[][] => {
-  return [
-    [converterNetwork, "addTokenConverter(address)", guardian],
-    [converterNetwork, "removeTokenConverter(address)", guardian],
-  ];
-};
-
-const getSFrxETHOracleRevokePermissions = (sFrxETHOracle: string, guardian: string): string[][] => {
-  return [[sFrxETHOracle, "setMaxAllowedPriceDifference(uint256)", guardian]];
-};
-
-const getConvertersRevokePermissions = (converters: string[], guardian: string): string[][] => {
-  return [
-    converters.flatMap(converter => [converter, "setMinAmountToConvert(uint256)", guardian]),
-    converters.flatMap(converter => [converter, "setConversionConfig(address,address,ConversionConfig)", guardian]),
-  ];
-};
-
-const getOmniChainExecutorOwnerRevokePermissions = (omniChainExecutor: string, guardian: string): string[][] => {
-  return [
-    [omniChainExecutor, "setTrustedRemoteAddress(uint16,bytes)", AccountType.CRITICAL_TIMELOCK],
-    [omniChainExecutor, "setTimelockPendingAdmin(address,uint8)", AccountType.CRITICAL_TIMELOCK],
-    [omniChainExecutor, "setGuardian(address)", AccountType.CRITICAL_TIMELOCK],
-    [omniChainExecutor, "setTrustedRemoteAddress(uint16,bytes)", AccountType.FAST_TRACK_TIMELOCK],
-    [omniChainExecutor, "setTimelockPendingAdmin(address,uint8)", AccountType.FAST_TRACK_TIMELOCK],
-    [omniChainExecutor, "setGuardian(address)", AccountType.FAST_TRACK_TIMELOCK],
-    [omniChainExecutor, "setSendVersion(uint16)", guardian],
-    [omniChainExecutor, "setPrecrime(address)", guardian],
-    [omniChainExecutor, "setMinDstGas(uint16,uint16,uint256)", guardian],
-    [omniChainExecutor, "setPayloadSizeLimit(uint16,uint256)", guardian],
-  ];
-};
 
 const grantPermissions: Permissions = {
   arbitrumone: [
@@ -662,7 +307,7 @@ const revokePermissions: Permissions = {
     ...getBoundValidatorRevokePermissions(OPBNBTESTNET_BOUND_VALIDATOR, OPBNBTESTNET_GUARDIAN),
     ...getXVSVaultRevokePermissions(OPBNBTESTNET_XVS, OPBNBTESTNET_GUARDIAN),
     ...getIRMRevokePermissions(OPBNBTESTNET_GUARDIAN),
-    ...getPoolRegistryRevokePermissions(OPBNBTESTNET_POOL_REGISTRY, OPBNBTESTNET_GUARDIAN),
+    ...getPoolRegistryRevokePermissionsForWildcard(OPBNBTESTNET_GUARDIAN),
     ...getComptrollerRevokePermissions(OPBNBTESTNET_GUARDIAN),
     ...getVTokenRevokePermissions(OPBNBTESTNET_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(OPBNBTESTNET_XVS_BRIDGE_ADMIN, OPBNBTESTNET_GUARDIAN),
@@ -696,7 +341,7 @@ const revokePermissions: Permissions = {
     ...getXVSVaultRevokePermissions(ARBITRUMSEPOLIA_XVS, ARBITRUMSEPOLIA_GUARDIAN),
     ...getRewardDistributorRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN, true),
     ...getIRMRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
-    ...getPoolRegistryRevokePermissions(ARBITRUMSEPOLIA_POOL_REGISTRY, ARBITRUMSEPOLIA_GUARDIAN),
+    ...getPoolRegistryRevokePermissionsForWildcard(ARBITRUMSEPOLIA_GUARDIAN),
     ...getComptrollerRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
     ...getVTokenRevokePermissions(ARBITRUMSEPOLIA_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(ARBITRUMSEPOLIA_XVS_BRIDGE_ADMIN, ARBITRUMSEPOLIA_GUARDIAN),
@@ -707,7 +352,7 @@ const revokePermissions: Permissions = {
 
 function splitPermissions(
   array: ACMCommandsAggregator.PermissionStruct[],
-  chunkSize: number = 100,
+  chunkSize: number = 200,
 ): ACMCommandsAggregator.PermissionStruct[][] {
   const result: ACMCommandsAggregator.PermissionStruct[][] = [];
 
