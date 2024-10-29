@@ -4,6 +4,7 @@ import "@matterlabs/hardhat-zksync";
 import "@matterlabs/hardhat-zksync-solc";
 import "@matterlabs/hardhat-zksync-verify";
 import "@nomicfoundation/hardhat-chai-matchers";
+import "@nomiclabs/hardhat-ethers";
 import "hardhat-dependency-compiler";
 import "hardhat-deploy";
 import { HardhatUserConfig, task } from "hardhat/config";
