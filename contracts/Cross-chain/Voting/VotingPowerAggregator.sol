@@ -13,20 +13,23 @@ import { Pausable } from "@openzeppelin/contracts/security/Pausable.sol";
 contract VotingPowerAggregator is NonblockingLzApp, Pausable {
     using ExcessivelySafeCall for address;
 
+    struct Proofs {
+        uint16 remoteChainId;
+        bytes numCheckpointsProof;
+        bytes checkpointsProof;
+    }
+
     uint8 public constant CHECKPOINTS_SLOT = 16;
     uint8 public constant NUM_CHECKPOINTS_SLOT = 17;
     IDataWarehouse public warehouse;
 
-    // Array of remote chain ids for iteration on mapping
-    uint16[] public remoteChainIds;
+    // containing deactivation record of chain id
+    mapping(uint16 => bool) public isdeactived;
 
     // remote identifier => chainId => blockHash
     mapping(uint256 => mapping(uint16 => bytes32)) public remoteBlockHash;
 
-    // List of supported remote chain Id
-    mapping(uint16 => bool) public isSupportedRemote;
-
-    // Address of XVS vault wrt to chain Id
+    // Address of XVS vault corresponding to remote chain Id
     mapping(uint16 => address) public xvsVault;
 
     /**
@@ -37,12 +40,27 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
     /**
      * @notice Emitted when block hash of remote chain is received
      */
-    event HashReceived(uint256 remoteIdentifier, uint16 remoteChainId, bytes blockHash);
+    event HashReceived(uint256 indexed remoteIdentifier, uint16 indexed remoteChainId, bytes blockHash);
 
     /**
      *  @notice Emitted when remote configurations are updated
      */
-    event UpdateRemoteConfigurations(uint16 remoteChainId, address xvsVault, bool isSupported);
+    event UpdateDeactivatedRemoteChainId(uint16 indexed remoteChainId, bool isSupported);
+
+    /**
+     * @notice Emitted when vault addressis updated
+     */
+    event UpdateVaultAddress(uint16 indexed remoteChainId, address xvsVault);
+
+    /**
+     * @notice Thrown when invalid chain id is provided
+     */
+    error InvalidChainId(uint16 chainId);
+
+    /**
+     * @notice Thrown when chain id is deactivated
+     */
+    error DeactivatedChainId(uint16 chainId);
 
     constructor(address endpoint, address warehouseAddress) NonblockingLzApp(endpoint) {
         ensureNonzeroAddress(warehouseAddress);
@@ -66,31 +84,45 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
     }
 
     /**
-     * @notice Updates the configuration of remote chain ids, marking them as supported or unsupported and setting the corresponding XVS vault addresses
-     * @param remoteChainId An array of remote chain ids to update
-     * @param isSupported An array indicating whether each remote chain id is supported or not
+     * @notice Update xvs vault address corresponding to the remote chain id
+     * @param remoteChainId An array of remote chain ids
      * @param xvsVaultAddress An array of XVS vault addresses corresponding to each remote chain id
      * @custom:access Only owner
-     * @custom:emit UpdateRemoteConfigurations Emitted when the configuration of a remote chain id is updated, along with its vault address and support status
+     * @custom:event UpdateVaultAddress with remote chain id and its corresponding xvs vault address
      */
-    function updateRemoteConfigurations(
+    function updateVaultAddress(
         uint16[] calldata remoteChainId,
-        bool[] calldata isSupported,
         address[] calldata xvsVaultAddress
     ) external onlyOwner {
+        require(remoteChainId.length == xvsVaultAddress.length, "invalid params");
         for (uint16 i; i < remoteChainId.length; ++i) {
             ensureNonzeroAddress(xvsVaultAddress[i]);
-            require(remoteChainId[i] != 0, "Invalid chain id");
-            isSupportedRemote[remoteChainId[i]] = isSupported[i];
-            if (isSupported[i]) {
-                remoteChainIds.push(remoteChainId[i]);
-                xvsVault[remoteChainId[i]] = xvsVaultAddress[i];
-            } else {
-                delete remoteChainIds[remoteChainId[i]];
-                delete xvsVault[remoteChainId[i]];
+            if (remoteChainId[i] == 0) {
+                revert InvalidChainId(remoteChainId[i]);
             }
 
-            emit UpdateRemoteConfigurations(remoteChainId[i], xvsVaultAddress[i], isSupported[i]);
+            xvsVault[remoteChainId[i]] = xvsVaultAddress[i];
+            emit UpdateVaultAddress(remoteChainId[i], xvsVaultAddress[i]);
+        }
+    }
+
+    /**
+     * @notice Updates the deactivedRemoteChainIds array
+     * @param remoteChainId An array of remote chain ids to update
+     * @param isDeactivated An array indicating whether each remote chain id is deactivated or not
+     * @custom:access Only owner
+     * @custom:emit UpdateDeactivatedRemoteChainId emitted with remote chain id & its deactivation status
+     */
+    function updateDeactivatedRemoteChainId(
+        uint16[] calldata remoteChainId,
+        bool[] calldata isDeactivated
+    ) external onlyOwner {
+        for (uint16 i; i < remoteChainId.length; ++i) {
+            if (remoteChainId[i] == 0) {
+                revert InvalidChainId(remoteChainId[i]);
+            }
+            isdeactived[remoteChainId[i]] = isDeactivated[i];
+            emit UpdateDeactivatedRemoteChainId(remoteChainId[i], isDeactivated[i]);
         }
     }
 
@@ -98,23 +130,27 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
      * @notice Calculates the total voting power of a voter across multiple remote chains
      * @param voter The address of the voter for whom to calculate the voting power
      * @param remoteIdentifier The identifier that links to remote chain-specific data
-     * @param numCheckpointsProof The proof data needed to verify the number of checkpoints
-     * @param checkpointsProof The proof data needed to verify the actual voting power from the checkpoints
+     * @param proofs Array of proofs containing remote chain id with their corresponding proofs (numCheckpointsProof, checkpointsProof) where
+     *  numCheckpointsProof is the proof data needed to verify the number of checkpoints and
+     *  checkpointsProof is the proof data needed to verify the actual voting power from the checkpoints
      * @return power The total voting power of the voter across all supported remote chains
      */
     function getVotingPower(
         address voter,
         uint256 remoteIdentifier,
-        bytes calldata numCheckpointsProof,
-        bytes calldata checkpointsProof
+        Proofs[] calldata proofs
     ) external view returns (uint96 power) {
         uint96 totalVotingPower;
-        for (uint16 i; i < remoteChainIds.length; ++i) {
+        for (uint16 i; i < proofs.length; ++i) {
+            // remoteChainId must be active
+            if (isdeactived[proofs[i].remoteChainId]) {
+                revert DeactivatedChainId(proofs[i].remoteChainId);
+            }
             totalVotingPower += _getVotingPower(
-                remoteChainIds[i],
+                proofs[i].remoteChainId,
                 remoteIdentifier,
-                numCheckpointsProof,
-                checkpointsProof,
+                proofs[i].numCheckpointsProof,
+                proofs[i].checkpointsProof,
                 voter
             );
         }
@@ -147,19 +183,23 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
             numCheckpointsProof
         );
 
-        if (latestCheckpoint.exists) {
-            StateProofVerifier.SlotValue memory votingPower = warehouse.getStorage(
-                vault,
-                blockHash,
-                SlotUtils.getCheckpointSlotHash(voter, uint32(latestCheckpoint.value - 1), uint32(CHECKPOINTS_SLOT)),
-                checkpointsProof
-            );
-            if (votingPower.exists) {
-                return votingPower.value >> 32;
-            }
+        // Reverts if latest checkpoint not exists
+        require(latestCheckpoint.exists, "Invalid num checkpoint proof");
+
+        if (latestCheckpoint.value == 0) {
             return 0;
         }
-        return 0;
+        StateProofVerifier.SlotValue memory votingPower = warehouse.getStorage(
+            vault,
+            blockHash,
+            SlotUtils.getCheckpointSlotHash(voter, uint32(latestCheckpoint.value - 1), uint32(CHECKPOINTS_SLOT)),
+            checkpointsProof
+        );
+
+        // Reverts if voting power not exists
+        require(votingPower.exists, "Invalid checkpoint proof");
+
+        return votingPower.value >> 32;
     }
 
     /**
@@ -176,8 +216,6 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
         uint64 nonce,
         bytes memory payload
     ) internal override {
-        // remoteChainId should belongs to supported chainIds
-        require(isSupportedRemote[remoteChainId], "source chain id not supported");
         bytes32 hashedPayload = keccak256(payload);
         bytes memory callData = abi.encodeCall(
             this.nonblockingLzReceive,
@@ -210,20 +248,5 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
         require(remoteBlockHash[remoteIdentifier][remoteChainId] == bytes32(0), "block hash already exists");
 
         emit HashReceived(remoteIdentifier, remoteChainId, blockHash);
-    }
-
-    /**
-     * @dev Removes a specified remote chain id from the list of supported remote chain ids.
-     * @param remoteChainId The chain id to be removed from the list of supported remote chains.
-     */
-    function _removeRemoteChainId(uint16 remoteChainId) internal {
-        uint256 length = remoteChainIds.length;
-        for (uint256 i = 0; i < length; i++) {
-            if (remoteChainIds[i] == remoteChainId) {
-                remoteChainIds[i] = remoteChainIds[length - 1];
-                remoteChainIds.pop();
-                break;
-            }
-        }
     }
 }

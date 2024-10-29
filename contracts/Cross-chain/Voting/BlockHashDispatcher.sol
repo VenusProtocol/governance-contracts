@@ -12,12 +12,14 @@ contract BlockHashDispatcher is Pausable {
      */
     address public accessControlManager;
 
-    /** @notice Proposal chain id on which block hash will be send (BNB) */
+    /**
+     *  @notice Proposal chain id on which block hash will be send (BNB)
+     */
 
     uint16 public proposalChainId;
 
-    /** @notice Counter to keep track of hahses dispatched */
-    uint256 public dispatchedHashes;
+    // remote identifier => blockHash
+    mapping(uint256 => bytes32) public blockHash;
 
     /**
      * @notice LayerZero endpoint for sending messages to remote chains
@@ -145,8 +147,11 @@ contract BlockHashDispatcher is Pausable {
         address zroPaymentAddress,
         bytes calldata adapterParams
     ) external payable {
-        bytes32 blockHash = blockhash(block.number - 1);
-        bytes memory payload = abi.encode(remoteIdentifier, blockHash);
+        // Send hash only once for each unique identifier
+        require(blockHash[remoteIdentifier] == bytes32(0), "block hash already exists");
+
+        bytes32 blockHash_ = blockhash(block.number - 1);
+        bytes memory payload = abi.encode(remoteIdentifier, blockHash_);
         uint16 proposalChainId_ = proposalChainId;
         bytes memory trustedRemote = trustedRemoteLookup[proposalChainId_];
         require(trustedRemote.length != 0, "proposal chain id is not set");
@@ -154,7 +159,6 @@ contract BlockHashDispatcher is Pausable {
         // A zero value will result in a failed message; therefore, a positive value is required to send a message across the chain.
         require(msg.value > 0, "value cannot be zero");
 
-        dispatchedHashes++;
         try
             LZ_ENDPOINT.send{ value: msg.value }(
                 proposalChainId_,
