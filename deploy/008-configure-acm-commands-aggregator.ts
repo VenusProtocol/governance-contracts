@@ -223,7 +223,7 @@ const grantPermissions: Permissions = {
   ],
   sepolia: [
     ...getResilientOraclePermissions(SEPOLIA_RESILIENT_ORACLE),
-    ...getResilientOraclePermissions(SEPOLIA_CHAINLINK_ORACLE),
+    ...getChainlinkOraclePermissions(SEPOLIA_CHAINLINK_ORACLE),
     ...getRedstoneOraclePermissions(SEPOLIA_REDSTONE_ORACLE),
     ...getBoundValidatorPermissions(SEPOLIA_BOUND_VALIDATOR),
     ...getSFrxETHOraclePermissions(SEPOLIA_sFrxETH_ORACLE),
@@ -245,7 +245,7 @@ const grantPermissions: Permissions = {
   ],
   opbnbtestnet: [
     ...getResilientOraclePermissions(OPBNBTESTNET_RESILIENT_ORACLE),
-    ...getResilientOraclePermissions(OPBNBTESTNET_BOUND_VALIDATOR),
+    ...getBoundValidatorPermissions(OPBNBTESTNET_BOUND_VALIDATOR),
     ...getBinanceOraclePermissions(OPBNBTESTNET_BINANCE_ORACLE),
     ...getXVSPermissions(OPBNBTESTNET_XVS),
     ...getXVSBridgeAdminPermissions(OPBNBTESTNET_XVS_BRIDGE_ADMIN),
