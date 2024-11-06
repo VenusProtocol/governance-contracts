@@ -1,3 +1,14 @@
+## [2.5.0-dev.3](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.2...v2.5.0-dev.3) (2024-11-06)
+
+
+### Features
+
+* add deployment files for the multichain governance on op sepolia ([d5ed71a](https://github.com/VenusProtocol/governance-contracts/commit/d5ed71a7f725e5829b0c27ef243a609f8d281fdb))
+* deployment files for the acm aggregator ([0f1b742](https://github.com/VenusProtocol/governance-contracts/commit/0f1b7422d0896308718124c5c71849c62b4a4c30))
+* script to add grant permissions for op network ([45de807](https://github.com/VenusProtocol/governance-contracts/commit/45de807aafe3ecd92a4a6234ea318c3f5097f529))
+* updating deployment files ([dd5dd7b](https://github.com/VenusProtocol/governance-contracts/commit/dd5dd7bf758013640e6c8668495edd19e76be336))
+* updating deployment files ([58bc439](https://github.com/VenusProtocol/governance-contracts/commit/58bc439abb354328ba6b7242c801f3c09f7fd0c4))
+
 ## [2.5.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.1...v2.5.0-dev.2) (2024-11-06)
 
 
