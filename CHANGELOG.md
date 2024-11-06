@@ -1,3 +1,16 @@
+## [2.5.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.1...v2.5.0-dev.2) (2024-11-06)
+
+
+### Features
+
+* deploy ACMAggregator on zksyncsepolia & add script for ACM permission for ZKsync ([7338234](https://github.com/VenusProtocol/governance-contracts/commit/7338234868dcc9df233e8fc35a461c5d9363086a))
+* updating deployment files ([93342e8](https://github.com/VenusProtocol/governance-contracts/commit/93342e8c7cf4226d4e4a1a7b8a8a8795c0101e1f))
+
+
+### Bug Fixes
+
+* typo ([2b19488](https://github.com/VenusProtocol/governance-contracts/commit/2b1948851ca6a8fa1b1e5fe6295763ceb82fe6f5))
+
 ## [2.5.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.4.0...v2.5.0-dev.1) (2024-11-01)
 
 
