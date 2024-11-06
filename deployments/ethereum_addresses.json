@@ -2,6 +2,7 @@
   "name": "ethereum",
   "chainId": "1",
   "addresses": {
+    "ACMCommandsAggregator": "0xb78772bed6995551b64e54Cdb8e09800d86C73ee",
     "AccessControlManager": "0x230058da2D23eb8836EC5DB7037ef7250c56E25E",
     "CriticalTimelock": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
     "DefaultProxyAdmin": "0x567e4cc5e085d09f66f836fa8279f38b4e5866b9",

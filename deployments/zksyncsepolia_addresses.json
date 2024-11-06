@@ -2,6 +2,7 @@
   "name": "zksyncsepolia",
   "chainId": "300",
   "addresses": {
+    "ACMCommandsAggregator": "0x920Bb18c4bd4D7bc41Bf39933BCAa3D078641502",
     "AccessControlManager": "0xD07f543d47c3a8997D6079958308e981AC14CD01",
     "CriticalTimelock": "0x0E6138bE0FA1915efC73670a20A10EFd720a6Cc8",
     "DefaultProxyAdmin": "0x18E44f588a4DcF2F7145d35A5C226e129040b6D3",
