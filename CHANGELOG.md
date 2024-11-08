@@ -1,3 +1,14 @@
+## [2.5.0-dev.4](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.3...v2.5.0-dev.4) (2024-11-08)
+
+
+### Features
+
+* add multichain governance deployment ([67b624b](https://github.com/VenusProtocol/governance-contracts/commit/67b624b9ef51919b214b84a4e8afc02e80909504))
+* add multichain governance deployment on opmainnet ([af9a2d7](https://github.com/VenusProtocol/governance-contracts/commit/af9a2d73e19128920e8e49f5948b14af11cc75a0))
+* deploy and configure ACM aggregator for zksync mainnet ([1560ff3](https://github.com/VenusProtocol/governance-contracts/commit/1560ff3b59f0cd63ded85a27b90e8d59546d3416))
+* updating deployment files ([93a9b43](https://github.com/VenusProtocol/governance-contracts/commit/93a9b432f030edd867b05195ba3ed7567080843c))
+* updating deployment files ([12212cf](https://github.com/VenusProtocol/governance-contracts/commit/12212cf4d65788a35604ce751e06cb680e4f8853))
+
 ## [2.5.0-dev.3](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.2...v2.5.0-dev.3) (2024-11-06)
 
 
