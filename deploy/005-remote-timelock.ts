@@ -11,6 +11,8 @@ export enum REMOTE_NETWORKS {
   ARBITRUM_SEPOLIA = "arbitrumsepolia",
   ZKSYNCSEPOLIA = "zksyncsepolia",
   ZKSYNCMAINNET = "zksyncmainnet",
+  OPSEPOLIA = "opsepolia",
+  OPMAINNET = "opmainnet",
   HARDHAT = "hardhat",
 }
 type DelayTypes = {
@@ -64,6 +66,16 @@ export const delayConfig: DelayConfig = {
     critical: 100,
   },
   zksyncmainnet: {
+    normal: 172800,
+    fast: 21600,
+    critical: 3600,
+  },
+  opsepolia: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  opmainnet: {
     normal: 172800,
     fast: 21600,
     critical: 3600,
