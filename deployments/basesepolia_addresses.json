@@ -1,0 +1,7 @@
+{
+  "name": "basesepolia",
+  "chainId": "84532",
+  "addresses": {
+    "AccessControlManager": "0x724138223D8F76b519fdE715f60124E7Ce51e051"
+  }
+}
