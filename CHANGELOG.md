@@ -1,3 +1,10 @@
+## [2.5.0-dev.5](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.4...v2.5.0-dev.5) (2024-11-21)
+
+
+### Features
+
+* deploy ACM to base sepolia ([7cb4cad](https://github.com/VenusProtocol/governance-contracts/commit/7cb4cad35e994466cc48aa9e548c7535587d113c))
+
 ## [2.5.0-dev.4](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.3...v2.5.0-dev.4) (2024-11-08)
 
 
