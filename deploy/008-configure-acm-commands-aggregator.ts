@@ -263,7 +263,7 @@ const grantPermissions: Permissions = {
     ...getProtocolShareReservePermissions(ZKSYNCMAINNET_PSR),
     ...getComptrollerPermissions(),
     ...getVTokenPermissions(),
-    ...getRewardDistributorPermissionsBlockbased(),
+    ...getRewardDistributorPermissionsTimebased(),
     ...getIRMPermissions(),
   ],
   opmainnet: [
@@ -280,7 +280,7 @@ const grantPermissions: Permissions = {
     ...getProtocolShareReservePermissions(OPMAINNET_PSR),
     ...getComptrollerPermissions(),
     ...getVTokenPermissions(),
-    ...getRewardDistributorPermissionsBlockbased(),
+    ...getRewardDistributorPermissionsTimebased(),
     ...getIRMPermissions(),
   ],
 
@@ -351,7 +351,7 @@ const grantPermissions: Permissions = {
     ...getProtocolShareReservePermissions(OPSEPOLIA_PSR),
     ...getComptrollerPermissions(),
     ...getVTokenPermissions(),
-    ...getRewardDistributorPermissionsBlockbased(),
+    ...getRewardDistributorPermissionsTimebased(),
     ...getIRMPermissions(),
   ],
   zksyncsepolia: [
@@ -368,7 +368,7 @@ const grantPermissions: Permissions = {
     ...getProtocolShareReservePermissions(ZKSYNCSEPOLIA_PSR),
     ...getComptrollerPermissions(),
     ...getVTokenPermissions(),
-    ...getRewardDistributorPermissionsBlockbased(),
+    ...getRewardDistributorPermissionsTimebased(),
     ...getIRMPermissions(),
   ],
 };
@@ -421,14 +421,14 @@ const revokePermissions: Permissions = {
     ...getPrimeLiquidityProviderRevokePermissions(OPMAINNET_PLP, OPMAINNET_GUARDIAN),
     ...getResilientOracleRevokePermissions(OPMAINNET_RESILIENT_ORACLE, OPMAINNET_GUARDIAN),
     ...getBoundValidatorRevokePermissions(OPMAINNET_BOUND_VALIDATOR, OPMAINNET_GUARDIAN),
-    ...getXVSVaultRevokePermissions(OPMAINNET_XVS, OPMAINNET_GUARDIAN),
+    ...getXVSVaultRevokePermissions(OPMAINNET_XVS_VAULT_PROXY, OPMAINNET_GUARDIAN),
     ...getRewardDistributorRevokePermissions(OPMAINNET_GUARDIAN, true),
     ...getIRMRevokePermissions(OPMAINNET_GUARDIAN),
-    ...getPoolRegistryRevokePermissionsForWildcard(OPMAINNET_GUARDIAN),
+    ...getPoolRegistryRevokePermissions(OPSEPOLIA_POOL_REGISTRY, OPSEPOLIA_GUARDIAN),
     ...getComptrollerRevokePermissions(OPMAINNET_GUARDIAN),
     ...getVTokenRevokePermissions(OPMAINNET_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(OPMAINNET_XVS_BRIDGE_ADMIN, OPMAINNET_GUARDIAN),
-    ...getRedstoneOracleRevokePermissions(OPMAINNET_REDSTONE_ORACLE, ARBITRUMSEPOLIA_GUARDIAN),
+    // ...getRedstoneOracleRevokePermissions(OPMAINNET_REDSTONE_ORACLE, ARBITRUMSEPOLIA_GUARDIAN), // TBD
   ],
 
   zksyncmainnet: [
@@ -436,14 +436,15 @@ const revokePermissions: Permissions = {
     ...getPrimeLiquidityProviderRevokePermissions(ZKSYNCMAINNET_PLP, ZKSYNCMAINNET_GUARDIAN),
     ...getResilientOracleRevokePermissions(ZKSYNCMAINNET_RESILIENT_ORACLE, ZKSYNCMAINNET_GUARDIAN),
     ...getBoundValidatorRevokePermissions(ZKSYNCMAINNET_BOUND_VALIDATOR, ZKSYNCMAINNET_GUARDIAN),
-    ...getXVSVaultRevokePermissions(ZKSYNCMAINNET_XVS, ZKSYNCMAINNET_GUARDIAN),
+    ...getXVSVaultRevokePermissions(ZKSYNCMAINNET_XVS_VAULT_PROXY, ZKSYNCMAINNET_GUARDIAN),
     ...getRewardDistributorRevokePermissions(ZKSYNCMAINNET_GUARDIAN, true),
     ...getIRMRevokePermissions(ZKSYNCMAINNET_GUARDIAN),
     ...getPoolRegistryRevokePermissionsForWildcard(ZKSYNCMAINNET_GUARDIAN),
+    ...getPoolRegistryRevokePermissions(ZKSYNCMAINNET_POOL_REGISTRY, ZKSYNCMAINNET_GUARDIAN),
     ...getComptrollerRevokePermissions(ZKSYNCMAINNET_GUARDIAN),
     ...getVTokenRevokePermissions(ZKSYNCMAINNET_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(ZKSYNCMAINNET_XVS_BRIDGE_ADMIN, ZKSYNCMAINNET_GUARDIAN),
-    ...getRedstoneOracleRevokePermissions(ZKSYNCMAINNET_REDSTONE_ORACLE, ZKSYNCMAINNET_GUARDIAN),
+    // ...getRedstoneOracleRevokePermissions(ZKSYNCMAINNET_REDSTONE_ORACLE, ZKSYNCMAINNET_GUARDIAN), // TBD
   ],
 
   opbnbtestnet: [
@@ -497,10 +498,10 @@ const revokePermissions: Permissions = {
     ...getPrimeLiquidityProviderRevokePermissions(OPSEPOLIA_PLP, OPSEPOLIA_GUARDIAN),
     ...getResilientOracleRevokePermissions(OPSEPOLIA_RESILIENT_ORACLE, OPSEPOLIA_GUARDIAN),
     ...getBoundValidatorRevokePermissions(OPSEPOLIA_BOUND_VALIDATOR, OPSEPOLIA_GUARDIAN),
-    ...getXVSVaultRevokePermissions(OPSEPOLIA_XVS, OPSEPOLIA_GUARDIAN),
+    ...getXVSVaultRevokePermissions(OPSEPOLIA_XVS_VAULT_PROXY, OPSEPOLIA_GUARDIAN),
     ...getRewardDistributorRevokePermissions(OPSEPOLIA_GUARDIAN, true),
     ...getIRMRevokePermissions(OPSEPOLIA_GUARDIAN),
-    ...getPoolRegistryRevokePermissionsForWildcard(OPSEPOLIA_GUARDIAN),
+    ...getPoolRegistryRevokePermissions(OPSEPOLIA_POOL_REGISTRY, OPSEPOLIA_GUARDIAN),
     ...getComptrollerRevokePermissions(OPSEPOLIA_GUARDIAN),
     ...getVTokenRevokePermissions(OPSEPOLIA_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(OPSEPOLIA_XVS_BRIDGE_ADMIN, OPSEPOLIA_GUARDIAN),
@@ -510,14 +511,15 @@ const revokePermissions: Permissions = {
     ...getPrimeLiquidityProviderRevokePermissions(ZKSYNCSEPOLIA_PLP, ZKSYNCSEPOLIA_GUARDIAN),
     ...getResilientOracleRevokePermissions(ZKSYNCSEPOLIA_RESILIENT_ORACLE, ZKSYNCSEPOLIA_GUARDIAN),
     ...getBoundValidatorRevokePermissions(ZKSYNCSEPOLIA_BOUND_VALIDATOR, ZKSYNCSEPOLIA_GUARDIAN),
-    ...getXVSVaultRevokePermissions(ZKSYNCSEPOLIA_XVS, ZKSYNCSEPOLIA_GUARDIAN),
+    ...getXVSVaultRevokePermissions(ZKSYNCSEPOLIA_XVS_VAULT_PROXY, ZKSYNCSEPOLIA_GUARDIAN),
     ...getRewardDistributorRevokePermissions(ZKSYNCSEPOLIA_GUARDIAN, true),
     ...getIRMRevokePermissions(ZKSYNCSEPOLIA_GUARDIAN),
     ...getPoolRegistryRevokePermissionsForWildcard(ZKSYNCSEPOLIA_GUARDIAN),
+    ...getPoolRegistryRevokePermissions(ZKSYNCSEPOLIA_POOL_REGISTRY, ZKSYNCSEPOLIA_GUARDIAN),
     ...getComptrollerRevokePermissions(ZKSYNCSEPOLIA_GUARDIAN),
     ...getVTokenRevokePermissions(ZKSYNCSEPOLIA_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(ZKSYNCSEPOLIA_XVS_BRIDGE_ADMIN, ZKSYNCSEPOLIA_GUARDIAN),
-    ...getRedstoneOracleRevokePermissions(ZKSYNCSEPOLIA_REDSTONE_ORACLE, ZKSYNCSEPOLIA_GUARDIAN),
+    // ...getRedstoneOracleRevokePermissions(ZKSYNCSEPOLIA_REDSTONE_ORACLE, ZKSYNCSEPOLIA_GUARDIAN), // TBD
   ],
 };
 
