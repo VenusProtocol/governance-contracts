@@ -424,7 +424,7 @@ const revokePermissions: Permissions = {
     ...getXVSVaultRevokePermissions(OPMAINNET_XVS_VAULT_PROXY, OPMAINNET_GUARDIAN),
     ...getRewardDistributorRevokePermissions(OPMAINNET_GUARDIAN, true),
     ...getIRMRevokePermissions(OPMAINNET_GUARDIAN),
-    ...getPoolRegistryRevokePermissions(OPSEPOLIA_POOL_REGISTRY, OPSEPOLIA_GUARDIAN),
+    ...getPoolRegistryRevokePermissions(OPMAINNET_POOL_REGISTRY, OPMAINNET_GUARDIAN),
     ...getComptrollerRevokePermissions(OPMAINNET_GUARDIAN),
     ...getVTokenRevokePermissions(OPMAINNET_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(OPMAINNET_XVS_BRIDGE_ADMIN, OPMAINNET_GUARDIAN),
