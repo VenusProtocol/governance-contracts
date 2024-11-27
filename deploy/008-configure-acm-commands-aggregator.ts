@@ -428,7 +428,6 @@ const revokePermissions: Permissions = {
     ...getComptrollerRevokePermissions(OPMAINNET_GUARDIAN),
     ...getVTokenRevokePermissions(OPMAINNET_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(OPMAINNET_XVS_BRIDGE_ADMIN, OPMAINNET_GUARDIAN),
-    // ...getRedstoneOracleRevokePermissions(OPMAINNET_REDSTONE_ORACLE, ARBITRUMSEPOLIA_GUARDIAN), // TBD
   ],
 
   zksyncmainnet: [
@@ -444,7 +443,6 @@ const revokePermissions: Permissions = {
     ...getComptrollerRevokePermissions(ZKSYNCMAINNET_GUARDIAN),
     ...getVTokenRevokePermissions(ZKSYNCMAINNET_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(ZKSYNCMAINNET_XVS_BRIDGE_ADMIN, ZKSYNCMAINNET_GUARDIAN),
-    // ...getRedstoneOracleRevokePermissions(ZKSYNCMAINNET_REDSTONE_ORACLE, ZKSYNCMAINNET_GUARDIAN), // TBD
   ],
 
   opbnbtestnet: [
@@ -519,7 +517,6 @@ const revokePermissions: Permissions = {
     ...getComptrollerRevokePermissions(ZKSYNCSEPOLIA_GUARDIAN),
     ...getVTokenRevokePermissions(ZKSYNCSEPOLIA_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(ZKSYNCSEPOLIA_XVS_BRIDGE_ADMIN, ZKSYNCSEPOLIA_GUARDIAN),
-    // ...getRedstoneOracleRevokePermissions(ZKSYNCSEPOLIA_REDSTONE_ORACLE, ZKSYNCSEPOLIA_GUARDIAN), // TBD
   ],
 };
 
