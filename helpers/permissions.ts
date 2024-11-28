@@ -34,13 +34,6 @@ export const getRedstoneOraclePermissions = (redstoneOracle: string): string[][]
   ];
 };
 
-export const getRedstoneOraclePermissionsRevokedPreviously = (redstoneOracle: string, guardian: string): string[][] => {
-  return [
-    [redstoneOracle, "setTokenConfig(TokenConfig)", guardian],
-    [redstoneOracle, "setDirectPrice(address,uint256)", guardian],
-  ];
-};
-
 export const getBoundValidatorPermissions = (boundValidator: string): string[][] => {
   return [[boundValidator, "setValidateConfig(ValidateConfig)", AccountType.NORMAL_TIMELOCK]];
 };

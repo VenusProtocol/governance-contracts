@@ -21,11 +21,18 @@ import {
   SEPOLIA_REDSTONE_ORACLE,
   SEPOLIA_XVS_VAULT_PROXY,
 } from "../helpers/Addresses";
-import { getRedstoneOraclePermissionsRevokedPreviously, getXVSVaultRevokePermissions } from "../helpers/permissions";
+import { getXVSVaultRevokePermissions } from "../helpers/permissions";
 
 interface Permissions {
   [key: string]: string[][];
 }
+
+const getRedstoneOraclePermissionsRevokedPreviously = (redstoneOracle: string, guardian: string): string[][] => {
+  return [
+    [redstoneOracle, "setTokenConfig(TokenConfig)", guardian],
+    [redstoneOracle, "setDirectPrice(address,uint256)", guardian],
+  ];
+};
 const BSCMAINNET_REDSTONE_ORACLE = "0x8455EFA4D7Ff63b8BFD96AdD889483Ea7d39B70a";
 const BSCTESTNET_REDSTONE_ORACLE = "0x0Af51d1504ac5B711A9EAFe2fAC11A51d32029Ad";
 
