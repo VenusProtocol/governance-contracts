@@ -90,4 +90,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
 func.tags = ["redstone-vault-permissions"];
 
+func.skip = async (hre: HardhatRuntimeEnvironment) => hre.network.name === "hardhat";
+
 export default func;
