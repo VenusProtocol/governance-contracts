@@ -2,6 +2,7 @@
   "name": "basesepolia",
   "chainId": "84532",
   "addresses": {
+    "ACMCommandsAggregator": "0xd82A217713F6c61f3ed4199cdEEDfbB80e5E4562",
     "AccessControlManager": "0x724138223D8F76b519fdE715f60124E7Ce51e051",
     "CriticalTimelock": "0xbeDb7F2d0617292364bA4D73cf016c0f6BB5542E",
     "DefaultProxyAdmin": "0xB85dD19112c4BF1240FeD0f26E8D0b0576a82546",
