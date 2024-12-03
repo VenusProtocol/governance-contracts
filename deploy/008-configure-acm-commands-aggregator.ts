@@ -286,7 +286,6 @@ const grantPermissions: Permissions = {
     ...getVTokenPermissions(),
     ...getRewardDistributorPermissionsTimebased(),
     ...getIRMPermissions(),
-    ...getOmniChainExecutorOwnerPermissions(BASESEPOLIA_OMNICHAIN_EXECUTOR_OWNER, BASESEPOLIA_GUARDIAN),
   ],
 };
 
