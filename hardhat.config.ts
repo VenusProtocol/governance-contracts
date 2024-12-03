@@ -145,6 +145,12 @@ const config: HardhatUserConfig = {
       live: true,
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
+    basemainnet: {
+      url: process.env.ARCHIVE_NODE_basemainnet || "https://mainnet.base.org",
+      chainId: 8453,
+      live: true,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
   },
   etherscan: {
     apiKey: {
@@ -159,6 +165,7 @@ const config: HardhatUserConfig = {
       opsepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
       opmainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
       basesepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      basemainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
     },
     customChains: [
       {
@@ -247,6 +254,14 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://sepolia.base.org",
           browserURL: "https://sepolia.basescan.org/",
+        },
+      },
+      {
+        network: "basemainnet",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://mainnet.base.org",
+          browserURL: "https://basescan.org/",
         },
       },
     ],
