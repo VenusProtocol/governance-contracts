@@ -386,10 +386,9 @@ const revokePermissions: Permissions = {
     ...getXVSVaultRevokePermissions(BASESEPOLIA_XVS_VAULT_PROXY, BASESEPOLIA_GUARDIAN),
     ...getRewardDistributorRevokePermissions(BASESEPOLIA_GUARDIAN, true),
     ...getIRMRevokePermissions(BASESEPOLIA_GUARDIAN),
-    ...getPoolRegistryRevokePermissionsForWildcard(BASESEPOLIA_GUARDIAN),
+    ...getPoolRegistryRevokePermissions(BASESEPOLIA_POOL_REGISTRY, BASESEPOLIA_GUARDIAN),
     ...getComptrollerRevokePermissions(BASESEPOLIA_GUARDIAN),
     ...getVTokenRevokePermissions(BASESEPOLIA_GUARDIAN),
-    ...getOmniChainExecutorOwnerRevokePermissions(BASESEPOLIA_OMNICHAIN_EXECUTOR_OWNER, BASESEPOLIA_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(BASESEPOLIA_XVS_BRIDGE_ADMIN, BASESEPOLIA_GUARDIAN),
   ],
 };
