@@ -14,7 +14,15 @@ export const testnetNetworks = [
   "basesepolia",
   "hardhat",
 ];
-const mainnetNetworks = ["ethereum", "opbnbmainnet", "arbitrumone", "zksyncmainnet", "opmainnet", "hardhat"];
+const mainnetNetworks = [
+  "ethereum",
+  "opbnbmainnet",
+  "arbitrumone",
+  "zksyncmainnet",
+  "opmainnet",
+  "basemainnet",
+  "hardhat",
+];
 
 export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<string> => {
   const { deployer } = await getNamedAccounts();

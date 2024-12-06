@@ -252,7 +252,7 @@ const config: HardhatUserConfig = {
         network: "basesepolia",
         chainId: 84532,
         urls: {
-          apiURL: "https://sepolia.base.org",
+          apiURL: "https://api-sepolia.basescan.org/api",
           browserURL: "https://sepolia.basescan.org/",
         },
       },
@@ -260,7 +260,7 @@ const config: HardhatUserConfig = {
         network: "basemainnet",
         chainId: 8453,
         urls: {
-          apiURL: "https://mainnet.base.org",
+          apiURL: "https://api.basescan.org/api",
           browserURL: "https://basescan.org/",
         },
       },
