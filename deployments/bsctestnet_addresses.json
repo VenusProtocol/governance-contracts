@@ -2,6 +2,7 @@
   "name": "bsctestnet",
   "chainId": "97",
   "addresses": {
+    "ACMCommandsAggregator": "0xB59523628D92f914ec6624Be4281397E8aFD71EF",
     "AccessControlManager": "0x45f8a08F534f34A97187626E05d4b6648Eeaa9AA",
     "CriticalTimelock": "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D",
     "FastTrackTimelock": "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",

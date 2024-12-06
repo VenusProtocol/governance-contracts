@@ -2,6 +2,7 @@
   "name": "bscmainnet",
   "chainId": "56",
   "addresses": {
+    "ACMCommandsAggregator": "0x8b443Ea6726E56DF4C4F62f80F0556bB9B2a7c64",
     "AccessControlManager": "0x4788629abc6cfca10f9f969efdeaa1cf70c23555",
     "CriticalTimelock": "0x213c446ec11e45b15a6E29C1C1b402B8897f606d",
     "FastTrackTimelock": "0x555ba73dB1b006F3f2C7dB7126d6e4343aDBce02",
