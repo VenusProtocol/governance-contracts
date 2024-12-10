@@ -13,6 +13,7 @@ export enum REMOTE_NETWORKS {
   ZKSYNCMAINNET = "zksyncmainnet",
   OPSEPOLIA = "opsepolia",
   OPMAINNET = "opmainnet",
+  BASESEPOLIA = "basesepolia",
   HARDHAT = "hardhat",
 }
 type DelayTypes = {
@@ -80,6 +81,11 @@ export const delayConfig: DelayConfig = {
     fast: 21600,
     critical: 3600,
   },
+  basesepolia: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
 };
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
@@ -98,6 +104,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].normal],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 
   await deploy(live ? "FastTrackTimelock" : "FastTrackTimelockRemote", {
@@ -106,6 +113,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].fast],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 
   await deploy(live ? "CriticalTimelock" : "CriticalTimelockRemote", {
@@ -114,6 +122,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].critical],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 };
 

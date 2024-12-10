@@ -1,3 +1,38 @@
+## [2.5.0-dev.7](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.6...v2.5.0-dev.7) (2024-12-10)
+
+
+### Features
+
+*  add redstone and xvs vault permission in acm aggregator ([3c616bf](https://github.com/VenusProtocol/governance-contracts/commit/3c616bf3cf6097c8d3030622f41927f439ac96cb))
+* deploy ACMAggregator on bscmainnet ([fc5d595](https://github.com/VenusProtocol/governance-contracts/commit/fc5d595aefa11134c433c95c3b99bd3186a0022f))
+* updating deployment files ([9cfd10b](https://github.com/VenusProtocol/governance-contracts/commit/9cfd10b5c1e7f14ee9588b9debd58b586cae6a92))
+* updating deployment files ([240296f](https://github.com/VenusProtocol/governance-contracts/commit/240296fbcbec0b175414ae10cb6caace1289f684))
+
+
+### Bug Fixes
+
+* guardian bsctestnet address ([330d280](https://github.com/VenusProtocol/governance-contracts/commit/330d280e5b3b88cad31b3de3ae27e99f9fcf533a))
+* skip script for hardhat ([1976dd7](https://github.com/VenusProtocol/governance-contracts/commit/1976dd7e02b3cc412bd17a295a7ff5e433885e95))
+
+## [2.5.0-dev.6](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.5...v2.5.0-dev.6) (2024-12-05)
+
+
+### Features
+
+* deployed contracts ([defc929](https://github.com/VenusProtocol/governance-contracts/commit/defc929e3f3176877720e8c23677d018a4d27f2c))
+* deployed permissions aggregator ([96d0dc4](https://github.com/VenusProtocol/governance-contracts/commit/96d0dc433fb7767587a90e9edf4467472439e046))
+* updating deployment files ([e4f5c87](https://github.com/VenusProtocol/governance-contracts/commit/e4f5c8794d0254760f057e2c261b562fcc503570))
+* updating deployment files ([e7a8056](https://github.com/VenusProtocol/governance-contracts/commit/e7a8056247ed87fc5b702a4acd811ec7f1f5c526))
+
+
+### Bug Fixes
+
+* added deployments ([d2a2bbe](https://github.com/VenusProtocol/governance-contracts/commit/d2a2bbe62954bdcae25aad20cbd1ace955dc48e7))
+* fixed prime address ([a4d2361](https://github.com/VenusProtocol/governance-contracts/commit/a4d23614dc608b5b63c7b42055b5293d9dbec519))
+* fixed revoke permissions ([f36f880](https://github.com/VenusProtocol/governance-contracts/commit/f36f8805fe3e5f07f80d04af212935a67750ff71))
+* remove getOmniChainExecutorOwnerPermissions permissions ([efb2a6e](https://github.com/VenusProtocol/governance-contracts/commit/efb2a6ec004b8e49a8db623f2bb4a38acab0bb78))
+* updated prime and xvs addresses ([2689a51](https://github.com/VenusProtocol/governance-contracts/commit/2689a514914b22c091a99c654f527a429252e643))
+
 ## [2.5.0-dev.5](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.4...v2.5.0-dev.5) (2024-11-21)
 
 
