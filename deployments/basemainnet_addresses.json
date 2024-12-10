@@ -2,6 +2,15 @@
   "name": "basemainnet",
   "chainId": "8453",
   "addresses": {
-    "AccessControlManager": "0x9E6CeEfDC6183e4D0DF8092A9B90cDF659687daB"
+    "ACMCommandsAggregator": "0xB2770DBD5146f7ee0766Dc9E3931433bb697Aa06",
+    "AccessControlManager": "0x9E6CeEfDC6183e4D0DF8092A9B90cDF659687daB",
+    "CriticalTimelock": "0x47F65466392ff2aE825d7a170889F7b5b9D8e60D",
+    "DefaultProxyAdmin": "0x7B06EF6b68648C61aFE0f715740fE3950B90746B",
+    "FastTrackTimelock": "0x209F73Ee2Fa9A72aF3Fa6aF1933A3B58ed3De5D7",
+    "NormalTimelock": "0x21c12f2946a1a66cBFf7eb997022a37167eCf517",
+    "OmnichainExecutorOwner": "0x8BA591f72a90fb379b9a82087b190d51b226F0a9",
+    "OmnichainExecutorOwner_Implementation": "0x8C991C19eaC962c0314d8B7B612c768247393e05",
+    "OmnichainExecutorOwner_Proxy": "0x8BA591f72a90fb379b9a82087b190d51b226F0a9",
+    "OmnichainGovernanceExecutor": "0xE7C56EaA4b6eafCe787B3E1AB8BCa0BC6CBDDb9e"
   }
 }
