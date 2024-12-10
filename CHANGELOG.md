@@ -1,3 +1,19 @@
+## [2.5.0-dev.7](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.6...v2.5.0-dev.7) (2024-12-10)
+
+
+### Features
+
+*  add redstone and xvs vault permission in acm aggregator ([3c616bf](https://github.com/VenusProtocol/governance-contracts/commit/3c616bf3cf6097c8d3030622f41927f439ac96cb))
+* deploy ACMAggregator on bscmainnet ([fc5d595](https://github.com/VenusProtocol/governance-contracts/commit/fc5d595aefa11134c433c95c3b99bd3186a0022f))
+* updating deployment files ([9cfd10b](https://github.com/VenusProtocol/governance-contracts/commit/9cfd10b5c1e7f14ee9588b9debd58b586cae6a92))
+* updating deployment files ([240296f](https://github.com/VenusProtocol/governance-contracts/commit/240296fbcbec0b175414ae10cb6caace1289f684))
+
+
+### Bug Fixes
+
+* guardian bsctestnet address ([330d280](https://github.com/VenusProtocol/governance-contracts/commit/330d280e5b3b88cad31b3de3ae27e99f9fcf533a))
+* skip script for hardhat ([1976dd7](https://github.com/VenusProtocol/governance-contracts/commit/1976dd7e02b3cc412bd17a295a7ff5e433885e95))
+
 ## [2.5.0-dev.6](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.5...v2.5.0-dev.6) (2024-12-05)
 
 
