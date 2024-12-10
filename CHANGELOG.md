@@ -1,3 +1,18 @@
+## [2.5.0-dev.8](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.7...v2.5.0-dev.8) (2024-12-10)
+
+
+### Features
+
+* grant permissions to timelock on optimism and zksync ([96bd334](https://github.com/VenusProtocol/governance-contracts/commit/96bd33451d9ef83a13679d5534a6fb66a3d7e43c))
+
+
+### Bug Fixes
+
+* address ([94abd01](https://github.com/VenusProtocol/governance-contracts/commit/94abd01ea449e92a81d1d9f66b576043fca3daba))
+* addresses on ethereum, opBNB & arbitrum ([4d5f878](https://github.com/VenusProtocol/governance-contracts/commit/4d5f878f7d2050e33f2cbe298964741457ac085f))
+* lint ([a111c9c](https://github.com/VenusProtocol/governance-contracts/commit/a111c9c68e32b26d87b3ca94951bcea0ed71a5e4))
+* permissions and address on zksync and optimism ([3eddebd](https://github.com/VenusProtocol/governance-contracts/commit/3eddebd76276d5a06a647f5ddb79310a5908934b))
+
 ## [2.5.0-dev.7](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.6...v2.5.0-dev.7) (2024-12-10)
 
 
