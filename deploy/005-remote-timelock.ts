@@ -104,6 +104,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].normal],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 
   await deploy(live ? "FastTrackTimelock" : "FastTrackTimelockRemote", {
@@ -112,6 +113,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].fast],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 
   await deploy(live ? "CriticalTimelock" : "CriticalTimelockRemote", {
@@ -120,6 +122,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].critical],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 };
 
