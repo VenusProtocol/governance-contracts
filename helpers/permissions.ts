@@ -361,13 +361,6 @@ export const getVTokenRevokePermissions = (guardian: string): string[][] => {
   ];
 };
 
-export const getRedstoneOracleRevokePermissions = (redstoneOracle: string, guardian: string): string[][] => {
-  return [
-    [redstoneOracle, "setTokenConfig(TokenConfig)", guardian],
-    [redstoneOracle, "setDirectPrice(address,uint256)", guardian],
-  ];
-};
-
 export const getConverterNetworkRevokePermissions = (converterNetwork: string, guardian: string): string[][] => {
   return [
     [converterNetwork, "addTokenConverter(address)", guardian],
