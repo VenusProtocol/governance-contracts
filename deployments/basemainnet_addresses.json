@@ -1,0 +1,7 @@
+{
+  "name": "basemainnet",
+  "chainId": "8453",
+  "addresses": {
+    "AccessControlManager": "0x9E6CeEfDC6183e4D0DF8092A9B90cDF659687daB"
+  }
+}
