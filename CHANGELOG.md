@@ -1,3 +1,16 @@
+## [2.5.0-dev.9](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.8...v2.5.0-dev.9) (2024-12-12)
+
+
+### Features
+
+* deployed contracts ([c3afae7](https://github.com/VenusProtocol/governance-contracts/commit/c3afae7308a408f4394542f2614a9ed5fed3b2e7))
+* updating deployment files ([896b18a](https://github.com/VenusProtocol/governance-contracts/commit/896b18a7af635e5f984dba234348b00297e32140))
+
+
+### Bug Fixes
+
+* fixed lint ([8b267fa](https://github.com/VenusProtocol/governance-contracts/commit/8b267faf64db1560df174d9ba537d12580f5b904))
+
 ## [2.5.0-dev.8](https://github.com/VenusProtocol/governance-contracts/compare/v2.5.0-dev.7...v2.5.0-dev.8) (2024-12-10)
 
 
