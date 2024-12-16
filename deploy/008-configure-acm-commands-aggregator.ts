@@ -516,7 +516,7 @@ const revokePermissions: Permissions = {
     ...getVTokenRevokePermissions(BASEMAINNET_GUARDIAN),
     ...getXVSBridgeAdminRevokePermissions(BASEMAINNET_XVS_BRIDGE_ADMIN, BASEMAINNET_GUARDIAN),
   ],
-  
+
   opbnbtestnet: [
     ...getResilientOracleRevokePermissions(OPBNBTESTNET_RESILIENT_ORACLE, OPBNBTESTNET_GUARDIAN),
     ...getBoundValidatorRevokePermissions(OPBNBTESTNET_BOUND_VALIDATOR, OPBNBTESTNET_GUARDIAN),
