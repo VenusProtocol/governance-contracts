@@ -229,4 +229,9 @@ contract BlockHashDispatcher is Pausable {
             "access denied"
         );
     }
+
+    function getHash(uint256 blockTimestamp) external view returns (uint256, bytes32) {
+        bytes32 blockHash_ = blockhash(blockTimestamp);
+        return (blockTimestamp, blockHash_);
+    }
 }

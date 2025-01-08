@@ -10,7 +10,16 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
 
 import { Pausable } from "@openzeppelin/contracts/security/Pausable.sol";
 
-contract VotingPowerAggregator is NonblockingLzApp, Pausable {
+import { BlockHashDispatcher } from "./BlockHashDispatcher.sol";
+
+import { MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
+import { OAppRead } from "@layerzerolabs/oapp-evm/contracts/oapp/OAppRead.sol";
+import { MessagingReceipt } from "@layerzerolabs/oapp-evm/contracts/oapp/OAppSender.sol";
+import { IOAppMapper } from "@layerzerolabs/oapp-evm/contracts/oapp/interfaces/IOAppMapper.sol";
+import { IOAppReducer } from "@layerzerolabs/oapp-evm/contracts/oapp/interfaces/IOAppReducer.sol";
+import { ReadCodecV1, EVMCallComputeV1, EVMCallRequestV1 } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/ReadCodecV1.sol";
+
+contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
     using ExcessivelySafeCall for address;
 
     struct Proofs {
@@ -19,15 +28,32 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
         bytes checkpointsProof;
     }
 
+    enum Status {
+        REJECTED,
+        PENDING,
+        ACTIVE
+    }
+
     uint8 public constant CHECKPOINTS_SLOT = 16;
     uint8 public constant NUM_CHECKPOINTS_SLOT = 17;
     IDataWarehouse public warehouse;
 
+    address public governanceBravo;
+    mapping(uint256 => uint16[]) private requiredChainIds;
+    mapping(uint256 => uint16[]) public remoteChainIds;
+    // block timestamp => proposal ID
+    mapping(uint256 => uint256) public proposalId;
+
+    mapping(uint256 => bytes[]) private remoteBlockHeaders;
+
+    // blockTimestamp => proof
+    mapping(uint256 => Proofs[]) public proposerVotingProof;
+
     // containing deactivation record of chain id
     mapping(uint16 => bool) public isdeactived;
 
-    // remote identifier => chainId => blockHash
-    mapping(uint256 => mapping(uint16 => bytes32)) public remoteBlockHash;
+    // chainId -> block number -> block hash
+    mapping(uint16 => mapping(uint256 => bytes32)) public remoteBlockHash;
 
     // Address of XVS vault corresponding to remote chain Id
     mapping(uint16 => address) public xvsVault;
@@ -62,9 +88,11 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
      */
     error DeactivatedChainId(uint16 chainId);
 
-    constructor(address endpoint, address warehouseAddress) NonblockingLzApp(endpoint) {
+    constructor(address endpoint, address warehouseAddress, address bravo) NonblockingLzApp(endpoint) {
         ensureNonzeroAddress(warehouseAddress);
+        ensureNonzeroAddress(bravo);
         warehouse = IDataWarehouse(warehouseAddress);
+        governanceBravo = bravo;
     }
 
     /**
@@ -126,10 +154,73 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
         }
     }
 
+    function getRemoteBlockHashes(
+        uint16[] remoteChainId,
+        uint16 appLabel,
+        Proofs[] proposerVotingProofs,
+        bytes[] memory remoteBlockheader
+    ) external {
+        uint32 channelId = getChannelId();
+        EVMReadRequest[] requests = getRequests(remoteChainIds);
+        EVMComputeRequest computeRequest = getComputeRequests(remoteChainIds);
+        bytes calldata options = getOptions();
+
+        // decode blockTimestamp from remoteBlockHeader
+        for (uint256 i; i < remoteBlockHeader.length; i++) {
+            blockTimestamp = decode(remoteBlockheader);
+            requiredChainIds[blockTimestamp].push(remoteChainIds);
+            remoteBlockHeaders[blockTimestamp] = remoteBlockHeader;
+        }
+        remoteChainIds[blockTimestamp] = remoteChainId;
+
+        proposerVotingProof[tx.origin] = proposerVotingProofs;
+        bytes memory cmd = buildCmd(_appLabel, _requests, _computeRequest);
+        receipt = _lzSend(_channelId, cmd, _options, MessagingFee(msg.value, 0), payable(tx.origin));
+    }
+
+    /**
+     * @notice Builds the command to be sent
+     * @param appLabel The application label to use for the message.
+     * @param _readRequests An array of `EvmReadRequest` structs containing the read requests to be made.
+     * @param _computeRequest A `EvmComputeRequest` struct containing the compute request to be made.
+     * @return cmd The encoded command to be sent to to the channel.
+     */
+    function buildCmd(
+        uint16 appLabel,
+        EvmReadRequestV1[] memory _readRequests,
+        EvmComputeRequest memory _computeRequest
+    ) public pure returns (bytes memory) {
+        require(_readRequests.length > 0, "LzReadCounter: empty requests");
+        // build read requests
+        EVMCallRequestV1[] memory readRequests = new EVMCallRequestV1[](_readRequests.length);
+        for (uint256 i = 0; i < _readRequests.length; i++) {
+            EvmReadRequestV1 memory req = _readRequests[i];
+            readRequests[i] = EVMCallRequestV1({
+                appRequestLabel: req.appRequestLabel,
+                targetEid: req.targetEid,
+                isBlockNum: req.isBlockNum,
+                blockNumOrTimestamp: req.blockNumOrTimestamp,
+                confirmations: req.confirmations,
+                to: req.to,
+                callData: abi.encodeWithSelector(this.myInformation.selector)
+            });
+        }
+        require(_computeRequest.computeSetting <= COMPUTE_SETTING_NONE, "LzReadCounter: invalid compute type");
+        EVMCallComputeV1 memory evmCompute = EVMCallComputeV1({
+            computeSetting: _computeRequest.computeSetting,
+            targetEid: _computeRequest.computeSetting == COMPUTE_SETTING_NONE ? 0 : _computeRequest.targetEid,
+            isBlockNum: _computeRequest.isBlockNum,
+            blockNumOrTimestamp: _computeRequest.blockNumOrTimestamp,
+            confirmations: _computeRequest.confirmations,
+            to: _computeRequest.to
+        });
+        bytes memory cmd = ReadCodecV1.encode(appLabel, readRequests, evmCompute);
+        return cmd;
+    }
+
     /**
      * @notice Calculates the total voting power of a voter across multiple remote chains
      * @param voter The address of the voter for whom to calculate the voting power
-     * @param remoteIdentifier The identifier that links to remote chain-specific data
      * @param proofs Array of proofs containing remote chain id with their corresponding proofs (numCheckpointsProof, checkpointsProof) where
      *  numCheckpointsProof is the proof data needed to verify the number of checkpoints and
      *  checkpointsProof is the proof data needed to verify the actual voting power from the checkpoints
@@ -137,7 +228,7 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
      */
     function getVotingPower(
         address voter,
-        uint256 remoteIdentifier,
+        uint256 blockTimestamp,
         Proofs[] calldata proofs
     ) external view returns (uint96 power) {
         uint96 totalVotingPower;
@@ -148,7 +239,7 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
             }
             totalVotingPower += _getVotingPower(
                 proofs[i].remoteChainId,
-                remoteIdentifier,
+                blockTimestamp,
                 proofs[i].numCheckpointsProof,
                 proofs[i].checkpointsProof,
                 voter
@@ -203,50 +294,53 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable {
     }
 
     /**
-     * @notice Process blocking LayerZero receive request
-     * @param remoteChainId Remote chain Id
-     * @param remoteAddress Remote address from which payload is received
-     * @param nonce Nonce associated with the payload to prevent replay attacks
-     * @param payload Encoded payload containing block hash and remote identifier of remote chains
-     * @custom:event Emit ReceivePayloadFailed if call fails
+     * @dev Internal function override to handle incoming messages from another chain.
+     * @param payload The encoded message payload being received. This is the resolved command from the DVN
+     *
+     * @dev The following params are unused in the current implementation of the OApp.
+     * @dev _origin A struct containing information about the message sender.
+     * @dev _guid A unique global packet identifier for the message.
+     * @dev _executor The address of the Executor responsible for processing the message.
+     * @dev _extraData Arbitrary data appended by the Executor to the message.
+     *
+     * Decodes the received payload and processes it as per the business logic defined in the function.
      */
-    function _blockingLzReceive(
-        uint16 remoteChainId,
-        bytes memory remoteAddress,
-        uint64 nonce,
-        bytes memory payload
+    function _lzReceive(
+        Origin calldata origin,
+        bytes32 /*_guid*/,
+        bytes calldata payload,
+        address /*_executor*/,
+        bytes calldata /*_extraData*/
     ) internal override {
-        bytes32 hashedPayload = keccak256(payload);
-        bytes memory callData = abi.encodeCall(
-            this.nonblockingLzReceive,
-            (remoteChainId, remoteAddress, nonce, payload)
-        );
+        uint256 status;
+        (uint256 blockTimestamp, bytes memory blockHash) = abi.decode(payload);
+        remoteBlockHash[origin.srcEid][blockTimestamp] = blockHash;
+        requiredChainIds[blockTimestamp].remove(origin.srcEid);
 
-        (bool success, bytes memory reason) = address(this).excessivelySafeCall(gasleft() - 30000, 150, callData);
-        // try-catch all errors/exceptions
-        if (!success) {
-            failedMessages[remoteChainId][remoteAddress][nonce] = hashedPayload;
-            emit ReceivePayloadFailed(remoteChainId, remoteAddress, nonce, reason); // Retrieve payload from the remote chain if needed to clear
+        // Once all the block hashes has been synced
+        if (requiredChainIds[blockTimestamp].length == 0) {
+            // verify all block hashes
+            for (uint256 i; i < remoteBlockheaders[blockTimestamp].length; i++) {
+                bytes memory decodedBlockHash = abi.decode(remoteBlockheaders[blockTimestamp][i]);
+                // compare with the block hashes got from above steps
+                uint chainId = remoteChainIds[blockTimestamp];
+                if (decodedBlockHash != remoteBlockHash[chainId][blockTimestamp]) {
+                    status = Status.REJECTED;
+                    break;
+                }
+            }
+
+            if (proposerVotingProof[blockTimestamp][0].remoteChainId != 0 && status != Status.REJECTED) {
+                uint96 votes = getVotingPower(msg.sender, blocknumber, proposerVotingProof);
+                // compare proposer votes with the threshold
+                if (votes > threshold) {
+                    status = Status.ACTIVE;
+                } else {
+                    status = Status.PENDING;
+                }
+            }
+
+            IGovernanceBravoDelegate(governanceBravo).InternalActivateProposal(proposalId[blockTimestamp], status);
         }
-    }
-
-    /**
-     * @notice Process non blocking LayerZero receive request
-     * @param payload Encoded payload containing block hash and remote identifier of remote chains
-     * @custom:event Emit ProposalReceived
-     */
-    function _nonblockingLzReceive(
-        uint16 remoteChainId,
-        bytes memory,
-        uint64,
-        bytes memory payload
-    ) internal override whenNotPaused {
-        // remoteIdentifier is unique identifier generated at the time of createProposal
-        (uint256 remoteIdentifier, bytes memory blockHash) = abi.decode(payload, (uint256, bytes));
-
-        // Prevent Overriding hash
-        require(remoteBlockHash[remoteIdentifier][remoteChainId] == bytes32(0), "block hash already exists");
-
-        emit HashReceived(remoteIdentifier, remoteChainId, blockHash);
     }
 }
