@@ -14,6 +14,7 @@ contract DataWarehouse is IDataWarehouse {
     using RLPReader for bytes;
     using RLPReader for RLPReader.RLPItem;
 
+    uint256 public delay;
     // account address => (block hash => Account state root hash)
     mapping(address => mapping(bytes32 => bytes32)) internal _storageRoots;
 
@@ -30,17 +31,25 @@ contract DataWarehouse is IDataWarehouse {
         return _slotsRegistered[account][blockHash][slot];
     }
 
+    function setDelay(uint256 _delay) external onlyOwner {
+        delay = _delay;
+    }
+
     /// @inheritdoc IDataWarehouse
     function processStorageRoot(
         address account,
         bytes32 blockHash,
         bytes memory blockHeaderRLP,
         bytes memory accountStateProofRLP
-    ) external returns (bytes32) {
+    ) external returns (StateProofVerifier.BlockHeader memory) {
         StateProofVerifier.BlockHeader memory decodedHeader = StateProofVerifier.verifyBlockHeader(
             blockHeaderRLP,
             blockHash
         );
+
+        // Verifies blockTimestamp
+        require(decodedHeader.blockTimestamp < block.timestamp + delay && decoded.blockTimestamp > block.timestamp + delay, "Invalid block timestamp");
+        
         // The path for an account in the state trie is the hash of its address
         bytes32 proofPath = keccak256(abi.encodePacked(account));
         StateProofVerifier.Account memory accountData = StateProofVerifier.extractAccountFromProof(
@@ -53,7 +62,7 @@ contract DataWarehouse is IDataWarehouse {
 
         emit StorageRootProcessed(msg.sender, account, blockHash);
 
-        return accountData.storageRoot;
+        return decodedHeader;
     }
 
     /// @inheritdoc IDataWarehouse

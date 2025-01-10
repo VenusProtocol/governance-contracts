@@ -28,23 +28,28 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
         bytes checkpointsProof;
     }
 
-    enum Status {
+    enum BridgeStatus {
         REJECTED,
         PENDING,
-        ACTIVE
+        SYNCED
     }
 
     uint8 public constant CHECKPOINTS_SLOT = 16;
     uint8 public constant NUM_CHECKPOINTS_SLOT = 17;
     IDataWarehouse public warehouse;
+    uint256 public status;
+
+    /// @notice The minimum setable voting period
+    uint public constant MIN_VOTING_PERIOD = 20 * 60 * 3; // About 3 hours, 3 secs per block
+
+    /// @notice The max setable voting period
+    uint public constant MAX_VOTING_PERIOD = 20 * 60 * 24 * 14; // About 2 weeks, 3 secs per block
+
 
     address public governanceBravo;
     mapping(uint256 => uint16[]) private requiredChainIds;
     mapping(uint256 => uint16[]) public remoteChainIds;
-    // block timestamp => proposal ID
-    mapping(uint256 => uint256) public proposalId;
-
-    mapping(uint256 => bytes[]) private remoteBlockHeaders;
+    mapping(uint16 => address) public proposer;
 
     // blockTimestamp => proof
     mapping(uint256 => Proofs[]) public proposerVotingProof;
@@ -53,10 +58,16 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
     mapping(uint16 => bool) public isdeactived;
 
     // chainId -> block number -> block hash
-    mapping(uint16 => mapping(uint256 => bytes32)) public remoteBlockHash;
+    mapping(uint256 => mapping(uint16 => mapping(uint256 => bytes32))) public remoteBlockHash;
 
     // Address of XVS vault corresponding to remote chain Id
     mapping(uint16 => address) public xvsVault;
+
+    // proposalId => remoteChainId => blockNumber
+    mapping(uint256 => mapping(uint16 => uint256)) public remoteBlockNumber;
+
+    // pId => remoteChainId => decodedHeader
+    mapping(uint256 => mapping(uint16 => StateProofVerifier.BlockHeader)) decodedBlockHeader; 
 
     /**
      * @notice Emitted when proposal failed
@@ -153,29 +164,44 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
             emit UpdateDeactivatedRemoteChainId(remoteChainId[i], isDeactivated[i]);
         }
     }
-
-    function getRemoteBlockHashes(
-        uint16[] remoteChainId,
-        uint16 appLabel,
-        Proofs[] proposerVotingProofs,
-        bytes[] memory remoteBlockheader
-    ) external {
-        uint32 channelId = getChannelId();
-        EVMReadRequest[] requests = getRequests(remoteChainIds);
-        EVMComputeRequest computeRequest = getComputeRequests(remoteChainIds);
-        bytes calldata options = getOptions();
-
-        // decode blockTimestamp from remoteBlockHeader
-        for (uint256 i; i < remoteBlockHeader.length; i++) {
-            blockTimestamp = decode(remoteBlockheader);
-            requiredChainIds[blockTimestamp].push(remoteChainIds);
-            remoteBlockHeaders[blockTimestamp] = remoteBlockHeader;
+    function startVotingPowerSync(
+        uint256 pId,
+        uint16[] memory remoteChainId,
+        bytes[] memory blockHash,
+        bytes[] memory remoteBlockheaderRLP,
+        bytes[] memory xvsVaultStateProofRLP,
+        Proofs[] memory proposerVotingProofs
+        ) external {
+        // Verify headers
+        for(uint256 i; i < remoteChainId.length; i++ ){
+           StateProofVerifier.BlockHeader memory decodedHeader = warehouse.processStorageRoot(xvsVault[remoteChainId[i]], blockHash[i], remoteBlockHeaderRLP[i], xvsVaultStateProofRLP[i]);
+            decodedBlockHeader[pId][remoteChainId] = decodedHeader;
         }
-        remoteChainIds[blockTimestamp] = remoteChainId;
+        proposer[pId] = tx.origin;
+        _startVotingPowerSync(pId, remoteChainId, blockHash, remoteBlockheaderRLP, xvsVaultStateProofRLP, proposerVotingProofs );
+    }
 
-        proposerVotingProof[tx.origin] = proposerVotingProofs;
-        bytes memory cmd = buildCmd(_appLabel, _requests, _computeRequest);
-        receipt = _lzSend(_channelId, cmd, _options, MessagingFee(msg.value, 0), payable(tx.origin));
+    function _startVotingPowerSync(
+        uint256 pId,
+        uint16[] memory remoteChainId,
+        bytes[] memory blockHash,
+        bytes[] memory remoteBlockheaderRLP,
+        bytes[] memory xvsVaultStateProofRLP,
+        Proofs[] memory proposerVotingProofs   
+        ) internal {
+        remoteChainIds[pId] = remoteChainId;
+        requiredChainIds[pId] = remoteChainIds;
+
+        for(uint256 i; i < remoteChainId.length; i++){
+            uint32 channelId = getChannelId(remoteChainId[i]);
+            EVMReadRequest[] requests = getRequests(remoteChainId[i]);
+            EVMComputeRequest computeRequest = getComputeRequests(remoteChainId[i]);
+            bytes calldata options = getOptions(remoteChainId[i]);
+            blockNumber[pId][remoteChainId[i]] = decodedHeader.blockNumber; 
+            proposerVotingProof[proposer] = proposerVotingProofs;
+            bytes memory cmd = buildCmd(_appLabel, _requests, _computeRequest);
+            receipt = _lzSend(_channelId, cmd, _options, MessagingFee(msg.value, 0), payable(tx.origin));
+        }
     }
 
     /**
@@ -228,7 +254,7 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
      */
     function getVotingPower(
         address voter,
-        uint256 blockTimestamp,
+        uint256 pId,
         Proofs[] calldata proofs
     ) external view returns (uint96 power) {
         uint96 totalVotingPower;
@@ -239,7 +265,7 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
             }
             totalVotingPower += _getVotingPower(
                 proofs[i].remoteChainId,
-                blockTimestamp,
+                pId,
                 proofs[i].numCheckpointsProof,
                 proofs[i].checkpointsProof,
                 voter
@@ -252,19 +278,20 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
     /**
      * @dev Calculates the total voting power of a voter for a remote chain
      * @param voter The address of the voter for whom to calculate the voting power
-     * @param remoteIdentifier The identifier that links to remote chain-specific data
+     * @param pId The identifier that links to remote chain-specific data
      * @param numCheckpointsProof The proof data needed to verify the number of checkpoints
      * @param checkpointsProof The proof data needed to verify the actual voting power from the checkpoints
      * @return power The total voting power of supported remote chains
      */
     function _getVotingPower(
         uint16 remoteChainId,
-        uint256 remoteIdentifier,
+        uint256 pId,
         bytes calldata numCheckpointsProof,
         bytes calldata checkpointsProof,
         address voter
     ) internal view returns (uint96) {
-        bytes32 blockHash = remoteBlockHash[remoteIdentifier][remoteChainId];
+        uint256 blockNumber = remoteBlockNumber[pId][remoteChainId];
+        bytes32 blockHash = remoteBlockHash[pId][remoteChainId][blockNumber];
         address vault = xvsVault[remoteChainId];
 
         StateProofVerifier.SlotValue memory latestCheckpoint = warehouse.getStorage(
@@ -312,35 +339,36 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
         address /*_executor*/,
         bytes calldata /*_extraData*/
     ) internal override {
-        uint256 status;
-        (uint256 blockTimestamp, bytes memory blockHash) = abi.decode(payload);
-        remoteBlockHash[origin.srcEid][blockTimestamp] = blockHash;
-        requiredChainIds[blockTimestamp].remove(origin.srcEid);
+        (uint256 pId, uint256 blockNumber, bytes memory blockHash) = abi.decode(payload);
+        require(remoteBlockNumber[pId][origin.srcEid] == blockNumber, "Invalid blockNumber");
+        remoteBlockHash[pId][origin.srcEid][blockNumber] = blockHash;
+        requiredChainIds[pId].remove(origin.srcEid);
 
         // Once all the block hashes has been synced
-        if (requiredChainIds[blockTimestamp].length == 0) {
+        if (requiredChainIds[pId].length == 0) {
             // verify all block hashes
-            for (uint256 i; i < remoteBlockheaders[blockTimestamp].length; i++) {
-                bytes memory decodedBlockHash = abi.decode(remoteBlockheaders[blockTimestamp][i]);
+            for (uint256 i; i < decodedBlockHeader[pId][remoteChainIds].length; i++) {
+                bytes memory decodedBlockHash = decodedBlockHeader[pId][remoteChainIds].blockHash ;
                 // compare with the block hashes got from above steps
-                uint chainId = remoteChainIds[blockTimestamp];
-                if (decodedBlockHash != remoteBlockHash[chainId][blockTimestamp]) {
-                    status = Status.REJECTED;
+                uint chainId = remoteChainIds[i];
+                uint256 _blockNumber = remoteBlockNumber[pId][origin.srcEid];
+                if(decodedBlockHash != remoteBlockHash[pId][chainId][_blockNumber]) {
+                    status = BridgeStatus.REJECTED;
                     break;
                 }
             }
 
-            if (proposerVotingProof[blockTimestamp][0].remoteChainId != 0 && status != Status.REJECTED) {
-                uint96 votes = getVotingPower(msg.sender, blocknumber, proposerVotingProof);
+            if (proposerVotingProof[pId][0].remoteChainId != 0 && status != BridgeStatus.REJECTED) {
+                uint96 votes = getVotingPower(proposer[pId], blocknumber, proposerVotingProof);
                 // compare proposer votes with the threshold
-                if (votes > threshold) {
-                    status = Status.ACTIVE;
+                if (votes > MIN_VOTING_PERIOD && votes < MAX_VOTING_PERIOD) {
+                    status = BridgeStatus.SYNCED;
                 } else {
-                    status = Status.PENDING;
+                    status = BridgeStatus.PENDING;
                 }
             }
 
-            IGovernanceBravoDelegate(governanceBravo).InternalActivateProposal(proposalId[blockTimestamp], status);
+            IGovernanceBravoDelegate(governanceBravo).activateProposal(pId, status, proposer[pId]);
         }
     }
 }

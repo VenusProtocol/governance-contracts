@@ -54,7 +54,7 @@ interface IDataWarehouse {
         bytes32 blockHash,
         bytes memory blockHeaderRLP,
         bytes memory accountStateProofRLP
-    ) external returns (bytes32);
+    ) external returns (StateProofVerifier.BlockHeader memory);
 
     /**
      * @notice method to get the storage value at a certain slot and block hash for a certain address

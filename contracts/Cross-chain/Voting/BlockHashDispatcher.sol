@@ -138,20 +138,21 @@ contract BlockHashDispatcher is Pausable {
 
     /**
      * @notice Dispatches a block hash along with a remote identifier to proposal chain(BNB)
-     * @param remoteIdentifier A unique identifier to identify the proposal
+     * @param pId A unique identifier to identify the proposal
      * @param zroPaymentAddress The address for payment using ZRO tokens
      * @param adapterParams The params used to specify the custom amount of gas required for the execution on the destination
      */
     function dispatchHash(
-        uint256 remoteIdentifier,
+        uint256 pId,
+        uint256 blockNumber,
         address zroPaymentAddress,
         bytes calldata adapterParams
     ) external payable {
         // Send hash only once for each unique identifier
-        require(blockHash[remoteIdentifier] == bytes32(0), "block hash already exists");
+        require(blockHash[pId] == bytes32(0), "block hash already exists");
 
-        bytes32 blockHash_ = blockhash(block.number - 1);
-        bytes memory payload = abi.encode(remoteIdentifier, blockHash_);
+        bytes32 blockHash_ = blockhash(blockNumber);
+        bytes memory payload = abi.encode(pId, blockHash_);
         uint16 proposalChainId_ = proposalChainId;
         bytes memory trustedRemote = trustedRemoteLookup[proposalChainId_];
         require(trustedRemote.length != 0, "proposal chain id is not set");
@@ -169,10 +170,10 @@ contract BlockHashDispatcher is Pausable {
                 adapterParams
             )
         {
-            emit HashDispatched(remoteIdentifier, payload);
+            emit HashDispatched(pId, payload);
         } catch (bytes memory reason) {
-            storedExecutionHashes[remoteIdentifier] = keccak256(abi.encode(payload, adapterParams, msg.value));
-            emit HashStored(remoteIdentifier, payload, adapterParams, msg.value, reason);
+            storedExecutionHashes[pId] = keccak256(abi.encode(payload, adapterParams, msg.value));
+            emit HashStored(pId, payload, adapterParams, msg.value, reason);
         }
     }
 
@@ -230,8 +231,8 @@ contract BlockHashDispatcher is Pausable {
         );
     }
 
-    function getHash(uint256 blockTimestamp) external view returns (uint256, bytes32) {
-        bytes32 blockHash_ = blockhash(blockTimestamp);
-        return (blockTimestamp, blockHash_);
+    function getHash(uint256 blockNumber, uint256 pId) external view returns (uint256, uint256, bytes32) {
+        bytes32 blockHash_ = blockhash(blockNumber);
+        return (pId, blockNumber, blockHash_);
     }
 }
