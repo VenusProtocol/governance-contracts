@@ -71,7 +71,6 @@ import "./GovernorBravoInterfaces.sol";
  * vote delegation by calling the same function with a value of `0`.
  */
 contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoEvents {
-
     enum BridgeStatus {
         REJECTED,
         PENDING,
@@ -115,7 +114,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     address public votingPowerAggregator;
 
     // proposal id => block number
-    mapping(uint256 => uint256) public proposalSubmissionTimestamp;
+    mapping(uint256 => uint256) public proposalSubmissionBlock;
 
     struct VotingProof {
         uint16 chainId;
@@ -246,20 +245,19 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         }
 
         proposalCount++;
-        proposalSubmissionTimestamp[proposalCount] = block.number;
+        proposalSubmissionBlock[proposalCount] = block.number;
 
         uint startBlock = 0;
-        uint endBlock = 0; 
+        uint endBlock = 0;
 
         // Backward compatibility
-        if(remoteChainIds.length == 0) {
+        if (remoteChainIds.length == 0) {
             uint96 proposerVotes = IVotingPowerAggregator(votingPowerAggregator).getVotingPower(msg.sender);
             require(proposerVotes > MIN_PROPOSAL_THRESHOLD && proposerVotes < MAX_PROPOSAL_THRESHOLD);
             isBridged[proposalCount] = true;
-            Proposal[proposalCount].startBlock = block.number;
-            Proposal[proposalCount].endBlock = block.number + delayBlocks;
-        }
-        else {
+            startBlock = add256(block.number, proposalConfigs[uint8(proposalType)].votingDelay);
+            endBlock = add256(startBlock, proposalConfigs[uint8(proposalType)].votingPeriod);
+        } else {
             // Fetch all block hashes
             IVotingPowerAggregator(votingPowerAggregator).startVotingPowerSync.value(msg.value)(
                 proposalCount,
@@ -309,16 +307,21 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
 
     function activateProposal(uint256 proposalId, uint256 status, address proposer) external {
         // Either votes not synced or proposer has not sufficient power
-        if(msg.sender == votingPowerAggregator) {
+        if (msg.sender == votingPowerAggregator) {
             require(status == BridgeStatus.SYNCED, "Not synced yet");
-        }
-        else {
+        } else {
             require(IVotingPowerAggregator(votingPowerAggregator).status == BridgeStatus.SYNCED, "Not synced yet");
         }
 
         // If Votes get Synced
-        Proposal[proposalId].startBlock = block.number;
-        Proposal[proposalId].endBlock = block.number + delayBlocks;
+        ProposalType proposalType = proposals[proposalId].proposalType;
+
+        uint startBlock = add256(block.number, proposalConfigs[uint8(proposalType)].votingDelay);
+        uint endBlock = add256(startBlock, proposalConfigs[uint8(proposalType)].votingPeriod);
+
+        Proposal[proposalId].startBlock = startBlock;
+        Proposal[proposalId].endBlock = endBlock;
+
         isBridged[proposalId] = true;
 
         emit ProposalActivated(proposalId);
@@ -458,10 +461,9 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         Proposal storage proposal = proposals[proposalId];
         if (proposal.canceled) {
             return ProposalState.Canceled;
-            // If not activated yet return expired
-        } else if(proposal.startBlock == 0 && !isBridged[proposalId] &&  proposalSubmissionTimestamp[proposalId] > 0 && block.number > proposalSubmissionTimestamp[proposalId] ){
+        } else if (proposal.startBlock == 0 && !isBridged[proposalId]) {
             return ProposalState.PendingSync;
-        }else if (block.number <= proposal.startBlock) {
+        } else if (block.number <= proposal.startBlock) {
             return ProposalState.Pending;
         } else if (block.number <= proposal.endBlock && isBridged[proposalId]) {
             return ProposalState.Active;
