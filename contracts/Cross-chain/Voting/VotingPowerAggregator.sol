@@ -1,25 +1,24 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.25;
+pragma solidity ^0.8.25;
+
 import { IDataWarehouse } from "../interfaces/IDataWarehouse.sol";
+import { IGovernorBravoDelegate } from "../interfaces/IGovernorBravoDelegate.sol";
+import { IBlockHashDispatcher } from "../interfaces/IBlockHashDispatcher.sol";
 import { SlotUtils } from "../../Utils/SlotUtils.sol";
 import { StateProofVerifier } from "../libs/StateProofVerifier.sol";
 import { ExcessivelySafeCall } from "@layerzerolabs/solidity-examples/contracts/libraries/ExcessivelySafeCall.sol";
-
-import { NonblockingLzApp } from "@layerzerolabs/solidity-examples/contracts/lzApp/NonblockingLzApp.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
-
 import { Pausable } from "@openzeppelin/contracts/security/Pausable.sol";
-
-import { BlockHashDispatcher } from "./BlockHashDispatcher.sol";
-
 import { MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
 import { OAppRead } from "@layerzerolabs/oapp-evm/contracts/oapp/OAppRead.sol";
-import { MessagingReceipt } from "@layerzerolabs/oapp-evm/contracts/oapp/OAppSender.sol";
-import { IOAppMapper } from "@layerzerolabs/oapp-evm/contracts/oapp/interfaces/IOAppMapper.sol";
-import { IOAppReducer } from "@layerzerolabs/oapp-evm/contracts/oapp/interfaces/IOAppReducer.sol";
+import { ILayerZeroEndpointV2, MessagingFee, MessagingReceipt, Origin } from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
 import { ReadCodecV1, EVMCallComputeV1, EVMCallRequestV1 } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/ReadCodecV1.sol";
+import { OAppOptionsType3 } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
+import { AddressCast } from "@layerzerolabs/lz-evm-protocol-v2/contracts/libs/AddressCast.sol";
+import { IXvsVault } from "../interfaces/IXvsVault.sol";
+// import { XvsVaultInterface } from "../../Governance/GovernorBravoInterfaces.sol";
 
-contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
+contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
     using ExcessivelySafeCall for address;
 
     struct Proofs {
@@ -28,46 +27,57 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
         bytes checkpointsProof;
     }
 
-    enum BridgeStatus {
-        REJECTED,
-        PENDING,
-        SYNCED
+    struct NetworkProposalBlockDetails {
+        uint256 blockNumber;
+        bytes32 blockHash;
     }
+
+    struct SyncingParameters {
+        uint16 remoteChainId;
+        bytes32 blockHash;
+        bytes remoteBlockHeaderRLP;
+        bytes xvsVaultStateProofRLP;
+    }
+
+    struct NetworkConfig {
+        address xvsVault;
+        address blockHashDispatcher;
+        bool isLzReadSupported;
+    }
+
+    struct LzReadParams {
+        uint16 remoteTargetEid;
+        uint256 blockNumber;
+    }
+
+    /// @notice LayerZero read message type.
+    uint8 private constant READ_MSG_TYPE = 1;
 
     uint8 public constant CHECKPOINTS_SLOT = 16;
     uint8 public constant NUM_CHECKPOINTS_SLOT = 17;
+    uint16 public constant MAX_BLOCK_TIME_DIFF = 600; // 10 mins
+    uint16 private constant BSC_CHAIN_ID = 5656;
+
     IDataWarehouse public warehouse;
-    uint256 public status;
+    IGovernorBravoDelegate public governorBravo;
+    IXvsVault public bscXvsVault;
 
-    /// @notice The minimum setable voting period
-    uint public constant MIN_VOTING_PERIOD = 20 * 60 * 3; // About 3 hours, 3 secs per block
-
-    /// @notice The max setable voting period
-    uint public constant MAX_VOTING_PERIOD = 20 * 60 * 24 * 14; // About 2 weeks, 3 secs per block
-
-
-    address public governanceBravo;
-    mapping(uint256 => uint16[]) private requiredChainIds;
-    mapping(uint256 => uint16[]) public remoteChainIds;
-    mapping(uint16 => address) public proposer;
-
-    // blockTimestamp => proof
-    mapping(uint256 => Proofs[]) public proposerVotingProof;
-
-    // containing deactivation record of chain id
-    mapping(uint16 => bool) public isdeactived;
+    uint32 public READ_CHANNEL;
 
     // chainId -> block number -> block hash
-    mapping(uint256 => mapping(uint16 => mapping(uint256 => bytes32))) public remoteBlockHash;
+    mapping(uint16 => mapping(uint256 => bytes32)) public remoteBlockHash;
 
-    // Address of XVS vault corresponding to remote chain Id
-    mapping(uint16 => address) public xvsVault;
+    // pId -> chainId -> block number
+    mapping(uint256 => mapping(uint16 => NetworkProposalBlockDetails)) public proposalBlockDetails;
 
-    // proposalId => remoteChainId => blockNumber
-    mapping(uint256 => mapping(uint16 => uint256)) public remoteBlockNumber;
+    // chainId -> NetworkConfig
+    mapping(uint16 => NetworkConfig) public networkConfig;
 
-    // pId => remoteChainId => decodedHeader
-    mapping(uint256 => mapping(uint16 => StateProofVerifier.BlockHeader)) decodedBlockHeader; 
+    // pId -> (remoteChainId, blockNumber, blockHash)
+    mapping(uint256 => uint16[]) public proposalRemoteChainIds;
+
+    // pId -> (remoteChainId, blockNumber)
+    mapping(uint256 => LzReadParams[]) public lzReadParams;
 
     /**
      * @notice Emitted when proposal failed
@@ -90,20 +100,63 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
     event UpdateVaultAddress(uint16 indexed remoteChainId, address xvsVault);
 
     /**
-     * @notice Thrown when invalid chain id is provided
+     * @notice Thrown when syncing details for an unsupported network is provided
      */
-    error InvalidChainId(uint16 chainId);
+    error RemoteChainNotSupported(uint16 chainId);
 
     /**
      * @notice Thrown when chain id is deactivated
      */
     error DeactivatedChainId(uint16 chainId);
 
-    constructor(address endpoint, address warehouseAddress, address bravo) NonblockingLzApp(endpoint) {
+    /**
+     * @notice Thrown when an access controlled function is called
+     */
+    error InvalidCaller(address providedAddress, address requiredAddress);
+
+    /**
+     * @notice Thrown when an access controlled function is called
+     */
+    error InvalidBlockTimestamp(uint16 remoteChainId, uint256 providedTimestamp);
+
+    /**
+     * @notice Thrown array lengths mismatch
+     */
+    error LengthMismatch(string additionalReason);
+
+    /**
+     * @notice Thrown when an access controlled function is called
+     */
+    error ProposalThresholdNotMet(uint256 providedPower, uint256 acceptablePower);
+
+    /**
+     * @notice Thrown when an invalid chain id is provided
+     */
+    error InvalidChainId(uint16 chainId);
+
+    /**
+     * @notice Thrown when an access controlled function is called
+     */
+    error LZReceiveProposalNotExists(string reason);
+
+    constructor(
+        address endpoint,
+        uint32 readChannel,
+        address warehouseAddress,
+        address governorBravoAddress,
+        address delegate,
+        address bscXvsVaultAddress
+    ) OAppRead(endpoint, delegate) {
         ensureNonzeroAddress(warehouseAddress);
-        ensureNonzeroAddress(bravo);
+        ensureNonzeroAddress(governorBravoAddress);
+        ensureNonzeroAddress(bscXvsVaultAddress);
         warehouse = IDataWarehouse(warehouseAddress);
-        governanceBravo = bravo;
+        governorBravo = IGovernorBravoDelegate(governorBravoAddress);
+        bscXvsVault = IXvsVault(bscXvsVaultAddress);
+
+        // Set the read channel
+        READ_CHANNEL = readChannel;
+        _setPeer(READ_CHANNEL, AddressCast.toBytes32(address(this)));
     }
 
     /**
@@ -123,125 +176,207 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
     }
 
     /**
-     * @notice Update xvs vault address corresponding to the remote chain id
-     * @param remoteChainId An array of remote chain ids
-     * @param xvsVaultAddress An array of XVS vault addresses corresponding to each remote chain id
-     * @custom:access Only owner
-     * @custom:event UpdateVaultAddress with remote chain id and its corresponding xvs vault address
+     * @notice Sets the LayerZero read channel, enabling or disabling it based on `_active`.
+     * @param _channelId The channel ID to set.
+     * @param _active Flag to activate or deactivate the channel.
      */
-    function updateVaultAddress(
-        uint16[] calldata remoteChainId,
-        address[] calldata xvsVaultAddress
-    ) external onlyOwner {
-        require(remoteChainId.length == xvsVaultAddress.length, "invalid params");
-        for (uint16 i; i < remoteChainId.length; ++i) {
-            ensureNonzeroAddress(xvsVaultAddress[i]);
-            if (remoteChainId[i] == 0) {
-                revert InvalidChainId(remoteChainId[i]);
-            }
-
-            xvsVault[remoteChainId[i]] = xvsVaultAddress[i];
-            emit UpdateVaultAddress(remoteChainId[i], xvsVaultAddress[i]);
-        }
+    function setReadChannel(uint32 _channelId, bool _active) public override onlyOwner {
+        _setPeer(_channelId, _active ? AddressCast.toBytes32(address(this)) : bytes32(0));
+        READ_CHANNEL = _channelId;
     }
 
     /**
-     * @notice Updates the deactivedRemoteChainIds array
-     * @param remoteChainId An array of remote chain ids to update
-     * @param isDeactivated An array indicating whether each remote chain id is deactivated or not
+     * @notice Updates the network configuration for a given chain ID.
+     * @param chainId The chain ID for which to update the configuration.
+     * @param xvsVaultAddress The address of the XVS vault.
+     * @param blockHashDispatcherAddress The address of the block hash fetcher.
      * @custom:access Only owner
-     * @custom:emit UpdateDeactivatedRemoteChainId emitted with remote chain id & its deactivation status
      */
-    function updateDeactivatedRemoteChainId(
-        uint16[] calldata remoteChainId,
-        bool[] calldata isDeactivated
+    function updateNetworkConfig(
+        uint16 chainId,
+        address xvsVaultAddress,
+        address blockHashDispatcherAddress,
+        bool isLzReadSupported
     ) external onlyOwner {
-        for (uint16 i; i < remoteChainId.length; ++i) {
-            if (remoteChainId[i] == 0) {
-                revert InvalidChainId(remoteChainId[i]);
-            }
-            isdeactived[remoteChainId[i]] = isDeactivated[i];
-            emit UpdateDeactivatedRemoteChainId(remoteChainId[i], isDeactivated[i]);
+        ensureNonzeroAddress(xvsVaultAddress);
+        ensureNonzeroAddress(blockHashDispatcherAddress);
+
+        if (chainId == 0) {
+            revert InvalidChainId(chainId);
         }
+
+        networkConfig[chainId] = NetworkConfig({
+            xvsVault: xvsVaultAddress,
+            blockHashDispatcher: blockHashDispatcherAddress,
+            isLzReadSupported: isLzReadSupported
+        });
+
+        emit UpdateVaultAddress(chainId, xvsVaultAddress);
     }
+
+    /**
+     * 
+     * @param pId proposal Id to start syncing voting power of
+     * @param proposer The address of the proposer
+     * @param syncingParameters Array of syncing parameters containing remote chain id with their corresponding block hash, remote block header RLP, and XVS vault state proof RLP
+     * @param proposerVotingProofs Array of proofs containing remote chain id with their corresponding proofs (numCheckpointsProof, checkpointsProof) where
+     * numCheckpointsProof is the proof data needed to verify the number of checkpoints and
+     * checkpointsProof is the proof data needed to verify the actual voting power from the checkpoints
+     * @param proposalThreshold The minimum voting power required to start syncing
+     * @param extraOptions Additional messaging options, including gas and fee settings
+     * @custom:access Only GovernorBravo
+     */
     function startVotingPowerSync(
         uint256 pId,
-        uint16[] memory remoteChainId,
-        bytes[] memory blockHash,
-        bytes[] memory remoteBlockheaderRLP,
-        bytes[] memory xvsVaultStateProofRLP,
-        Proofs[] memory proposerVotingProofs
-        ) external {
-        // Verify headers
-        for(uint256 i; i < remoteChainId.length; i++ ){
-           StateProofVerifier.BlockHeader memory decodedHeader = warehouse.processStorageRoot(xvsVault[remoteChainId[i]], blockHash[i], remoteBlockHeaderRLP[i], xvsVaultStateProofRLP[i]);
-            decodedBlockHeader[pId][remoteChainId] = decodedHeader;
+        address proposer,
+        SyncingParameters[] calldata syncingParameters,
+        Proofs[] calldata proposerVotingProofs,
+        uint256 proposalThreshold,
+        bytes calldata extraOptions
+    ) external {
+        if (msg.sender != address(governorBravo)) {
+            revert InvalidCaller(msg.sender, address(governorBravo));
         }
-        proposer[pId] = tx.origin;
-        _startVotingPowerSync(pId, remoteChainId, blockHash, remoteBlockheaderRLP, xvsVaultStateProofRLP, proposerVotingProofs );
-    }
-
-    function _startVotingPowerSync(
-        uint256 pId,
-        uint16[] memory remoteChainId,
-        bytes[] memory blockHash,
-        bytes[] memory remoteBlockheaderRLP,
-        bytes[] memory xvsVaultStateProofRLP,
-        Proofs[] memory proposerVotingProofs   
-        ) internal {
-        remoteChainIds[pId] = remoteChainId;
-        requiredChainIds[pId] = remoteChainIds;
-
-        for(uint256 i; i < remoteChainId.length; i++){
-            uint32 channelId = getChannelId(remoteChainId[i]);
-            EVMReadRequest[] requests = getRequests(remoteChainId[i]);
-            EVMComputeRequest computeRequest = getComputeRequests(remoteChainId[i]);
-            bytes calldata options = getOptions(remoteChainId[i]);
-            blockNumber[pId][remoteChainId[i]] = decodedHeader.blockNumber; 
-            proposerVotingProof[proposer] = proposerVotingProofs;
-            bytes memory cmd = buildCmd(_appLabel, _requests, _computeRequest);
-            receipt = _lzSend(_channelId, cmd, _options, MessagingFee(msg.value, 0), payable(tx.origin));
+        if (proposerVotingProofs.length > syncingParameters.length) {
+            revert LengthMismatch("proposerVotingProofs length > syncingParameters length");
         }
+
+        for (uint256 i; i < syncingParameters.length; i++) {
+            SyncingParameters memory params = syncingParameters[i];
+            if (
+                networkConfig[params.remoteChainId].xvsVault == address(0) ||
+                networkConfig[params.remoteChainId].blockHashDispatcher == address(0)
+            ) {
+                revert RemoteChainNotSupported(params.remoteChainId);
+            }
+
+            StateProofVerifier.BlockHeader memory decodedHeader = warehouse.processStorageRoot(
+                networkConfig[params.remoteChainId].xvsVault,
+                params.blockHash,
+                params.remoteBlockHeaderRLP,
+                params.xvsVaultStateProofRLP
+            );
+
+            if (!isValidBlockTimestamp(decodedHeader.timestamp)) {
+                revert InvalidBlockTimestamp(params.remoteChainId, decodedHeader.timestamp);
+            }
+
+            proposalBlockDetails[pId][params.remoteChainId] = NetworkProposalBlockDetails(
+                decodedHeader.number,
+                params.blockHash
+            );
+
+            proposalRemoteChainIds[pId].push(params.remoteChainId);
+
+            if (networkConfig[params.remoteChainId].isLzReadSupported) {
+                lzReadParams[pId].push(LzReadParams(params.remoteChainId, decodedHeader.number));
+            }
+        }
+
+        proposalBlockDetails[pId][BSC_CHAIN_ID] = NetworkProposalBlockDetails(block.number, blockhash(block.number));
+
+        uint96 power = getVotingPower(proposer, pId, proposerVotingProofs);
+        if (power < proposalThreshold) {
+            revert ProposalThresholdNotMet(power, proposalThreshold);
+        }
+
+        readRemoteBlockHash(pId, extraOptions);
     }
 
     /**
-     * @notice Builds the command to be sent
-     * @param appLabel The application label to use for the message.
-     * @param _readRequests An array of `EvmReadRequest` structs containing the read requests to be made.
-     * @param _computeRequest A `EvmComputeRequest` struct containing the compute request to be made.
-     * @return cmd The encoded command to be sent to to the channel.
+     * @notice Sends a read request to LayerZero, querying Uniswap QuoterV2 for WETH/USDC prices on configured chains.
+     * @param _extraOptions Additional messaging options, including gas and fee settings.
+     * @return receipt The LayerZero messaging receipt for the request.
      */
-    function buildCmd(
-        uint16 appLabel,
-        EvmReadRequestV1[] memory _readRequests,
-        EvmComputeRequest memory _computeRequest
-    ) public pure returns (bytes memory) {
-        require(_readRequests.length > 0, "LzReadCounter: empty requests");
-        // build read requests
-        EVMCallRequestV1[] memory readRequests = new EVMCallRequestV1[](_readRequests.length);
-        for (uint256 i = 0; i < _readRequests.length; i++) {
-            EvmReadRequestV1 memory req = _readRequests[i];
+    function readRemoteBlockHash(
+        uint256 proposalId,
+        bytes calldata _extraOptions
+    ) public payable returns (MessagingReceipt memory receipt) {
+        uint16[] memory remoteTargetEids = new uint16[](lzReadParams[proposalId].length);
+        uint256[] memory blockNumbers = new uint256[](lzReadParams[proposalId].length);
+
+        for (uint256 i = 0; i < lzReadParams[proposalId].length; i++) {
+            remoteTargetEids[i] = lzReadParams[proposalId][i].remoteTargetEid;
+            blockNumbers[i] = lzReadParams[proposalId][i].blockNumber;
+        }
+
+        bytes memory cmd = getCmd(proposalId, remoteTargetEids, blockNumbers);
+        return
+            _lzSend(
+                READ_CHANNEL,
+                cmd,
+                combineOptions(READ_CHANNEL, READ_MSG_TYPE, _extraOptions),
+                MessagingFee(msg.value, 0),
+                payable(msg.sender)
+            );
+    }
+
+    /**
+     * @notice Quotes the estimated messaging fee for querying Uniswap QuoterV2 for WETH/USDC prices.
+     * @param _extraOptions Additional messaging options.
+     * @param _payInLzToken Boolean flag indicating whether to pay in LayerZero tokens.
+     * @return fee The estimated messaging fee.
+     */
+    function quoteRemoteBlockHash(
+        uint256 proposalId,
+        uint16[] calldata remoteTargetEids,
+        uint256[] calldata blockNumbers,
+        bytes calldata _extraOptions,
+        bool _payInLzToken
+    ) public view returns (MessagingFee memory fee) {
+        bytes memory cmd = getCmd(proposalId, remoteTargetEids, blockNumbers);
+        return _quote(READ_CHANNEL, cmd, combineOptions(READ_CHANNEL, READ_MSG_TYPE, _extraOptions), _payInLzToken);
+    }
+
+    /**
+     * @notice Constructs a command to query the Uniswap QuoterV2 for WETH/USDC prices on all configured chains.
+     * @return cmd The encoded command to request Uniswap quotes.
+     */
+    function getCmd(
+        uint256 proposalId,
+        uint16[] memory remoteTargetEids,
+        uint256[] memory blockNumbers
+    ) public view returns (bytes memory) {
+        uint256 networkCount = remoteTargetEids.length;
+
+        if (networkCount != blockNumbers.length) {
+            revert LengthMismatch("network count length != blockNumbers length");
+        }
+
+        EVMCallRequestV1[] memory readRequests = new EVMCallRequestV1[](networkCount);
+
+        for (uint256 i = 0; i < networkCount; i++) {
+            if (networkConfig[remoteTargetEids[i]].blockHashDispatcher == address(0)) {
+                revert RemoteChainNotSupported(remoteTargetEids[i]);
+            }
+
+            bytes memory callData = abi.encodeWithSelector(
+                IBlockHashDispatcher.getHash.selector,
+                proposalId,
+                blockNumbers[i]
+            );
+
             readRequests[i] = EVMCallRequestV1({
-                appRequestLabel: req.appRequestLabel,
-                targetEid: req.targetEid,
-                isBlockNum: req.isBlockNum,
-                blockNumOrTimestamp: req.blockNumOrTimestamp,
-                confirmations: req.confirmations,
-                to: req.to,
-                callData: abi.encodeWithSelector(this.myInformation.selector)
+                appRequestLabel: uint16(i + 1),
+                targetEid: remoteTargetEids[i],
+                isBlockNum: false,
+                blockNumOrTimestamp: uint64(block.timestamp),
+                confirmations: 5,
+                to: networkConfig[remoteTargetEids[i]].blockHashDispatcher,
+                callData: callData
             });
         }
-        require(_computeRequest.computeSetting <= COMPUTE_SETTING_NONE, "LzReadCounter: invalid compute type");
-        EVMCallComputeV1 memory evmCompute = EVMCallComputeV1({
-            computeSetting: _computeRequest.computeSetting,
-            targetEid: _computeRequest.computeSetting == COMPUTE_SETTING_NONE ? 0 : _computeRequest.targetEid,
-            isBlockNum: _computeRequest.isBlockNum,
-            blockNumOrTimestamp: _computeRequest.blockNumOrTimestamp,
-            confirmations: _computeRequest.confirmations,
-            to: _computeRequest.to
+
+        EVMCallComputeV1 memory computeSettings = EVMCallComputeV1({
+            computeSetting: 3, // None
+            targetEid: ILayerZeroEndpointV2(endpoint).eid(),
+            isBlockNum: false,
+            blockNumOrTimestamp: uint64(block.timestamp),
+            confirmations: 15,
+            to: address(this)
         });
-        bytes memory cmd = ReadCodecV1.encode(appLabel, readRequests, evmCompute);
-        return cmd;
+
+        return ReadCodecV1.encode(0, readRequests, computeSettings);
     }
 
     /**
@@ -252,17 +387,9 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
      *  checkpointsProof is the proof data needed to verify the actual voting power from the checkpoints
      * @return power The total voting power of the voter across all supported remote chains
      */
-    function getVotingPower(
-        address voter,
-        uint256 pId,
-        Proofs[] calldata proofs
-    ) external view returns (uint96 power) {
+    function getVotingPower(address voter, uint256 pId, Proofs[] calldata proofs) public view returns (uint96 power) {
         uint96 totalVotingPower;
         for (uint16 i; i < proofs.length; ++i) {
-            // remoteChainId must be active
-            if (isdeactived[proofs[i].remoteChainId]) {
-                revert DeactivatedChainId(proofs[i].remoteChainId);
-            }
             totalVotingPower += _getVotingPower(
                 proofs[i].remoteChainId,
                 pId,
@@ -271,6 +398,8 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
                 voter
             );
         }
+
+        totalVotingPower += bscXvsVault.getPriorVotes(voter, proposalBlockDetails[pId][BSC_CHAIN_ID].blockNumber - 1);
 
         return totalVotingPower;
     }
@@ -290,13 +419,13 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
         bytes calldata checkpointsProof,
         address voter
     ) internal view returns (uint96) {
-        uint256 blockNumber = remoteBlockNumber[pId][remoteChainId];
-        bytes32 blockHash = remoteBlockHash[pId][remoteChainId][blockNumber];
-        address vault = xvsVault[remoteChainId];
+        NetworkProposalBlockDetails memory blockDetails = proposalBlockDetails[pId][remoteChainId];
+        address vault = networkConfig[remoteChainId].xvsVault;
+
 
         StateProofVerifier.SlotValue memory latestCheckpoint = warehouse.getStorage(
             vault,
-            blockHash,
+            blockDetails.blockHash,
             SlotUtils.getAccountSlotHash(voter, NUM_CHECKPOINTS_SLOT),
             numCheckpointsProof
         );
@@ -309,7 +438,7 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
         }
         StateProofVerifier.SlotValue memory votingPower = warehouse.getStorage(
             vault,
-            blockHash,
+            blockDetails.blockHash,
             SlotUtils.getCheckpointSlotHash(voter, uint32(latestCheckpoint.value - 1), uint32(CHECKPOINTS_SLOT)),
             checkpointsProof
         );
@@ -339,36 +468,52 @@ contract VotingPowerAggregator is NonblockingLzApp, Pausable, OAppRead {
         address /*_executor*/,
         bytes calldata /*_extraData*/
     ) internal override {
-        (uint256 pId, uint256 blockNumber, bytes memory blockHash) = abi.decode(payload);
-        require(remoteBlockNumber[pId][origin.srcEid] == blockNumber, "Invalid blockNumber");
-        remoteBlockHash[pId][origin.srcEid][blockNumber] = blockHash;
-        requiredChainIds[pId].remove(origin.srcEid);
+        (uint256 pId, uint256 blockNumber, bytes32 blockHash) = abi.decode(payload, (uint256, uint256, bytes32));
+        uint16 remoteChainId = uint16(origin.srcEid);
 
-        // Once all the block hashes has been synced
-        if (requiredChainIds[pId].length == 0) {
-            // verify all block hashes
-            for (uint256 i; i < decodedBlockHeader[pId][remoteChainIds].length; i++) {
-                bytes memory decodedBlockHash = decodedBlockHeader[pId][remoteChainIds].blockHash ;
-                // compare with the block hashes got from above steps
-                uint chainId = remoteChainIds[i];
-                uint256 _blockNumber = remoteBlockNumber[pId][origin.srcEid];
-                if(decodedBlockHash != remoteBlockHash[pId][chainId][_blockNumber]) {
-                    status = BridgeStatus.REJECTED;
-                    break;
-                }
-            }
-
-            if (proposerVotingProof[pId][0].remoteChainId != 0 && status != BridgeStatus.REJECTED) {
-                uint96 votes = getVotingPower(proposer[pId], blocknumber, proposerVotingProof);
-                // compare proposer votes with the threshold
-                if (votes > MIN_VOTING_PERIOD && votes < MAX_VOTING_PERIOD) {
-                    status = BridgeStatus.SYNCED;
-                } else {
-                    status = BridgeStatus.PENDING;
-                }
-            }
-
-            IGovernanceBravoDelegate(governanceBravo).activateProposal(pId, status, proposer[pId]);
+        if (proposalBlockDetails[pId][remoteChainId].blockNumber == 0) {
+            revert LZReceiveProposalNotExists("Remote proposal does not exist");
         }
+
+        remoteBlockHash[remoteChainId][blockNumber] = blockHash;
+
+        if (isProposalSynced(pId)) {
+            governorBravo.activateProposal(pId);
+        }
+    }
+
+    /**
+     * @notice Checks if the proposal is synced across all remote chains
+     * @param proposalId The identifier that links to remote chain-specific data
+     * @return True if the proposal is synced across all remote chains, false otherwise
+     */
+    function isProposalSynced(uint256 proposalId) public view returns (bool) {
+        uint16[] memory remoteProposalChainIds = proposalRemoteChainIds[proposalId];
+        uint256 proposalsLength = remoteProposalChainIds.length;
+
+        for (uint8 i = 0; i < proposalsLength; i++) {
+            uint16 remoteProposalChainId = remoteProposalChainIds[i];
+            NetworkProposalBlockDetails memory NetworkProposalBlockDetails = proposalBlockDetails[proposalId][
+                remoteProposalChainId
+            ];
+            if (
+                remoteBlockHash[remoteProposalChainId][NetworkProposalBlockDetails.blockNumber] !=
+                NetworkProposalBlockDetails.blockHash
+            ) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * @notice Checks if the provided block time is within 10 minutes and less than or equal to the current timestamp
+     * @param providedBlockTime The block time to be validated
+     * @return isValid True if the provided block time is valid, false otherwise
+     */
+    function isValidBlockTimestamp(uint256 providedBlockTime) internal view returns (bool) {
+        uint256 currentTimestamp = block.timestamp;
+        return (providedBlockTime <= currentTimestamp) && (providedBlockTime >= currentTimestamp - MAX_BLOCK_TIME_DIFF);
     }
 }

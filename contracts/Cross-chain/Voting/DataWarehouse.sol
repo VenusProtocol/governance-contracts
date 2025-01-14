@@ -31,10 +31,6 @@ contract DataWarehouse is IDataWarehouse {
         return _slotsRegistered[account][blockHash][slot];
     }
 
-    function setDelay(uint256 _delay) external onlyOwner {
-        delay = _delay;
-    }
-
     /// @inheritdoc IDataWarehouse
     function processStorageRoot(
         address account,
@@ -46,9 +42,6 @@ contract DataWarehouse is IDataWarehouse {
             blockHeaderRLP,
             blockHash
         );
-
-        // Verifies blockTimestamp
-        require(decodedHeader.blockTimestamp < block.timestamp + delay && decoded.blockTimestamp > block.timestamp + delay, "Invalid block timestamp");
         
         // The path for an account in the state trie is the hash of its address
         bytes32 proofPath = keccak256(abi.encodePacked(account));
