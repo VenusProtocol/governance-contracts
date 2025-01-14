@@ -71,12 +71,6 @@ import "./GovernorBravoInterfaces.sol";
  * vote delegation by calling the same function with a value of `0`.
  */
 contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoEvents {
-    enum BridgeStatus {
-        REJECTED,
-        PENDING,
-        SYNCED
-    }
-
     /// @notice The name of this contract
     string public constant name = "Venus Governor Bravo";
 
@@ -108,25 +102,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     /// @notice The EIP-712 typehash for the ballot struct used by the contract
     bytes32 public constant BALLOT_TYPEHASH = keccak256("Ballot(uint256 proposalId,uint8 support)");
 
-    // Is proposal bridged
-    mapping(uint256 => bool) public isBridged;
-
-    address public votingPowerAggregator;
-
-    // proposal id => block number
-    mapping(uint256 => uint256) public proposalSubmissionBlock;
-
-    struct VotingProof {
-        uint16 chainId;
-        bytes numCheckPointproof;
-        bytes checkpointProof;
-    }
-    struct SyncingParams {
-        uint16 remoteIds;
-        bytes proofs;
-        bytes remoteBlockheaders; // block hash, stateRoot, timestamp, blockNumber
-    }
-
     /**
      * @notice Used to initialize the contract during delegator contructor
      * @param xvsVault_ The address of the XvsVault
@@ -135,7 +110,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      */
     function initialize(
         address xvsVault_,
-        address votingPowerAggregator_,
         ProposalConfig[] memory proposalConfigs_,
         TimelockInterface[] memory timelocks,
         address guardian_
@@ -144,7 +118,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         require(msg.sender == admin, "GovernorBravo::initialize: admin only");
         require(xvsVault_ != address(0), "GovernorBravo::initialize: invalid xvs address");
         require(guardian_ != address(0), "GovernorBravo::initialize: invalid guardian");
-        require(votingPowerAggregator_ != address(0), "GovernorBravo::initialize: invalid votingPowerAggregator");
         require(
             timelocks.length == uint8(ProposalType.CRITICAL) + 1,
             "GovernorBravo::initialize:number of timelocks should match number of governance routes"
@@ -157,7 +130,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         xvsVault = XvsVaultInterface(xvsVault_);
         proposalMaxOperations = 10;
         guardian = guardian_;
-        votingPowerAggregator = votingPowerAggregator_;
 
         //Set parameters for each Governance Route
         uint256 arrLength = proposalConfigs_.length;
@@ -206,22 +178,21 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param proposalType the type of the proposal (e.g NORMAL, FASTTRACK, CRITICAL)
      * @return Proposal id of new proposal
      */
-    function submitProposalPayload(
+    function propose(
         address[] memory targets,
         uint[] memory values,
         string[] memory signatures,
         bytes[] memory calldatas,
         string memory description,
-        ProposalType proposalType,
-        VotingProof[] memory proposerVotingProof,
-        uint16[] memory remoteChainIds,
-        bytes[] memory blockHash,
-        bytes[] memory remoteBlockHeadersRLP,
-        bytes[] memory xvsVaultStateProofRLP
-    ) public payable returns (uint) {
+        ProposalType proposalType
+    ) public returns (uint) {
         // Reject proposals before initiating as Governor
         require(initialProposalId != 0, "GovernorBravo::propose: Governor Bravo not active");
-
+        require(
+            xvsVault.getPriorVotes(msg.sender, sub256(block.number, 1)) >=
+                proposalConfigs[uint8(proposalType)].proposalThreshold,
+            "GovernorBravo::propose: proposer votes below proposal threshold"
+        );
         require(
             targets.length == values.length &&
                 targets.length == signatures.length &&
@@ -244,31 +215,10 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
             );
         }
 
+        uint startBlock = add256(block.number, proposalConfigs[uint8(proposalType)].votingDelay);
+        uint endBlock = add256(startBlock, proposalConfigs[uint8(proposalType)].votingPeriod);
+
         proposalCount++;
-        proposalSubmissionBlock[proposalCount] = block.number;
-
-        uint startBlock = 0;
-        uint endBlock = 0;
-
-        // Backward compatibility
-        if (remoteChainIds.length == 0) {
-            uint96 proposerVotes = IVotingPowerAggregator(votingPowerAggregator).getVotingPower(msg.sender);
-            require(proposerVotes > MIN_PROPOSAL_THRESHOLD && proposerVotes < MAX_PROPOSAL_THRESHOLD);
-            isBridged[proposalCount] = true;
-            startBlock = add256(block.number, proposalConfigs[uint8(proposalType)].votingDelay);
-            endBlock = add256(startBlock, proposalConfigs[uint8(proposalType)].votingPeriod);
-        } else {
-            // Fetch all block hashes
-            IVotingPowerAggregator(votingPowerAggregator).startVotingPowerSync.value(msg.value)(
-                proposalCount,
-                remoteChainIds,
-                blockHash,
-                remoteBlockHeadersRLP,
-                xvsVaultStateProofRLP,
-                proposerVotingProof
-            );
-        }
-
         Proposal memory newProposal = Proposal({
             id: proposalCount,
             proposer: msg.sender,
@@ -303,28 +253,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
             uint8(proposalType)
         );
         return newProposal.id;
-    }
-
-    function activateProposal(uint256 proposalId, uint256 status, address proposer) external {
-        // Either votes not synced or proposer has not sufficient power
-        if (msg.sender == votingPowerAggregator) {
-            require(status == BridgeStatus.SYNCED, "Not synced yet");
-        } else {
-            require(IVotingPowerAggregator(votingPowerAggregator).status == BridgeStatus.SYNCED, "Not synced yet");
-        }
-
-        // If Votes get Synced
-        ProposalType proposalType = proposals[proposalId].proposalType;
-
-        uint startBlock = add256(block.number, proposalConfigs[uint8(proposalType)].votingDelay);
-        uint endBlock = add256(startBlock, proposalConfigs[uint8(proposalType)].votingPeriod);
-
-        Proposal[proposalId].startBlock = startBlock;
-        Proposal[proposalId].endBlock = endBlock;
-
-        isBridged[proposalId] = true;
-
-        emit ProposalActivated(proposalId);
     }
 
     /**
@@ -461,11 +389,9 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         Proposal storage proposal = proposals[proposalId];
         if (proposal.canceled) {
             return ProposalState.Canceled;
-        } else if (proposal.startBlock == 0 && !isBridged[proposalId]) {
-            return ProposalState.PendingSync;
         } else if (block.number <= proposal.startBlock) {
             return ProposalState.Pending;
-        } else if (block.number <= proposal.endBlock && isBridged[proposalId]) {
+        } else if (block.number <= proposal.endBlock) {
             return ProposalState.Active;
         } else if (proposal.forVotes <= proposal.againstVotes || proposal.forVotes < quorumVotes) {
             return ProposalState.Defeated;
