@@ -49,6 +49,11 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
     uint256 public constant UPDATE_EXPIRATION_TIME = 1 days;
 
     /**
+     * @notice Event emitted when a risk parameter config is set
+     */
+    event RiskParameterConfigSet(string updateType, uint256 debounce, uint256 maxIncreaseBps, bool isRelative);
+
+    /**
      * @notice Event emitted when an update is successfully applied
      */
     event RiskParameterUpdated(uint256 updateId);
@@ -79,9 +84,19 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
     error UpdateNotInRange();
 
     /**
-     * @notice Thrown when a config that is not implemented is set
+     * @notice Thrown when an updateType that is not supported is operated on
      */
     error UnsupportedUpdateType();
+
+    /**
+     * @notice Thrown when a debounce value of 0 is set
+     */
+    error InvalidDebounce();
+
+    /**
+     * @notice Thrown when a maxIncreaseBps value of 0 is set
+     */
+    error InvalidMaxIncreaseBps();
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address riskOracle_, address corePoolComptroller_) {
@@ -126,12 +141,27 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
         uint256 maxIncreaseBps,
         bool isRelative
     ) external onlyOwner {
+        if (Strings.equal(updateType, "")) {
+            revert UnsupportedUpdateType();
+        }
+        if (debounce == 0) {
+            revert InvalidDebounce();
+        }
+        if (maxIncreaseBps == 0) {
+            revert InvalidMaxIncreaseBps();
+        }
         riskParameterConfigs[updateType] = RiskParamConfig({
             active: true,
             debounce: debounce,
             maxIncreaseBps: maxIncreaseBps,
             isRelative: isRelative
         });
+        emit RiskParameterConfigSet(
+            updateType,
+            debounce,
+            maxIncreaseBps,
+            isRelative
+        );
     }
 
     /**
@@ -148,6 +178,10 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
      * @param updateType The type of update to toggle the config for
      */
     function toggleConfigActive(string calldata updateType) external onlyOwner {
+        // Debounce can't be zero so we are trying to toggle an unsupported update type
+        if (riskParameterConfigs[updateType].debounce == 0) {
+            revert UnsupportedUpdateType();
+        }
         riskParameterConfigs[updateType].active = !riskParameterConfigs[updateType].active;
     }
 
