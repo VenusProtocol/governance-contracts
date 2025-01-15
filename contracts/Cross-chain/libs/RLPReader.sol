@@ -8,11 +8,11 @@
 pragma solidity ^0.8.0;
 
 library RLPReader {
-    uint8 constant internal STRING_SHORT_START = 0x80;
-    uint8 constant internal STRING_LONG_START = 0xb8;
-    uint8 constant internal LIST_SHORT_START = 0xc0;
-    uint8 constant internal LIST_LONG_START = 0xf8;
-    uint8 constant internal WORD_SIZE = 32;
+    uint8 internal constant STRING_SHORT_START = 0x80;
+    uint8 internal constant STRING_LONG_START = 0xb8;
+    uint8 internal constant LIST_SHORT_START = 0xc0;
+    uint8 internal constant LIST_LONG_START = 0xf8;
+    uint8 internal constant WORD_SIZE = 32;
 
     struct RLPItem {
         uint256 len;

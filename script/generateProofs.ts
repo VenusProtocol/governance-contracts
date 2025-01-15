@@ -11,7 +11,7 @@ import {
   getProof,
   getSolidityStorageSlotBytes,
   getSolidityTwoLevelStorageSlotHash,
-  prepareBLockRLP, 
+  prepareBLockRLP,
 } from "./utils.ts";
 
 export type ProofData = {
@@ -70,14 +70,14 @@ const generateRoots = async (xvsVaultAddress: string, numCheckpointSlotRaw: numb
   if (!proofsJson["xvsVaultAddress"]) {
     proofsJson["xvsVaultAddress"] = xvsVaultAddress;
   }
-    
+
   // calculate blockHeaderRLP
   const blockData = await getExtendedBlock(parseInt(process.env.BLOCK as string));
   const blockHeaderRLP = prepareBLockRLP(blockData);
   proofsJson.blockHash = blockData.hash;
   proofsJson.blockNumber = BigNumber.from(blockData.number).toNumber();
   proofsJson.blockHeaderRLP = blockHeaderRLP;
-  
+
   // calculate slots
   const slots: string[] = [];
 
@@ -161,7 +161,7 @@ const generateXvsVaultProofsByCheckpoint = async (vault: string, rawSlot: number
 };
 
 const generateJson = async () => {
-  const XVS_VAULT = xvsVault[process.env.REMOTE_NETWORK  as string];
+  const XVS_VAULT = xvsVault[process.env.REMOTE_NETWORK as string];
 
   await generateRoots(XVS_VAULT, SLOTS.checkpoints, SLOTS.numCheckpoint);
 
