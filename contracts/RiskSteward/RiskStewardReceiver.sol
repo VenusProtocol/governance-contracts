@@ -9,6 +9,7 @@ import { IVToken } from "../interfaces/IVToken.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
 import { IRiskStewardReceiver, RiskParamConfig } from "./IRiskStewardReceiver.sol";
+import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 
 /**
  * @title RiskStewardReceiver
@@ -16,7 +17,7 @@ import { IRiskStewardReceiver, RiskParamConfig } from "./IRiskStewardReceiver.so
  * @notice Contract that can automatically adjust market caps based on risk oracle recommendations
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2StepUpgradeable {
+contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2StepUpgradeable, PausableUpgradeable {
     /**
      * @notice Mapping of supported risk configurations and their validation parameters
      */
@@ -82,21 +83,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
      */
     error UnsupportedUpdateType();
 
-    /**
-     * @notice Flag to pause/unpause update processing
-     */
-    bool public paused;
-
-    /**
-     * @notice Event emitted when pause state is changed
-     */
-    event PauseStateChanged(bool newState);
-
-    /**
-     * @notice Error thrown when contract is paused
-     */
-    error ContractPaused();
-
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address riskOracle_, address corePoolComptroller_) {
         require(riskOracle_ != address(0), "Risk Oracle address must not be zero");
@@ -108,6 +94,23 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
 
     function initialize() external initializer {
         __Ownable2Step_init();
+        __Pausable_init();
+    }
+
+    /**
+     * @notice Pauses processing of updates
+     * @custom:access Only owner
+     */
+    function pause() external onlyOwner {
+        _pause();
+    }
+
+    /**
+     * @notice auses processing of updates
+     * @custom:access Only owner
+     */
+    function unpause() external onlyOwner {
+        _unpause();
     }
 
     /**
@@ -299,23 +302,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
         if (diff > maxDiff) {
             revert UpdateNotInRange();
         }
-    }
-
-    /**
-     * @notice Toggles the pause state of the contract
-     * @custom:event Emits PauseStateChanged
-     */
-    function togglePaused() external onlyOwner {
-        paused = !paused;
-        emit PauseStateChanged(paused);
-    }
-
-    /**
-     * @notice Modifier to prevent execution when contract is paused
-     */
-    modifier whenNotPaused() {
-        if (paused) revert ContractPaused();
-        _;
     }
 
     uint256[50] private __gap;
