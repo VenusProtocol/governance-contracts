@@ -111,6 +111,10 @@ describe("Risk Steward", async function () {
       expect((await riskStewardReceiver.getRiskParameterConfig("MarketSupplyCaps")).active).to.equal(false);
     });
 
+    it("should revert if pausing unsupported update type", async function () {
+      await expect(riskStewardReceiver.toggleConfigActive("Supply")).to.be.rejectedWith("UnsupportedUpdateType");
+    });
+
     it("should update risk parameter configs", async function () {
       await riskStewardReceiver.setRiskParameterConfig("MarketSupplyCaps", 1, 1000, true);
       expect(await riskStewardReceiver.getRiskParameterConfig("MarketSupplyCaps")).to.deep.equal([
@@ -119,6 +123,22 @@ describe("Risk Steward", async function () {
         BigNumber.from(1000),
         true,
       ]);
+    });
+
+    it("should emit RiskParameterConfigSet event", async function () {
+      await expect(riskStewardReceiver.setRiskParameterConfig("MarketSupplyCaps", 1, 1000, true)).to.emit(riskStewardReceiver, "RiskParameterConfigSet");
+    });
+
+    it("should revert if empty updateType is set", async function() {
+      await expect(riskStewardReceiver.setRiskParameterConfig("", 1, 1000, true)).to.be.rejectedWith("UnsupportedUpdateType");
+    });
+
+    it("should revert if debounce is 0", async function () {
+      await expect(riskStewardReceiver.setRiskParameterConfig("MarketSupplyCaps", 0, 1000, true)).to.be.rejectedWith("InvalidDebounce");
+    });
+
+    it("should revert if maxIncreaseBps is 0", async function () {
+      await expect(riskStewardReceiver.setRiskParameterConfig("MarketSupplyCaps", 1, 0, true)).to.be.rejectedWith("InvalidMaxIncreaseBps");
     });
   });
 
