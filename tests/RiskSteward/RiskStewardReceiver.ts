@@ -124,18 +124,18 @@ describe("Risk Steward", async function () {
 
   describe("Risk Steward Pause", async function () {
     it("should toggle paused state", async function () {
-      await riskStewardReceiver.togglePaused();
+      await riskStewardReceiver.pause();
       expect(await riskStewardReceiver.paused()).to.equal(true);
     });
 
     it("should revert if contract is paused", async function () {
-      await riskStewardReceiver.togglePaused();
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("ContractPaused");
+      await riskStewardReceiver.pause();
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("Pausable: paused");
     });
 
     it("should revert if contract is paused", async function () {
-      await riskStewardReceiver.togglePaused();
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("ContractPaused");
+      await riskStewardReceiver.pause();
+      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("MarketSupplyCaps", mockCoreVToken.address)).to.be.rejectedWith("Pausable: paused");
     });
   });
 
