@@ -149,7 +149,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
     }
 
     /**
-     * 
+     *
      * @param pId proposal Id to start syncing voting power of
      * @param proposer The address of the proposer
      * @param syncingParameters Array of syncing parameters containing remote chain id with their corresponding block hash, remote block header RLP, and XVS vault state proof RLP

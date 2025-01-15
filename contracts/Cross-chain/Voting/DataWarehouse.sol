@@ -42,7 +42,7 @@ contract DataWarehouse is IDataWarehouse {
             blockHeaderRLP,
             blockHash
         );
-        
+
         // The path for an account in the state trie is the hash of its address
         bytes32 proofPath = keccak256(abi.encodePacked(account));
         StateProofVerifier.Account memory accountData = StateProofVerifier.extractAccountFromProof(
