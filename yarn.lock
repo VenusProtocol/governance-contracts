@@ -2456,17 +2456,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@openzeppelin/contracts@npm:^4.4.1, @openzeppelin/contracts@npm:^4.8.3, @openzeppelin/contracts@npm:^4.9.2":
+"@openzeppelin/contracts@npm:^4.4.1, @openzeppelin/contracts@npm:^4.8.3, @openzeppelin/contracts@npm:^4.9.2, @openzeppelin/contracts@npm:^4.9.6":
   version: 4.9.6
   resolution: "@openzeppelin/contracts@npm:4.9.6"
   checksum: 274b6e968268294f12d5ca4f0278f6e6357792c8bb4d76664f83dbdc325f780541538a127e6a6e97e4f018088b42f65952014dec9c745c0fa25081f43ef9c4bf
-  languageName: node
-  linkType: hard
-
-"@openzeppelin/contracts@npm:^4.8.2":
-  version: 4.8.2
-  resolution: "@openzeppelin/contracts@npm:4.8.2"
-  checksum: 1d362f0b9c880549cb82544e23fb70270fbbbe24a69e10bd5aa07649fd82347686173998ae484defafdc473d04004d519f839e3cd3d3e7733d0895b950622243
   languageName: node
   linkType: hard
 
@@ -3473,7 +3466,7 @@ __metadata:
     "@nomicfoundation/hardhat-verify": ^2.0.8
     "@nomiclabs/hardhat-ethers": ^2.2.1
     "@nomiclabs/hardhat-etherscan": ^3.1.2
-    "@openzeppelin/contracts": ^4.8.2
+    "@openzeppelin/contracts": ^4.9.6
     "@openzeppelin/contracts-upgradeable": ^4.8.2
     "@openzeppelin/hardhat-upgrades": ^1.22.1
     "@semantic-release/changelog": ^6.0.2
