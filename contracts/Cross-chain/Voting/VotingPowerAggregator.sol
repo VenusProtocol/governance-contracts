@@ -16,13 +16,12 @@ import { ReadCodecV1, EVMCallComputeV1, EVMCallRequestV1 } from "@layerzerolabs/
 import { OAppOptionsType3 } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
 import { AddressCast } from "@layerzerolabs/lz-evm-protocol-v2/contracts/libs/AddressCast.sol";
 import { IXvsVault } from "../interfaces/IXvsVault.sol";
-// import { XvsVaultInterface } from "../../Governance/GovernorBravoInterfaces.sol";
 
 contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
     using ExcessivelySafeCall for address;
 
     struct Proofs {
-        uint16 remoteChainId;
+        uint32 remoteChainEid;
         bytes numCheckpointsProof;
         bytes checkpointsProof;
     }
@@ -33,7 +32,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
     }
 
     struct SyncingParameters {
-        uint16 remoteChainId;
+        uint32 remoteChainEid;
         bytes32 blockHash;
         bytes remoteBlockHeaderRLP;
         bytes xvsVaultStateProofRLP;
@@ -46,7 +45,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
     }
 
     struct LzReadParams {
-        uint16 remoteTargetEid;
+        uint32 remoteChainEid;
         uint256 blockNumber;
     }
 
@@ -56,7 +55,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
     uint8 public constant CHECKPOINTS_SLOT = 16;
     uint8 public constant NUM_CHECKPOINTS_SLOT = 17;
     uint16 public constant MAX_BLOCK_TIME_DIFF = 600; // 10 mins
-    uint16 private constant BSC_CHAIN_ID = 5656;
+    uint32 private constant BSC_CHAIN_ID = 5656;
 
     IDataWarehouse public warehouse;
     IGovernorBravoDelegate public governorBravo;
@@ -64,50 +63,50 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
 
     uint32 public READ_CHANNEL;
 
-    // chainId -> block number -> block hash
-    mapping(uint16 => mapping(uint256 => bytes32)) public remoteBlockHash;
+    // remoteChainEId -> block number -> block hash
+    mapping(uint32 => mapping(uint256 => bytes32)) public remoteBlockHash;
 
-    // pId -> chainId -> block number
-    mapping(uint256 => mapping(uint16 => NetworkProposalBlockDetails)) public proposalBlockDetails;
+    // pId -> remoteChainEid -> (blockNumber, blockHash)
+    mapping(uint256 => mapping(uint32 => NetworkProposalBlockDetails)) public proposalBlockDetails;
 
-    // chainId -> NetworkConfig
-    mapping(uint16 => NetworkConfig) public networkConfig;
+    // remoteChainEid -> NetworkConfig
+    mapping(uint32 => NetworkConfig) public networkConfig;
 
-    // pId -> (remoteChainId, blockNumber, blockHash)
-    mapping(uint256 => uint16[]) public proposalRemoteChainIds;
+    // pId -> remoteChainEids for lzRead supported networks
+    mapping(uint256 => uint32[]) public proposalRemoteChainEids;
 
-    // pId -> (remoteChainId, blockNumber)
+    // pId -> (remoteChainEid, blockNumber)
     mapping(uint256 => LzReadParams[]) public lzReadParams;
 
     /**
      * @notice Emitted when proposal failed
      */
-    event ReceivePayloadFailed(uint16 indexed remoteChainId, bytes indexed remoteAddress, uint64 nonce, bytes reason);
+    event ReceivePayloadFailed(uint32 indexed remoteChainEid, bytes indexed remoteAddress, uint64 nonce, bytes reason);
 
     /**
      * @notice Emitted when block hash of remote chain is received
      */
-    event HashReceived(uint256 indexed remoteIdentifier, uint16 indexed remoteChainId, bytes blockHash);
+    event HashReceived(uint256 indexed remoteIdentifier, uint32 indexed remoteChainEid, bytes blockHash);
 
     /**
      *  @notice Emitted when remote configurations are updated
      */
-    event UpdateDeactivatedRemoteChainId(uint16 indexed remoteChainId, bool isSupported);
+    event UpdateDeactivatedremoteChainEid(uint32 indexed remoteChainEid, bool isSupported);
 
     /**
      * @notice Emitted when vault addressis updated
      */
-    event UpdateVaultAddress(uint16 indexed remoteChainId, address xvsVault);
+    event UpdateVaultAddress(uint32 indexed remoteChainEid, address xvsVault);
 
     /**
      * @notice Thrown when syncing details for an unsupported network is provided
      */
-    error RemoteChainNotSupported(uint16 chainId);
+    error RemoteChainNotSupported(uint32 chainId);
 
     /**
      * @notice Thrown when chain id is deactivated
      */
-    error DeactivatedChainId(uint16 chainId);
+    error DeactivatedChainId(uint32 chainId);
 
     /**
      * @notice Thrown when an access controlled function is called
@@ -117,7 +116,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
     /**
      * @notice Thrown when an access controlled function is called
      */
-    error InvalidBlockTimestamp(uint16 remoteChainId, uint256 providedTimestamp);
+    error InvalidBlockTimestamp(uint32 remoteChainEid, uint256 providedTimestamp);
 
     /**
      * @notice Thrown array lengths mismatch
@@ -132,7 +131,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
     /**
      * @notice Thrown when an invalid chain id is provided
      */
-    error InvalidChainId(uint16 chainId);
+    error InvalidChainEid(uint32 remoteChainEid);
 
     /**
      * @notice Thrown when an access controlled function is called
@@ -187,13 +186,13 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
 
     /**
      * @notice Updates the network configuration for a given chain ID.
-     * @param chainId The chain ID for which to update the configuration.
+     * @param remoteChainEid The chain ID for which to update the configuration.
      * @param xvsVaultAddress The address of the XVS vault.
      * @param blockHashDispatcherAddress The address of the block hash fetcher.
      * @custom:access Only owner
      */
     function updateNetworkConfig(
-        uint16 chainId,
+        uint32 remoteChainEid,
         address xvsVaultAddress,
         address blockHashDispatcherAddress,
         bool isLzReadSupported
@@ -201,17 +200,17 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
         ensureNonzeroAddress(xvsVaultAddress);
         ensureNonzeroAddress(blockHashDispatcherAddress);
 
-        if (chainId == 0) {
-            revert InvalidChainId(chainId);
+        if (remoteChainEid == 0) {
+            revert InvalidChainEid(remoteChainEid);
         }
 
-        networkConfig[chainId] = NetworkConfig({
+        networkConfig[remoteChainEid] = NetworkConfig({
             xvsVault: xvsVaultAddress,
             blockHashDispatcher: blockHashDispatcherAddress,
             isLzReadSupported: isLzReadSupported
         });
 
-        emit UpdateVaultAddress(chainId, xvsVaultAddress);
+        emit UpdateVaultAddress(remoteChainEid, xvsVaultAddress);
     }
 
     /**
@@ -244,32 +243,32 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
         for (uint256 i; i < syncingParameters.length; i++) {
             SyncingParameters memory params = syncingParameters[i];
             if (
-                networkConfig[params.remoteChainId].xvsVault == address(0) ||
-                networkConfig[params.remoteChainId].blockHashDispatcher == address(0)
+                networkConfig[params.remoteChainEid].xvsVault == address(0) ||
+                networkConfig[params.remoteChainEid].blockHashDispatcher == address(0)
             ) {
-                revert RemoteChainNotSupported(params.remoteChainId);
+                revert RemoteChainNotSupported(params.remoteChainEid);
             }
 
             StateProofVerifier.BlockHeader memory decodedHeader = warehouse.processStorageRoot(
-                networkConfig[params.remoteChainId].xvsVault,
+                networkConfig[params.remoteChainEid].xvsVault,
                 params.blockHash,
                 params.remoteBlockHeaderRLP,
                 params.xvsVaultStateProofRLP
             );
 
             if (!isValidBlockTimestamp(decodedHeader.timestamp)) {
-                revert InvalidBlockTimestamp(params.remoteChainId, decodedHeader.timestamp);
+                revert InvalidBlockTimestamp(params.remoteChainEid, decodedHeader.timestamp);
             }
 
-            proposalBlockDetails[pId][params.remoteChainId] = NetworkProposalBlockDetails(
+            proposalBlockDetails[pId][params.remoteChainEid] = NetworkProposalBlockDetails(
                 decodedHeader.number,
                 params.blockHash
             );
 
-            proposalRemoteChainIds[pId].push(params.remoteChainId);
+            proposalRemoteChainEids[pId].push(params.remoteChainEid);
 
-            if (networkConfig[params.remoteChainId].isLzReadSupported) {
-                lzReadParams[pId].push(LzReadParams(params.remoteChainId, decodedHeader.number));
+            if (networkConfig[params.remoteChainEid].isLzReadSupported) {
+                lzReadParams[pId].push(LzReadParams(params.remoteChainEid, decodedHeader.number));
             }
         }
 
@@ -292,11 +291,11 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
         uint256 proposalId,
         bytes calldata _extraOptions
     ) public payable returns (MessagingReceipt memory receipt) {
-        uint16[] memory remoteTargetEids = new uint16[](lzReadParams[proposalId].length);
+        uint32[] memory remoteTargetEids = new uint32[](lzReadParams[proposalId].length);
         uint256[] memory blockNumbers = new uint256[](lzReadParams[proposalId].length);
 
         for (uint256 i = 0; i < lzReadParams[proposalId].length; i++) {
-            remoteTargetEids[i] = lzReadParams[proposalId][i].remoteTargetEid;
+            remoteTargetEids[i] = lzReadParams[proposalId][i].remoteChainEid;
             blockNumbers[i] = lzReadParams[proposalId][i].blockNumber;
         }
 
@@ -319,7 +318,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
      */
     function quoteRemoteBlockHash(
         uint256 proposalId,
-        uint16[] calldata remoteTargetEids,
+        uint32[] calldata remoteTargetEids,
         uint256[] calldata blockNumbers,
         bytes calldata _extraOptions,
         bool _payInLzToken
@@ -334,7 +333,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
      */
     function getCmd(
         uint256 proposalId,
-        uint16[] memory remoteTargetEids,
+        uint32[] memory remoteTargetEids,
         uint256[] memory blockNumbers
     ) public view returns (bytes memory) {
         uint256 networkCount = remoteTargetEids.length;
@@ -389,9 +388,9 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
      */
     function getVotingPower(address voter, uint256 pId, Proofs[] calldata proofs) public view returns (uint96 power) {
         uint96 totalVotingPower;
-        for (uint16 i; i < proofs.length; ++i) {
+        for (uint32 i; i < proofs.length; ++i) {
             totalVotingPower += _getVotingPower(
-                proofs[i].remoteChainId,
+                proofs[i].remoteChainEid,
                 pId,
                 proofs[i].numCheckpointsProof,
                 proofs[i].checkpointsProof,
@@ -413,16 +412,19 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
      * @return power The total voting power of supported remote chains
      */
     function _getVotingPower(
-        uint16 remoteChainId,
+        uint32 remoteChainEid,
         uint256 pId,
         bytes calldata numCheckpointsProof,
         bytes calldata checkpointsProof,
         address voter
     ) internal view returns (uint96) {
-        NetworkProposalBlockDetails memory blockDetails = proposalBlockDetails[pId][remoteChainId];
-        address vault = networkConfig[remoteChainId].xvsVault;
+        NetworkProposalBlockDetails memory blockDetails = proposalBlockDetails[pId][remoteChainEid];
+        address vault = networkConfig[remoteChainEid].xvsVault;
 
-
+        if (vault == address(0)) {
+            revert RemoteChainNotSupported(remoteChainEid);
+        }
+        
         StateProofVerifier.SlotValue memory latestCheckpoint = warehouse.getStorage(
             vault,
             blockDetails.blockHash,
@@ -469,7 +471,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
         bytes calldata /*_extraData*/
     ) internal override {
         (uint256 pId, uint256 blockNumber, bytes32 blockHash) = abi.decode(payload, (uint256, uint256, bytes32));
-        uint16 remoteChainId = uint16(origin.srcEid);
+        uint32 remoteChainId = origin.srcEid;
 
         if (proposalBlockDetails[pId][remoteChainId].blockNumber == 0) {
             revert LZReceiveProposalNotExists("Remote proposal does not exist");
@@ -488,17 +490,17 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
      * @return True if the proposal is synced across all remote chains, false otherwise
      */
     function isProposalSynced(uint256 proposalId) public view returns (bool) {
-        uint16[] memory remoteProposalChainIds = proposalRemoteChainIds[proposalId];
+        uint32[] memory remoteProposalChainIds = proposalRemoteChainEids[proposalId];
         uint256 proposalsLength = remoteProposalChainIds.length;
 
         for (uint8 i = 0; i < proposalsLength; i++) {
-            uint16 remoteProposalChainId = remoteProposalChainIds[i];
-            NetworkProposalBlockDetails memory NetworkProposalBlockDetails = proposalBlockDetails[proposalId][
+            uint32 remoteProposalChainId = remoteProposalChainIds[i];
+            NetworkProposalBlockDetails memory networkProposalBlockDetails = proposalBlockDetails[proposalId][
                 remoteProposalChainId
             ];
             if (
-                remoteBlockHash[remoteProposalChainId][NetworkProposalBlockDetails.blockNumber] !=
-                NetworkProposalBlockDetails.blockHash
+                remoteBlockHash[remoteProposalChainId][networkProposalBlockDetails.blockNumber] !=
+                networkProposalBlockDetails.blockHash
             ) {
                 return false;
             }
