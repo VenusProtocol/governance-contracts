@@ -10,6 +10,7 @@ import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
 import { IRiskStewardReceiver, RiskParamConfig } from "./IRiskStewardReceiver.sol";
 import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import { AccessControlledV8 } from "@openzeppelin/contracts-upgradeable/access/AccessControlledV8.sol";
 
 /**
  * @title RiskStewardReceiver
@@ -17,7 +18,7 @@ import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/securit
  * @notice Contract that can automatically adjust market caps based on risk oracle recommendations
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2StepUpgradeable, PausableUpgradeable {
+contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2StepUpgradeable, PausableUpgradeable, AccessControlledV8 {
     /**
      * @notice Mapping of supported risk configurations and their validation parameters
      */
@@ -107,16 +108,18 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
         _disableInitializers();
     }
 
-    function initialize() external initializer {
+    function initialize(address accessControlManager_) external initializer {
         __Ownable2Step_init();
         __Pausable_init();
+        __AccessControlled_init_unchained(accessControlManager_);
     }
 
     /**
      * @notice Pauses processing of updates
      * @custom:access Only owner
      */
-    function pause() external onlyOwner {
+    function pause() external {
+        _pause("unpause(");
         _pause();
     }
 
@@ -124,7 +127,8 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
      * @notice auses processing of updates
      * @custom:access Only owner
      */
-    function unpause() external onlyOwner {
+    function unpause() external {
+        _checkAccessAllowed("unpause(");
         _unpause();
     }
 
@@ -141,6 +145,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
         uint256 maxIncreaseBps,
         bool isRelative
     ) external onlyOwner {
+        _checkAccessAllowed("setRiskParameterConfig(string,uint256,uint256,bool)");
         if (Strings.equal(updateType, "")) {
             revert UnsupportedUpdateType();
         }
@@ -178,10 +183,12 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
      * @param updateType The type of update to toggle the config for
      */
     function toggleConfigActive(string calldata updateType) external onlyOwner {
+        _checkAccessAllowed("toggleConfigActive(string)");
         // Debounce can't be zero so we are trying to toggle an unsupported update type
         if (riskParameterConfigs[updateType].debounce == 0) {
             revert UnsupportedUpdateType();
         }
+
         riskParameterConfigs[updateType].active = !riskParameterConfigs[updateType].active;
     }
 
@@ -337,6 +344,11 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
             revert UpdateNotInRange();
         }
     }
+
+    /**
+     * @dev Disabling renounceOwnership function.
+     */
+    function renounceOwnership() public override {}
 
     uint256[50] private __gap;
 }
