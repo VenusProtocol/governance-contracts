@@ -16,15 +16,10 @@ import { ReadCodecV1, EVMCallComputeV1, EVMCallRequestV1 } from "@layerzerolabs/
 import { OAppOptionsType3 } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
 import { AddressCast } from "@layerzerolabs/lz-evm-protocol-v2/contracts/libs/AddressCast.sol";
 import { IXvsVault } from "../interfaces/IXvsVault.sol";
+import { IVotingPowerAggregator } from "../interfaces/IVotingPowerAggregator.sol";
 
-contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
+contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingPowerAggregator {
     using ExcessivelySafeCall for address;
-
-    struct Proofs {
-        uint32 remoteChainEid;
-        bytes numCheckpointsProof;
-        bytes checkpointsProof;
-    }
 
     struct NetworkProposalBlockDetails {
         uint256 blockNumber;
@@ -77,66 +72,6 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
 
     // pId -> (remoteChainEid, blockNumber)
     mapping(uint256 => LzReadParams[]) public lzReadParams;
-
-    /**
-     * @notice Emitted when proposal failed
-     */
-    event ReceivePayloadFailed(uint32 indexed remoteChainEid, bytes indexed remoteAddress, uint64 nonce, bytes reason);
-
-    /**
-     * @notice Emitted when block hash of remote chain is received
-     */
-    event HashReceived(uint256 indexed remoteIdentifier, uint32 indexed remoteChainEid, bytes blockHash);
-
-    /**
-     *  @notice Emitted when remote configurations are updated
-     */
-    event UpdateDeactivatedremoteChainEid(uint32 indexed remoteChainEid, bool isSupported);
-
-    /**
-     * @notice Emitted when vault addressis updated
-     */
-    event UpdateVaultAddress(uint32 indexed remoteChainEid, address xvsVault);
-
-    /**
-     * @notice Thrown when syncing details for an unsupported network is provided
-     */
-    error RemoteChainNotSupported(uint32 chainId);
-
-    /**
-     * @notice Thrown when chain id is deactivated
-     */
-    error DeactivatedChainId(uint32 chainId);
-
-    /**
-     * @notice Thrown when an access controlled function is called
-     */
-    error InvalidCaller(address providedAddress, address requiredAddress);
-
-    /**
-     * @notice Thrown when an access controlled function is called
-     */
-    error InvalidBlockTimestamp(uint32 remoteChainEid, uint256 providedTimestamp);
-
-    /**
-     * @notice Thrown array lengths mismatch
-     */
-    error LengthMismatch(string additionalReason);
-
-    /**
-     * @notice Thrown when an access controlled function is called
-     */
-    error ProposalThresholdNotMet(uint256 providedPower, uint256 acceptablePower);
-
-    /**
-     * @notice Thrown when an invalid chain id is provided
-     */
-    error InvalidChainEid(uint32 remoteChainEid);
-
-    /**
-     * @notice Thrown when an access controlled function is called
-     */
-    error LZReceiveProposalNotExists(string reason);
 
     constructor(
         address endpoint,
@@ -274,7 +209,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
 
         proposalBlockDetails[pId][BSC_CHAIN_ID] = NetworkProposalBlockDetails(block.number, blockhash(block.number));
 
-        uint96 power = getVotingPower(proposer, pId, proposerVotingProofs);
+        uint96 power = this.getVotingPower(proposer, pId, proposerVotingProofs);
         if (power < proposalThreshold) {
             revert ProposalThresholdNotMet(power, proposalThreshold);
         }
@@ -386,7 +321,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
      *  checkpointsProof is the proof data needed to verify the actual voting power from the checkpoints
      * @return power The total voting power of the voter across all supported remote chains
      */
-    function getVotingPower(address voter, uint256 pId, Proofs[] calldata proofs) public view returns (uint96 power) {
+    function getVotingPower(address voter, uint256 pId, Proofs[] calldata proofs) external view returns (uint96 power) {
         uint96 totalVotingPower;
         for (uint32 i; i < proofs.length; ++i) {
             totalVotingPower += _getVotingPower(
