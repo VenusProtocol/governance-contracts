@@ -209,7 +209,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
 
         proposalBlockDetails[pId][BSC_CHAIN_ID] = NetworkProposalBlockDetails(block.number, blockhash(block.number));
 
-        uint96 power = this.getVotingPower(proposer, pId, proposerVotingProofs);
+        uint96 power = getVotingPower(proposer, pId, proposerVotingProofs);
         if (power < proposalThreshold) {
             revert ProposalThresholdNotMet(power, proposalThreshold);
         }
@@ -321,7 +321,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
      *  checkpointsProof is the proof data needed to verify the actual voting power from the checkpoints
      * @return power The total voting power of the voter across all supported remote chains
      */
-    function getVotingPower(address voter, uint256 pId, Proofs[] calldata proofs) external view returns (uint96 power) {
+    function getVotingPower(address voter, uint256 pId, Proofs[] calldata proofs) public view returns (uint96 power) {
         uint96 totalVotingPower;
         for (uint32 i; i < proofs.length; ++i) {
             totalVotingPower += _getVotingPower(
