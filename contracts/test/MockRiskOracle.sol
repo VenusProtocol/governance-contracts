@@ -25,7 +25,8 @@ contract MockRiskOracle is Ownable {
     mapping(uint256 => RiskParameterUpdate) private updatesById; // Mapping from unique update ID to the update details
     mapping(address => bool) private authorizedSenders; // Authorized accounts capable of executing updates
 
-    mapping(address => mapping(string => uint256)) public latestUpdateIdByMarketAndType; // Mapping to store the latest update ID for each combination of market and update type
+    // Mapping to store the latest update ID for each combination of market and update type
+    mapping(address => mapping(string => uint256)) public latestUpdateIdByMarketAndType;
     uint256 public updateCounter; // Counter to keep track of the total number of updates
     string public description; // Description of contract
 

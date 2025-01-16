@@ -4,21 +4,28 @@ pragma solidity 0.8.25;
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
+import { IRiskSteward } from "./IRiskSteward.sol";
 import { IRiskOracle, RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
 import { IVToken } from "../interfaces/IVToken.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
 import { IRiskStewardReceiver, RiskParamConfig } from "./IRiskStewardReceiver.sol";
 import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
-import { AccessControlledV8 } from "@openzeppelin/contracts-upgradeable/access/AccessControlledV8.sol";
+import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 
 /**
  * @title RiskStewardReceiver
  * @author Venus
- * @notice Contract that can automatically adjust market caps based on risk oracle recommendations
+ * @notice Contract that can receive updates from the risk oracle and then validate and push them to the correct RiskSteward
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2StepUpgradeable, PausableUpgradeable, AccessControlledV8 {
+contract RiskStewardReceiver is
+    IRiskStewardReceiver,
+    Initializable,
+    Ownable2StepUpgradeable,
+    PausableUpgradeable,
+    AccessControlledV8
+{
     /**
      * @notice Mapping of supported risk configurations and their validation parameters
      */
@@ -28,11 +35,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
      * @notice Whitelisted oracle address to receive updates from
      */
     IRiskOracle public immutable RISK_ORACLE;
-
-    /**
-     * @notice Address of the CorePool comptroller used for selecting the correct comptroller abi
-     */
-    ICorePoolComptroller public immutable CORE_POOL_COMPTROLLER;
 
     /**
      * @notice Mapping of market and update type to last update. Used for debouncing updates.
@@ -52,12 +54,12 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
     /**
      * @notice Event emitted when a risk parameter config is set
      */
-    event RiskParameterConfigSet(string updateType, uint256 debounce, uint256 maxIncreaseBps, bool isRelative);
+    event RiskParameterConfigSet(string indexed updateType, address indexed riskSteward, uint256 debounce);
 
     /**
      * @notice Event emitted when an update is successfully applied
      */
-    event RiskParameterUpdated(uint256 updateId);
+    event RiskParameterUpdated(uint256 indexed updateId);
 
     /**
      * @notice Flag for if a risk parameter type can be updated by the steward
@@ -80,11 +82,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
     error UpdateTooFrequent();
 
     /**
-     * @notice Thrown when the new value of an update is our of range
-     */
-    error UpdateNotInRange();
-
-    /**
      * @notice Thrown when an updateType that is not supported is operated on
      */
     error UnsupportedUpdateType();
@@ -94,17 +91,10 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
      */
     error InvalidDebounce();
 
-    /**
-     * @notice Thrown when a maxIncreaseBps value of 0 is set
-     */
-    error InvalidMaxIncreaseBps();
-
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address riskOracle_, address corePoolComptroller_) {
+    constructor(address riskOracle_) {
         require(riskOracle_ != address(0), "Risk Oracle address must not be zero");
-        require(corePoolComptroller_ != address(0), "Core Pool Comptroller address must not be zero");
         RISK_ORACLE = IRiskOracle(riskOracle_);
-        CORE_POOL_COMPTROLLER = ICorePoolComptroller(corePoolComptroller_);
         _disableInitializers();
     }
 
@@ -116,19 +106,19 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
 
     /**
      * @notice Pauses processing of updates
-     * @custom:access Only owner
+     * @custom:access AccessControlledV8
      */
     function pause() external {
-        _pause("unpause(");
+        _checkAccessAllowed("pause()");
         _pause();
     }
 
     /**
      * @notice auses processing of updates
-     * @custom:access Only owner
+     * @custom:access AccessControlledV8
      */
     function unpause() external {
-        _checkAccessAllowed("unpause(");
+        _checkAccessAllowed("unpause()");
         _unpause();
     }
 
@@ -136,37 +126,21 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
      * @notice Sets the risk parameter config for a given update type
      * @param updateType The type of update to set the config for
      * @param debounce The debounce period for the update
-     * @param maxIncreaseBps The max increase bps for the update
-     * @param isRelative Whether the max increase bps is relative or absolute
      */
-    function setRiskParameterConfig(
-        string calldata updateType,
-        uint256 debounce,
-        uint256 maxIncreaseBps,
-        bool isRelative
-    ) external onlyOwner {
-        _checkAccessAllowed("setRiskParameterConfig(string,uint256,uint256,bool)");
+    function setRiskParameterConfig(string calldata updateType, address riskSteward, uint256 debounce) external {
+        _checkAccessAllowed("setRiskParameterConfig(string,address,uint256)");
         if (Strings.equal(updateType, "")) {
             revert UnsupportedUpdateType();
         }
         if (debounce == 0) {
             revert InvalidDebounce();
         }
-        if (maxIncreaseBps == 0) {
-            revert InvalidMaxIncreaseBps();
-        }
         riskParameterConfigs[updateType] = RiskParamConfig({
             active: true,
-            debounce: debounce,
-            maxIncreaseBps: maxIncreaseBps,
-            isRelative: isRelative
+            riskSteward: riskSteward,
+            debounce: debounce
         });
-        emit RiskParameterConfigSet(
-            updateType,
-            debounce,
-            maxIncreaseBps,
-            isRelative
-        );
+        emit RiskParameterConfigSet(updateType, riskSteward, debounce);
     }
 
     /**
@@ -182,10 +156,10 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
      * @notice Toggles the active status of a risk parameter config
      * @param updateType The type of update to toggle the config for
      */
-    function toggleConfigActive(string calldata updateType) external onlyOwner {
+    function toggleConfigActive(string calldata updateType) external {
         _checkAccessAllowed("toggleConfigActive(string)");
-        // Debounce can't be zero so we are trying to toggle an unsupported update type
-        if (riskParameterConfigs[updateType].debounce == 0) {
+
+        if (riskParameterConfigs[updateType].riskSteward == address(0)) {
             revert UnsupportedUpdateType();
         }
 
@@ -221,13 +195,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
     }
 
     function _processUpdate(RiskParameterUpdate memory update) internal {
-        if (Strings.equal(update.updateType, "MarketSupplyCaps")) {
-            _processSupplyCapUpdate(update);
-        } else if (Strings.equal(update.updateType, "MarketBorrowCaps")) {
-            _processBorrowCapUpdate(update);
-        } else {
-            revert UnsupportedUpdateType();
-        }
+        IRiskSteward(riskParameterConfigs[update.updateType].riskSteward).processUpdate(update);
         lastProcessedTime[_getMarketUpdateTypeKey(update.market, update.updateType)] = block.timestamp;
         processedUpdates[update.updateId] = true;
         emit RiskParameterUpdated(update.updateId);
@@ -235,43 +203,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
 
     function _getMarketUpdateTypeKey(address market, string memory updateType) internal pure returns (bytes memory) {
         return abi.encodePacked(market, updateType);
-    }
-
-    function _updateSupplyCaps(address market, bytes memory newValue) internal {
-        address comptroller = IVToken(market).comptroller();
-        address[] memory newSupplyCapMarkets = new address[](1);
-        newSupplyCapMarkets[0] = market;
-        uint256[] memory newSupplyCaps = new uint256[](1);
-
-        newSupplyCaps[0] = uint256(bytes32(newValue));
-        if (comptroller == address(CORE_POOL_COMPTROLLER)) {
-            ICorePoolComptroller(comptroller)._setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
-        } else {
-            IIsolatedPoolsComptroller(comptroller).setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
-        }
-    }
-
-    function _updateBorrowCaps(address market, bytes memory newValue) internal {
-        address comptroller = IVToken(market).comptroller();
-        address[] memory newBorrowCapMarkets = new address[](1);
-        newBorrowCapMarkets[0] = market;
-        uint256[] memory newBorrowCaps = new uint256[](1);
-        newBorrowCaps[0] = uint256(bytes32(newValue));
-        if (comptroller == address(CORE_POOL_COMPTROLLER)) {
-            ICorePoolComptroller(comptroller)._setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
-        } else {
-            IIsolatedPoolsComptroller(comptroller).setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
-        }
-    }
-
-    function _processSupplyCapUpdate(RiskParameterUpdate memory update) internal {
-        _validateSupplyCapUpdate(update);
-        _updateSupplyCaps(update.market, update.newValue);
-    }
-
-    function _processBorrowCapUpdate(RiskParameterUpdate memory update) internal {
-        _validateBorrowCapUpdate(update);
-        _updateBorrowCaps(update.market, update.newValue);
     }
 
     function _validateUpdateStatus(RiskParameterUpdate memory update) internal view {
@@ -294,54 +225,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, Initializable, Ownable2Ste
             config.debounce
         ) {
             revert UpdateTooFrequent();
-        }
-    }
-
-    function _validateSupplyCapUpdate(RiskParameterUpdate memory update) internal view {
-        RiskParamConfig memory config = riskParameterConfigs[update.updateType];
-
-        ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(update.market).comptroller());
-        uint256 currentSupplyCap = comptroller.supplyCaps(address(update.market));
-
-        uint256 newValue = uint256(bytes32(update.newValue));
-        _updateWithinAllowedRange(currentSupplyCap, newValue, config.maxIncreaseBps, config.isRelative);
-    }
-
-    function _validateBorrowCapUpdate(RiskParameterUpdate memory update) internal view {
-        RiskParamConfig memory config = riskParameterConfigs[update.updateType];
-
-        ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(update.market).comptroller());
-        uint256 currentBorrowCap = comptroller.borrowCaps(address(update.market));
-
-        uint256 newValue = uint256(bytes32(update.newValue));
-        _updateWithinAllowedRange(currentBorrowCap, newValue, config.maxIncreaseBps, config.isRelative);
-    }
-
-    /**
-     * @notice Ensures the risk param update is within the allowed range
-     * @param previousValue current risk param value
-     * @param newValue new updated risk param value
-     * @param maxIncreaseBps the max bps change allowed
-     * @param isRelative true, if maxPercentChange is relative in value, false if maxPercentChange
-     *        is absolute in value.
-     * @return bool true, if difference is within the maxPercentChange
-     */
-    function _updateWithinAllowedRange(
-        uint256 previousValue,
-        uint256 newValue,
-        uint256 maxIncreaseBps,
-        bool isRelative
-    ) internal pure returns (bool) {
-        if (newValue < previousValue) {
-            revert UpdateNotInRange();
-        }
-
-        uint256 diff = newValue - previousValue;
-
-        uint256 maxDiff = isRelative ? (maxIncreaseBps * previousValue) / 10000 : maxIncreaseBps;
-
-        if (diff > maxDiff) {
-            revert UpdateNotInRange();
         }
     }
 
