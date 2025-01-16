@@ -133,6 +133,15 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
   }[networkName];
 };
 
+export const getRiskOracle = async (networkName: "bsctestnet" | "bscmainnet" | "hardhat") => {
+  const mockRiskOracle = await ethers.getContractOrNull("MockRiskOracle");
+  return {
+    bscmainnet: "",
+    bsctestnet: "",
+    hardhat: mockRiskOracle?.address || "",
+  }[networkName];
+};
+
 export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {
   if (testnetNetworks.includes(network as string)) {
     return LZ_CHAINID.bsctestnet;
@@ -144,6 +153,10 @@ export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {
 
 export const onlyHardhat = () => async (hre: HardhatRuntimeEnvironment) => {
   return hre.network.name !== "hardhat";
+};
+
+export const skipRemoteNetworks = () => async (hre: HardhatRuntimeEnvironment) => {
+  return hre.network.name !== "bscmainnet" && hre.network.name !== "bsctestnet" && hre.network.name !== "hardhat";
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
