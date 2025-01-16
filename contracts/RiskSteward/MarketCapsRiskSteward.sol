@@ -40,6 +40,11 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
     event BorrowCapUpdated(address market, uint256 newBorrowCap);
 
     /**
+     * @notice Emitted when the max increase bps is updated
+     */
+    event MaxIncreaseBpsUpdated(uint256 oldMaxIncreaseBps, uint256 newMaxIncreaseBps);
+
+    /**
      * @notice Thrown when a maxIncreaseBps value of 0 is set
      */
     error InvalidMaxIncreaseBps();
@@ -72,10 +77,12 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
 
     function setMaxIncreaseBps(uint256 maxIncreaseBps_) external {
         _checkAccessAllowed("setMaxIncreaseBps(uint256)");
+        uint256 _maxIncreaseBps = maxIncreaseBps;
         if (maxIncreaseBps_ == 0) {
             revert InvalidMaxIncreaseBps();
         }
         maxIncreaseBps = maxIncreaseBps_;
+        emit MaxIncreaseBpsUpdated(_maxIncreaseBps, maxIncreaseBps_);
     }
 
     /**
@@ -105,6 +112,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         } else {
             IIsolatedPoolsComptroller(comptroller).setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
         }
+        emit SupplyCapUpdated(market, newSupplyCaps[0]);
     }
 
     function _updateBorrowCaps(address market, bytes memory newValue) internal {
@@ -118,6 +126,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         } else {
             IIsolatedPoolsComptroller(comptroller).setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
         }
+        emit BorrowCapUpdated(market, newBorrowCaps[0]);
     }
 
     function _processSupplyCapUpdate(RiskParameterUpdate memory update) internal {

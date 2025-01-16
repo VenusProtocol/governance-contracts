@@ -12,6 +12,7 @@ import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroll
 import { IRiskStewardReceiver, RiskParamConfig } from "./IRiskStewardReceiver.sol";
 import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
 /**
  * @title RiskStewardReceiver
@@ -93,7 +94,7 @@ contract RiskStewardReceiver is
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address riskOracle_) {
-        require(riskOracle_ != address(0), "Risk Oracle address must not be zero");
+        ensureNonzeroAddress(riskOracle_);
         RISK_ORACLE = IRiskOracle(riskOracle_);
         _disableInitializers();
     }
@@ -114,7 +115,7 @@ contract RiskStewardReceiver is
     }
 
     /**
-     * @notice auses processing of updates
+     * @notice Unpauses processing of updates
      * @custom:access AccessControlledV8
      */
     function unpause() external {
