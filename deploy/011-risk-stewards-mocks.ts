@@ -7,9 +7,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
+
   await deploy("MockRiskOracle", {
     from: deployer,
-    args: ["Mock Risk Oracle", [deployer], ["MarketSupplyCaps", "MarketBorrowCaps"]],
+    args: ["Mock Risk Oracle", [deployer], ["supplyCap", "borrowCap"]],
     log: true,
     autoMine: true,
   });
@@ -28,7 +29,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   }
 };
 
-func.tags = ["mocks"];
+func.tags = ["mocks", "risk-stewards-mocks"];
 
 func.skip = onlyHardhat();
 
