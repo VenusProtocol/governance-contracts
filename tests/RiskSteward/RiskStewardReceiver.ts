@@ -64,7 +64,7 @@ describe("Risk Steward", async function () {
     mockRiskOracle = (await MockRiskOracleFactory.deploy(
       "MockRiskOracle",
       [deployer.address],
-      ["MarketSupplyCap", "MarketBorrowCap", "RandomUpdateType"],
+      ["supplyCap", "borrowCap", "RandomUpdateType"],
     )) as MockRiskOracle;
     RiskStewardReceiverFactory = await ethers.getContractFactory("RiskStewardReceiver");
     riskStewardReceiver = await upgrades.deployProxy(RiskStewardReceiverFactory, [accessControlManager.address], {
@@ -111,8 +111,8 @@ describe("Risk Steward", async function () {
       deployer.address,
     );
 
-    await riskStewardReceiver.setRiskParameterConfig("MarketSupplyCap", marketCapsRiskSteward.address, 5);
-    await riskStewardReceiver.setRiskParameterConfig("MarketBorrowCap", marketCapsRiskSteward.address, 5);
+    await riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 5);
+    await riskStewardReceiver.setRiskParameterConfig("borrowCap", marketCapsRiskSteward.address, 5);
   };
 
   beforeEach(async function () {
@@ -124,14 +124,14 @@ describe("Risk Steward", async function () {
       await expect(
         riskStewardReceiver
           .connect(signer1)
-          .setRiskParameterConfig("MarketSupplyCap", marketCapsRiskSteward.address, 1),
+          .setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1),
       ).to.be.rejectedWith(
         'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x4631BCAbD6dF18D94796344963cB60d44a4136b6", "setRiskParameterConfig(string,address,uint256)")',
       );
     });
 
     it("should revert if access is not granted for toggling config active", async function () {
-      await expect(riskStewardReceiver.connect(signer1).toggleConfigActive("MarketSupplyCap")).to.be.rejectedWith(
+      await expect(riskStewardReceiver.connect(signer1).toggleConfigActive("supplyCap")).to.be.rejectedWith(
         'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x4631BCAbD6dF18D94796344963cB60d44a4136b6", "toggleConfigActive(string)")',
       );
     });
@@ -155,7 +155,7 @@ describe("Risk Steward", async function () {
           newValue: "0x",
           previousValue: "0x",
           referenceId: "1",
-          updateType: "MarketSupplyCap",
+          updateType: "supplyCap",
           updateId: 1,
           additionalData: "0x",
           market: mockCoreVToken.address,
@@ -186,7 +186,7 @@ describe("Risk Steward", async function () {
       const mockRiskOracle = (await MockRiskOracleFactory.deploy(
         "Mock Risk Oracle",
         [deployer.address],
-        ["MarketSupplyCap", "MarketBorrowCap"],
+        ["supplyCap", "borrowCap"],
       )) as MockRiskOracle;
       await upgrades.upgradeProxy(riskStewardReceiver, RiskStewardReceiverFactory, {
         constructorArgs: [mockRiskOracle.address],
@@ -198,12 +198,12 @@ describe("Risk Steward", async function () {
 
   describe("Risk Parameter Config", async function () {
     it("should get original risk parameter configs", async function () {
-      expect(await riskStewardReceiver.getRiskParameterConfig("MarketSupplyCap")).to.deep.equal([
+      expect(await riskStewardReceiver.getRiskParameterConfig("supplyCap")).to.deep.equal([
         true,
         BigNumber.from(5),
         marketCapsRiskSteward.address,
       ]);
-      expect(await riskStewardReceiver.getRiskParameterConfig("MarketBorrowCap")).to.deep.equal([
+      expect(await riskStewardReceiver.getRiskParameterConfig("borrowCap")).to.deep.equal([
         true,
         BigNumber.from(5),
         marketCapsRiskSteward.address,
@@ -211,8 +211,8 @@ describe("Risk Steward", async function () {
     });
 
     it("should pause risk parameter configs", async function () {
-      await riskStewardReceiver.toggleConfigActive("MarketSupplyCap");
-      expect((await riskStewardReceiver.getRiskParameterConfig("MarketSupplyCap")).active).to.equal(false);
+      await riskStewardReceiver.toggleConfigActive("supplyCap");
+      expect((await riskStewardReceiver.getRiskParameterConfig("supplyCap")).active).to.equal(false);
     });
 
     it("should revert if pausing unsupported update type", async function () {
@@ -220,8 +220,8 @@ describe("Risk Steward", async function () {
     });
 
     it("should update risk parameter configs", async function () {
-      await riskStewardReceiver.setRiskParameterConfig("MarketSupplyCap", marketCapsRiskSteward.address, 1);
-      expect(await riskStewardReceiver.getRiskParameterConfig("MarketSupplyCap")).to.deep.equal([
+      await riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1);
+      expect(await riskStewardReceiver.getRiskParameterConfig("supplyCap")).to.deep.equal([
         true,
         BigNumber.from(1),
         marketCapsRiskSteward.address,
@@ -230,7 +230,7 @@ describe("Risk Steward", async function () {
 
     it("should emit RiskParameterConfigSet event", async function () {
       await expect(
-        riskStewardReceiver.setRiskParameterConfig("MarketSupplyCap", marketCapsRiskSteward.address, 1),
+        riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1),
       ).to.emit(riskStewardReceiver, "RiskParameterConfigSet");
     });
 
@@ -242,7 +242,7 @@ describe("Risk Steward", async function () {
 
     it("should revert if debounce is 0", async function () {
       await expect(
-        riskStewardReceiver.setRiskParameterConfig("MarketSupplyCap", marketCapsRiskSteward.address, 0),
+        riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 0),
       ).to.be.rejectedWith("InvalidDebounce");
     });
 
@@ -265,7 +265,7 @@ describe("Risk Steward", async function () {
     it("should revert if contract is paused", async function () {
       await riskStewardReceiver.pause();
       await expect(
-        riskStewardReceiver.processUpdateByParameterAndMarket("MarketSupplyCap", mockCoreVToken.address),
+        riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address),
       ).to.be.rejectedWith("Pausable: paused");
     });
   });
@@ -299,21 +299,21 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketSupplyCap",
+        "supplyCap",
         mockCoreVToken.address,
         "0x",
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketBorrowCap",
+        "borrowCap",
         mockCoreVToken.address,
         "0x",
       );
-      await riskStewardReceiver.toggleConfigActive("MarketSupplyCap");
+      await riskStewardReceiver.toggleConfigActive("supplyCap");
       await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("ConfigNotActive");
 
-      await riskStewardReceiver.toggleConfigActive("MarketBorrowCap");
+      await riskStewardReceiver.toggleConfigActive("borrowCap");
       await expect(riskStewardReceiver.processUpdateById(2)).to.be.rejectedWith("ConfigNotActive");
     });
 
@@ -321,14 +321,14 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketSupplyCap",
+        "supplyCap",
         mockCoreVToken.address,
         "0x",
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketBorrowCap",
+        "borrowCap",
         mockCoreVToken.address,
         "0x",
       );
@@ -341,7 +341,7 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketSupplyCap",
+        "supplyCap",
         mockCoreComptroller.address,
         "0x",
       );
@@ -350,7 +350,7 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketBorrowCap",
+        "borrowCap",
         mockCoreComptroller.address,
         "0x",
       );
@@ -361,14 +361,14 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketSupplyCap",
+        "supplyCap",
         mockCoreVToken.address,
         "0x",
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(12),
-        "MarketSupplyCap",
+        "supplyCap",
         mockCoreVToken.address,
         "0x",
       );
@@ -378,14 +378,14 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketBorrowCap",
+        "borrowCap",
         mockCoreVToken.address,
         "0x",
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(12),
-        "MarketBorrowCap",
+        "borrowCap",
         mockCoreVToken.address,
         "0x",
       );
@@ -401,7 +401,7 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketSupplyCap",
+        "supplyCap",
         mockCoreVToken.address,
         "0x",
       );
@@ -414,7 +414,7 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(5),
-        "MarketSupplyCap",
+        "supplyCap",
         mockCoreVToken.address,
         "0x",
       );
@@ -424,7 +424,7 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(20),
-        "MarketSupplyCap",
+        "supplyCap",
         mockCoreVToken.address,
         "0x",
       );
@@ -434,7 +434,7 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(5),
-        "MarketBorrowCap",
+        "borrowCap",
         mockCoreVToken.address,
         "0x",
       );
@@ -444,7 +444,7 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(20),
-        "MarketBorrowCap",
+        "borrowCap",
         mockCoreVToken.address,
         "0x",
       );
@@ -460,14 +460,14 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketSupplyCap",
+        "supplyCap",
         mockCoreVToken.address,
         "0x",
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketBorrowCap",
+        "borrowCap",
         mockCoreVToken.address,
         "0x",
       );
@@ -481,14 +481,14 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketSupplyCap",
+        "supplyCap",
         mockVToken.address,
         "0x",
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketBorrowCap",
+        "borrowCap",
         mockVToken.address,
         "0x",
       );
@@ -505,19 +505,19 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketSupplyCap",
+        "supplyCap",
         mockCoreVToken.address,
         "0x",
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketBorrowCap",
+        "borrowCap",
         mockCoreVToken.address,
         "0x",
       );
-      await riskStewardReceiver.processUpdateByParameterAndMarket("MarketSupplyCap", mockCoreVToken.address);
-      await riskStewardReceiver.processUpdateByParameterAndMarket("MarketBorrowCap", mockCoreVToken.address);
+      await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address);
+      await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address);
       expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("10", 18));
       expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("10", 18));
       // Isolated Pool
@@ -526,19 +526,19 @@ describe("Risk Steward", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketSupplyCap",
+        "supplyCap",
         mockVToken.address,
         "0x",
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
-        "MarketBorrowCap",
+        "borrowCap",
         mockVToken.address,
         "0x",
       );
-      await riskStewardReceiver.processUpdateByParameterAndMarket("MarketSupplyCap", mockVToken.address);
-      await riskStewardReceiver.processUpdateByParameterAndMarket("MarketBorrowCap", mockVToken.address);
+      await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockVToken.address);
+      await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockVToken.address);
       expect(await mockComptroller.supplyCaps(mockVToken.address)).to.equal(parseUnits("10", 18));
       expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("10", 18));
     });
