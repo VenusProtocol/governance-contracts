@@ -105,7 +105,7 @@ export const getRiskOracle = async (networkName: "bsctestnet" | "bscmainnet" | "
   const mockRiskOracle = await ethers.getContractOrNull("MockRiskOracle");
   return {
     bscmainnet: "",
-    bsctestnet: "",
+    bsctestnet: "0x7bd97dd6c199532d11cf5f55e13a120db6dd0f4f",
     hardhat: mockRiskOracle?.address || "",
   }[networkName];
 };
