@@ -91,9 +91,9 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
      */
     function processUpdate(RiskParameterUpdate calldata update) external {
         _checkAccessAllowed("processUpdate(RiskParameterUpdate)");
-        if (Strings.equal(update.updateType, "MarketSupplyCap")) {
+        if (Strings.equal(update.updateType, "supplyCap")) {
             _processSupplyCapUpdate(update);
-        } else if (Strings.equal(update.updateType, "MarketBorrowCap")) {
+        } else if (Strings.equal(update.updateType, "borrowCap")) {
             _processBorrowCapUpdate(update);
         } else {
             revert UnsupportedUpdateType();
