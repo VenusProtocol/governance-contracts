@@ -116,9 +116,7 @@ describe("Risk Steward", async function () {
   describe("Access Control", async function () {
     it("should revert if access is not granted for setting risk parameter config", async function () {
       await expect(
-        riskStewardReceiver
-          .connect(signer1)
-          .setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1),
+        riskStewardReceiver.connect(signer1).setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1),
       ).to.be.rejectedWith(
         'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x4631BCAbD6dF18D94796344963cB60d44a4136b6", "setRiskParameterConfig(string,address,uint256)")',
       );
@@ -154,9 +152,7 @@ describe("Risk Steward", async function () {
           additionalData: "0x",
           market: mockCoreVToken.address,
         }),
-      ).to.be.rejectedWith(
-        'OnlyRiskStewardReceiver()',
-      );
+      ).to.be.rejectedWith("OnlyRiskStewardReceiver()");
     });
 
     it("should revert if access is not granted for setting max increase bps", async function () {
@@ -223,9 +219,10 @@ describe("Risk Steward", async function () {
     });
 
     it("should emit RiskParameterConfigSet event", async function () {
-      await expect(
-        riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1),
-      ).to.emit(riskStewardReceiver, "RiskParameterConfigSet");
+      await expect(riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1)).to.emit(
+        riskStewardReceiver,
+        "RiskParameterConfigSet",
+      );
     });
 
     it("should revert if empty updateType is set", async function () {
@@ -269,7 +266,7 @@ describe("Risk Steward", async function () {
       await expect(
         mockRiskOracle.publishRiskParameterUpdate(
           "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
-          parseUnits("10", 18),
+          parseUnitsToHex(10),
           "UnknownUpdateType",
           mockCoreVToken.address,
           "0x",
@@ -280,7 +277,7 @@ describe("Risk Steward", async function () {
     it("should revert if updateType is implemented", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
-        parseUnits("10", 18),
+        parseUnitsToHex(10),
         "RandomUpdateType",
         mockCoreVToken.address,
         "0x",
@@ -465,8 +462,8 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await riskStewardReceiver.processUpdateById(1);
-      await riskStewardReceiver.processUpdateById(2);
+      await expect(await riskStewardReceiver.processUpdateById(1)).to.emit(marketCapsRiskSteward, "SupplyCapUpdated").withArgs(mockCoreVToken.address,parseUnits('10', 18));
+      await expect(await riskStewardReceiver.processUpdateById(2)).to.emit(marketCapsRiskSteward, "BorrowCapUpdated").withArgs(mockCoreVToken.address,parseUnits('10', 18));
       expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("10", 18));
       expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("10", 18));
       // Isolated Pool
@@ -486,8 +483,8 @@ describe("Risk Steward", async function () {
         mockVToken.address,
         "0x",
       );
-      await riskStewardReceiver.processUpdateById(3);
-      await riskStewardReceiver.processUpdateById(4);
+      await expect(riskStewardReceiver.processUpdateById(3)).to.emit(marketCapsRiskSteward, "SupplyCapUpdated").withArgs(mockVToken.address,parseUnits('10', 18));
+      await expect(riskStewardReceiver.processUpdateById(4)).to.emit(marketCapsRiskSteward, "BorrowCapUpdated").withArgs(mockVToken.address,parseUnits('10', 18));
       expect(await mockComptroller.supplyCaps(mockVToken.address)).to.equal(parseUnits("10", 18));
       expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("10", 18));
     });

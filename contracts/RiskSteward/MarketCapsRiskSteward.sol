@@ -30,7 +30,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
      * @notice Address of the CorePool comptroller used for selecting the correct comptroller abi
      */
     ICorePoolComptroller public immutable CORE_POOL_COMPTROLLER;
-    
+
     /**
      * @notice Address of the RiskStewardReceiver used for to validate incoming updates
      */
@@ -121,7 +121,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         newSupplyCapMarkets[0] = market;
         uint256[] memory newSupplyCaps = new uint256[](1);
 
-        newSupplyCaps[0] = uint256(bytes32(newValue));
+        newSupplyCaps[0] = _decodeBytesToUint256(newValue);
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
             ICorePoolComptroller(comptroller)._setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
         } else {
@@ -135,7 +135,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         address[] memory newBorrowCapMarkets = new address[](1);
         newBorrowCapMarkets[0] = market;
         uint256[] memory newBorrowCaps = new uint256[](1);
-        newBorrowCaps[0] = uint256(bytes32(newValue));
+        newBorrowCaps[0] = _decodeBytesToUint256(newValue);
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
             ICorePoolComptroller(comptroller)._setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
         } else {
@@ -158,10 +158,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(update.market).comptroller());
         uint256 currentSupplyCap = comptroller.supplyCaps(address(update.market));
 
-        uint256 newValue = abi.decode(
-            abi.encodePacked(new bytes(32 - update.newValue.length), update.newValue),
-            (uint256)
-        );
+        uint256 newValue = _decodeBytesToUint256(update.newValue);
         _updateWithinAllowedRange(currentSupplyCap, newValue);
     }
 
@@ -169,10 +166,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(update.market).comptroller());
         uint256 currentBorrowCap = comptroller.borrowCaps(address(update.market));
 
-        uint256 newValue = abi.decode(
-            abi.encodePacked(new bytes(32 - update.newValue.length), update.newValue),
-            (uint256)
-        );
+        uint256 newValue = _decodeBytesToUint256(update.newValue);
         _updateWithinAllowedRange(currentBorrowCap, newValue);
     }
 
@@ -194,5 +188,9 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         if (diff > maxDiff) {
             revert UpdateNotInRange();
         }
+    }
+
+    function _decodeBytesToUint256(bytes memory data) internal pure returns (uint256) {
+        return abi.decode(abi.encodePacked(new bytes(32 - data.length), data), (uint256));
     }
 }
