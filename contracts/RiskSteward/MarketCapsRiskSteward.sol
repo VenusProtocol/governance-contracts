@@ -12,6 +12,7 @@ import { IRiskStewardReceiver, RiskParamConfig } from "./IRiskStewardReceiver.so
 import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { IRiskSteward } from "./IRiskSteward.sol";
+import { IRiskStewardReceiver } from "./IRiskStewardReceiver.sol";
 
 /**
  * @title MarketCapsRiskSteward
@@ -29,6 +30,12 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
      * @notice Address of the CorePool comptroller used for selecting the correct comptroller abi
      */
     ICorePoolComptroller public immutable CORE_POOL_COMPTROLLER;
+    
+    /**
+     * @notice Address of the RiskStewardReceiver used for to validate incoming updates
+     */
+    IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
+
     /**
      * @notice Emitted when a supply cap is updated
      */
@@ -59,10 +66,16 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
      */
     error UpdateNotInRange();
 
+    /**
+     * @notice Thrown when the update is not coming from the RiskStewardReceiver
+     */
+    error OnlyRiskStewardReceiver();
+
     /// @custom:oz-upgrades-unsafe-allow constructor
-    constructor(address corePoolComptroller_) {
+    constructor(address corePoolComptroller_, address riskStewardReceiver_) {
         require(corePoolComptroller_ != address(0), "Core Pool Comptroller address must not be zero");
         CORE_POOL_COMPTROLLER = ICorePoolComptroller(corePoolComptroller_);
+        RISK_STEWARD_RECEIVER = IRiskStewardReceiver(riskStewardReceiver_);
         _disableInitializers();
     }
 
@@ -90,7 +103,9 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
      * @param update
      */
     function processUpdate(RiskParameterUpdate calldata update) external {
-        _checkAccessAllowed("processUpdate(RiskParameterUpdate)");
+        if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
+            revert OnlyRiskStewardReceiver();
+        }
         if (Strings.equal(update.updateType, "supplyCap")) {
             _processSupplyCapUpdate(update);
         } else if (Strings.equal(update.updateType, "borrowCap")) {

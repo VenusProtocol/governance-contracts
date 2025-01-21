@@ -39,11 +39,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     },
   });
 
+  const riskStewardReceiver = await hre.ethers.getContract("RiskStewardReceiver");
+
   await deploy("MarketCapsRiskSteward", {
     from: deployer,
     log: true,
     deterministicDeployment: false,
-    args: [corePoolComptroller.address],
+    args: [corePoolComptroller.address, riskStewardReceiver.address],
     proxy: {
       owner: networkName === "hardhat" ? deployer : await guardian(networkName as SUPPORTED_NETWORKS),
       proxyContract: "OptimizedTransparentUpgradeableProxy",
