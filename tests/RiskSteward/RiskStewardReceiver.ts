@@ -77,7 +77,7 @@ describe("Risk Steward", async function () {
       MockMarketCapsRiskStewardFactory,
       [accessControlManager.address, 5000],
       {
-        constructorArgs: [mockCoreComptroller.address],
+        constructorArgs: [mockCoreComptroller.address, riskStewardReceiver.address],
         initializer: "initialize",
         unsafeAllow: ["state-variable-immutable"],
       },
@@ -98,12 +98,6 @@ describe("Risk Steward", async function () {
     await accessControlManager.giveCallPermission(riskStewardReceiver.address, "pause()", deployer.address);
 
     await accessControlManager.giveCallPermission(riskStewardReceiver.address, "unpause()", deployer.address);
-
-    await accessControlManager.giveCallPermission(
-      marketCapsRiskSteward.address,
-      "processUpdate(RiskParameterUpdate)",
-      riskStewardReceiver.address,
-    );
 
     await accessControlManager.giveCallPermission(
       marketCapsRiskSteward.address,
@@ -161,7 +155,7 @@ describe("Risk Steward", async function () {
           market: mockCoreVToken.address,
         }),
       ).to.be.rejectedWith(
-        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0xA4899D35897033b927acFCf422bc745916139776", "processUpdate(RiskParameterUpdate)")',
+        'OnlyRiskStewardReceiver()',
       );
     });
 
@@ -176,7 +170,7 @@ describe("Risk Steward", async function () {
     it("new implementation should update core comptroller", async function () {
       const corePoolComptrollerTestnetAddress = "0x94d1820b2D1c7c7452A163983Dc888CEC546b77D";
       await upgrades.upgradeProxy(marketCapsRiskSteward, MockMarketCapsRiskStewardFactory, {
-        constructorArgs: [corePoolComptrollerTestnetAddress],
+        constructorArgs: [corePoolComptrollerTestnetAddress, riskStewardReceiver.address],
         unsafeAllow: ["state-variable-immutable"],
       });
       expect(await marketCapsRiskSteward.CORE_POOL_COMPTROLLER()).to.equal(corePoolComptrollerTestnetAddress);
