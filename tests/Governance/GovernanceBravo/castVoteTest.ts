@@ -71,6 +71,7 @@ describe("Governor Bravo Cast Vote Test", () => {
   });
   describe("We must revert if:", () => {
     let customerAddress;
+
     it("We cannot propose without enough voting power by depositing xvs to the vault", async () => {
       customerAddress = await customer.getAddress();
       xvsVault.getPriorVotes.returns(convertToUnit("249999", 18));
@@ -83,8 +84,9 @@ describe("Governor Bravo Cast Vote Test", () => {
           "do nothing",
           ProposalType.CRITICAL,
         ),
-      ).to.be.rejectedWith("InsufficientVotingPower");
+      ).to.be.revertedWith("GovernorBravo::propose: proposer votes below proposal threshold or not whitelisted");
     });
+
     describe("after we deposit xvs to the vault", () => {
       let proposalId: BigNumber;
       beforeEach(async () => {
