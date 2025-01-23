@@ -62,6 +62,12 @@ contract GovernorBravoEvents {
 
     /// @notice Emitted when the maximum number of operations in one proposal is updated
     event ProposalMaxOperationsUpdated(uint256 oldMaxOperations, uint256 newMaxOperations);
+
+    /// @notice Emitted when a proposer is added to the whitelist
+    event WhitelistedProposerAdded(address indexed proposer);
+
+    /// @notice Emitted when a proposer is removed from the whitelist
+    event WhitelistedProposerRemoved(address indexed proposer);
 }
 
 /**
