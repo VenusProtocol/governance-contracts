@@ -182,6 +182,9 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     /// @notice Error thrown when sender is not pending admin
     error SenderIsNotPendingAdmin();
 
+    /// @notice Error thrown when the proposer is not whitelisted
+    error TimelockNotWhitelistedForProposer();
+
     modifier onlyAdmin() {
         if (msg.sender != admin) {
             revert OnlyAdmin();
@@ -294,6 +297,10 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
             revert InsufficientVotingPower();
         }
 
+        if (whitelistedProposers[msg.sender] != address(0) && whitelistedProposers[msg.sender] != address(proposalTimelocks[uint8(proposalType)])) {
+            revert TimelockNotWhitelistedForProposer();
+        }
+
         if (
             targets.length != values.length || targets.length != signatures.length || targets.length != calldatas.length
         ) {
@@ -374,6 +381,34 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         }
         proposal.eta = eta;
         emit ProposalQueued(proposalId, eta);
+    }
+
+    /**
+     * @notice Whitelists a proposer
+     * @param proposer The address of the proposer to whitelist
+     */
+    function whitelistProposer(address proposer) external {
+        require(
+            msg.sender == address(proposalTimelocks[uint8(ProposalType.NORMAL)]),
+            "GovernorBravo::whitelistProposer: callable only from normal timelock only"
+        );
+        whitelistedProposers[proposer] = true;
+
+        emit WhitelistedProposerAdded(proposer);
+    }
+
+    /**
+     * @notice Removes a whitelisted proposer
+     * @param proposer The address of the proposer to remove from whitelist
+     */
+    function removeWhitelistedProposer(address proposer) external {
+        require(
+            msg.sender == address(proposalTimelocks[uint8(ProposalType.NORMAL)]),
+            "GovernorBravo::removeWhitelistedProposer: callable only from normal timelock only"
+        );
+        whitelistedProposers[proposer] = false;
+
+        emit WhitelistedProposerRemoved(proposer);
     }
 
     function queueOrRevertInternal(
