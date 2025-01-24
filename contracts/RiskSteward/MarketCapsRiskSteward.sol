@@ -90,6 +90,12 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         maxIncreaseBps = maxIncreaseBps_;
     }
 
+    /**
+     * @notice Sets the max increase bps
+     * @param maxIncreaseBps_ The new max increase bps
+     * @custom:error InvalidMaxIncreaseBps if the max increase bps is 0
+     * @custom:access Controlled by AccessControlManager
+     */
     function setMaxIncreaseBps(uint256 maxIncreaseBps_) external {
         _checkAccessAllowed("setMaxIncreaseBps(uint256)");
         uint256 _maxIncreaseBps = maxIncreaseBps;
@@ -101,8 +107,11 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
     }
 
     /**
-     * @notice
-     * @param update
+     * @notice Processes an update from the RiskStewardReceiver
+     * @param update Validates and processes supplyCap and borrowCap updates
+     * @custom:error OnlyRiskStewardReceiver if the sender is not the RiskStewardReceiver
+     * @custom:error UnsupportedUpdateType if the update type is not supported
+     * @custom:access Controlled by AccessControlManager
      */
     function processUpdate(RiskParameterUpdate calldata update) external {
         if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
