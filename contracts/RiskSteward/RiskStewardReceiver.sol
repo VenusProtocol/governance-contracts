@@ -114,7 +114,7 @@ contract RiskStewardReceiver is
 
     /**
      * @notice Pauses processing of updates
-     * @custom:access AccessControlledV8
+     * @custom:access Controlled by AccessControlManager
      */
     function pause() external {
         _checkAccessAllowed("pause()");
@@ -123,7 +123,7 @@ contract RiskStewardReceiver is
 
     /**
      * @notice Unpauses processing of updates
-     * @custom:access AccessControlledV8
+     * @custom:access Controlled by AccessControlManager
      */
     function unpause() external {
         _checkAccessAllowed("unpause()");
@@ -134,6 +134,7 @@ contract RiskStewardReceiver is
      * @notice Sets the risk parameter config for a given update type
      * @param updateType The type of update to set the config for
      * @param debounce The debounce period for the update
+     * @custom:access Controlled by AccessControlManager
      */
     function setRiskParameterConfig(string calldata updateType, address riskSteward, uint256 debounce) external {
         _checkAccessAllowed("setRiskParameterConfig(string,address,uint256)");
