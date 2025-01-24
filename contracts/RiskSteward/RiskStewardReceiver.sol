@@ -55,7 +55,12 @@ contract RiskStewardReceiver is
     /**
      * @notice Event emitted when a risk parameter config is set
      */
-    event RiskParameterConfigSet(string indexed updateType, address indexed riskSteward, uint256 debounce);
+    event RiskParameterConfigSet(string indexed updateType, address indexed previousRiskSteward, address indexed riskSteward, uint256 previousDebounce, uint256 debounce, bool previousActive, bool active);
+
+    /**
+     * @notice Event emitted when a risk parameter config is toggled
+     */
+    event ToggleConfigActive(string indexed updateType, bool active);
 
     /**
      * @notice Event emitted when an update is successfully applied
@@ -136,12 +141,13 @@ contract RiskStewardReceiver is
         if (debounce == 0) {
             revert InvalidDebounce();
         }
+        RiskParamConfig memory previousConfig = riskParameterConfigs[updateType];
         riskParameterConfigs[updateType] = RiskParamConfig({
             active: true,
             riskSteward: riskSteward,
             debounce: debounce
         });
-        emit RiskParameterConfigSet(updateType, riskSteward, debounce);
+        emit RiskParameterConfigSet(updateType, previousConfig.riskSteward, riskSteward, previousConfig.debounce, debounce, previousConfig.active, true);
     }
 
     /**
@@ -165,6 +171,7 @@ contract RiskStewardReceiver is
         }
 
         riskParameterConfigs[updateType].active = !riskParameterConfigs[updateType].active;
+        emit ToggleConfigActive(updateType, riskParameterConfigs[updateType].active);
     }
 
     /**
