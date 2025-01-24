@@ -13,6 +13,7 @@ import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/securit
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { IRiskSteward } from "./IRiskSteward.sol";
 import { IRiskStewardReceiver } from "./IRiskStewardReceiver.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
 /**
  * @title MarketCapsRiskSteward
@@ -73,7 +74,8 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor(address corePoolComptroller_, address riskStewardReceiver_) {
-        require(corePoolComptroller_ != address(0), "Core Pool Comptroller address must not be zero");
+        ensureNonzeroAddress(corePoolComptroller_);
+        ensureNonzeroAddress(riskStewardReceiver_);
         CORE_POOL_COMPTROLLER = ICorePoolComptroller(corePoolComptroller_);
         RISK_STEWARD_RECEIVER = IRiskStewardReceiver(riskStewardReceiver_);
         _disableInitializers();
