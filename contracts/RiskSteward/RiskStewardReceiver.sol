@@ -57,7 +57,15 @@ contract RiskStewardReceiver is
     /**
      * @notice Event emitted when a risk parameter config is set
      */
-    event RiskParameterConfigSet(string indexed updateType, address indexed previousRiskSteward, address indexed riskSteward, uint256 previousDebounce, uint256 debounce, bool previousActive, bool active);
+    event RiskParameterConfigSet(
+        string indexed updateType,
+        address indexed previousRiskSteward,
+        address indexed riskSteward,
+        uint256 previousDebounce,
+        uint256 debounce,
+        bool previousActive,
+        bool active
+    );
 
     /**
      * @notice Event emitted when a risk parameter config is toggled
@@ -150,7 +158,15 @@ contract RiskStewardReceiver is
             riskSteward: riskSteward,
             debounce: debounce
         });
-        emit RiskParameterConfigSet(updateType, previousConfig.riskSteward, riskSteward, previousConfig.debounce, debounce, previousConfig.active, true);
+        emit RiskParameterConfigSet(
+            updateType,
+            previousConfig.riskSteward,
+            riskSteward,
+            previousConfig.debounce,
+            debounce,
+            previousConfig.active,
+            true
+        );
     }
 
     /**

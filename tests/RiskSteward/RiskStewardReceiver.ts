@@ -462,8 +462,12 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await expect(await riskStewardReceiver.processUpdateById(1)).to.emit(marketCapsRiskSteward, "SupplyCapUpdated").withArgs(mockCoreVToken.address,parseUnits('10', 18));
-      await expect(await riskStewardReceiver.processUpdateById(2)).to.emit(marketCapsRiskSteward, "BorrowCapUpdated").withArgs(mockCoreVToken.address,parseUnits('10', 18));
+      await expect(await riskStewardReceiver.processUpdateById(1))
+        .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
+        .withArgs(mockCoreVToken.address, parseUnits("10", 18));
+      await expect(await riskStewardReceiver.processUpdateById(2))
+        .to.emit(marketCapsRiskSteward, "BorrowCapUpdated")
+        .withArgs(mockCoreVToken.address, parseUnits("10", 18));
       expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("10", 18));
       expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("10", 18));
       // Isolated Pool
@@ -483,8 +487,12 @@ describe("Risk Steward", async function () {
         mockVToken.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateById(3)).to.emit(marketCapsRiskSteward, "SupplyCapUpdated").withArgs(mockVToken.address,parseUnits('10', 18));
-      await expect(riskStewardReceiver.processUpdateById(4)).to.emit(marketCapsRiskSteward, "BorrowCapUpdated").withArgs(mockVToken.address,parseUnits('10', 18));
+      await expect(riskStewardReceiver.processUpdateById(3))
+        .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
+        .withArgs(mockVToken.address, parseUnits("10", 18));
+      await expect(riskStewardReceiver.processUpdateById(4))
+        .to.emit(marketCapsRiskSteward, "BorrowCapUpdated")
+        .withArgs(mockVToken.address, parseUnits("10", 18));
       expect(await mockComptroller.supplyCaps(mockVToken.address)).to.equal(parseUnits("10", 18));
       expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("10", 18));
     });
