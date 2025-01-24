@@ -30,7 +30,7 @@ contract RiskStewardReceiver is
     /**
      * @notice Mapping of supported risk configurations and their validation parameters
      */
-    mapping(string updateType => RiskParamConfig) private riskParameterConfigs;
+    mapping(string updateType => RiskParamConfig) public riskParameterConfigs;
 
     /**
      * @notice Whitelisted oracle address to receive updates from
