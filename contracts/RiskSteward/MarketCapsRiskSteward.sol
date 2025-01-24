@@ -98,12 +98,11 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
      */
     function setMaxIncreaseBps(uint256 maxIncreaseBps_) external {
         _checkAccessAllowed("setMaxIncreaseBps(uint256)");
-        uint256 _maxIncreaseBps = maxIncreaseBps;
         if (maxIncreaseBps_ == 0) {
             revert InvalidMaxIncreaseBps();
         }
+        emit MaxIncreaseBpsUpdated(maxIncreaseBps, maxIncreaseBps_);
         maxIncreaseBps = maxIncreaseBps_;
-        emit MaxIncreaseBpsUpdated(_maxIncreaseBps, maxIncreaseBps_);
     }
 
     /**
