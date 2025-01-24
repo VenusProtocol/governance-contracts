@@ -52,6 +52,8 @@ contract RiskStewardReceiver is
      */
     uint256 public constant UPDATE_EXPIRATION_TIME = 1 days;
 
+    uint256[50] private __gap;
+
     /**
      * @notice Event emitted when a risk parameter config is set
      */
@@ -240,6 +242,4 @@ contract RiskStewardReceiver is
      * @dev Disabling renounceOwnership function.
      */
     function renounceOwnership() public override {}
-
-    uint256[50] private __gap;
 }
