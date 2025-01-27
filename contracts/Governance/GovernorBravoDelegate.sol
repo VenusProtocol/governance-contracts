@@ -104,30 +104,124 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     /// @notice The EIP-712 typehash for the ballot struct used by the contract
     bytes32 public constant BALLOT_TYPEHASH = keccak256("Ballot(uint256 proposalId,uint8 support)");
 
+    /// @notice Mapping to store whitelisted proposers and the timelock they are authorized to use
+    mapping(address => address) public whitelistedProposers;
+
+    /// @notice Error thrown when the caller is not the admin
+    error OnlyAdmin();
+
+    /// @notice Error thrown when the caller is not the admin or the guardian
+    error OnlyAdminOrGuardian();
+
+    /// @notice Error thrown when the contract is already initialized
+    error AlreadyInitialized();
+
+    /// @notice Error thrown when the arity of the proposal function parameters are not equal
+    error ArityMismatch(string parameterName);
+
+    /// @notice Error thrown when the min voting period is invalid
+    error InvalidMinVotingPeriod();
+
+    /// @notice Error thrown when the max voting period is invalid
+    error InvalidMaxVotingPeriod();
+
+    /// @notice Error thrown when the min voting delay is invalid
+    error InvalidMinVotingDelay();
+
+    /// @notice Error thrown when the max voting delay is invalid
+    error InvalidMaxVotingDelay();
+
+    /// @notice Error thrown when the min proposal threshold is invalid
+    error InvalidMinProposalThreshold();
+
+    /// @notice Error thrown when the max proposal threshold is invalid
+    error InvalidMaxProposalThreshold();
+
+    /// @notice Error thrown when the governor is not active
+    error GovernorNotActive();
+
+    /// @notice Error thrown when user has insufficient voting power to execute a command
+    error InsufficientVotingPower();
+
+    /// @notice Error thrown when no actions are provided
+    error NoActionsProvided();
+
+    /// @notice Error thrown when too many actions are provided
+    error TooManyActions();
+
+    /// @notice Error thrown when a proposer has an active or pending proposal
+    error OneLiveProposalPerProposer();
+
+    /// @notice Error thrown when a proposal is not active
+    error ProposalNotActive();
+
+    /// @notice Error thrown when a proposal has not succeeded
+    error ProposalNotSucceeded();
+
+    /// @notice Error thrown when a proposal has not been queued
+    error ProposalNotQueued();
+
+    /// @notice Error thrown when a proposal has already been executed
+    error ProposalAlreadyExecuted();
+
+    /// @notice Error thrown when a proposal tries to queue identical actions
+    error DuplicateAction();
+
+    /// @notice Error thrown when the proposal id is too high (doesn't exist)
+    error InvalidProposalId();
+
+    /// @notice Error thrown when the signature is invalid
+    error InvalidSignature();
+
+    /// @notice Error thrown when vote type is not correct
+    error InvalidVoteType();
+
+    /// @notice Error thrown when user has already voted
+    error UserAlreadyVoted();
+
+    /// @notice Error thrown when sender is not pending admin
+    error SenderIsNotPendingAdmin();
+
+    modifier onlyAdmin() {
+        if (msg.sender != admin) {
+            revert OnlyAdmin();
+        }
+        _;
+    }
+
+    modifier onlyGuardianOrAdmin() {
+        if (msg.sender != guardian && msg.sender != admin) {
+            revert OnlyAdminOrGuardian();
+        }
+        _;
+    }
+
     /**
      * @notice Used to initialize the contract during delegator contructor
      * @param xvsVault_ The address of the XvsVault
      * @param proposalConfigs_ Governance configs for each governance route
      * @param timelocks Timelock addresses for each governance route
+     * @param guardian_ The address of the guardian
+     * @custom:access Only called by the admin
      */
     function initialize(
         address xvsVault_,
         ProposalConfig[] memory proposalConfigs_,
         TimelockInterface[] memory timelocks,
         address guardian_
-    ) public {
-        require(address(proposalTimelocks[0]) == address(0), "GovernorBravo::initialize: cannot initialize twice");
-        require(msg.sender == admin, "GovernorBravo::initialize: admin only");
-        require(xvsVault_ != address(0), "GovernorBravo::initialize: invalid xvs address");
-        require(guardian_ != address(0), "GovernorBravo::initialize: invalid guardian");
-        require(
-            timelocks.length == uint8(ProposalType.CRITICAL) + 1,
-            "GovernorBravo::initialize:number of timelocks should match number of governance routes"
-        );
-        require(
-            proposalConfigs_.length == uint8(ProposalType.CRITICAL) + 1,
-            "GovernorBravo::initialize:number of proposal configs should match number of governance routes"
-        );
+    ) public onlyAdmin {
+        if (address(proposalTimelocks[0]) != address(0)) {
+            revert AlreadyInitialized();
+        }
+        ensureNonzeroAddress(xvsVault_);
+        ensureNonzeroAddress(guardian_);
+        if (timelocks.length != uint8(ProposalType.CRITICAL) + 1) {
+            revert ArityMismatch("timelocks");
+        }
+
+        if (proposalConfigs_.length != uint8(ProposalType.CRITICAL) + 1) {
+            revert ArityMismatch("proposalConfigs_");
+        }
 
         xvsVault = XvsVaultInterface(xvsVault_);
         proposalMaxOperations = 10;
@@ -136,31 +230,30 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         //Set parameters for each Governance Route
         uint256 arrLength = proposalConfigs_.length;
         for (uint256 i; i < arrLength; ++i) {
-            require(
-                proposalConfigs_[i].votingPeriod >= MIN_VOTING_PERIOD,
-                "GovernorBravo::initialize: invalid min voting period"
-            );
-            require(
-                proposalConfigs_[i].votingPeriod <= MAX_VOTING_PERIOD,
-                "GovernorBravo::initialize: invalid max voting period"
-            );
-            require(
-                proposalConfigs_[i].votingDelay >= MIN_VOTING_DELAY,
-                "GovernorBravo::initialize: invalid min voting delay"
-            );
-            require(
-                proposalConfigs_[i].votingDelay <= MAX_VOTING_DELAY,
-                "GovernorBravo::initialize: invalid max voting delay"
-            );
-            require(
-                proposalConfigs_[i].proposalThreshold >= MIN_PROPOSAL_THRESHOLD,
-                "GovernorBravo::initialize: invalid min proposal threshold"
-            );
-            require(
-                proposalConfigs_[i].proposalThreshold <= MAX_PROPOSAL_THRESHOLD,
-                "GovernorBravo::initialize: invalid max proposal threshold"
-            );
-            require(address(timelocks[i]) != address(0), "GovernorBravo::initialize:invalid timelock address");
+            if (proposalConfigs_[i].votingPeriod < MIN_VOTING_PERIOD) {
+                revert InvalidMinVotingPeriod();
+            }
+
+            if (proposalConfigs_[i].votingPeriod > MAX_VOTING_PERIOD) {
+                revert InvalidMaxVotingPeriod();
+            }
+
+            if (proposalConfigs_[i].votingDelay < MIN_VOTING_DELAY) {
+                revert InvalidMinVotingDelay();
+            }
+
+            if (proposalConfigs_[i].votingDelay > MAX_VOTING_DELAY) {
+                revert InvalidMaxVotingDelay();
+            }
+
+            if (proposalConfigs_[i].proposalThreshold < MIN_PROPOSAL_THRESHOLD) {
+                revert InvalidMinProposalThreshold();
+            }
+
+            if (proposalConfigs_[i].proposalThreshold >= MAX_PROPOSAL_THRESHOLD) {
+                revert InvalidMaxProposalThreshold();
+            }
+            ensureNonzeroAddress(address(timelocks[i]));
 
             proposalConfigs[i] = proposalConfigs_[i];
             proposalTimelocks[i] = timelocks[i];
@@ -189,32 +282,40 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         ProposalType proposalType
     ) public returns (uint256) {
         // Reject proposals before initiating as Governor
-        require(initialProposalId != 0, "GovernorBravo::propose: Governor Bravo not active");
-        require(
-            xvsVault.getPriorVotes(msg.sender, sub256(block.number, 1)) >=
-                proposalConfigs[uint8(proposalType)].proposalThreshold,
-            "GovernorBravo::propose: proposer votes below proposal threshold"
-        );
-        require(
-            targets.length == values.length &&
-                targets.length == signatures.length &&
-                targets.length == calldatas.length,
-            "GovernorBravo::propose: proposal function information arity mismatch"
-        );
-        require(targets.length != 0, "GovernorBravo::propose: must provide actions");
-        require(targets.length <= proposalMaxOperations, "GovernorBravo::propose: too many actions");
+        if (initialProposalId == 0) {
+            revert GovernorNotActive();
+        }
+
+        if (
+            xvsVault.getPriorVotes(msg.sender, sub256(block.number, 1)) <
+            proposalConfigs[uint8(proposalType)].proposalThreshold &&
+            whitelistedProposers[msg.sender] == address(0)
+        ) {
+            revert InsufficientVotingPower();
+        }
+
+        if (
+            targets.length != values.length || targets.length != signatures.length || targets.length != calldatas.length
+        ) {
+            revert ArityMismatch("targets, values, signatures, calldatas");
+        }
+
+        if (targets.length == 0) {
+            revert NoActionsProvided();
+        }
+        if (targets.length > proposalMaxOperations) {
+            revert TooManyActions();
+        }
 
         uint256 latestProposalId = latestProposalIds[msg.sender];
         if (latestProposalId != 0) {
             ProposalState proposersLatestProposalState = state(latestProposalId);
-            require(
-                proposersLatestProposalState != ProposalState.Active,
-                "GovernorBravo::propose: one live proposal per proposer, found an already active proposal"
-            );
-            require(
-                proposersLatestProposalState != ProposalState.Pending,
-                "GovernorBravo::propose: one live proposal per proposer, found an already pending proposal"
-            );
+            if (
+                proposersLatestProposalState == ProposalState.Active ||
+                proposersLatestProposalState == ProposalState.Pending
+            ) {
+                revert OneLiveProposalPerProposer();
+            }
         }
 
         uint256 startBlock = add256(block.number, proposalConfigs[uint8(proposalType)].votingDelay);
@@ -255,10 +356,10 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param proposalId The id of the proposal to queue
      */
     function queue(uint256 proposalId) external {
-        require(
-            state(proposalId) == ProposalState.Succeeded,
-            "GovernorBravo::queue: proposal can only be queued if it is succeeded"
-        );
+        if (state(proposalId) != ProposalState.Succeeded) {
+            revert ProposalNotSucceeded();
+        }
+
         Proposal storage proposal = proposals[proposalId];
         uint256 eta = add256(block.timestamp, proposalTimelocks[uint8(proposal.proposalType)].delay());
         for (uint256 i; i < proposal.targets.length; ++i) {
@@ -283,12 +384,14 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         uint256 eta,
         uint8 proposalType
     ) internal {
-        require(
-            !proposalTimelocks[proposalType].queuedTransactions(
+        if (
+            proposalTimelocks[proposalType].queuedTransactions(
                 keccak256(abi.encode(target, value, signature, data, eta))
-            ),
-            "GovernorBravo::queueOrRevertInternal: identical proposal action already queued at eta"
-        );
+            )
+        ) {
+            revert DuplicateAction();
+        }
+
         proposalTimelocks[proposalType].queueTransaction(target, value, signature, data, eta);
     }
 
@@ -297,10 +400,10 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param proposalId The id of the proposal to execute
      */
     function execute(uint256 proposalId) external {
-        require(
-            state(proposalId) == ProposalState.Queued,
-            "GovernorBravo::execute: proposal can only be executed if it is queued"
-        );
+        if (state(proposalId) != ProposalState.Queued) {
+            revert ProposalNotQueued();
+        }
+
         Proposal storage proposal = proposals[proposalId];
         proposal.executed = true;
         for (uint256 i; i < proposal.targets.length; ++i) {
@@ -320,16 +423,18 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param proposalId The id of the proposal to cancel
      */
     function cancel(uint256 proposalId) external {
-        require(state(proposalId) != ProposalState.Executed, "GovernorBravo::cancel: cannot cancel executed proposal");
-
+        if (state(proposalId) == ProposalState.Executed) {
+            revert ProposalAlreadyExecuted();
+        }
         Proposal storage proposal = proposals[proposalId];
-        require(
-            msg.sender == guardian ||
-                msg.sender == proposal.proposer ||
-                xvsVault.getPriorVotes(proposal.proposer, sub256(block.number, 1)) <
-                proposalConfigs[proposal.proposalType].proposalThreshold,
-            "GovernorBravo::cancel: proposer above threshold"
-        );
+        if (
+            msg.sender != guardian &&
+            msg.sender != proposal.proposer &&
+            xvsVault.getPriorVotes(proposal.proposer, sub256(block.number, 1)) >=
+            proposalConfigs[proposal.proposalType].proposalThreshold
+        ) {
+            revert InsufficientVotingPower();
+        }
 
         proposal.canceled = true;
         for (uint256 i = 0; i < proposal.targets.length; i++) {
@@ -385,10 +490,9 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @return Proposal state
      */
     function state(uint256 proposalId) public view returns (ProposalState) {
-        require(
-            proposalCount >= proposalId && proposalId > initialProposalId,
-            "GovernorBravo::state: invalid proposal id"
-        );
+        if (proposalCount < proposalId && proposalId > initialProposalId) {
+            revert InvalidProposalId();
+        }
         Proposal storage proposal = proposals[proposalId];
         if (proposal.canceled) {
             return ProposalState.Canceled;
@@ -446,7 +550,9 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         bytes32 structHash = keccak256(abi.encode(BALLOT_TYPEHASH, proposalId, support));
         bytes32 digest = keccak256(abi.encodePacked("\x19\x01", domainSeparator, structHash));
         address signatory = ecrecover(digest, v, r, s);
-        require(signatory != address(0), "GovernorBravo::castVoteBySig: invalid signature");
+        if (signatory == address(0)) {
+            revert InvalidSignature();
+        }
         emit VoteCast(signatory, proposalId, support, castVoteInternal(signatory, proposalId, support), "");
     }
 
@@ -458,11 +564,17 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @return The number of votes cast
      */
     function castVoteInternal(address voter, uint256 proposalId, uint8 support) internal returns (uint96) {
-        require(state(proposalId) == ProposalState.Active, "GovernorBravo::castVoteInternal: voting is closed");
-        require(support <= 2, "GovernorBravo::castVoteInternal: invalid vote type");
+        if (state(proposalId) != ProposalState.Active) {
+            revert ProposalNotActive();
+        }
+        if (support > 2) {
+            revert InvalidVoteType();
+        }
         Proposal storage proposal = proposals[proposalId];
         Receipt storage receipt = proposal.receipts[voter];
-        require(receipt.hasVoted == false, "GovernorBravo::castVoteInternal: voter already voted");
+        if (receipt.hasVoted == true) {
+            revert UserAlreadyVoted();
+        }
         uint96 votes = xvsVault.getPriorVotes(voter, proposal.startBlock);
 
         if (support == 0) {
@@ -484,9 +596,8 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @notice Sets the new governance guardian
      * @param newGuardian the address of the new guardian
      */
-    function _setGuardian(address newGuardian) external {
-        require(msg.sender == guardian || msg.sender == admin, "GovernorBravo::_setGuardian: admin or guardian only");
-        require(newGuardian != address(0), "GovernorBravo::_setGuardian: cannot live without a guardian");
+    function _setGuardian(address newGuardian) external onlyGuardianOrAdmin {
+        ensureNonzeroAddress(newGuardian);
         address oldGuardian = guardian;
         guardian = newGuardian;
 
@@ -498,9 +609,10 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @dev Admin only. Sets initial proposal id which initiates the contract, ensuring a continuous proposal id count
      * @param governorAlpha The address for the Governor to continue the proposal id count from
      */
-    function _initiate(address governorAlpha) external {
-        require(msg.sender == admin, "GovernorBravo::_initiate: admin only");
-        require(initialProposalId == 0, "GovernorBravo::_initiate: can only initiate once");
+    function _initiate(address governorAlpha) external onlyAdmin {
+        if (initialProposalId != 0) {
+            revert AlreadyInitialized();
+        }
         proposalCount = GovernorAlphaInterface(governorAlpha).proposalCount();
         initialProposalId = proposalCount;
         for (uint256 i; i < uint8(ProposalType.CRITICAL) + 1; ++i) {
@@ -513,8 +625,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @dev Admin only.
      * @param proposalMaxOperations_ Max proposal operations
      */
-    function _setProposalMaxOperations(uint256 proposalMaxOperations_) external {
-        require(msg.sender == admin, "GovernorBravo::_setProposalMaxOperations: admin only");
+    function _setProposalMaxOperations(uint256 proposalMaxOperations_) external onlyAdmin {
         uint256 oldProposalMaxOperations = proposalMaxOperations;
         proposalMaxOperations = proposalMaxOperations_;
 
@@ -526,9 +637,8 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @dev Admin function to begin change of admin. The newPendingAdmin must call `_acceptAdmin` to finalize the transfer.
      * @param newPendingAdmin New pending admin.
      */
-    function _setPendingAdmin(address newPendingAdmin) external {
-        // Check caller = admin
-        require(msg.sender == admin, "GovernorBravo:_setPendingAdmin: admin only");
+    function _setPendingAdmin(address newPendingAdmin) external onlyAdmin {
+        ensureNonzeroAddress(newPendingAdmin);
 
         // Save current value, if any, for inclusion in log
         address oldPendingAdmin = pendingAdmin;
@@ -545,11 +655,11 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @dev Admin function for pending admin to accept role and update admin
      */
     function _acceptAdmin() external {
+        ensureNonzeroAddress(msg.sender);
         // Check caller is pendingAdmin and pendingAdmin ≠ address(0)
-        require(
-            msg.sender == pendingAdmin && msg.sender != address(0),
-            "GovernorBravo:_acceptAdmin: pending admin only"
-        );
+        if (msg.sender != pendingAdmin) {
+            revert SenderIsNotPendingAdmin();
+        }
 
         // Save current values for inclusion in log
         address oldAdmin = admin;

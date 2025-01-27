@@ -128,7 +128,7 @@ describe("Governor Bravo Propose Tests", () => {
     });
 
     describe("This function must revert if", () => {
-      it("the length of the values, signatures or calldatas arrays are not the same length,", async () => {
+      it("the length of the values, signatures or calldatas arrays are not the same length", async () => {
         await expect(
           governorBravoDelegate.propose(
             targets.concat(rootAddress),
@@ -138,7 +138,7 @@ describe("Governor Bravo Propose Tests", () => {
             "do nothing",
             ProposalType.CRITICAL,
           ),
-        ).to.be.revertedWith("GovernorBravo::propose: proposal function information arity mismatch");
+        ).to.be.rejectedWith('ArityMismatch("targets, values, signatures, calldatas")');
 
         await expect(
           governorBravoDelegate.propose(
@@ -149,7 +149,7 @@ describe("Governor Bravo Propose Tests", () => {
             "do nothing",
             ProposalType.CRITICAL,
           ),
-        ).to.be.revertedWith("GovernorBravo::propose: proposal function information arity mismatch");
+        ).to.be.rejectedWith('ArityMismatch("targets, values, signatures, calldatas")');
 
         await expect(
           governorBravoDelegate.propose(
@@ -160,7 +160,7 @@ describe("Governor Bravo Propose Tests", () => {
             "do nothing",
             ProposalType.CRITICAL,
           ),
-        ).to.be.revertedWith("GovernorBravo::propose: proposal function information arity mismatch");
+        ).to.be.rejectedWith('ArityMismatch("targets, values, signatures, calldatas")');
 
         await expect(
           governorBravoDelegate.propose(
@@ -171,22 +171,20 @@ describe("Governor Bravo Propose Tests", () => {
             "do nothing",
             ProposalType.CRITICAL,
           ),
-        ).to.be.revertedWith("GovernorBravo::propose: proposal function information arity mismatch");
+        ).to.be.rejectedWith('ArityMismatch("targets, values, signatures, calldatas")');
       });
 
-      it("or if that length is zero or greater than Max Operations.", async () => {
+      it("or if that length is zero or greater than Max Operations", async () => {
         await expect(
           governorBravoDelegate.propose([], [], [], [], "do nothing", ProposalType.CRITICAL),
-        ).to.be.revertedWith("GovernorBravo::propose: must provide actions");
+        ).to.be.rejectedWith("NoActionsProvided");
       });
 
       describe("Additionally, if there exists a pending or active proposal from the same proposer, we must revert.", () => {
         it("reverts with pending", async () => {
           await expect(
             governorBravoDelegate.propose(targets, values, signatures, callDatas, "do nothing", ProposalType.CRITICAL),
-          ).to.be.revertedWith(
-            "GovernorBravo::propose: one live proposal per proposer, found an already pending proposal",
-          );
+          ).to.be.rejectedWith("OneLiveProposalPerProposer");
         });
         it("reverts with active", async () => {
           await mine();
@@ -194,9 +192,7 @@ describe("Governor Bravo Propose Tests", () => {
 
           await expect(
             governorBravoDelegate.propose(targets, values, signatures, callDatas, "do nothing", ProposalType.CRITICAL),
-          ).to.be.revertedWith(
-            "GovernorBravo::propose: one live proposal per proposer, found an already active proposal",
-          );
+          ).to.be.rejectedWith("OneLiveProposalPerProposer");
         });
       });
     });
