@@ -6,6 +6,8 @@ import { ethers } from "hardhat";
 
 import { convertToUnit, fundAccount, impersonateSigner, releaseImpersonation } from "../../../helpers/utils";
 import {
+  AccessControlManager,
+  AccessControlManager__factory,
   GovernorBravoDelegate,
   GovernorBravoDelegate__factory,
   TestTimelockV8,
@@ -29,13 +31,14 @@ let governorBravoDelegate: MockContract<GovernorBravoDelegate>;
 let xvsVault: FakeContract<XVSVault>;
 let xvsToken: FakeContract<XVS>;
 let normalTimelock: FakeContract<TestTimelockV8>;
-
+let accessControlManager: MockContract<AccessControlManager>;
 type GovernorBravoDelegateFixture = {
   governorBravoDelegate: MockContract<GovernorBravoDelegate>;
   xvsVault: FakeContract<XVSVault>;
   xvsStore: FakeContract<XVSStore>;
   xvsToken: FakeContract<XVS>;
   normalTimelock: FakeContract<TestTimelockV8>;
+  accessControlManager: MockContract<AccessControlManager>;
 };
 
 async function governorBravoFixture(): Promise<GovernorBravoDelegateFixture> {
@@ -45,7 +48,9 @@ async function governorBravoFixture(): Promise<GovernorBravoDelegateFixture> {
   const xvsStore = await smock.fake<XVSStore>("XVSStore");
   const xvsToken = await smock.fake<XVS>("XVS");
   const normalTimelock = await smock.fake<TestTimelockV8>("TestTimelockV8");
-  return { governorBravoDelegate, xvsVault, xvsStore, xvsToken, normalTimelock };
+  const accessControlManagerFactory = await smock.mock<AccessControlManager__factory>("AccessControlManager");
+  const accessControlManager = await accessControlManagerFactory.deploy();
+  return { governorBravoDelegate, xvsVault, xvsStore, xvsToken, normalTimelock, accessControlManager };
 }
 
 const proposalConfigs = {
@@ -85,8 +90,9 @@ describe("Governor Bravo Propose Tests", () => {
     signatures = ["getBalanceOf(address)"];
     callDatas = [encodeParameters(["address"], [rootAddress])];
     const contracts = await loadFixture(governorBravoFixture);
-    ({ governorBravoDelegate, xvsVault, xvsToken, normalTimelock } = contracts);
+    ({ governorBravoDelegate, xvsVault, xvsToken, normalTimelock, accessControlManager } = contracts);
     await governorBravoDelegate.setVariable("admin", await root.getAddress());
+    await governorBravoDelegate.setVariable("guardian", await root.getAddress());
     await governorBravoDelegate.setVariable("initialProposalId", 1);
     await governorBravoDelegate.setVariable("proposalCount", 1);
     await governorBravoDelegate.setVariable("xvsVault", xvsVault.address);
@@ -94,6 +100,7 @@ describe("Governor Bravo Propose Tests", () => {
     await governorBravoDelegate.setVariable("proposalTimelocks", {
       0: normalTimelock.address,
     });
+    await governorBravoDelegate.setVariable("_accessControlManager", accessControlManager.address);
     xvsToken.balanceOf.returns(400001);
     xvsVault.getPriorVotes.returns(convertToUnit("300000", 18));
     await governorBravoDelegate.setVariable("proposalConfigs", proposalConfigs);
@@ -260,65 +267,184 @@ describe("Governor Bravo Propose Tests", () => {
   describe("whitelisted proposer", () => {
     describe("whitelist ACM", () => {
       it("should error if permission not granted", async () => {
-        const normalTimelockSigner = await impersonateSigner(normalTimelock.address)
-        await fundAccount(normalTimelock.address)
-        await expect(governorBravoDelegate.connect(normalTimelockSigner).whitelistProposer(await whiteListedProposer.getAddress(), 0)).to.be.rejectedWith("Unauthorized");  
-        await releaseImpersonation(normalTimelock.address)
-      })
+        const normalTimelockSigner = await impersonateSigner(normalTimelock.address);
+        await fundAccount(normalTimelock.address);
+        await expect(
+          governorBravoDelegate
+            .connect(normalTimelockSigner)
+            .whitelistProposer(await whiteListedProposer.getAddress(), 0),
+        ).to.be.rejectedWith("Unauthorized");
+        await releaseImpersonation(normalTimelock.address);
+      });
 
       it("should allow the guardian to remove from the whitelist without ACM permissions", async () => {
-        await expect(governorBravoDelegate.connect(root).removeWhitelistedProposer(await whiteListedProposer.getAddress())).to.emit(governorBravoDelegate, "WhitelistedProposerRemoved").withArgs(await whiteListedProposer.getAddress());
-      })
-    })
-    
+        await expect(
+          governorBravoDelegate.connect(root).removeWhitelistedProposer(await whiteListedProposer.getAddress()),
+        )
+          .to.emit(governorBravoDelegate, "WhitelistedProposerRemoved")
+          .withArgs(await whiteListedProposer.getAddress());
+      });
+    });
+
     describe("whitelisted proposer flow", () => {
       beforeEach(async () => {
         // Authorize timelock with ACM
-        await expect(accessControlManager.connect(root).giveCallPermission(governorBravoDelegate.address, "whitelistProposer(address,ProposalType)", normalTimelock.address)).to.emit(accessControlManager, "PermissionGranted").withArgs(normalTimelock.address, governorBravoDelegate.address, "whitelistProposer(address,ProposalType)");
-        await expect(accessControlManager.connect(root).giveCallPermission(governorBravoDelegate.address, "removeWhitelistedProposer(address)", normalTimelock.address)).to.emit(accessControlManager, "PermissionGranted").withArgs(normalTimelock.address, governorBravoDelegate.address, "removeWhitelistedProposer(address)");
-      })
+        await expect(
+          accessControlManager
+            .connect(root)
+            .giveCallPermission(
+              governorBravoDelegate.address,
+              "whitelistProposer(address,ProposalType)",
+              normalTimelock.address,
+            ),
+        )
+          .to.emit(accessControlManager, "PermissionGranted")
+          .withArgs(normalTimelock.address, governorBravoDelegate.address, "whitelistProposer(address,ProposalType)");
+        await expect(
+          accessControlManager
+            .connect(root)
+            .giveCallPermission(
+              governorBravoDelegate.address,
+              "removeWhitelistedProposer(address)",
+              normalTimelock.address,
+            ),
+        )
+          .to.emit(accessControlManager, "PermissionGranted")
+          .withArgs(normalTimelock.address, governorBravoDelegate.address, "removeWhitelistedProposer(address)");
+      });
 
       it("should be able to add to whitelist", async () => {
-        const normalTimelockSigner = await impersonateSigner(normalTimelock.address)
-        await fundAccount(normalTimelock.address)
+        const normalTimelockSigner = await impersonateSigner(normalTimelock.address);
+        await fundAccount(normalTimelock.address);
 
-        await expect(governorBravoDelegate.connect(normalTimelockSigner).whitelistProposer(await whiteListedProposer.getAddress(), 0)).to.emit(governorBravoDelegate, "WhitelistedProposerAdded").withArgs(await whiteListedProposer.getAddress());
-        await releaseImpersonation(normalTimelock.address)
-        expect(await governorBravoDelegate.whitelistedProposers(await whiteListedProposer.getAddress())).to.equal(normalTimelock.address);
+        await expect(
+          governorBravoDelegate
+            .connect(normalTimelockSigner)
+            .whitelistProposer(await whiteListedProposer.getAddress(), 0),
+        )
+          .to.emit(governorBravoDelegate, "WhitelistedProposerAdded")
+          .withArgs(await whiteListedProposer.getAddress());
+        await releaseImpersonation(normalTimelock.address);
+        expect(await governorBravoDelegate.whitelistedProposers(await whiteListedProposer.getAddress())).to.equal(
+          normalTimelock.address,
+        );
       });
 
       it("should be able to remove from whitelist", async () => {
-        const normalTimelockSigner = await impersonateSigner(normalTimelock.address)
-        await fundAccount(normalTimelock.address)
-        await expect(governorBravoDelegate.connect(normalTimelockSigner).whitelistProposer(await nonWhiteListedProposer.getAddress(), 0)).to.emit(governorBravoDelegate, "WhitelistedProposerAdded").withArgs(await nonWhiteListedProposer.getAddress());
-        await expect(governorBravoDelegate.connect(normalTimelockSigner).removeWhitelistedProposer(await nonWhiteListedProposer.getAddress())).to.emit(governorBravoDelegate, "WhitelistedProposerRemoved").withArgs(await nonWhiteListedProposer.getAddress());
-        await releaseImpersonation(normalTimelock.address)
+        const normalTimelockSigner = await impersonateSigner(normalTimelock.address);
+        await fundAccount(normalTimelock.address);
+        await expect(
+          governorBravoDelegate
+            .connect(normalTimelockSigner)
+            .whitelistProposer(await nonWhiteListedProposer.getAddress(), 0),
+        )
+          .to.emit(governorBravoDelegate, "WhitelistedProposerAdded")
+          .withArgs(await nonWhiteListedProposer.getAddress());
+        await expect(
+          governorBravoDelegate
+            .connect(normalTimelockSigner)
+            .removeWhitelistedProposer(await nonWhiteListedProposer.getAddress()),
+        )
+          .to.emit(governorBravoDelegate, "WhitelistedProposerRemoved")
+          .withArgs(await nonWhiteListedProposer.getAddress());
+        await releaseImpersonation(normalTimelock.address);
       });
 
       it("should not be able to propose if not whitelisted with no voting power", async () => {
         xvsVault.getPriorVotes.returns("0");
-        await expect(governorBravoDelegate.connect(nonWhiteListedProposer).propose(targets, values, signatures, callDatas, "do nothing", ProposalType.CRITICAL)).to.be.rejectedWith("InsufficientVotingPower");
+        await expect(
+          governorBravoDelegate
+            .connect(nonWhiteListedProposer)
+            .propose(targets, values, signatures, callDatas, "do nothing", ProposalType.CRITICAL),
+        ).to.be.rejectedWith("InsufficientVotingPower");
       });
 
       it("should not be able to propose if whitelisted address proposes with wrong timelock", async () => {
         xvsVault.getPriorVotes.returns("0");
-        const normalTimelockSigner = await impersonateSigner(normalTimelock.address)
-        await fundAccount(normalTimelock.address)
-        await governorBravoDelegate.connect(normalTimelockSigner).whitelistProposer(await whiteListedProposer.getAddress(), 0);
-        expect(await governorBravoDelegate.whitelistedProposers(await whiteListedProposer.getAddress())).to.equal(normalTimelock.address);
-        await expect(governorBravoDelegate.connect(whiteListedProposer).propose(targets, values, signatures, callDatas, "do nothing", ProposalType.CRITICAL)).to.be.rejectedWith("TimelockNotWhitelistedForProposer");
-        await releaseImpersonation(normalTimelock.address)
+        const normalTimelockSigner = await impersonateSigner(normalTimelock.address);
+        await fundAccount(normalTimelock.address);
+        await governorBravoDelegate
+          .connect(normalTimelockSigner)
+          .whitelistProposer(await whiteListedProposer.getAddress(), 0);
+        expect(await governorBravoDelegate.whitelistedProposers(await whiteListedProposer.getAddress())).to.equal(
+          normalTimelock.address,
+        );
+        await expect(
+          governorBravoDelegate
+            .connect(whiteListedProposer)
+            .propose(targets, values, signatures, callDatas, "do nothing", ProposalType.CRITICAL),
+        ).to.be.rejectedWith("TimelockNotWhitelistedForProposer");
+        await releaseImpersonation(normalTimelock.address);
       });
 
       it("should be able to propose if whitelisted with no voting power", async () => {
         xvsVault.getPriorVotes.returns("0");
-        const normalTimelockSigner = await impersonateSigner(normalTimelock.address)
-        await fundAccount(normalTimelock.address)
-        await governorBravoDelegate.connect(normalTimelockSigner).whitelistProposer(await whiteListedProposer.getAddress(), 0);
-        expect(await governorBravoDelegate.whitelistedProposers(await whiteListedProposer.getAddress())).to.equal(normalTimelock.address);
-        await governorBravoDelegate.connect(whiteListedProposer).propose(targets, values, signatures, callDatas, "do nothing", ProposalType.NORMAL);
-        await releaseImpersonation(normalTimelock.address)
+        const normalTimelockSigner = await impersonateSigner(normalTimelock.address);
+        await fundAccount(normalTimelock.address);
+        await governorBravoDelegate
+          .connect(normalTimelockSigner)
+          .whitelistProposer(await whiteListedProposer.getAddress(), 0);
+        expect(await governorBravoDelegate.whitelistedProposers(await whiteListedProposer.getAddress())).to.equal(
+          normalTimelock.address,
+        );
+        await governorBravoDelegate
+          .connect(whiteListedProposer)
+          .propose(targets, values, signatures, callDatas, "do nothing", ProposalType.NORMAL);
+        await releaseImpersonation(normalTimelock.address);
       });
+    });
+
+    it("should allow the guardian to remove from the whitelist without ACM permissions", async () => {
+      await expect(
+        governorBravoDelegate.connect(root).removeWhitelistedProposer(await whiteListedProposer.getAddress()),
+      )
+        .to.emit(governorBravoDelegate, "WhitelistedProposerRemoved")
+        .withArgs(await whiteListedProposer.getAddress());
+    });
+  });
+
+  describe("whitelisted proposer flow", () => {
+    beforeEach(async () => {
+      // Authorize timelock with ACM
+      await expect(
+        accessControlManager
+          .connect(root)
+          .giveCallPermission(
+            governorBravoDelegate.address,
+            "whitelistProposer(address,ProposalType)",
+            normalTimelock.address,
+          ),
+      )
+        .to.emit(accessControlManager, "PermissionGranted")
+        .withArgs(normalTimelock.address, governorBravoDelegate.address, "whitelistProposer(address,ProposalType)");
+      await expect(
+        accessControlManager
+          .connect(root)
+          .giveCallPermission(
+            governorBravoDelegate.address,
+            "removeWhitelistedProposer(address)",
+            normalTimelock.address,
+          ),
+      )
+        .to.emit(accessControlManager, "PermissionGranted")
+        .withArgs(normalTimelock.address, governorBravoDelegate.address, "removeWhitelistedProposer(address)");
+    });
+
+    it("should be able to add to whitelist", async () => {
+      const normalTimelockSigner = await impersonateSigner(normalTimelock.address);
+      await fundAccount(normalTimelock.address);
+
+      await expect(
+        governorBravoDelegate
+          .connect(normalTimelockSigner)
+          .whitelistProposer(await whiteListedProposer.getAddress(), 0),
+      )
+        .to.emit(governorBravoDelegate, "WhitelistedProposerAdded")
+        .withArgs(await whiteListedProposer.getAddress());
+      await releaseImpersonation(normalTimelock.address);
+      expect(await governorBravoDelegate.whitelistedProposers(await whiteListedProposer.getAddress())).to.equal(
+        normalTimelock.address,
+      );
     });
 
     it("should be able to remove from whitelist", async () => {
@@ -327,7 +453,7 @@ describe("Governor Bravo Propose Tests", () => {
       await expect(
         governorBravoDelegate
           .connect(normalTimelockSigner)
-          .whitelistProposer(await nonWhiteListedProposer.getAddress()),
+          .whitelistProposer(await nonWhiteListedProposer.getAddress(), 0),
       )
         .to.emit(governorBravoDelegate, "WhitelistedProposerAdded")
         .withArgs(await nonWhiteListedProposer.getAddress());
@@ -347,7 +473,7 @@ describe("Governor Bravo Propose Tests", () => {
         governorBravoDelegate
           .connect(nonWhiteListedProposer)
           .propose(targets, values, signatures, callDatas, "do nothing", ProposalType.CRITICAL),
-      ).to.be.revertedWith("GovernorBravo::propose: proposer votes below proposal threshold or not whitelisted");
+      ).to.be.rejectedWith("InsufficientVotingPower");
     });
 
     it("should be able to propose if whitelisted with no voting power", async () => {
@@ -356,10 +482,13 @@ describe("Governor Bravo Propose Tests", () => {
       await fundAccount(normalTimelock.address);
       await governorBravoDelegate
         .connect(normalTimelockSigner)
-        .whitelistProposer(await whiteListedProposer.getAddress());
+        .whitelistProposer(await whiteListedProposer.getAddress(), 0);
+      expect(await governorBravoDelegate.whitelistedProposers(await whiteListedProposer.getAddress())).to.equal(
+        normalTimelock.address,
+      );
       await governorBravoDelegate
         .connect(whiteListedProposer)
-        .propose(targets, values, signatures, callDatas, "do nothing", ProposalType.CRITICAL);
+        .propose(targets, values, signatures, callDatas, "do nothing", ProposalType.NORMAL);
       await releaseImpersonation(normalTimelock.address);
     });
   });
