@@ -1,237 +1,146 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.25;
 
-import { ILayerZeroEndpoint } from "@layerzerolabs/solidity-examples/contracts/lzApp/interfaces/ILayerZeroEndpoint.sol";
+import { OApp, MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
 import { Pausable } from "@openzeppelin/contracts/security/Pausable.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
-import { IAccessControlManagerV8 } from "./../../Governance/IAccessControlManagerV8.sol";
+import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract BlockHashDispatcher is Pausable {
-    /**
-     * @notice ACM (Access Control Manager) contract address
-     */
-    address public accessControlManager;
-
-    /**
-     *  @notice Proposal chain id on which block hash will be send (BNB)
-     */
-
-    uint16 public proposalChainId;
-
-    // remote identifier => blockHash
-    mapping(uint256 => bytes32) public blockHash;
-
-    /**
-     * @notice LayerZero endpoint for sending messages to remote chains
-     */
-    ILayerZeroEndpoint public immutable LZ_ENDPOINT;
-
-    /**
-     * @notice Specifies the allowed path for sending messages (remote chainId => remote app address + local app address)
-     */
-    mapping(uint16 => bytes) public trustedRemoteLookup;
-
-    /**
-     * @notice Execution hashes of failed messages
-     * @dev [identifier] -> [executionHash]
-     */
-    mapping(uint256 => bytes32) public storedExecutionHashes;
-
-    /**
-     * @notice Emitted when a remote message receiver is set for the remote chain
-     */
-    event SetTrustedRemoteAddress(uint16 indexed chainId, bytes oldRemoteAddress, bytes newRemoteAddress);
-    /**
-     * @notice Emitted when block hash is send to proposal chain (BNB)
-     */
-    event HashDispatched(uint256 indexed remoteIdentifier, bytes payload);
-
-    /**
-     * @notice Emitted when an execution hash of a failed message is saved
-     */
-    event HashStored(uint256 indexed remoteIdentifier, bytes payload, bytes adapterParams, uint256 value, bytes reason);
-
-    /**
-     * @notice Event emitted when trusted remote sets to empty
-     */
-    event TrustedRemoteRemoved(uint16 indexed chainId);
-
-    /**
-     * @notice Emitted when a previously failed message is successfully sent to the proposal chain (BNB)
-     */
-    event ClearPayload(uint256 indexed remoteIdentifier, bytes32 executionHash);
-
-    /*
-     * @notice Emitted when the address of ACM is updated
-     */
-    event NewAccessControlManager(address indexed oldAccessControlManager, address indexed newAccessControlManager);
-
-    constructor(ILayerZeroEndpoint lzEndpoint_, address accessControlManager_, uint16 proposalChainId_) {
-        ensureNonzeroAddress(address(lzEndpoint_));
-        require(proposalChainId_ != 0, "chain id can't be zero");
-        LZ_ENDPOINT = lzEndpoint_;
-        proposalChainId = proposalChainId_;
-        accessControlManager = accessControlManager_;
+/**
+ * @title BlockHashDispatcher
+ * @notice A contract for dispatching block hashes to a proposal chain and managing messaging between chains.
+ * @dev Inherits functionality from OApp, Pausable, and Ownable. Implements LayerZero messaging and access control.
+ */
+contract BlockHashDispatcher is Pausable, OApp {
+    /// @notice Messaging parameters structure
+    struct MessagingParams {
+        uint32 dstEid; // Destination chain ID
+        bytes32 receiver; // Receiver address on the destination chain
+        bytes payload; // Encoded data payload
+        bytes options; // Messaging options
+        bool payInLzToken; // Indicates payment in LayerZero tokens
     }
 
     /**
-     * @notice Triggers the paused state of the controller
-     * @custom:access Controlled by AccessControlManager
+     * @notice ID of the proposal chain (e.g., BNB Chain) where block hashes will be sent
      */
-    function pause() external {
-        _ensureAllowed("pause()");
+    uint32 public BSC_CHAIN_ID;
+
+    /**
+     * @notice Emitted when a block hash is dispatched to the proposal chain
+     * @param pId Proposal Id
+     * @param blockNum Block number
+     * @param payload Encoded data payload
+     */
+    event HashDispatched(uint256 indexed pId, uint256 indexed blockNum, bytes payload);
+
+    /// @notice Error thrown when an invalid chain ID is provided
+    error InvalidChainEid(uint32 eid);
+
+    /**
+     * @notice Constructor to initialize the contract
+     * @param endpoint_ Address of the LayerZero endpoint
+     * @param bnbChainEId_ Chain ID for the BNB Chain
+     * @param owner_ Address of the contract owner
+     */
+    constructor(address endpoint_, uint16 bnbChainEId_, address owner_) OApp(endpoint_, owner_) Ownable() {
+        ensureNonzeroAddress(address(endpoint_));
+        if (bnbChainEId_ == 0) {
+            revert InvalidChainEid(bnbChainEId_);
+        }
+        BSC_CHAIN_ID = bnbChainEId_;
+    }
+
+    /**
+     * @notice Pauses the contract
+     * @dev Callable only by the owner
+     */
+    function pause() external onlyOwner {
         _pause();
     }
 
     /**
-     * @notice Triggers the resume state of the controller
-     * @custom:access Controlled by AccessControlManager
+     * @notice Unpauses the contract
+     * @dev Callable only by the owner
      */
-    function unpause() external {
-        _ensureAllowed("unpause()");
+    function unpause() external onlyOwner {
         _unpause();
     }
 
     /**
-     * @notice Sets the address of Access Control Manager (ACM)
-     * @param newAccessControlManager The new address of the Access Control Manager
-     * @custom:access Only owner
-     * @custom:event Emits NewAccessControlManager with old and new access control manager addresses
+     * @notice Generates a payload containing a block hash
+     * @param pId Unique identifier for the proposal
+     * @param blockNumber Block number for which the hash is generated
+     * @return payload Encoded payload containing the proposal ID, block number, and block hash
      */
-    function setAccessControlManager(address newAccessControlManager) external {
-        _ensureAllowed("setAccessControlManager(address)");
-        ensureNonzeroAddress(newAccessControlManager);
-        emit NewAccessControlManager(accessControlManager, newAccessControlManager);
-        accessControlManager = newAccessControlManager;
+    function getPayload(uint256 pId, uint256 blockNumber) public view returns (bytes memory payload) {
+        bytes32 blockHash_ = blockhash(blockNumber);
+        payload = abi.encode(pId, blockNumber, blockHash_);
     }
 
     /**
-     * @notice Estimates LayerZero fees for cross-chain message delivery to the proposal chain
-     * @dev The estimated fees are the minimum required; it's recommended to increase the fees amount when sending a message. The unused amount will be refunded
-     * @param payload The payload to be sent to the proposal chain. It's computed as follows:
-     * payload = abi.encode(remoteIdentifier, blockHash)
-     * @param useZro Bool that indicates whether to pay in ZRO tokens or not
-     * @param adapterParams The params used to specify the custom amount of gas required for the execution on the proposal chain
-     * @return nativeFee The amount of fee in the native gas token (e.g. ETH)
-     * @return zroFee The amount of fee in ZRO token
+     * @notice Quotes the messaging fee for dispatching a block hash
+     * @param pId Proposal ID
+     * @param blockNumber Block number
+     * @param options Messaging options
+     * @param payInLzToken Payment method (native token or LayerZero token)
+     * @return fee The messaging fee details
      */
-    function estimateFees(
-        bytes calldata payload,
-        bool useZro,
-        bytes calldata adapterParams
-    ) external view returns (uint256, uint256) {
-        return LZ_ENDPOINT.estimateFees(proposalChainId, address(this), payload, useZro, adapterParams);
+    function quote(
+        uint256 pId,
+        uint256 blockNumber,
+        bytes memory options,
+        bool payInLzToken
+    ) public view returns (MessagingFee memory fee) {
+        return _quote(BSC_CHAIN_ID, getPayload(pId, blockNumber), options, payInLzToken);
     }
 
     /**
-     * @notice Remove trusted remote from storage
-     * @param chainId The chain's id corresponds to setting the trusted remote to empty
-     * @custom:access Controlled by Access Control Manager
-     * @custom:event Emit TrustedRemoteRemoved with remote chain id
-     */
-    function removeTrustedRemote(uint16 chainId) external {
-        _ensureAllowed("removeTrustedRemote(uint16)");
-        require(trustedRemoteLookup[chainId].length != 0, "trusted remote not found");
-        delete trustedRemoteLookup[chainId];
-        emit TrustedRemoteRemoved(chainId);
-    }
-
-    /**
-     * @notice Dispatches a block hash along with a remote identifier to proposal chain(BNB)
-     * @param pId A unique identifier to identify the proposal
-     * @param zroPaymentAddress The address for payment using ZRO tokens
-     * @param adapterParams The params used to specify the custom amount of gas required for the execution on the destination
+     * @notice Dispatches a block hash along with its proposal ID and block number to the proposal chain
+     * @param pId Proposal ID
+     * @param blockNumber Block number
+     * @param zroTokens Address for ZRO token payment
+     * @param options Custom gas options for execution on the destination chain
      */
     function dispatchHash(
         uint256 pId,
         uint256 blockNumber,
-        address zroPaymentAddress,
-        bytes calldata adapterParams
-    ) external payable {
-        // Send hash only once for each unique identifier
-        require(blockHash[pId] == bytes32(0), "block hash already exists");
-
-        bytes32 blockHash_ = blockhash(blockNumber);
-        bytes memory payload = abi.encode(pId, blockHash_);
-        uint16 proposalChainId_ = proposalChainId;
-        bytes memory trustedRemote = trustedRemoteLookup[proposalChainId_];
-        require(trustedRemote.length != 0, "proposal chain id is not set");
-
-        // A zero value will result in a failed message; therefore, a positive value is required to send a message across the chain.
-        require(msg.value > 0, "value cannot be zero");
-
-        try
-            LZ_ENDPOINT.send{ value: msg.value }(
-                proposalChainId_,
-                trustedRemote,
-                payload,
-                payable(msg.sender),
-                zroPaymentAddress,
-                adapterParams
-            )
-        {
-            emit HashDispatched(pId, payload);
-        } catch (bytes memory reason) {
-            storedExecutionHashes[pId] = keccak256(abi.encode(payload, adapterParams, msg.value));
-            emit HashStored(pId, payload, adapterParams, msg.value, reason);
-        }
-    }
-
-    /**
-     * @notice Resends a previously failed message
-     * @dev Allows providing more fees if needed. The extra fees will be refunded to the caller
-     * @param remoteIdentifier The unique remote identifier identify a failed message
-     * @param payload The payload to be sent to the remote chain
-     * It's computed as follows: payload = abi.encode(remoteIdentifier, blockHash)
-     * @param adapterParams The params used to specify the custom amount of gas required for the execution on the destination
-     * @param zroPaymentAddress The address of the ZRO token holder who would pay for the transaction.
-     * @param originalValue The msg.value passed when dispatchHash() function was called
-     * @custom:event Emits ClearPayload with proposal id and hash
-     * @custom:access Controlled by Access Control Manager
-     */
-    function retryExecute(
-        uint256 remoteIdentifier,
-        bytes calldata payload,
-        bytes calldata adapterParams,
-        address zroPaymentAddress,
-        uint256 originalValue
+        uint256 zroTokens,
+        bytes calldata options
     ) external payable whenNotPaused {
-        _ensureAllowed("retryExecute(uint256,uint16,bytes,bytes,address,uint256)");
-        uint16 proposalChainId_ = proposalChainId;
+        bytes memory payload = getPayload(pId, blockNumber);
 
-        bytes memory trustedRemote = trustedRemoteLookup[proposalChainId_];
-        require(trustedRemote.length != 0, "proposal chain id is not a trusted source");
-        bytes32 hash = storedExecutionHashes[remoteIdentifier];
-        require(hash != bytes32(0), "no stored payload");
-
-        require(keccak256(abi.encode(payload, adapterParams, originalValue)) == hash, "invalid execution params");
-
-        delete storedExecutionHashes[remoteIdentifier];
-
-        emit ClearPayload(remoteIdentifier, hash);
-
-        LZ_ENDPOINT.send{ value: originalValue + msg.value }(
-            proposalChainId_,
-            trustedRemote,
+        _lzSend(
+            BSC_CHAIN_ID,
             payload,
-            payable(msg.sender),
-            zroPaymentAddress,
-            adapterParams
+            options,
+            // Fee in native gas and ZRO token.
+            MessagingFee(msg.value, zroTokens),
+            // Refund address in case of failed source message.
+            payable(msg.sender)
         );
     }
 
     /**
-     * @notice Ensure that the caller has permission to execute a specific function
-     * @param functionSig Function signature to be checked for permission
+     * @notice Internal function to handle incoming LayerZero messages
      */
-    function _ensureAllowed(string memory functionSig) internal view {
-        require(
-            IAccessControlManagerV8(accessControlManager).isAllowedToCall(msg.sender, functionSig),
-            "access denied"
-        );
-    }
+    function _lzReceive(
+        Origin calldata _origin,
+        bytes32 _guid,
+        bytes calldata payload,
+        address _executor,
+        bytes calldata _extraData
+    ) internal override {}
 
-    function getHash(uint256 blockNumber, uint256 pId) external view returns (uint256, uint256, bytes32) {
+    /**
+     * @notice Retrieves the block hash for a given block number and proposal ID
+     * @param blockNumber The block number
+     * @param pId The proposal ID
+     * @return pId The proposal ID
+     * @return blockNumber The block number
+     * @return blockHash_ The block hash
+     */
+    function getHash(uint256 blockNumber, uint256 pId) external view whenNotPaused returns (uint256, uint256, bytes32) {
         bytes32 blockHash_ = blockhash(blockNumber);
         return (pId, blockNumber, blockHash_);
     }

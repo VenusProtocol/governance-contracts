@@ -149,10 +149,11 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
     }
 
     /**
-     * 
+     *
      * @param pId proposal Id to start syncing voting power of
      * @param proposer The address of the proposer
-     * @param syncingParameters Array of syncing parameters containing remote chain id with their corresponding block hash, remote block header RLP, and XVS vault state proof RLP
+     * @param syncingParameters Array of syncing parameters containing remote chain id with their corresponding 
+     * block hash, remote block header RLP, and XVS vault state proof RLP
      * @param proposerVotingProofs Array of proofs containing remote chain id with their corresponding proofs (numCheckpointsProof, checkpointsProof) where
      * numCheckpointsProof is the proof data needed to verify the number of checkpoints and
      * checkpointsProof is the proof data needed to verify the actual voting power from the checkpoints
@@ -241,7 +242,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
                 cmd,
                 combineOptions(READ_CHANNEL, READ_MSG_TYPE, _extraOptions),
                 MessagingFee(msg.value, 0),
-                payable(msg.sender)
+                payable(msg.sender) // It will be proposer address
             );
     }
 
@@ -359,7 +360,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
         if (vault == address(0)) {
             revert RemoteChainNotSupported(remoteChainEid);
         }
-        
+
         StateProofVerifier.SlotValue memory latestCheckpoint = warehouse.getStorage(
             vault,
             blockDetails.blockHash,

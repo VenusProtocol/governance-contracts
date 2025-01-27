@@ -12,9 +12,9 @@ library StateProofVerifier {
     using RLPReader for RLPReader.RLPItem;
     using RLPReader for bytes;
 
-    uint256 constant internal HEADER_STATE_ROOT_INDEX = 3;
-    uint256 constant internal HEADER_NUMBER_INDEX = 8;
-    uint256 constant internal HEADER_TIMESTAMP_INDEX = 11;
+    uint256 internal constant HEADER_STATE_ROOT_INDEX = 3;
+    uint256 internal constant HEADER_NUMBER_INDEX = 8;
+    uint256 internal constant HEADER_TIMESTAMP_INDEX = 11;
 
     struct BlockHeader {
         bytes32 hash;
