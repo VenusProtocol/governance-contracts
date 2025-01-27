@@ -2,7 +2,8 @@
 pragma solidity 0.8.25;
 pragma experimental ABIEncoderV2;
 
-import "./GovernorBravoInterfacesV8.sol";
+import { GovernorBravoDelegateStorageV2, GovernorBravoEvents, TimelockInterface, XvsVaultInterface, GovernorAlphaInterface } from "./GovernorBravoInterfacesV8.sol";
+import { AccessControlledV8 } from "./AccessControlledV8.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
 /**
@@ -72,7 +73,7 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * The delegation of votes happens through the `XVSVault` contract by calling the `delegate` or `delegateBySig` functions. These same functions can revert
  * vote delegation by calling the same function with a value of `0`.
  */
-contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoEvents {
+contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoEvents, AccessControlledV8 {
     /// @notice The name of this contract
     string public constant name = "Venus Governor Bravo";
 
@@ -205,19 +206,22 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param proposalConfigs_ Governance configs for each governance route
      * @param timelocks Timelock addresses for each governance route
      * @param guardian_ The address of the guardian
+     * @param accessControlManager_ The address of the access control manager
      * @custom:access Only called by the admin
      */
     function initialize(
         address xvsVault_,
         ProposalConfig[] memory proposalConfigs_,
         TimelockInterface[] memory timelocks,
-        address guardian_
+        address guardian_,
+        address accessControlManager_
     ) public onlyAdmin {
         if (address(proposalTimelocks[0]) != address(0)) {
             revert AlreadyInitialized();
         }
         ensureNonzeroAddress(xvsVault_);
         ensureNonzeroAddress(guardian_);
+
         if (timelocks.length != uint8(ProposalType.CRITICAL) + 1) {
             revert ArityMismatch("timelocks");
         }
@@ -230,6 +234,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         proposalMaxOperations = 10;
         guardian = guardian_;
 
+        _setAccessControlManager(accessControlManager_);
         //Set parameters for each Governance Route
         uint256 arrLength = proposalConfigs_.length;
         for (uint256 i; i < arrLength; ++i) {
@@ -297,7 +302,10 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
             revert InsufficientVotingPower();
         }
 
-        if (whitelistedProposers[msg.sender] != address(0) && whitelistedProposers[msg.sender] != address(proposalTimelocks[uint8(proposalType)])) {
+        if (
+            whitelistedProposers[msg.sender] != address(0) &&
+            whitelistedProposers[msg.sender] != address(proposalTimelocks[uint8(proposalType)])
+        ) {
             revert TimelockNotWhitelistedForProposer();
         }
 
@@ -386,13 +394,12 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     /**
      * @notice Whitelists a proposer
      * @param proposer The address of the proposer to whitelist
+     * @custom:event emit WhitelistedProposerAdded with the address or the whitelisted proposer
      */
-    function whitelistProposer(address proposer) external {
-        require(
-            msg.sender == address(proposalTimelocks[uint8(ProposalType.NORMAL)]),
-            "GovernorBravo::whitelistProposer: callable only from normal timelock only"
-        );
-        whitelistedProposers[proposer] = true;
+    function whitelistProposer(address proposer, ProposalType proposalType) external {
+        _checkAccessAllowed("whitelistProposer(address,ProposalType)");
+        ensureNonzeroAddress(proposer);
+        whitelistedProposers[proposer] = address(proposalTimelocks[uint8(proposalType)]);
 
         emit WhitelistedProposerAdded(proposer);
     }
@@ -402,11 +409,10 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param proposer The address of the proposer to remove from whitelist
      */
     function removeWhitelistedProposer(address proposer) external {
-        require(
-            msg.sender == address(proposalTimelocks[uint8(ProposalType.NORMAL)]),
-            "GovernorBravo::removeWhitelistedProposer: callable only from normal timelock only"
-        );
-        whitelistedProposers[proposer] = false;
+        if (msg.sender != guardian) {
+            _checkAccessAllowed("removeWhitelistedProposer(address)");
+        }
+        whitelistedProposers[proposer] = address(0);
 
         emit WhitelistedProposerRemoved(proposer);
     }

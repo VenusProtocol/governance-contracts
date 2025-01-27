@@ -84,7 +84,7 @@ describe("Governor Bravo Cast Vote Test", () => {
           "do nothing",
           ProposalType.CRITICAL,
         ),
-      ).to.be.revertedWith("GovernorBravo::propose: proposer votes below proposal threshold or not whitelisted");
+      ).to.be.rejectedWith("InsufficientVotingPower");
     });
 
     describe("after we deposit xvs to the vault", () => {
