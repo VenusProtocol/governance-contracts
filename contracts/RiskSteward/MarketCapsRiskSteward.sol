@@ -23,9 +23,9 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  */
 contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgradeable, AccessControlledV8 {
     /**
-     * @notice The max increase bps for the update relative to the current value
+     * @notice The max delta bps for the update relative to the current value
      */
-    uint256 public maxIncreaseBps;
+    uint256 public maxDeltaBps;
 
     /**
      * @notice Address of the CorePool comptroller used for selecting the correct comptroller abi
@@ -60,12 +60,12 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
     /**
      * @notice Emitted when the max increase bps is updated
      */
-    event MaxIncreaseBpsUpdated(uint256 oldMaxIncreaseBps, uint256 newMaxIncreaseBps);
+    event MaxDeltaBpsUpdated(uint256 oldMaxDeltaBps, uint256 newMaxDeltaBps);
 
     /**
-     * @notice Thrown when a maxIncreaseBps value of 0 is set
+     * @notice Thrown when a maxDeltaBps value of 0 is set
      */
-    error InvalidMaxIncreaseBps();
+    error InvalidMaxDeltaBps();
 
     /**
      * @notice Thrown when an updateType that is not supported is operated on
@@ -91,28 +91,28 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         _disableInitializers();
     }
 
-    function initialize(address accessControlManager_, uint256 maxIncreaseBps_) external initializer {
+    function initialize(address accessControlManager_, uint256 maxDeltaBps_) external initializer {
         __Ownable2Step_init();
         __AccessControlled_init_unchained(accessControlManager_);
-        if (maxIncreaseBps_ == 0) {
-            revert InvalidMaxIncreaseBps();
+        if (maxDeltaBps_ == 0) {
+            revert InvalidMaxDeltaBps();
         }
-        maxIncreaseBps = maxIncreaseBps_;
+        maxDeltaBps = maxDeltaBps_;
     }
 
     /**
      * @notice Sets the max increase bps
-     * @param maxIncreaseBps_ The new max increase bps
-     * @custom:error InvalidMaxIncreaseBps if the max increase bps is 0
+     * @param maxDeltaBps_ The new max increase bps
+     * @custom:error InvalidMaxDeltaBps if the max increase bps is 0
      * @custom:access Controlled by AccessControlManager
      */
-    function setMaxIncreaseBps(uint256 maxIncreaseBps_) external {
-        _checkAccessAllowed("setMaxIncreaseBps(uint256)");
-        if (maxIncreaseBps_ == 0) {
-            revert InvalidMaxIncreaseBps();
+    function setMaxDeltaBps(uint256 maxDeltaBps_) external {
+        _checkAccessAllowed("setMaxDeltaBps(uint256)");
+        if (maxDeltaBps_ == 0) {
+            revert InvalidMaxDeltaBps();
         }
-        emit MaxIncreaseBpsUpdated(maxIncreaseBps, maxIncreaseBps_);
-        maxIncreaseBps = maxIncreaseBps_;
+        emit MaxDeltaBpsUpdated(maxDeltaBps, maxDeltaBps_);
+        maxDeltaBps = maxDeltaBps_;
     }
 
     /**
@@ -197,13 +197,9 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
      * @return bool true, if difference is within the maxPercentChange
      */
     function _updateWithinAllowedRange(uint256 previousValue, uint256 newValue) internal view returns (bool) {
-        if (newValue < previousValue) {
-            revert UpdateNotInRange();
-        }
+        uint256 diff = newValue > previousValue ? newValue - previousValue : previousValue - newValue;
 
-        uint256 diff = newValue - previousValue;
-
-        uint256 maxDiff = (maxIncreaseBps * previousValue) / 10000;
+        uint256 maxDiff = (maxDeltaBps * previousValue) / 10000;
 
         if (diff > maxDiff) {
             revert UpdateNotInRange();
