@@ -4,7 +4,12 @@ import chai from "chai";
 import { Signer } from "ethers";
 import { ethers } from "hardhat";
 
-import { GovernorBravoDelegate, GovernorBravoDelegate__factory, XVSVault } from "../../../typechain";
+import {
+  AccessControlManager,
+  GovernorBravoDelegate,
+  GovernorBravoDelegate__factory,
+  XVSVault,
+} from "../../../typechain";
 
 const { expect } = chai;
 chai.use(smock.matchers);
@@ -14,24 +19,27 @@ let customer: Signer;
 let accounts: Signer[];
 let governorBravoDelegate: MockContract<GovernorBravoDelegate>;
 let xvsVault: FakeContract<XVSVault>;
+let accessControlManager: FakeContract<AccessControlManager>;
 
 type GovernorBravoDelegateFixture = {
   governorBravoDelegate: MockContract<GovernorBravoDelegate>;
   xvsVault: FakeContract<XVSVault>;
+  accessControlManager: FakeContract<AccessControlManager>;
 };
 
 async function governorBravoFixture(): Promise<GovernorBravoDelegateFixture> {
   const GovernorBravoDelegateFactory = await smock.mock<GovernorBravoDelegate__factory>("GovernorBravoDelegate");
   const governorBravoDelegate = await GovernorBravoDelegateFactory.deploy();
   const xvsVault = await smock.fake<XVSVault>("MockXVSVault");
-  return { governorBravoDelegate, xvsVault };
+  const accessControlManager = await smock.fake<AccessControlManager>("AccessControlManager");
+  return { governorBravoDelegate, xvsVault, accessControlManager };
 }
 
 describe("Governor Bravo Initializing Test", () => {
   beforeEach(async () => {
     [root, customer, ...accounts] = await ethers.getSigners();
     const contracts = await loadFixture(governorBravoFixture);
-    ({ governorBravoDelegate, xvsVault } = contracts);
+    ({ governorBravoDelegate, xvsVault, accessControlManager } = contracts);
     await governorBravoDelegate.setVariable("admin", await root.getAddress());
   });
 
@@ -40,19 +48,31 @@ describe("Governor Bravo Initializing Test", () => {
       await expect(
         governorBravoDelegate
           .connect(customer)
-          .initialize(ethers.constants.AddressZero, [], [], ethers.constants.AddressZero),
+          .initialize(ethers.constants.AddressZero, [], [], ethers.constants.AddressZero, ethers.constants.AddressZero),
       ).to.be.rejectedWith("OnlyAdmin");
     });
 
     it("should revert if invalid xvs address", async () => {
       await expect(
-        governorBravoDelegate.initialize(ethers.constants.AddressZero, [], [], ethers.constants.AddressZero),
+        governorBravoDelegate.initialize(
+          ethers.constants.AddressZero,
+          [],
+          [],
+          ethers.constants.AddressZero,
+          ethers.constants.AddressZero,
+        ),
       ).to.be.rejectedWith("ZeroAddressNotAllowed");
     });
 
     it("should revert if invalid guardian address", async () => {
       await expect(
-        governorBravoDelegate.initialize(xvsVault.address, [], [], ethers.constants.AddressZero),
+        governorBravoDelegate.initialize(
+          xvsVault.address,
+          [],
+          [],
+          ethers.constants.AddressZero,
+          ethers.constants.AddressZero,
+        ),
       ).to.be.rejectedWith("ZeroAddressNotAllowed");
     });
 
@@ -81,8 +101,14 @@ describe("Governor Bravo Initializing Test", () => {
 
       const timelocks = [accounts[0].getAddress(), accounts[1].getAddress(), accounts[2].getAddress()];
       await expect(
-        governorBravoDelegate.initialize(xvsVault.address, proposalConfigs, timelocks, guardianAddress, ethers.constants.AddressZero),
-      ).to.be.rejectedWith("ZeroAddressNotAllowed");
+        governorBravoDelegate.initialize(
+          xvsVault.address,
+          proposalConfigs,
+          timelocks,
+          guardianAddress,
+          ethers.constants.AddressZero,
+        ),
+      ).to.be.revertedWith("invalid acess control manager address");
     });
 
     it("should revert if timelock adress count differs from governance routes count", async () => {
@@ -90,7 +116,13 @@ describe("Governor Bravo Initializing Test", () => {
 
       const timelocks = [accounts[0].getAddress(), accounts[1].getAddress()];
       await expect(
-        governorBravoDelegate.initialize(xvsVault.address, [], timelocks, guardianAddress),
+        governorBravoDelegate.initialize(
+          xvsVault.address,
+          [],
+          timelocks,
+          guardianAddress,
+          accessControlManager.address,
+        ),
       ).to.be.rejectedWith('ArityMismatch("timelocks")');
     });
 
@@ -105,7 +137,13 @@ describe("Governor Bravo Initializing Test", () => {
 
       const timelocks = [accounts[0].getAddress(), accounts[1].getAddress(), accounts[2].getAddress()];
       await expect(
-        governorBravoDelegate.initialize(xvsVault.address, proposalConfigs, timelocks, guardianAddress),
+        governorBravoDelegate.initialize(
+          xvsVault.address,
+          proposalConfigs,
+          timelocks,
+          guardianAddress,
+          accessControlManager.address,
+        ),
       ).to.be.rejectedWith('ArityMismatch("proposalConfigs_")');
     });
 
@@ -133,9 +171,21 @@ describe("Governor Bravo Initializing Test", () => {
       ];
 
       const timelocks = [accounts[0].getAddress(), accounts[1].getAddress(), accounts[2].getAddress()];
-      await governorBravoDelegate.initialize(xvsVault.address, proposalConfigs, timelocks, guardianAddress);
+      await governorBravoDelegate.initialize(
+        xvsVault.address,
+        proposalConfigs,
+        timelocks,
+        guardianAddress,
+        accessControlManager.address,
+      );
       await expect(
-        governorBravoDelegate.initialize(xvsVault.address, proposalConfigs, timelocks, guardianAddress),
+        governorBravoDelegate.initialize(
+          xvsVault.address,
+          proposalConfigs,
+          timelocks,
+          guardianAddress,
+          accessControlManager.address,
+        ),
       ).to.be.rejectedWith("AlreadyInitialized");
     });
 
