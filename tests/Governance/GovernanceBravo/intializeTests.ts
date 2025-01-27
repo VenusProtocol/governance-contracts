@@ -41,26 +41,30 @@ describe("Governor Bravo Initializing Test", () => {
         governorBravoDelegate
           .connect(customer)
           .initialize(ethers.constants.AddressZero, [], [], ethers.constants.AddressZero),
-      ).to.be.revertedWith("GovernorBravo::initialize: admin only");
+      ).to.be.rejectedWith("Unauthorized");
     });
+
     it("should revert if invalid xvs address", async () => {
       await expect(
         governorBravoDelegate.initialize(ethers.constants.AddressZero, [], [], ethers.constants.AddressZero),
-      ).to.be.revertedWith("GovernorBravo::initialize: invalid xvs address");
+      ).to.be.rejectedWith("ZeroAddressNotAllowed");
     });
+
     it("should revert if invalid guardian address", async () => {
       await expect(
         governorBravoDelegate.initialize(xvsVault.address, [], [], ethers.constants.AddressZero),
-      ).to.be.revertedWith("GovernorBravo::initialize: invalid guardian");
+      ).to.be.rejectedWith("ZeroAddressNotAllowed");
     });
+
     it("should revert if timelock adress count differs from governance routes count", async () => {
       const guardianAddress = await accounts[0].getAddress();
 
       const timelocks = [accounts[0].getAddress(), accounts[1].getAddress()];
       await expect(
         governorBravoDelegate.initialize(xvsVault.address, [], timelocks, guardianAddress),
-      ).to.be.revertedWith("GovernorBravo::initialize:number of timelocks should match number of governance routes");
+      ).to.be.rejectedWith('ArityMismatch("timelocks")');
     });
+
     it("should revert if proposal config count differs from governance routes count", async () => {
       const guardianAddress = await accounts[0].getAddress();
       const proposalConfigs = [
@@ -73,9 +77,7 @@ describe("Governor Bravo Initializing Test", () => {
       const timelocks = [accounts[0].getAddress(), accounts[1].getAddress(), accounts[2].getAddress()];
       await expect(
         governorBravoDelegate.initialize(xvsVault.address, proposalConfigs, timelocks, guardianAddress),
-      ).to.be.revertedWith(
-        "GovernorBravo::initialize:number of proposal configs should match number of governance routes",
-      );
+      ).to.be.rejectedWith('ArityMismatch("proposalConfigs_")');
     });
 
     it("should revert if initialized twice", async () => {
@@ -105,7 +107,7 @@ describe("Governor Bravo Initializing Test", () => {
       await governorBravoDelegate.initialize(xvsVault.address, proposalConfigs, timelocks, guardianAddress);
       await expect(
         governorBravoDelegate.initialize(xvsVault.address, proposalConfigs, timelocks, guardianAddress),
-      ).to.be.revertedWith("GovernorBravo::initialize: cannot initialize twice");
+      ).to.be.rejectedWith("AlreadyInitialized");
     });
 
     //TODO: implement tests for min, max value validation of voting period, voting delay, proposal threshold
