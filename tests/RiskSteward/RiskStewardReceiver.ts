@@ -101,7 +101,7 @@ describe("Risk Steward", async function () {
 
     await accessControlManager.giveCallPermission(
       marketCapsRiskSteward.address,
-      "setMaxIncreaseBps(uint256)",
+      "setMaxDeltaBps(uint256)",
       deployer.address,
     );
 
@@ -156,8 +156,8 @@ describe("Risk Steward", async function () {
     });
 
     it("should revert if access is not granted for setting max increase bps", async function () {
-      await expect(marketCapsRiskSteward.connect(signer1).setMaxIncreaseBps(1)).to.be.rejectedWith(
-        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0xA4899D35897033b927acFCf422bc745916139776", "setMaxIncreaseBps(uint256)")',
+      await expect(marketCapsRiskSteward.connect(signer1).setMaxDeltaBps(1)).to.be.rejectedWith(
+        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0xA4899D35897033b927acFCf422bc745916139776", "setMaxDeltaBps(uint256)")',
       );
     });
   });
@@ -237,8 +237,8 @@ describe("Risk Steward", async function () {
       ).to.be.rejectedWith("InvalidDebounce");
     });
 
-    it("should revert if maxIncreaseBps is 0", async function () {
-      await expect(marketCapsRiskSteward.setMaxIncreaseBps(0)).to.be.rejectedWith("InvalidMaxIncreaseBps");
+    it("should revert if maxDeltaBps is 0", async function () {
+      await expect(marketCapsRiskSteward.setMaxDeltaBps(0)).to.be.rejectedWith("InvalidMaxDeltaBps");
     });
   });
 
@@ -401,10 +401,10 @@ describe("Risk Steward", async function () {
     });
 
     it("should revert if the update is out of bounds", async function () {
-      // Lower
+      // Too low
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
-        parseUnitsToHex(5),
+        parseUnitsToHex(2),
         "supplyCap",
         mockCoreVToken.address,
         "0x",
@@ -421,10 +421,10 @@ describe("Risk Steward", async function () {
       );
       await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateNotInRange");
 
-      // Lower
+      // Too Low
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
-        parseUnitsToHex(5),
+        parseUnitsToHex(2),
         "borrowCap",
         mockCoreVToken.address,
         "0x",
@@ -497,7 +497,7 @@ describe("Risk Steward", async function () {
       expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("10", 18));
     });
 
-    it("should process update by parameter and market", async function () {
+    it("should process increase updates by parameter and market", async function () {
       // Core Pool
       expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
       expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
@@ -540,6 +540,51 @@ describe("Risk Steward", async function () {
       await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockVToken.address);
       expect(await mockComptroller.supplyCaps(mockVToken.address)).to.equal(parseUnits("10", 18));
       expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("10", 18));
+    });
+
+    it("should process decrease updates by parameter and market", async function () {
+      // Core Pool
+      expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
+      expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
+      await mockRiskOracle.publishRiskParameterUpdate(
+        "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
+        parseUnitsToHex(6),
+        "supplyCap",
+        mockCoreVToken.address,
+        "0x",
+      );
+      await mockRiskOracle.publishRiskParameterUpdate(
+        "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
+        parseUnitsToHex(6),
+        "borrowCap",
+        mockCoreVToken.address,
+        "0x",
+      );
+      await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address);
+      await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address);
+      expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("6", 18));
+      expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("6", 18));
+      // Isolated Pool
+      expect(await mockComptroller.supplyCaps(mockVToken.address)).to.equal(parseUnits("8", 18));
+      expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("8", 18));
+      await mockRiskOracle.publishRiskParameterUpdate(
+        "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
+        parseUnitsToHex(6),
+        "supplyCap",
+        mockVToken.address,
+        "0x",
+      );
+      await mockRiskOracle.publishRiskParameterUpdate(
+        "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
+        parseUnitsToHex(6),
+        "borrowCap",
+        mockVToken.address,
+        "0x",
+      );
+      await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockVToken.address);
+      await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockVToken.address);
+      expect(await mockComptroller.supplyCaps(mockVToken.address)).to.equal(parseUnits("6", 18));
+      expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("6", 18));
     });
   });
 });
