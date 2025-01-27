@@ -152,7 +152,8 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
      *
      * @param pId proposal Id to start syncing voting power of
      * @param proposer The address of the proposer
-     * @param syncingParameters Array of syncing parameters containing remote chain id with their corresponding block hash, remote block header RLP, and XVS vault state proof RLP
+     * @param syncingParameters Array of syncing parameters containing remote chain id with their corresponding
+     *  block hash, remote block header RLP, and XVS vault state proof RLP
      * @param proposerVotingProofs Array of proofs containing remote chain id with their corresponding proofs (numCheckpointsProof, checkpointsProof) where
      * numCheckpointsProof is the proof data needed to verify the number of checkpoints and
      * checkpointsProof is the proof data needed to verify the actual voting power from the checkpoints
@@ -209,7 +210,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
 
         proposalBlockDetails[pId][BSC_CHAIN_ID] = NetworkProposalBlockDetails(block.number, blockhash(block.number));
 
-        uint96 power = this.getVotingPower(proposer, pId, proposerVotingProofs);
+        uint96 power = getVotingPower(proposer, pId, proposerVotingProofs);
         if (power < proposalThreshold) {
             revert ProposalThresholdNotMet(power, proposalThreshold);
         }
@@ -321,7 +322,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
      *  checkpointsProof is the proof data needed to verify the actual voting power from the checkpoints
      * @return power The total voting power of the voter across all supported remote chains
      */
-    function getVotingPower(address voter, uint256 pId, Proofs[] calldata proofs) external view returns (uint96 power) {
+    function getVotingPower(address voter, uint256 pId, Proofs[] calldata proofs) public view returns (uint96 power) {
         uint96 totalVotingPower;
         for (uint32 i; i < proofs.length; ++i) {
             totalVotingPower += _getVotingPower(
@@ -359,7 +360,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
         if (vault == address(0)) {
             revert RemoteChainNotSupported(remoteChainEid);
         }
-        
+
         StateProofVerifier.SlotValue memory latestCheckpoint = warehouse.getStorage(
             vault,
             blockDetails.blockHash,

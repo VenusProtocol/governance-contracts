@@ -177,8 +177,8 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
         bytes[] memory calldatas,
         string memory description,
         ProposalType proposalType,
-        VotingProof[] memory proposerVotingProof,
-        SyncingParams[] memory syncingParams,
+        IVotingPowerAggregator.Proofs[] memory proposerVotingProof,
+        IVotingPowerAggregator.SyncingParameters[] memory syncingParams,
         bytes memory extraOptions
     ) public payable returns (uint) {
         // Reject proposals before initiating as Governor
@@ -192,9 +192,8 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
         );
         require(targets.length != 0, "GovernorBravo::propose: must provide actions");
         require(targets.length <= proposalMaxOperations, "GovernorBravo::propose: too many actions");
-        uint latestProposalId = latestProposalIds[msg.sender];
-        if (latestProposalId != 0) {
-            ProposalState proposersLatestProposalState = state(latestProposalId);
+        if (latestProposalIds[msg.sender] != 0) {
+            ProposalState proposersLatestProposalState = state(latestProposalIds[msg.sender]);
             require(
                 proposersLatestProposalState != ProposalState.Active,
                 "GovernorBravo::propose: one live proposal per proposer, found an already active proposal"
@@ -207,9 +206,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
 
         proposalCount++;
         submissionBlock[proposalCount] = block.number;
-
-        uint startBlock = 0;
-        uint endBlock = 0;
 
         // Fetch all block hashes
         IVotingPowerAggregator(votingPowerAggregator).startVotingPowerSync.value(msg.value)(
@@ -229,8 +225,8 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
             values: values,
             signatures: signatures,
             calldatas: calldatas,
-            startBlock: startBlock,
-            endBlock: endBlock,
+            startBlock: 0,
+            endBlock: 0,
             forVotes: 0,
             againstVotes: 0,
             abstainVotes: 0,
@@ -248,8 +244,8 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
             values,
             signatures,
             calldatas,
-            startBlock,
-            endBlock,
+            newProposal.startBlock,
+            newProposal.endBlock,
             description,
             uint8(proposalType)
         );
@@ -346,7 +342,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
         return newProposal.id;
     }
 
-    function activateProposal(uint256 proposalId, uint256 status, address proposer) external {
+    function activateProposal(uint256 proposalId) external {
         if (msg.sender != votingPowerAggregator) {
             require(
                 IVotingPowerAggregator(votingPowerAggregator).isProposalSynced(proposalId),
@@ -359,8 +355,10 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
         uint startBlock = add256(block.number, proposalConfigs[uint8(proposalType)].votingDelay);
         uint endBlock = add256(startBlock, proposalConfigs[uint8(proposalType)].votingPeriod);
 
-        Proposal[proposalId].startBlock = startBlock;
-        Proposal[proposalId].endBlock = endBlock;
+        Proposal storage proposal = proposals[proposalId];
+
+        proposal.startBlock = startBlock;
+        proposal.endBlock = endBlock;
 
         emit ProposalActivated(proposalId);
     }
