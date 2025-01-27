@@ -38,6 +38,16 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
     IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
 
     /**
+     * @notice The update type for supply caps
+     */
+    string public constant SUPPLY_CAP = "supplyCap";
+
+    /**
+     * @notice The update type for borrow caps
+     */
+    string public constant BORROW_CAP = "borrowCap";
+
+    /**
      * @notice Emitted when a supply cap is updated
      */
     event SupplyCapUpdated(address market, uint256 newSupplyCap);
@@ -116,9 +126,9 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
             revert OnlyRiskStewardReceiver();
         }
-        if (Strings.equal(update.updateType, "supplyCap")) {
+        if (Strings.equal(update.updateType, SUPPLY_CAP)) {
             _processSupplyCapUpdate(update);
-        } else if (Strings.equal(update.updateType, "borrowCap")) {
+        } else if (Strings.equal(update.updateType, BORROW_CAP)) {
             _processBorrowCapUpdate(update);
         } else {
             revert UnsupportedUpdateType();
