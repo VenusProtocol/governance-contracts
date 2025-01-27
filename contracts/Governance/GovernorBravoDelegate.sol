@@ -1,7 +1,9 @@
-pragma solidity ^0.5.16;
+// SPDX-License-Identifier: BSD-3-Clause
+pragma solidity 0.8.25;
 pragma experimental ABIEncoderV2;
 
-import "./GovernorBravoInterfaces.sol";
+import "./GovernorBravoInterfacesV8.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
 /**
  * @title GovernorBravoDelegate
@@ -75,25 +77,25 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     string public constant name = "Venus Governor Bravo";
 
     /// @notice The minimum setable proposal threshold
-    uint public constant MIN_PROPOSAL_THRESHOLD = 150000e18; // 150,000 Xvs
+    uint256 public constant MIN_PROPOSAL_THRESHOLD = 150000e18; // 150,000 Xvs
 
     /// @notice The maximum setable proposal threshold
-    uint public constant MAX_PROPOSAL_THRESHOLD = 300000e18; //300,000 Xvs
+    uint256 public constant MAX_PROPOSAL_THRESHOLD = 300000e18; //300,000 Xvs
 
     /// @notice The minimum setable voting period
-    uint public constant MIN_VOTING_PERIOD = 20 * 60 * 3; // About 3 hours, 3 secs per block
+    uint256 public constant MIN_VOTING_PERIOD = 20 * 60 * 3; // About 3 hours, 3 secs per block
 
     /// @notice The max setable voting period
-    uint public constant MAX_VOTING_PERIOD = 20 * 60 * 24 * 14; // About 2 weeks, 3 secs per block
+    uint256 public constant MAX_VOTING_PERIOD = 20 * 60 * 24 * 14; // About 2 weeks, 3 secs per block
 
     /// @notice The min setable voting delay
-    uint public constant MIN_VOTING_DELAY = 1;
+    uint256 public constant MIN_VOTING_DELAY = 1;
 
     /// @notice The max setable voting delay
-    uint public constant MAX_VOTING_DELAY = 20 * 60 * 24 * 7; // About 1 week, 3 secs per block
+    uint256 public constant MAX_VOTING_DELAY = 20 * 60 * 24 * 7; // About 1 week, 3 secs per block
 
     /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
-    uint public constant quorumVotes = 600000e18; // 600,000 = 2% of Xvs
+    uint256 public constant quorumVotes = 600000e18; // 600,000 = 2% of Xvs
 
     /// @notice The EIP-712 typehash for the contract's domain
     bytes32 public constant DOMAIN_TYPEHASH =
@@ -180,12 +182,12 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      */
     function propose(
         address[] memory targets,
-        uint[] memory values,
+        uint256[] memory values,
         string[] memory signatures,
         bytes[] memory calldatas,
         string memory description,
         ProposalType proposalType
-    ) public returns (uint) {
+    ) public returns (uint256) {
         // Reject proposals before initiating as Governor
         require(initialProposalId != 0, "GovernorBravo::propose: Governor Bravo not active");
         require(
@@ -202,7 +204,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         require(targets.length != 0, "GovernorBravo::propose: must provide actions");
         require(targets.length <= proposalMaxOperations, "GovernorBravo::propose: too many actions");
 
-        uint latestProposalId = latestProposalIds[msg.sender];
+        uint256 latestProposalId = latestProposalIds[msg.sender];
         if (latestProposalId != 0) {
             ProposalState proposersLatestProposalState = state(latestProposalId);
             require(
@@ -215,33 +217,26 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
             );
         }
 
-        uint startBlock = add256(block.number, proposalConfigs[uint8(proposalType)].votingDelay);
-        uint endBlock = add256(startBlock, proposalConfigs[uint8(proposalType)].votingPeriod);
+        uint256 startBlock = add256(block.number, proposalConfigs[uint8(proposalType)].votingDelay);
+        uint256 endBlock = add256(startBlock, proposalConfigs[uint8(proposalType)].votingPeriod);
 
         proposalCount++;
-        Proposal memory newProposal = Proposal({
-            id: proposalCount,
-            proposer: msg.sender,
-            eta: 0,
-            targets: targets,
-            values: values,
-            signatures: signatures,
-            calldatas: calldatas,
-            startBlock: startBlock,
-            endBlock: endBlock,
-            forVotes: 0,
-            againstVotes: 0,
-            abstainVotes: 0,
-            canceled: false,
-            executed: false,
-            proposalType: uint8(proposalType)
-        });
 
-        proposals[newProposal.id] = newProposal;
-        latestProposalIds[newProposal.proposer] = newProposal.id;
+        Proposal storage proposal = proposals[proposalCount];
+        proposal.id = proposalCount;
+        proposal.proposer = msg.sender;
+        proposal.targets = targets;
+        proposal.values = values;
+        proposal.signatures = signatures;
+        proposal.calldatas = calldatas;
+        proposal.startBlock = startBlock;
+        proposal.endBlock = endBlock;
+        proposal.proposalType = uint8(proposalType);
+
+        latestProposalIds[msg.sender] = proposalCount;
 
         emit ProposalCreated(
-            newProposal.id,
+            proposalCount,
             msg.sender,
             targets,
             values,
@@ -252,21 +247,21 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
             description,
             uint8(proposalType)
         );
-        return newProposal.id;
+        return proposalCount;
     }
 
     /**
      * @notice Queues a proposal of state succeeded
      * @param proposalId The id of the proposal to queue
      */
-    function queue(uint proposalId) external {
+    function queue(uint256 proposalId) external {
         require(
             state(proposalId) == ProposalState.Succeeded,
             "GovernorBravo::queue: proposal can only be queued if it is succeeded"
         );
         Proposal storage proposal = proposals[proposalId];
-        uint eta = add256(block.timestamp, proposalTimelocks[uint8(proposal.proposalType)].delay());
-        for (uint i; i < proposal.targets.length; ++i) {
+        uint256 eta = add256(block.timestamp, proposalTimelocks[uint8(proposal.proposalType)].delay());
+        for (uint256 i; i < proposal.targets.length; ++i) {
             queueOrRevertInternal(
                 proposal.targets[i],
                 proposal.values[i],
@@ -282,10 +277,10 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
 
     function queueOrRevertInternal(
         address target,
-        uint value,
+        uint256 value,
         string memory signature,
         bytes memory data,
-        uint eta,
+        uint256 eta,
         uint8 proposalType
     ) internal {
         require(
@@ -301,14 +296,14 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @notice Executes a queued proposal if eta has passed
      * @param proposalId The id of the proposal to execute
      */
-    function execute(uint proposalId) external {
+    function execute(uint256 proposalId) external {
         require(
             state(proposalId) == ProposalState.Queued,
             "GovernorBravo::execute: proposal can only be executed if it is queued"
         );
         Proposal storage proposal = proposals[proposalId];
         proposal.executed = true;
-        for (uint i; i < proposal.targets.length; ++i) {
+        for (uint256 i; i < proposal.targets.length; ++i) {
             proposalTimelocks[uint8(proposal.proposalType)].executeTransaction(
                 proposal.targets[i],
                 proposal.values[i],
@@ -324,7 +319,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @notice Cancels a proposal only if sender is the proposer, or proposer delegates dropped below proposal threshold
      * @param proposalId The id of the proposal to cancel
      */
-    function cancel(uint proposalId) external {
+    function cancel(uint256 proposalId) external {
         require(state(proposalId) != ProposalState.Executed, "GovernorBravo::cancel: cannot cancel executed proposal");
 
         Proposal storage proposal = proposals[proposalId];
@@ -337,7 +332,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         );
 
         proposal.canceled = true;
-        for (uint i = 0; i < proposal.targets.length; i++) {
+        for (uint256 i = 0; i < proposal.targets.length; i++) {
             proposalTimelocks[proposal.proposalType].cancelTransaction(
                 proposal.targets[i],
                 proposal.values[i],
@@ -353,14 +348,22 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     /**
      * @notice Gets actions of a proposal
      * @param proposalId the id of the proposal
-     * @return targets, values, signatures, and calldatas of the proposal actions
+     * @return targets Array of proposal targets,
+     * @return values Array of proposal values
+     * @return signatures Array of proposal signatures
+     * @return calldatas Array of proposal calldatas
      */
     function getActions(
-        uint proposalId
+        uint256 proposalId
     )
         external
         view
-        returns (address[] memory targets, uint[] memory values, string[] memory signatures, bytes[] memory calldatas)
+        returns (
+            address[] memory targets,
+            uint256[] memory values,
+            string[] memory signatures,
+            bytes[] memory calldatas
+        )
     {
         Proposal storage p = proposals[proposalId];
         return (p.targets, p.values, p.signatures, p.calldatas);
@@ -372,7 +375,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param voter The address of the voter
      * @return The voting receipt
      */
-    function getReceipt(uint proposalId, address voter) external view returns (Receipt memory) {
+    function getReceipt(uint256 proposalId, address voter) external view returns (Receipt memory) {
         return proposals[proposalId].receipts[voter];
     }
 
@@ -381,7 +384,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param proposalId The id of the proposal
      * @return Proposal state
      */
-    function state(uint proposalId) public view returns (ProposalState) {
+    function state(uint256 proposalId) public view returns (ProposalState) {
         require(
             proposalCount >= proposalId && proposalId > initialProposalId,
             "GovernorBravo::state: invalid proposal id"
@@ -413,7 +416,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param proposalId The id of the proposal to vote on
      * @param support The support value for the vote. 0=against, 1=for, 2=abstain
      */
-    function castVote(uint proposalId, uint8 support) external {
+    function castVote(uint256 proposalId, uint8 support) external {
         emit VoteCast(msg.sender, proposalId, support, castVoteInternal(msg.sender, proposalId, support), "");
     }
 
@@ -423,7 +426,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param support The support value for the vote. 0=against, 1=for, 2=abstain
      * @param reason The reason given for the vote by the voter
      */
-    function castVoteWithReason(uint proposalId, uint8 support, string calldata reason) external {
+    function castVoteWithReason(uint256 proposalId, uint8 support, string calldata reason) external {
         emit VoteCast(msg.sender, proposalId, support, castVoteInternal(msg.sender, proposalId, support), reason);
     }
 
@@ -436,7 +439,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param r part of the ECDSA sig output
      * @param s part of the ECDSA sig output
      */
-    function castVoteBySig(uint proposalId, uint8 support, uint8 v, bytes32 r, bytes32 s) external {
+    function castVoteBySig(uint256 proposalId, uint8 support, uint8 v, bytes32 r, bytes32 s) external {
         bytes32 domainSeparator = keccak256(
             abi.encode(DOMAIN_TYPEHASH, keccak256(bytes(name)), getChainIdInternal(), address(this))
         );
@@ -454,7 +457,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param support The support value for the vote. 0=against, 1=for, 2=abstain
      * @return The number of votes cast
      */
-    function castVoteInternal(address voter, uint proposalId, uint8 support) internal returns (uint96) {
+    function castVoteInternal(address voter, uint256 proposalId, uint8 support) internal returns (uint96) {
         require(state(proposalId) == ProposalState.Active, "GovernorBravo::castVoteInternal: voting is closed");
         require(support <= 2, "GovernorBravo::castVoteInternal: invalid vote type");
         Proposal storage proposal = proposals[proposalId];
@@ -510,9 +513,9 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @dev Admin only.
      * @param proposalMaxOperations_ Max proposal operations
      */
-    function _setProposalMaxOperations(uint proposalMaxOperations_) external {
+    function _setProposalMaxOperations(uint256 proposalMaxOperations_) external {
         require(msg.sender == admin, "GovernorBravo::_setProposalMaxOperations: admin only");
-        uint oldProposalMaxOperations = proposalMaxOperations;
+        uint256 oldProposalMaxOperations = proposalMaxOperations;
         proposalMaxOperations = proposalMaxOperations_;
 
         emit ProposalMaxOperationsUpdated(oldProposalMaxOperations, proposalMaxOperations_);
@@ -562,19 +565,19 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         emit NewPendingAdmin(oldPendingAdmin, pendingAdmin);
     }
 
-    function add256(uint256 a, uint256 b) internal pure returns (uint) {
-        uint c = a + b;
+    function add256(uint256 a, uint256 b) internal pure returns (uint256) {
+        uint256 c = a + b;
         require(c >= a, "addition overflow");
         return c;
     }
 
-    function sub256(uint256 a, uint256 b) internal pure returns (uint) {
+    function sub256(uint256 a, uint256 b) internal pure returns (uint256) {
         require(b <= a, "subtraction underflow");
         return a - b;
     }
 
-    function getChainIdInternal() internal pure returns (uint) {
-        uint chainId;
+    function getChainIdInternal() internal view returns (uint256) {
+        uint256 chainId;
         assembly {
             chainId := chainid()
         }
