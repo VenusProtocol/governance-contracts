@@ -186,6 +186,13 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     /// @notice Error thrown when the proposer is not whitelisted
     error TimelockNotWhitelistedForProposer();
 
+    modifier requireActiveGovernor() {
+        if (initialProposalId == 0) {
+            revert GovernorNotActive();
+        }
+        _;
+    }
+
     modifier onlyAdmin() {
         if (msg.sender != admin) {
             revert OnlyAdmin();
@@ -236,36 +243,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
 
         _setAccessControlManager(accessControlManager_);
         //Set parameters for each Governance Route
-        uint256 arrLength = proposalConfigs_.length;
-        for (uint256 i; i < arrLength; ++i) {
-            if (proposalConfigs_[i].votingPeriod < MIN_VOTING_PERIOD) {
-                revert InvalidMinVotingPeriod();
-            }
-
-            if (proposalConfigs_[i].votingPeriod > MAX_VOTING_PERIOD) {
-                revert InvalidMaxVotingPeriod();
-            }
-
-            if (proposalConfigs_[i].votingDelay < MIN_VOTING_DELAY) {
-                revert InvalidMinVotingDelay();
-            }
-
-            if (proposalConfigs_[i].votingDelay > MAX_VOTING_DELAY) {
-                revert InvalidMaxVotingDelay();
-            }
-
-            if (proposalConfigs_[i].proposalThreshold < MIN_PROPOSAL_THRESHOLD) {
-                revert InvalidMinProposalThreshold();
-            }
-
-            if (proposalConfigs_[i].proposalThreshold >= MAX_PROPOSAL_THRESHOLD) {
-                revert InvalidMaxProposalThreshold();
-            }
-            ensureNonzeroAddress(address(timelocks[i]));
-
-            proposalConfigs[i] = proposalConfigs_[i];
-            proposalTimelocks[i] = timelocks[i];
-        }
+        _validateAndSetProposalConfigTimelocks(proposalConfigs_, timelocks);
     }
 
     /**
@@ -288,12 +266,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         bytes[] memory calldatas,
         string memory description,
         ProposalType proposalType
-    ) public returns (uint256) {
-        // Reject proposals before initiating as Governor
-        if (initialProposalId == 0) {
-            revert GovernorNotActive();
-        }
-
+    ) public requireActiveGovernor returns (uint256) {
         if (
             xvsVault.getPriorVotes(msg.sender, sub256(block.number, 1)) <
             proposalConfigs[uint8(proposalType)].proposalThreshold &&
@@ -530,11 +503,14 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
      * @param proposalId The id of the proposal
      * @return Proposal state
      */
+    // solhint-disable-next-line code-complexity
     function state(uint256 proposalId) public view returns (ProposalState) {
         if (proposalCount < proposalId && proposalId > initialProposalId) {
             revert InvalidProposalId();
         }
+
         Proposal storage proposal = proposals[proposalId];
+
         if (proposal.canceled) {
             return ProposalState.Canceled;
         } else if (block.number <= proposal.startBlock) {
@@ -714,6 +690,42 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
 
         emit NewAdmin(oldAdmin, admin);
         emit NewPendingAdmin(oldPendingAdmin, pendingAdmin);
+    }
+
+    function _validateAndSetProposalConfigTimelocks(
+        ProposalConfig[] memory proposalConfigs_,
+        TimelockInterface[] memory timelocks
+    ) internal {
+        uint256 arrLength = proposalConfigs_.length;
+
+        for (uint256 i; i < arrLength; ++i) {
+            if (proposalConfigs_[i].votingPeriod < MIN_VOTING_PERIOD) {
+                revert InvalidMinVotingPeriod();
+            }
+
+            if (proposalConfigs_[i].votingPeriod > MAX_VOTING_PERIOD) {
+                revert InvalidMaxVotingPeriod();
+            }
+
+            if (proposalConfigs_[i].votingDelay < MIN_VOTING_DELAY) {
+                revert InvalidMinVotingDelay();
+            }
+
+            if (proposalConfigs_[i].votingDelay > MAX_VOTING_DELAY) {
+                revert InvalidMaxVotingDelay();
+            }
+
+            if (proposalConfigs_[i].proposalThreshold < MIN_PROPOSAL_THRESHOLD) {
+                revert InvalidMinProposalThreshold();
+            }
+
+            if (proposalConfigs_[i].proposalThreshold >= MAX_PROPOSAL_THRESHOLD) {
+                revert InvalidMaxProposalThreshold();
+            }
+            ensureNonzeroAddress(address(timelocks[i]));
+            proposalConfigs[i] = proposalConfigs_[i];
+            proposalTimelocks[i] = timelocks[i];
+        }
     }
 
     function add256(uint256 a, uint256 b) internal pure returns (uint256) {
