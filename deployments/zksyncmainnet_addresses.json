@@ -2,6 +2,15 @@
   "name": "zksyncmainnet",
   "chainId": "324",
   "addresses": {
-    "AccessControlManager": "0x526159A92A82afE5327d37Ef446b68FD9a5cA914"
+    "ACMCommandsAggregator": "0x88B1452e512c8fcf83889DdCfe54dF37D561Db82",
+    "AccessControlManager": "0x526159A92A82afE5327d37Ef446b68FD9a5cA914",
+    "CriticalTimelock": "0xbfbc79D4198963e4a66270F3EfB1fdA0F382E49c",
+    "DefaultProxyAdmin": "0x8Ea1A989B036f7Ef21bb95CE4E7961522Ca00287",
+    "FastTrackTimelock": "0x32f71c95BC8F9d996f89c642f1a84d06B2484AE9",
+    "NormalTimelock": "0x093565Bc20AA326F4209eBaF3a26089272627613",
+    "OmnichainExecutorOwner": "0xdfaed3E5d9707629Ed5c225b4fB980c064286771",
+    "OmnichainExecutorOwner_Implementation": "0x1a1e8b2e095aEaca3Ba2d9bDa0B9Adf855032E89",
+    "OmnichainExecutorOwner_Proxy": "0xdfaed3E5d9707629Ed5c225b4fB980c064286771",
+    "OmnichainGovernanceExecutor": "0xA1b56f19CA5E5b15EF29d38238930Ce9f0235312"
   }
 }

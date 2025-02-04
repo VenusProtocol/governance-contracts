@@ -11,6 +11,10 @@ export enum REMOTE_NETWORKS {
   ARBITRUM_SEPOLIA = "arbitrumsepolia",
   ZKSYNCSEPOLIA = "zksyncsepolia",
   ZKSYNCMAINNET = "zksyncmainnet",
+  OPSEPOLIA = "opsepolia",
+  OPMAINNET = "opmainnet",
+  BASESEPOLIA = "basesepolia",
+  BASEMAINNET = "basemainnet",
   HARDHAT = "hardhat",
 }
 type DelayTypes = {
@@ -68,7 +72,28 @@ export const delayConfig: DelayConfig = {
     fast: 21600,
     critical: 3600,
   },
+  opsepolia: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  opmainnet: {
+    normal: 172800,
+    fast: 21600,
+    critical: 3600,
+  },
+  basesepolia: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  basemainnet: {
+    normal: 172800,
+    fast: 21600,
+    critical: 3600,
+  },
 };
+
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
@@ -85,6 +110,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].normal],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 
   await deploy(live ? "FastTrackTimelock" : "FastTrackTimelockRemote", {
@@ -93,6 +119,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].fast],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 
   await deploy(live ? "CriticalTimelock" : "CriticalTimelockRemote", {
@@ -101,6 +128,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].critical],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 };
 

@@ -6,15 +6,31 @@ import bscTestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
 import { LZ_CHAINID, SUPPORTED_NETWORKS } from "./constants";
 
 export const testnetNetworks = [
+  
   "sepolia",
+ 
   "opbnbtestnet",
+ 
   "arbitrumsepolia",
+ 
   "zksyncsepolia",
+ 
   "opsepolia",
+  "basesepolia",
+ 
   "unichainsepolia",
   "hardhat",
+,
 ];
-const mainnetNetworks = ["ethereum", "opbnbmainnet", "arbitrumone", "zksyncmainnet", "opmainnet", "hardhat"];
+const mainnetNetworks = [
+  "ethereum",
+  "opbnbmainnet",
+  "arbitrumone",
+  "zksyncmainnet",
+  "opmainnet",
+  "basemainnet",
+  "hardhat",
+];
 
 export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<string> => {
   const { deployer } = await getNamedAccounts();
@@ -40,6 +56,10 @@ export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<s
     return "0xd57365EE4E850e881229e2F8Aa405822f289e78d"; // OPSEPOLIA MULTISIG
   } else if (network === "opmainnet") {
     return "0x2e94dd14E81999CdBF5deDE31938beD7308354b3"; // OPMAINNET MULTISIG
+  } else if (network === "basesepolia") {
+    return "0xdf3b635d2b535f906BB02abb22AED71346E36a00"; // BASE SEPOLIA MULTISIG
+  } else if (network === "basemainnet") {
+    return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // BASE MAINNET MULTISIG
   } else if (network === "unichainsepolia") {
     return "0x9831D3A641E8c7F082EEA75b8249c99be9D09a34"; // UNICHAIN SEPOLIA MULTISIG
   }
@@ -72,6 +92,10 @@ export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => 
     return "0xd57365EE4E850e881229e2F8Aa405822f289e78d"; // OPSEPOLIA MULTISIG
   } else if (network === "opmainnet") {
     return "0x2e94dd14E81999CdBF5deDE31938beD7308354b3"; // OPMAINNET MULTISIG
+  } else if (network === "basesepolia") {
+    return "0xdf3b635d2b535f906BB02abb22AED71346E36a00"; // BASE SEPOLIA MULTISIG
+  } else if (network === "basemainnet") {
+    return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // BASE MAINNET MULTISIG
   } else if (network === "unichainsepolia") {
     return "0x9831D3A641E8c7F082EEA75b8249c99be9D09a34"; // UNICHAIN SEPOLIA MULTISIG
   }
@@ -106,6 +130,8 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
     zksyncmainnet: "0x9b896c0e23220469C7AE69cb4BbAE391eAa4C8da",
     opmainnet: "0x3c2269811836af69497E5F486A85D7316753cf62",
     opsepolia: "0x55370E0fBB5f5b8dAeD978BA1c075a499eB107B8",
+    basesepolia: "0x55370E0fBB5f5b8dAeD978BA1c075a499eB107B8",
+    basemainnet: "0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7",
     unichainsepolia: "0x012f6eaE2A0Bf5916f48b5F37C62Bcfb7C1ffdA1",
     hardhat: lzEndpointMock?.address || "",
   }[networkName];
