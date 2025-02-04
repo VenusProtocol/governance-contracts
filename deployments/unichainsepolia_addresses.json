@@ -1,0 +1,7 @@
+{
+  "name": "unichainsepolia",
+  "chainId": "1301",
+  "addresses": {
+    "AccessControlManager": "0x854C064EA6b503A97980F481FA3B7279012fdeDd"
+  }
+}
