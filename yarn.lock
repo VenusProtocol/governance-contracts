@@ -3450,29 +3450,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@venusprotocol/governance-contracts@npm:^1.4.0":
-  version: 1.4.0
-  resolution: "@venusprotocol/governance-contracts@npm:1.4.0"
-  dependencies:
-    "@venusprotocol/solidity-utilities": ^1.1.0
-    hardhat-deploy-ethers: ^0.3.0-beta.13
-    module-alias: ^2.2.2
-  checksum: 85c6b6a815edb0befa4c38e3652a58464827d390620210b99575c16960ee6505e95e7c2192ebc972da7ed758d3c62e150d32fbdd1f01acab1731f29b11d1884e
-  languageName: node
-  linkType: hard
-
-"@venusprotocol/governance-contracts@npm:^2.0.0":
-  version: 2.6.0
-  resolution: "@venusprotocol/governance-contracts@npm:2.6.0"
-  dependencies:
-    "@venusprotocol/solidity-utilities": 2.0.0
-    hardhat-deploy-ethers: ^0.3.0-beta.13
-    module-alias: ^2.2.2
-  checksum: 7b4e8034961d02a3ae1f33b9a771e98d1ae39576ae60222433c2d33d184b7f6d8e1368a050dfe1d40f4ce3a0341e6500f00dd6e64c58a35092c942c125247c77
-  languageName: node
-  linkType: hard
-
-"@venusprotocol/governance-contracts@workspace:.":
+"@venusprotocol/governance-contracts@^2.0.0, @venusprotocol/governance-contracts@workspace:.":
   version: 0.0.0-use.local
   resolution: "@venusprotocol/governance-contracts@workspace:."
   dependencies:
@@ -3550,6 +3528,17 @@ __metadata:
     zksync-ethers: ^5.9.1
   languageName: unknown
   linkType: soft
+
+"@venusprotocol/governance-contracts@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@venusprotocol/governance-contracts@npm:1.4.0"
+  dependencies:
+    "@venusprotocol/solidity-utilities": ^1.1.0
+    hardhat-deploy-ethers: ^0.3.0-beta.13
+    module-alias: ^2.2.2
+  checksum: 85c6b6a815edb0befa4c38e3652a58464827d390620210b99575c16960ee6505e95e7c2192ebc972da7ed758d3c62e150d32fbdd1f01acab1731f29b11d1884e
+  languageName: node
+  linkType: hard
 
 "@venusprotocol/protocol-reserve@npm:^1.4.0":
   version: 1.5.0
