@@ -6,21 +6,14 @@ import bscTestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
 import { LZ_CHAINID, SUPPORTED_NETWORKS } from "./constants";
 
 export const testnetNetworks = [
-  
   "sepolia",
- 
   "opbnbtestnet",
- 
   "arbitrumsepolia",
- 
   "zksyncsepolia",
- 
   "opsepolia",
   "basesepolia",
- 
   "unichainsepolia",
   "hardhat",
-,
 ];
 const mainnetNetworks = [
   "ethereum",
