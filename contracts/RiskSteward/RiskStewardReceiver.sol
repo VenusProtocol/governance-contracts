@@ -206,8 +206,9 @@ contract RiskStewardReceiver is
      */
     function processUpdateById(uint256 updateId) external whenNotPaused {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
-        _validateUpdateStatus(update);
-        _processUpdate(update);
+        bytes memory marketUpdateTypeKey = _getMarketUpdateTypeKey(update.market, update.updateType);
+        _validateUpdateStatus(update, marketUpdateTypeKey);
+        _processUpdate(update, marketUpdateTypeKey);
     }
 
     /**
@@ -217,13 +218,14 @@ contract RiskStewardReceiver is
      */
     function processUpdateByParameterAndMarket(string memory updateType, address market) external whenNotPaused {
         RiskParameterUpdate memory update = RISK_ORACLE.getLatestUpdateByParameterAndMarket(updateType, market);
-        _validateUpdateStatus(update);
-        _processUpdate(update);
+        bytes memory marketUpdateTypeKey = _getMarketUpdateTypeKey(update.market, update.updateType);
+        _validateUpdateStatus(update, marketUpdateTypeKey);
+        _processUpdate(update, marketUpdateTypeKey);
     }
 
-    function _processUpdate(RiskParameterUpdate memory update) internal {
+    function _processUpdate(RiskParameterUpdate memory update, bytes memory marketUpdateTypeKey) internal {
         IRiskSteward(riskParameterConfigs[update.updateType].riskSteward).processUpdate(update);
-        lastProcessedTime[_getMarketUpdateTypeKey(update.market, update.updateType)] = block.timestamp;
+        lastProcessedTime[marketUpdateTypeKey] = block.timestamp;
         processedUpdates[update.updateId] = true;
         emit RiskParameterUpdated(update.updateId);
     }
@@ -232,7 +234,7 @@ contract RiskStewardReceiver is
         return abi.encodePacked(market, updateType);
     }
 
-    function _validateUpdateStatus(RiskParameterUpdate memory update) internal view {
+    function _validateUpdateStatus(RiskParameterUpdate memory update, bytes memory marketUpdateTypeKey) internal view {
         RiskParamConfig memory config = riskParameterConfigs[update.updateType];
 
         if (!config.active) {
@@ -247,10 +249,7 @@ contract RiskStewardReceiver is
             revert ConfigAlreadyProcessed();
         }
 
-        if (
-            block.timestamp - lastProcessedTime[_getMarketUpdateTypeKey(update.market, update.updateType)] <
-            config.debounce
-        ) {
+        if (block.timestamp - lastProcessedTime[marketUpdateTypeKey] < config.debounce) {
             revert UpdateTooFrequent();
         }
     }
