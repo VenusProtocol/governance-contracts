@@ -53,7 +53,7 @@ export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<s
   } else if (network === "basemainnet") {
     return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // BASE MAINNET MULTISIG
   } else if (network === "unichainmainnet") {
-    return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C";
+    return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // Unichain mainnet multisig
   }
 
   const normalTimelock = await ethers.getContract("NormalTimelock");
@@ -88,8 +88,9 @@ export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => 
     return "0xdf3b635d2b535f906BB02abb22AED71346E36a00"; // BASE SEPOLIA MULTISIG
   } else if (network === "basemainnet") {
     return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // BASE MAINNET MULTISIG
+  } else if (network === "unichainmainnet") {
+    return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // Unichain mainnet multisig
   }
-
   return deployer;
 };
 
