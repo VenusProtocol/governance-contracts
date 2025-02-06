@@ -47,17 +47,17 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Emitted when a supply cap is updated
      */
-    event SupplyCapUpdated(address market, uint256 newSupplyCap);
+    event SupplyCapUpdated(address indexed market, uint256 indexed newSupplyCap);
 
     /**
      * @notice Emitted when a borrow cap is updated
      */
-    event BorrowCapUpdated(address market, uint256 newBorrowCap);
+    event BorrowCapUpdated(address indexed market, uint256 indexed newBorrowCap);
 
     /**
      * @notice Emitted when the max delta bps is updated
      */
-    event MaxDeltaBpsUpdated(uint256 oldMaxDeltaBps, uint256 newMaxDeltaBps);
+    event MaxDeltaBpsUpdated(uint256 oldMaxDeltaBps, uint256 indexed newMaxDeltaBps);
 
     /**
      * @notice Thrown when a maxDeltaBps value of 0 is set
