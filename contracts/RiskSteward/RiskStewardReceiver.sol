@@ -278,9 +278,4 @@ contract RiskStewardReceiver is
             revert UpdateTooFrequent();
         }
     }
-
-    /**
-     * @dev Disabling renounceOwnership function.
-     */
-    function renounceOwnership() public override {}
 }
