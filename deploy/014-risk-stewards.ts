@@ -2,7 +2,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { LZ_CHAINID, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { getRiskOracle, getAcmAdminAccount, skipRemoteNetworks } from "../helpers/deploy/deploymentUtils";
+import { getAcmAdminAccount, getRiskOracle, skipRemoteNetworks } from "../helpers/deploy/deploymentUtils";
 
 const marketCapsRiskStewardNetworkConfigs = {
   hardhat: {

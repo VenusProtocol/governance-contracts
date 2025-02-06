@@ -4,8 +4,7 @@ pragma solidity 0.8.25;
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
 import { IVToken } from "../interfaces/IVToken.sol";
-import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
-import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
+import { IUnifiedComptroller } from "../interfaces/IUnifiedComptroller.sol";
 import { IRiskStewardReceiver } from "./IRiskStewardReceiver.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { IRiskSteward } from "./IRiskSteward.sol";
@@ -28,14 +27,14 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     uint256 public maxDeltaBps;
 
     /**
-     * @notice Address of the CorePoolComptroller used for selecting the correct comptroller abi
-     */
-    ICorePoolComptroller public immutable CORE_POOL_COMPTROLLER;
-
-    /**
      * @notice Address of the RiskStewardReceiver used to validate incoming updates
      */
     IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
+
+    /**
+     * @notice Source chain id
+     */
+    uint16 public immutable LAYER_ZERO_CHAIN_ID;
 
     /**
      * @notice The update type for supply caps
@@ -48,11 +47,26 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     string public constant BORROW_CAP = "borrowCap";
 
     /**
+     * @notice The debounce period for updates in seconds
+     */
+    uint256 public debouncePeriod;
+
+    /**
+     * @notice Mapping of market and update type to last update timestamp. Used for debouncing updates.
+     */
+    mapping(bytes marketUpdateType => uint256) public lastProcessedTime;
+
+    /**
+     * @notice Mapping of processed updates. Used to prevent re-execution
+     */
+    mapping(uint256 updateId => bool) public processedUpdates;
+
+    /**
      * @dev This empty reserved space is put in place to allow future versions to add new
      * variables without shifting down storage in the inheritance chain.
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
-    uint256[49] private __gap;
+    uint256[47] private __gap;
 
     /**
      * @notice Emitted when a supply cap is updated
@@ -70,19 +84,29 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     event MaxDeltaBpsUpdated(uint256 oldMaxDeltaBps, uint256 indexed newMaxDeltaBps);
 
     /**
+     * @notice Emitted when the debounce period is updated
+     */
+    event DebouncePeriodUpdated(uint256 oldDebouncePeriod, uint256 newDebouncePeriod);
+
+    /**
      * @notice Thrown when a maxDeltaBps value of 0 is set
      */
     error InvalidMaxDeltaBps();
 
     /**
-     * @notice Thrown when an update type that is not supported is operated on
+     * @notice Thrown when a debounce period of 0 is set
      */
-    error UnsupportedUpdateType();
+    error InvalidDebouncePeriod();
+
+    /**
+     * @notice Thrown when an updateType that is not supported is operated on
+     */
+    error UnsupportedUpdateType(uint256 updateId);
 
     /**
      * @notice Thrown when the new value of an update is out of range
      */
-    error UpdateNotInRange();
+    error UpdateNotInRange(uint256 updateId);
 
     /**
      * @notice Thrown when the update is not coming from the RiskStewardReceiver
@@ -90,17 +114,27 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     error OnlyRiskStewardReceiver();
 
     /**
+     * @notice Thrown when the debounce period hasn't passed for applying an update to a specific market/ update type
+     */
+    error UpdateTooFrequent();
+
+    modifier onlyRiskStewardReceiver() {
+        if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
+            revert OnlyRiskStewardReceiver();
+        }
+        _;
+    }
+    /**
      * @dev Sets the immutable CorePoolComptroller and RiskStewardReceiver addresses and disables initializers
-     * @param corePoolComptroller_ The address of the CorePoolComptroller
      * @param riskStewardReceiver_ The address of the RiskStewardReceiver
+     * @param layerZeroChainId The layer zero chain ID
      * @custom:error Throws ZeroAddressNotAllowed if the CorePoolComptroller or RiskStewardReceiver addresses are zero
      * @custom:oz-upgrades-unsafe-allow constructor
      */
-    constructor(address corePoolComptroller_, address riskStewardReceiver_) {
-        ensureNonzeroAddress(corePoolComptroller_);
+    constructor(address riskStewardReceiver_, uint16 layerZeroChainId) {
         ensureNonzeroAddress(riskStewardReceiver_);
-        CORE_POOL_COMPTROLLER = ICorePoolComptroller(corePoolComptroller_);
         RISK_STEWARD_RECEIVER = IRiskStewardReceiver(riskStewardReceiver_);
+        LAYER_ZERO_CHAIN_ID = layerZeroChainId;
         _disableInitializers();
     }
 
@@ -110,12 +144,17 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @param maxDeltaBps_ The max detla bps
      * @custom:error Throws InvalidMaxDeltaBps if the max delta bps is 0 or greater than MAX_BPS
      */
-    function initialize(address accessControlManager_, uint256 maxDeltaBps_) external initializer {
+    function initialize(
+        address accessControlManager_,
+        uint256 maxDeltaBps_,
+        uint256 _debouncePeriod
+    ) external initializer {
         __AccessControlled_init(accessControlManager_);
         if (maxDeltaBps_ == 0 || maxDeltaBps_ > MAX_BPS) {
             revert InvalidMaxDeltaBps();
         }
         maxDeltaBps = maxDeltaBps_;
+        debouncePeriod = _debouncePeriod;
     }
 
     /**
@@ -135,6 +174,22 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
+     * @notice Sets the debounce period
+     * @param debouncePeriod_ The new debounce period
+     * @custom:event Emits DebouncePeriodUpdated with the old and new debounce period
+     * @custom:error InvalidDebouncePeriod if the debounce period is 0 or less than the RiskStewardReceiver's UPDATE_EXPIRATION_TIME
+     * @custom:access Controlled by AccessControlManager
+     */
+    function setDebouncePeriod(uint256 debouncePeriod_) external {
+        _checkAccessAllowed("setDebouncePeriod(uint256)");
+        if (debouncePeriod_ == 0 || debouncePeriod_ <= RISK_STEWARD_RECEIVER.UPDATE_EXPIRATION_TIME()) {
+            revert InvalidDebouncePeriod();
+        }
+        emit DebouncePeriodUpdated(debouncePeriod, debouncePeriod_);
+        debouncePeriod = debouncePeriod_;
+    }
+
+    /**
      * @notice Processes a market cap update from the RiskStewardReceiver.
      * Validates that the update is within range and then directly update the market supply or borrow cap on the market's comptroller.
      * @param update RiskParameterUpdate update to process.
@@ -144,17 +199,41 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:event Emits SupplyCapUpdated or BorrowCapUpdated depending on the update with the market and new cap
      * @custom:access Only callable by the RiskStewardReceiver
      */
-    function processUpdate(RiskParameterUpdate calldata update) external {
-        if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
-            revert OnlyRiskStewardReceiver();
-        }
+    function processUpdate(
+        RiskParameterUpdate calldata update
+    )
+        external
+        onlyRiskStewardReceiver
+    {
         if (Strings.equal(update.updateType, SUPPLY_CAP)) {
             _processSupplyCapUpdate(update);
         } else if (Strings.equal(update.updateType, BORROW_CAP)) {
             _processBorrowCapUpdate(update);
         } else {
-            revert UnsupportedUpdateType();
+            revert UnsupportedUpdateType(update.updateId);
         }
+    }
+
+    /**
+     * @notice Decodes the additional data from the SupplyCap and BorrowCap RiskParameterUpdates
+     * @param additionalData The additional data to decode
+     * @return underlying The underlying asset address
+     * @return destChainId The destination chain ID
+     */
+    function decodeAdditionalData(
+        bytes calldata additionalData
+    ) external pure returns (address underlying, uint16 destChainId) {
+        (address underlying, uint16 destChainId) = abi.decode(additionalData, (address, uint16));
+        return (underlying, destChainId);
+    }
+
+    /**
+     * @notice Packs the new value into a bytes memory
+     * @param data The un-padded bytes to decode
+     * @return bytes memory The packed bytes
+     */
+    function packNewValue(bytes memory data) public pure returns (bytes memory) {
+        return abi.encodePacked(new bytes(32 - data.length), data);
     }
 
     /**
@@ -163,17 +242,14 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @param newValue The new supply cap value
      * @custom:event Emits SupplyCapUpdated with the market and new supply cap
      */
-    function _updateSupplyCaps(address market, uint256 newValue) internal {
-        address comptroller = IVToken(market).comptroller();
+    function _updateSupplyCaps(IUnifiedComptroller comptroller, address market, uint256 newValue) internal {
         address[] memory newSupplyCapMarkets = new address[](1);
         newSupplyCapMarkets[0] = market;
         uint256[] memory newSupplyCaps = new uint256[](1);
         newSupplyCaps[0] = newValue;
-        if (comptroller == address(CORE_POOL_COMPTROLLER)) {
-            ICorePoolComptroller(comptroller)._setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
-        } else {
-            IIsolatedPoolsComptroller(comptroller).setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
-        }
+
+        IUnifiedComptroller(comptroller).setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
+
         emit SupplyCapUpdated(market, newSupplyCaps[0]);
     }
 
@@ -183,17 +259,14 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @param newValue The new borrow cap value
      * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
      */
-    function _updateBorrowCaps(address market, uint256 newValue) internal {
-        address comptroller = IVToken(market).comptroller();
+    function _updateBorrowCaps(IUnifiedComptroller comptroller, address market, uint256 newValue) internal {
         address[] memory newBorrowCapMarkets = new address[](1);
         newBorrowCapMarkets[0] = market;
         uint256[] memory newBorrowCaps = new uint256[](1);
         newBorrowCaps[0] = newValue;
-        if (comptroller == address(CORE_POOL_COMPTROLLER)) {
-            ICorePoolComptroller(comptroller)._setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
-        } else {
-            IIsolatedPoolsComptroller(comptroller).setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
-        }
+
+        IUnifiedComptroller(comptroller).setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
+
         emit BorrowCapUpdated(market, newBorrowCaps[0]);
     }
 
@@ -203,10 +276,14 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:event Emits SupplyCapUpdated with the market and new supply cap
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
-    function _processSupplyCapUpdate(RiskParameterUpdate memory update) internal {
-        uint256 newValue = _decodeBytesToUint256(update.newValue);
-        _validateSupplyCapUpdate(update.market, newValue);
-        _updateSupplyCaps(update.market, newValue);
+    function _processSupplyCapUpdate(
+        RiskParameterUpdate calldata update
+    ) internal {
+        uint256 newCap = _decodeBytesToUint256(update.newValue);
+        IUnifiedComptroller comptroller = IUnifiedComptroller(IVToken(update.market).comptroller());
+        _validateSupplyCapUpdate(comptroller, update.market, update.updateId, newCap);
+        _updateSupplyCaps(comptroller, update.market, newCap);
+        lastProcessedTime[_getMarketUpdateTypeKey(update.market, update.updateType)] = block.timestamp;
     }
 
     /**
@@ -215,36 +292,60 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
-    function _processBorrowCapUpdate(RiskParameterUpdate memory update) internal {
-        uint256 newValue = _decodeBytesToUint256(update.newValue);
-        _validateBorrowCapUpdate(update.market, newValue);
-        _updateBorrowCaps(update.market, newValue);
+    function _processBorrowCapUpdate(
+        RiskParameterUpdate calldata update
+    ) internal {
+        uint256 newCap = _decodeBytesToUint256(update.newValue);
+        IUnifiedComptroller comptroller = IUnifiedComptroller(IVToken(update.market).comptroller());
+        _validateBorrowCapUpdate(comptroller, update.market, update.updateId, newCap);
+        _updateBorrowCaps(comptroller, update.market, newCap);
+        lastProcessedTime[_getMarketUpdateTypeKey(update.market, update.updateType)] = block.timestamp;
     }
 
     /**
      * @notice Checks that the new supply cap is within the allowed range of the current supply cap.
-     * @param market The market to validate the supply cap for
-     * @param newValue The new supply cap value
+     * @param market The market whose supply cap is being updated
+     * @param updateId The ID of the update
+     * @param newCap The new market cap value to validate
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
-    function _validateSupplyCapUpdate(address market, uint256 newValue) internal view {
-        ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(market).comptroller());
-        uint256 currentSupplyCap = comptroller.supplyCaps(market);
-
-        _updateWithinAllowedRange(currentSupplyCap, newValue);
+    function _validateSupplyCapUpdate(IUnifiedComptroller comptroller, address market, uint256 updateId, uint256 newCap) internal view {
+        uint256 currentSupplyCap = comptroller.supplyCaps(address(market));
+        _verifyUpdate(market, updateId, SUPPLY_CAP, currentSupplyCap, newCap);
     }
 
     /**
      * @notice Checks that the new borrow cap is within the allowed range of the current borrow cap.
-     * @param market The market to validate the borrow cap for
-     * @param newValue The new borrow cap value
+     * @param market The market whose borrow cap is being updated
+     * @param updateId The ID of the update
+     * @param newCap The new market cap value to validate
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
-    function _validateBorrowCapUpdate(address market, uint256 newValue) internal view {
-        ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(market).comptroller());
+    function _validateBorrowCapUpdate(IUnifiedComptroller comptroller, address market, uint256 updateId, uint256 newCap) internal view {
         uint256 currentBorrowCap = comptroller.borrowCaps(address(market));
+        _verifyUpdate(market, updateId, BORROW_CAP, currentBorrowCap, newCap);
+    }
 
-        _updateWithinAllowedRange(currentBorrowCap, newValue);
+    /**
+     * @notice Verifies that the update is not too frequent and within the allowed range
+     * @param market The market whose update is being verified
+     * @param updateType The type of update being verified
+     * @param previousValue The previous value of the update
+     * @param newValue The new value of the update
+     * @custom:error UpdateTooFrequent if the update is too frequent
+     * @custom:error UpdateNotInRange if the update is not within the allowed range
+     */
+    function _verifyUpdate(
+        address market,
+        uint256 updateId,
+        string memory updateType,
+        uint256 previousValue,
+        uint256 newValue
+    ) internal view {
+        if (block.timestamp - lastProcessedTime[_getMarketUpdateTypeKey(market, updateType)] < debouncePeriod) {
+            revert UpdateTooFrequent();
+        }
+        _updateWithinAllowedRange(updateId, previousValue, newValue);
     }
 
     /**
@@ -254,13 +355,13 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @param newValue new updated risk param value
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
-    function _updateWithinAllowedRange(uint256 previousValue, uint256 newValue) internal view {
+    function _updateWithinAllowedRange(uint256 updateId, uint256 previousValue, uint256 newValue) internal view {
         uint256 diff = newValue > previousValue ? newValue - previousValue : previousValue - newValue;
 
         uint256 maxDiff = (maxDeltaBps * previousValue) / MAX_BPS;
 
         if (diff > maxDiff) {
-            revert UpdateNotInRange();
+            revert UpdateNotInRange(updateId);
         }
     }
 
@@ -270,7 +371,14 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @return uint256 The decoded uint256
      */
     function _decodeBytesToUint256(bytes memory data) internal pure returns (uint256) {
-        return abi.decode(abi.encodePacked(new bytes(32 - data.length), data), (uint256));
+        return abi.decode(packNewValue(data), (uint256));
+    }
+
+    /**
+     * @dev Encodes the market and update type into a bytes key to be used with the last processed time mapping
+     */
+    function _getMarketUpdateTypeKey(address market, string memory updateType) internal pure returns (bytes memory) {
+        return abi.encodePacked(market, updateType);
     }
 
     /**
