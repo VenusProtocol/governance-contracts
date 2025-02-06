@@ -237,6 +237,12 @@ describe("Risk Steward", async function () {
       ).to.be.rejectedWith("InvalidDebounce");
     });
 
+    it("should not support zero risk steward address", async function () {
+      await expect(
+        riskStewardReceiver.setRiskParameterConfig("supplyCap", ethers.constants.AddressZero, 1),
+      ).to.be.rejectedWith("ZeroAddressNotAllowed");
+    });
+
     it("should revert if debounce is greater than UPDATE_EXPIRATION_TIME", async function () {
       await expect(
         riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 60 * 60 * 24 + 1),
