@@ -1,7 +1,5 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
-import { IGovernorBravoDelegate } from "../Governance/GovernorBravoInterfacesV8.sol";
-import { IOmnichainProposalSender } from "../Cross-chain/interfaces/IOmnichainProposalSender.sol";
 import { IRiskOracle } from "../interfaces/IRiskOracle.sol";
 import { IRiskSteward } from "./IRiskSteward.sol";
 
@@ -11,14 +9,9 @@ struct RiskParamConfig {
     IRiskSteward riskSteward;
 }
 
-interface IRiskStewardReceiver {
-    function UPDATE_EXPIRATION_TIME() external returns (uint256);
+interface IRiskStewardRemoteReceiver {
 
     function initialize(address accessControlManager_) external;
-
-    function setRiskParameterConfig(string calldata updateType, address riskSteward, uint256 debounce) external;
-
-    function toggleConfigActive(string calldata updateType) external;
 
     function processUpdateById(uint256 updateId) external;
 

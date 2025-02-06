@@ -1,9 +1,11 @@
+import { FakeContract, MockContract, smock } from "@defi-wonderland/smock";
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { BigNumber, ContractFactory } from "ethers";
 import { ethers, upgrades } from "hardhat";
 import { SignerWithAddress } from "hardhat-deploy-ethers/signers";
+import { LZ_CHAINID } from "../../helpers/deploy/constants";
 
 import {
   MarketCapsRiskSteward,
@@ -12,15 +14,19 @@ import {
   MockRiskOracle,
   MockVToken,
   RiskStewardReceiver,
+  GovernorBravoDelegate__factory,
+  GovernorBravoDelegate,
+  OmnichainProposalSender
 } from "../../typechain";
 
-const { parseUnits, hexValue } = ethers.utils;
+const { parseUnits, hexValue, defaultAbiCoder } = ethers.utils;
 
 const parseUnitsToHex = (value: number) => {
   return ethers.utils.hexZeroPad(hexValue(BigNumber.from(parseUnits(value.toString(), 18))), 32);
 };
 
 const DAY_AND_ONE_SECOND = 60 * 60 * 24 + 1;
+const HARDHAT_LAYER_ZERO_CHAIN_ID = 10102;
 
 describe("Risk Steward", async function () {
   let deployer: SignerWithAddress,
@@ -34,7 +40,9 @@ describe("Risk Steward", async function () {
     mockVToken: MockVToken,
     mockCoreComptroller: MockCoreComptroller,
     mockComptroller: MockComptroller,
-    marketCapsRiskSteward: MarketCapsRiskSteward;
+    marketCapsRiskSteward: MarketCapsRiskSteward,
+    governorBravoDelegate: MockContract<GovernorBravoDelegate>,
+    omniChainProposalSender: OmnichainProposalSender;
 
   const riskStewardFixture = async () => {
     deployer = (await ethers.getSigners())[0];
@@ -69,17 +77,26 @@ describe("Risk Steward", async function () {
       ["supplyCap", "borrowCap", "RandomUpdateType"],
     )) as MockRiskOracle;
     RiskStewardReceiverFactory = await ethers.getContractFactory("RiskStewardReceiver");
+
+    const GovernorBravoDelegateFactory = await smock.mock<GovernorBravoDelegate__factory>("GovernorBravoDelegate");
+    governorBravoDelegate = await GovernorBravoDelegateFactory.deploy();
+
+    const LZEndpointMock = await ethers.getContractFactory("LZEndpointMock");
+    const OmniChainProposalSenderFactory = await ethers.getContractFactory("OmnichainProposalSender");
+    const localEndpoint = await LZEndpointMock.deploy(HARDHAT_LAYER_ZERO_CHAIN_ID);
+    omniChainProposalSender = await OmniChainProposalSenderFactory.deploy(localEndpoint.address, accessControlManager.address);
+
     riskStewardReceiver = await upgrades.deployProxy(RiskStewardReceiverFactory, [accessControlManager.address], {
-      constructorArgs: [mockRiskOracle.address],
+      constructorArgs: [mockRiskOracle.address, governorBravoDelegate.address, omniChainProposalSender.address, HARDHAT_LAYER_ZERO_CHAIN_ID],
       initializer: "initialize",
       unsafeAllow: ["state-variable-immutable"],
     });
 
     marketCapsRiskSteward = await upgrades.deployProxy(
       MockMarketCapsRiskStewardFactory,
-      [accessControlManager.address, 5000],
+      [accessControlManager.address, 5000, 5],
       {
-        constructorArgs: [mockCoreComptroller.address, riskStewardReceiver.address],
+        constructorArgs: [riskStewardReceiver.address, HARDHAT_LAYER_ZERO_CHAIN_ID],
         initializer: "initialize",
         unsafeAllow: ["state-variable-immutable"],
       },
@@ -120,25 +137,25 @@ describe("Risk Steward", async function () {
       await expect(
         riskStewardReceiver.connect(signer1).setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1),
       ).to.be.rejectedWith(
-        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x4631BCAbD6dF18D94796344963cB60d44a4136b6", "setRiskParameterConfig(string,address,uint256)")',
+        `Unauthorized("${signer1.address}", "${riskStewardReceiver.address}", "setRiskParameterConfig(string,address,uint256)")`,
       );
     });
 
     it("should revert if access is not granted for toggling config active", async function () {
       await expect(riskStewardReceiver.connect(signer1).toggleConfigActive("supplyCap")).to.be.rejectedWith(
-        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x4631BCAbD6dF18D94796344963cB60d44a4136b6", "toggleConfigActive(string)")',
+        `Unauthorized("${signer1.address}", "${riskStewardReceiver.address}", "toggleConfigActive(string)")`,``
       );
     });
 
     it("should revert if access is not granted for pausing", async function () {
       await expect(riskStewardReceiver.connect(signer1).pause()).to.be.rejectedWith(
-        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x4631BCAbD6dF18D94796344963cB60d44a4136b6", "pause()")',
+        `Unauthorized("${signer1.address}", "${riskStewardReceiver.address}", "pause()")`,
       );
     });
 
     it("should revert if access is not granted for unpausing", async function () {
       await expect(riskStewardReceiver.connect(signer1).unpause()).to.be.rejectedWith(
-        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x4631BCAbD6dF18D94796344963cB60d44a4136b6", "unpause()")',
+        `Unauthorized("${signer1.address}", "${riskStewardReceiver.address}", "unpause()")`,
       );
     });
 
@@ -159,21 +176,12 @@ describe("Risk Steward", async function () {
 
     it("should revert if access is not granted for setting max increase bps", async function () {
       await expect(marketCapsRiskSteward.connect(signer1).setMaxDeltaBps(1)).to.be.rejectedWith(
-        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0xA4899D35897033b927acFCf422bc745916139776", "setMaxDeltaBps(uint256)")',
+        `Unauthorized("${signer1.address}", "${marketCapsRiskSteward.address}", "setMaxDeltaBps(uint256)")`,
       );
     });
   });
 
   describe("Upgradeable", async function () {
-    it("new implementation should update core comptroller", async function () {
-      const corePoolComptrollerTestnetAddress = "0x94d1820b2D1c7c7452A163983Dc888CEC546b77D";
-      await upgrades.upgradeProxy(marketCapsRiskSteward, MockMarketCapsRiskStewardFactory, {
-        constructorArgs: [corePoolComptrollerTestnetAddress, riskStewardReceiver.address],
-        unsafeAllow: ["state-variable-immutable"],
-      });
-      expect(await marketCapsRiskSteward.CORE_POOL_COMPTROLLER()).to.equal(corePoolComptrollerTestnetAddress);
-    });
-
     it("new implementation should update risk oracle", async function () {
       const mockRiskOracle = (await MockRiskOracleFactory.deploy(
         "Mock Risk Oracle",
@@ -181,7 +189,7 @@ describe("Risk Steward", async function () {
         ["supplyCap", "borrowCap"],
       )) as MockRiskOracle;
       await upgrades.upgradeProxy(riskStewardReceiver, RiskStewardReceiverFactory, {
-        constructorArgs: [mockRiskOracle.address],
+        constructorArgs: [mockRiskOracle.address, governorBravoDelegate.address, omniChainProposalSender.address, HARDHAT_LAYER_ZERO_CHAIN_ID],
         unsafeAllow: ["state-variable-immutable"],
       });
       expect(await riskStewardReceiver.RISK_ORACLE()).to.equal(mockRiskOracle.address);
@@ -283,74 +291,64 @@ describe("Risk Steward", async function () {
   });
 
   describe("Risk Parameter Update Reverts under incorrect conditions", async function () {
-    it("should revert if updateType is unknown", async function () {
-      await expect(
-        mockRiskOracle.publishRiskParameterUpdate(
-          "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
-          parseUnitsToHex(10),
-          "UnknownUpdateType",
-          mockCoreVToken.address,
-          "0x",
-        ),
-      ).to.be.revertedWith("Unauthorized update type.");
-    });
 
-    it("should revert if updateType is implemented", async function () {
+    it("should error if updateType is not implemented", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
         "RandomUpdateType",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await riskStewardReceiver.setRiskParameterConfig(
         "RandomUpdateType",
         marketCapsRiskSteward.address,
         DAY_AND_ONE_SECOND + 1,
       );
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UnsupportedUpdateType");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.emit(riskStewardReceiver, "UpdateFailed").withArgs(1);
+      expect(await riskStewardReceiver.processedUpdates(1)).to.equal(6);
     });
 
-    it("should revert if updateType is not active", async function () {
+    it("should error if updateType is not active", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
         "supplyCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
         "borrowCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await riskStewardReceiver.toggleConfigActive("supplyCap");
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("ConfigNotActive");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.emit(riskStewardReceiver, "UpdateValidationFailed").withArgs(1, 3);
 
       await riskStewardReceiver.toggleConfigActive("borrowCap");
-      await expect(riskStewardReceiver.processUpdateById(2)).to.be.rejectedWith("ConfigNotActive");
+      await expect(riskStewardReceiver.processUpdateById(2)).to.emit(riskStewardReceiver, "UpdateValidationFailed").withArgs(2, 3);
     });
 
-    it("should revert if the update is expired", async function () {
+    it("should error if the update is expired", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
         "supplyCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
         "borrowCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await time.increase(60 * 60 * 24 + 1);
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateIsExpired");
-      await expect(riskStewardReceiver.processUpdateById(2)).to.be.rejectedWith("UpdateIsExpired");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.emit(riskStewardReceiver, "UpdateValidationFailed").withArgs(1, 4);
+      await expect(riskStewardReceiver.processUpdateById(2)).to.emit(riskStewardReceiver, "UpdateValidationFailed").withArgs(2, 4);
     });
 
     it("should revert if market is not supported", async function () {
@@ -359,58 +357,60 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(10),
         "supplyCap",
         mockCoreComptroller.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.reverted;
+
+      await expect(riskStewardReceiver.processUpdateById(1)).to.emit(riskStewardReceiver, "UpdateFailed").withArgs(1);
 
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
         "borrowCap",
         mockCoreComptroller.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
-      await expect(riskStewardReceiver.processUpdateById(2)).to.be.reverted;
+      await expect(riskStewardReceiver.processUpdateById(2)).to.emit(riskStewardReceiver, "UpdateFailed").withArgs(2);
     });
 
-    it("should revert if the update is too frequent", async function () {
+    it("should error if the update is too frequent", async function () {
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
         "supplyCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
+
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(12),
         "supplyCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await riskStewardReceiver.processUpdateById(1);
-      await expect(riskStewardReceiver.processUpdateById(2)).to.be.rejectedWith("UpdateTooFrequent");
+      await expect(riskStewardReceiver.processUpdateById(2)).to.emit(riskStewardReceiver, "UpdateFailed").withArgs(2);
 
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
         "borrowCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(12),
         "borrowCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await riskStewardReceiver.processUpdateById(3);
-      await expect(riskStewardReceiver.processUpdateById(4)).to.be.rejectedWith("UpdateTooFrequent");
+      await expect(riskStewardReceiver.processUpdateById(4)).to.emit(riskStewardReceiver, "UpdateFailed").withArgs(4);
     });
 
-    it("should error on invalid update ID", async function () {
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.revertedWith("Invalid update ID.");
+    it("should revert on invalid update ID", async function () {
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith('Invalid update ID.');
     });
 
     it("should revert if the update has already been applied", async function () {
@@ -419,10 +419,10 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(10),
         "supplyCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await riskStewardReceiver.processUpdateById(1);
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("ConfigAlreadyProcessed");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.emit(riskStewardReceiver, "UpdateValidationFailed").withArgs(1, 1);
     });
 
     it("should revert if the update is out of bounds", async function () {
@@ -432,9 +432,9 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(2),
         "supplyCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateNotInRange");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.emit(riskStewardReceiver, "UpdateFailed").withArgs(1);
 
       // Too high
       await mockRiskOracle.publishRiskParameterUpdate(
@@ -442,9 +442,9 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(20),
         "supplyCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateNotInRange");
+      await expect(riskStewardReceiver.processUpdateById(2)).to.emit(riskStewardReceiver, "UpdateFailed").withArgs(2);
 
       // Too Low
       await mockRiskOracle.publishRiskParameterUpdate(
@@ -452,9 +452,9 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(2),
         "borrowCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateNotInRange");
+      await expect(riskStewardReceiver.processUpdateById(3)).to.emit(riskStewardReceiver, "UpdateFailed").withArgs(3);
 
       // Too high
       await mockRiskOracle.publishRiskParameterUpdate(
@@ -462,13 +462,13 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(20),
         "borrowCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateNotInRange");
+      await expect(riskStewardReceiver.processUpdateById(4)).to.emit(riskStewardReceiver, "UpdateFailed").withArgs(4);
     });
   });
 
-  describe("Risk Parameter Updates under correct conditions", async function () {
+  describe("Risk Parameter Updates on Source chain under correct conditions", async function () {
     it("should process update by id", async function () {
       // Core Pool
       expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
@@ -478,14 +478,14 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(10),
         "supplyCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
         "borrowCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await expect(await riskStewardReceiver.processUpdateById(1))
         .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
@@ -503,14 +503,14 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(10),
         "supplyCap",
         mockVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
         "borrowCap",
         mockVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await expect(riskStewardReceiver.processUpdateById(3))
         .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
@@ -531,14 +531,14 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(10),
         "supplyCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
         "borrowCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address);
       await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address);
@@ -552,14 +552,14 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(10),
         "supplyCap",
         mockVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(10),
         "borrowCap",
         mockVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockVToken.address);
       await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockVToken.address);
@@ -576,14 +576,14 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(6),
         "supplyCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(6),
         "borrowCap",
         mockCoreVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address);
       await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address);
@@ -597,14 +597,14 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(6),
         "supplyCap",
         mockVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(6),
         "borrowCap",
         mockVToken.address,
-        "0x",
+        defaultAbiCoder.encode([ "address", "uint16" ], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", HARDHAT_LAYER_ZERO_CHAIN_ID ]),
       );
       await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockVToken.address);
       await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockVToken.address);

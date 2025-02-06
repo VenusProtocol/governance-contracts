@@ -26,6 +26,12 @@ contract MockCoreComptroller {
         allVTokens.push(IVToken(vToken));
     }
 
+    function supportMarket(address vToken) external {
+        require(!vTokenListed[vToken], "vToken already listed");
+        vTokenListed[address(vToken)] = true;
+        allVTokens.push(IVToken(vToken));
+    }
+
     /**
      * @notice Set the supply cap for a vToken
      * @param vTokens The vToken addresses
@@ -43,12 +49,36 @@ contract MockCoreComptroller {
         }
     }
 
+    function setMarketSupplyCaps(address[] calldata vTokens, uint256[] calldata newCaps) external {
+        uint256 numMarkets = vTokens.length;
+        uint256 numSupplyCaps = newCaps.length;
+
+        require(numMarkets != 0 && numMarkets == numSupplyCaps, "invalid input");
+
+        for (uint256 i; i < numMarkets; ++i) {
+            require(vTokenListed[vTokens[i]], "vToken not listed");
+            supplyCaps[address(vTokens[i])] = newCaps[i];
+        }
+    }
+
     /**
      * @notice Set the borrow cap for a vToken
      * @param vTokens The vToken addresses
      * @param newCaps The new borrow caps
      */
     function _setMarketBorrowCaps(address[] calldata vTokens, uint256[] calldata newCaps) external {
+        uint256 numMarkets = vTokens.length;
+        uint256 numBorrowCaps = newCaps.length;
+
+        require(numMarkets != 0 && numMarkets == numBorrowCaps, "invalid input");
+
+        for (uint256 i; i < numMarkets; ++i) {
+            require(vTokenListed[vTokens[i]], "vToken not listed");
+            borrowCaps[address(vTokens[i])] = newCaps[i];
+        }
+    }
+
+    function setMarketBorrowCaps(address[] calldata vTokens, uint256[] calldata newCaps) external {
         uint256 numMarkets = vTokens.length;
         uint256 numBorrowCaps = newCaps.length;
 

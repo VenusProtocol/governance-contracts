@@ -213,6 +213,50 @@ contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
     mapping(uint256 => TimelockInterface) public proposalTimelocks;
 }
 
+interface IGovernorBravoDelegate {
+    function propose(
+        address[] memory targets,
+        uint256[] memory values,
+        string[] memory signatures,
+        bytes[] memory calldatas,
+        string memory description,
+        GovernorBravoDelegateStorageV2.ProposalType proposalType
+    ) external returns (uint256);
+
+    function queue(uint256 proposalId) external;
+
+    function whitelistProposer(address proposer, GovernorBravoDelegateStorageV2.ProposalType proposalType) external;
+
+    function removeWhitelistedProposer(address proposer) external;
+
+    function execute(uint256 proposalId) external;
+
+    function cancel(uint256 proposalId) external;
+
+    function getReceipt(
+        uint256 proposalId,
+        address voter
+    ) external view returns (GovernorBravoDelegateStorageV2.Receipt memory);
+
+    function state(uint256 proposalId) external view returns (GovernorBravoDelegateStorageV2.ProposalState);
+
+    function castVote(uint256 proposalId, uint8 support) external;
+
+    function castVoteWithReason(uint256 proposalId, uint8 support, string calldata reason) external;
+
+    function castVoteBySig(uint256 proposalId, uint8 support, uint8 v, bytes32 r, bytes32 s) external;
+
+    function _setGuardian(address newGuardian) external;
+
+    function _initiate(address governorAlpha) external;
+
+    function _setProposalMaxOperations(uint256 proposalMaxOperations_) external;
+
+    function _setPendingAdmin(address newPendingAdmin) external;
+
+    function _acceptAdmin() external;
+}
+
 /**
  * @title TimelockInterface
  * @author Venus
