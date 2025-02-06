@@ -170,15 +170,6 @@ contract RiskStewardReceiver is
     }
 
     /**
-     * @notice Gets the risk parameter config for a given update type
-     * @param updateType The type of update to get the config for
-     * @return The risk parameter config for the given update type
-     */
-    function getRiskParameterConfig(string calldata updateType) external view returns (RiskParamConfig memory) {
-        return riskParameterConfigs[updateType];
-    }
-
-    /**
      * @notice Toggles the active status of a risk parameter config
      * @param updateType The type of update to toggle the config for
      */

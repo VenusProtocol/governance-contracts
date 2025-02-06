@@ -15,8 +15,6 @@ interface IRiskStewardReceiver {
 
     function setRiskParameterConfig(string calldata updateType, address riskSteward, uint256 debounce) external;
 
-    function getRiskParameterConfig(string calldata updateType) external view returns (RiskParamConfig memory);
-
     function toggleConfigActive(string calldata updateType) external;
 
     function processUpdateById(uint256 updateId) external;

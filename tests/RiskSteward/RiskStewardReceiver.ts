@@ -188,12 +188,12 @@ describe("Risk Steward", async function () {
 
   describe("Risk Parameter Config", async function () {
     it("should get original risk parameter configs", async function () {
-      expect(await riskStewardReceiver.getRiskParameterConfig("supplyCap")).to.deep.equal([
+      expect(await riskStewardReceiver.riskParameterConfigs("supplyCap")).to.deep.equal([
         true,
         BigNumber.from(5),
         marketCapsRiskSteward.address,
       ]);
-      expect(await riskStewardReceiver.getRiskParameterConfig("borrowCap")).to.deep.equal([
+      expect(await riskStewardReceiver.riskParameterConfigs("borrowCap")).to.deep.equal([
         true,
         BigNumber.from(5),
         marketCapsRiskSteward.address,
@@ -202,7 +202,7 @@ describe("Risk Steward", async function () {
 
     it("should pause risk parameter configs", async function () {
       await riskStewardReceiver.toggleConfigActive("supplyCap");
-      expect((await riskStewardReceiver.getRiskParameterConfig("supplyCap")).active).to.equal(false);
+      expect((await riskStewardReceiver.riskParameterConfigs("supplyCap")).active).to.equal(false);
     });
 
     it("should revert if pausing unsupported update type", async function () {
@@ -211,7 +211,7 @@ describe("Risk Steward", async function () {
 
     it("should update risk parameter configs", async function () {
       await riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1);
-      expect(await riskStewardReceiver.getRiskParameterConfig("supplyCap")).to.deep.equal([
+      expect(await riskStewardReceiver.riskParameterConfigs("supplyCap")).to.deep.equal([
         true,
         BigNumber.from(1),
         marketCapsRiskSteward.address,
