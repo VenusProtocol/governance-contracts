@@ -2,12 +2,12 @@
 pragma solidity 0.8.25;
 
 import { RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
-import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 
 interface IRiskSteward {
-    function CORE_POOL_COMPTROLLER() external view returns (ICorePoolComptroller);
 
-    function initialize(address accessControlManager_, uint256 maxIncreaseBps_) external;
+    function decodeAdditionalData(bytes calldata additionalData) external pure returns (address underlying, uint16 destChainId);
 
     function processUpdate(RiskParameterUpdate calldata update) external;
+
+    function packNewValue(bytes memory data) external pure returns (bytes memory);
 }
