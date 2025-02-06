@@ -144,6 +144,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, PausableUpgradeable, Acces
      * @custom:access Controlled by AccessControlManager
      * @custom:error Throws UnsupportedUpdateType if the update type is an empty string
      * @custom:error Throws InvalidDebounce if the debounce is 0
+     * @custom:error Throws ZeroAddressNotAllowed if the risk steward address is zero
      */
     function setRiskParameterConfig(string calldata updateType, address riskSteward, uint256 debounce) external {
         _checkAccessAllowed("setRiskParameterConfig(string,address,uint256)");
@@ -153,6 +154,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, PausableUpgradeable, Acces
         if (debounce == 0 || debounce > UPDATE_EXPIRATION_TIME) {
             revert InvalidDebounce();
         }
+        ensureNonzeroAddress(riskSteward);
         RiskParamConfig memory previousConfig = riskParameterConfigs[updateType];
         riskParameterConfigs[updateType] = RiskParamConfig({
             active: true,
