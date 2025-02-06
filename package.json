@@ -29,6 +29,7 @@
   "scripts": {
     "compile": "hardhat compile && hardhat compile --config hardhat.config.zksync.ts",
     "test": "hardhat test",
+    "test:fork": "hardhat test tests-fork/*",
     "build": "rm -rf dist && hardhat compile && hardhat compile --config hardhat.config.zksync.ts && tsc --declaration",
     "publish:dist": "yarn build && cd dist && yarn publish --access public",
     "lint": "yarn lint:ts && yarn lint:sol && yarn prettier:check",

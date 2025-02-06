@@ -32,6 +32,17 @@ extendConfig((config: HardhatConfig) => {
         ethereum: ["node_modules/@venusprotocol/governance-contracts/deployments/ethereum"],
       },
     };
+
+    if (process.env.FORKED_NETWORK) {
+      config.external.deployments!.hardhat = [
+        `./deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/oracle/deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/venus-protocol/deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/protocol-reserve/deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/governance-contracts/deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/isolated-pools/deployments/${process.env.FORKED_NETWORK}`,
+      ];
+    }
   }
 });
 
@@ -350,6 +361,9 @@ const config: HardhatUserConfig = {
       {
         artifacts: "./node_modules/@venusprotocol/venus-protocol/artifacts",
       },
+      {
+        artifacts: "./node_modules/@venusprotocol/isolated-pools/artifacts",
+      },
     ],
     deployments: {},
   },
@@ -361,26 +375,28 @@ const config: HardhatUserConfig = {
 };
 
 function isFork() {
-  return process.env.FORK === "true"
+  return process.env.FORKED_NETWORK
     ? {
-        allowUnlimitedContractSize: false,
-        loggingEnabled: false,
-        forking: {
-          url:
-            process.env[`ARCHIVE_NODE_${process.env.FORKED_NETWORK}`] ||
-            "https://data-seed-prebsc-1-s1.binance.org:8545",
-          blockNumber: 21068448,
-        },
-        accounts: {
-          accountsBalance: "1000000000000000000",
-        },
-        live: false,
-      }
+      allowUnlimitedContractSize: false,
+      loggingEnabled: false,
+      forking: {
+        url:
+          process.env[`ARCHIVE_NODE_${process.env.FORKED_NETWORK}`] ||
+          "https://data-seed-prebsc-1-s1.binance.org:8545",
+        blockNumber: 21068448,
+      },
+      accounts: {
+        accountsBalance: "1000000000000000000",
+      },
+      live: true,
+      saveDeployments: false,
+    }
     : {
-        allowUnlimitedContractSize: true,
-        loggingEnabled: false,
-        live: false,
-      };
+      allowUnlimitedContractSize: true,
+      loggingEnabled: false,
+      live: false,
+      saveDeployments: false,
+    };
 }
 
 export default config;
