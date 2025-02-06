@@ -57,7 +57,7 @@ contract RiskStewardReceiver is
      * @notice Event emitted when a risk parameter config is set
      */
     event RiskParameterConfigSet(
-        string indexed updateType,
+        string updateType,
         address indexed previousRiskSteward,
         address indexed riskSteward,
         uint256 previousDebounce,
@@ -69,7 +69,7 @@ contract RiskStewardReceiver is
     /**
      * @notice Event emitted when a risk parameter config is toggled on or off
      */
-    event ToggleConfigActive(string indexed updateType, bool active);
+    event ToggleConfigActive(string updateType, bool active);
 
     /**
      * @notice Event emitted when an update is successfully processed
