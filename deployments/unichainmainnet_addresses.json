@@ -1,0 +1,7 @@
+{
+  "name": "unichainmainnet",
+  "chainId": "130",
+  "addresses": {
+    "AccessControlManager": "0x1f12014c497a9d905155eB9BfDD9FaC6885e61d0"
+  }
+}
