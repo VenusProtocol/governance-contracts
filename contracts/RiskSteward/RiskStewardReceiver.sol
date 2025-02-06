@@ -2,8 +2,6 @@
 pragma solidity 0.8.25;
 
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import { IRiskSteward } from "./IRiskSteward.sol";
 import { IRiskOracle, RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
@@ -19,13 +17,7 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * @notice Contract that can read updates from the Chaos Labs Risk Oracle, validate them, and push them to the correct RiskSteward.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract RiskStewardReceiver is
-    IRiskStewardReceiver,
-    Initializable,
-    Ownable2StepUpgradeable,
-    PausableUpgradeable,
-    AccessControlledV8
-{
+contract RiskStewardReceiver is IRiskStewardReceiver, PausableUpgradeable, AccessControlledV8 {
     /**
      * @notice Mapping of supported risk configurations and their validation parameters
      */
@@ -122,9 +114,8 @@ contract RiskStewardReceiver is
      * @param accessControlManager_ The address of the access control manager
      */
     function initialize(address accessControlManager_) external initializer {
-        __Ownable2Step_init();
         __Pausable_init();
-        __AccessControlled_init_unchained(accessControlManager_);
+        __AccessControlled_init(accessControlManager_);
     }
 
     /**

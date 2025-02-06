@@ -2,8 +2,6 @@
 pragma solidity 0.8.25;
 
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
-import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import { RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
 import { IVToken } from "../interfaces/IVToken.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
@@ -20,7 +18,7 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * Expects the new value to be an encoded uint256 value of un padded bytes.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgradeable, AccessControlledV8 {
+contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice The max delta bps for the update relative to the current value
      */
@@ -103,8 +101,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
      * @custom:error Throws InvalidMaxDeltaBps if the max delta bps is 0
      */
     function initialize(address accessControlManager_, uint256 maxDeltaBps_) external initializer {
-        __Ownable2Step_init();
-        __AccessControlled_init_unchained(accessControlManager_);
+        __AccessControlled_init(accessControlManager_);
         if (maxDeltaBps_ == 0) {
             revert InvalidMaxDeltaBps();
         }
