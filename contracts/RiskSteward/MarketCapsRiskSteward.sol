@@ -57,7 +57,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
     event BorrowCapUpdated(address market, uint256 newBorrowCap);
 
     /**
-     * @notice Emitted when the max increase bps is updated
+     * @notice Emitted when the max delta bps is updated
      */
     event MaxDeltaBpsUpdated(uint256 oldMaxDeltaBps, uint256 newMaxDeltaBps);
 
@@ -97,10 +97,10 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
     }
 
     /**
-     * @dev Initializes the contract as ownable, access controlled, and pausable. Sets the max increase bps initial value.
+     * @dev Initializes the contract as ownable, access controlled, and pausable. Sets the max delta bps initial value.
      * @param accessControlManager_ The address of the access control manager
-     * @param maxDeltaBps_ The max increase bps
-     * @custom:error Throws InvalidMaxDeltaBps if the max increase bps is 0
+     * @param maxDeltaBps_ The max detla bps
+     * @custom:error Throws InvalidMaxDeltaBps if the max delta bps is 0
      */
     function initialize(address accessControlManager_, uint256 maxDeltaBps_) external initializer {
         __Ownable2Step_init();
@@ -112,10 +112,10 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
     }
 
     /**
-     * @notice Sets the max increase bps
-     * @param maxDeltaBps_ The new max increase bps
-     * @custom:event Emits MaxDeltaBpsUpdated with the old and new max increase bps
-     * @custom:error InvalidMaxDeltaBps if the max increase bps is 0
+     * @notice Sets the max delta bps
+     * @param maxDeltaBps_ The new max delta bps
+     * @custom:event Emits MaxDeltaBpsUpdated with the old and new max delta bps
+     * @custom:error InvalidMaxDeltaBps if the max delta bps is 0
      * @custom:access Controlled by AccessControlManager
      */
     function setMaxDeltaBps(uint256 maxDeltaBps_) external {
@@ -135,7 +135,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
      * @custom:error UnsupportedUpdateType Thrown if the update type is not supported
      * @custom:error UpdateNotInRange Thrown if the update is not within the allowed range
      * @custom:event Emits SupplyCapUpdated or BorrowCapUpdated depending on the update with the market and new cap
-     * @custom:access Controlled by AccessControlManager
+     * @custom:access Only callable by the RiskStewardReceiver
      */
     function processUpdate(RiskParameterUpdate calldata update) external {
         if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
@@ -161,7 +161,6 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         address[] memory newSupplyCapMarkets = new address[](1);
         newSupplyCapMarkets[0] = market;
         uint256[] memory newSupplyCaps = new uint256[](1);
-
         newSupplyCaps[0] = _decodeBytesToUint256(newValue);
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
             ICorePoolComptroller(comptroller)._setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
@@ -193,7 +192,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
 
     /**
      * @notice Validates the new supply cap and if valid, updates the supply cap for the given market.
-     * @param update The update to process
+     * @param update RiskParameterUpdate update to process
      * @custom:event Emits SupplyCapUpdated with the market and new supply cap
      */
     function _processSupplyCapUpdate(RiskParameterUpdate memory update) internal {
@@ -203,7 +202,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
 
     /**
      * @notice Validates the new borrow cap and if valid, updates the borrow cap for the given market.
-     * @param update The update to process
+     * @param update RiskParameterUpdate update to process
      * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
      */
     function _processBorrowCapUpdate(RiskParameterUpdate memory update) internal {
@@ -213,7 +212,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
 
     /**
      * @notice Checks that the new supply cap is within the allowed range of the current supply cap.
-     * @param update The update to validate
+     * @param update RiskParameterUpdate update to validate
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
     function _validateSupplyCapUpdate(RiskParameterUpdate memory update) internal view {
