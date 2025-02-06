@@ -18,7 +18,8 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
 /**
  * @title MarketCapsRiskSteward
  * @author Venus
- * @notice Contract that can update supply and borrow caps received from RiskStewardReceiver
+ * @notice Contract that can update supply and borrow caps received from RiskStewardReceiver. Requires that the update is within the max delta.
+ * Expects the new value to be an encoded uint256 value of un padded bytes.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgradeable, AccessControlledV8 {
@@ -28,12 +29,12 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
     uint256 public maxDeltaBps;
 
     /**
-     * @notice Address of the CorePool comptroller used for selecting the correct comptroller abi
+     * @notice Address of the CorePoolComptroller used for selecting the correct comptroller abi
      */
     ICorePoolComptroller public immutable CORE_POOL_COMPTROLLER;
 
     /**
-     * @notice Address of the RiskStewardReceiver used for to validate incoming updates
+     * @notice Address of the RiskStewardReceiver used to validate incoming updates
      */
     IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
 
@@ -68,12 +69,12 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
     error InvalidMaxDeltaBps();
 
     /**
-     * @notice Thrown when an updateType that is not supported is operated on
+     * @notice Thrown when an update type that is not supported is operated on
      */
     error UnsupportedUpdateType();
 
     /**
-     * @notice Thrown when the new value of an update is our of range
+     * @notice Thrown when the new value of an update is out of range
      */
     error UpdateNotInRange();
 
@@ -82,7 +83,13 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
      */
     error OnlyRiskStewardReceiver();
 
-    /// @custom:oz-upgrades-unsafe-allow constructor
+    /**
+     * @dev Sets the immutable CorePoolComptroller and RiskStewardReceiver addresses and disables initializers
+     * @param corePoolComptroller_ The address of the CorePoolComptroller
+     * @param riskStewardReceiver_ The address of the RiskStewardReceiver
+     * @custom:error Throws ZeroAddressNotAllowed if the CorePoolComptroller or RiskStewardReceiver addresses are zero
+     * @custom:oz-upgrades-unsafe-allow constructor
+     */
     constructor(address corePoolComptroller_, address riskStewardReceiver_) {
         ensureNonzeroAddress(corePoolComptroller_);
         ensureNonzeroAddress(riskStewardReceiver_);
@@ -91,6 +98,12 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         _disableInitializers();
     }
 
+    /**
+     * @dev Initializes the contract as ownable, access controlled, and pausable. Sets the max increase bps initial value.
+     * @param accessControlManager_ The address of the access control manager
+     * @param maxDeltaBps_ The max increase bps
+     * @custom:error Throws InvalidMaxDeltaBps if the max increase bps is 0
+     */
     function initialize(address accessControlManager_, uint256 maxDeltaBps_) external initializer {
         __Ownable2Step_init();
         __AccessControlled_init_unchained(accessControlManager_);
@@ -103,6 +116,7 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
     /**
      * @notice Sets the max increase bps
      * @param maxDeltaBps_ The new max increase bps
+     * @custom:event Emits MaxDeltaBpsUpdated with the old and new max increase bps
      * @custom:error InvalidMaxDeltaBps if the max increase bps is 0
      * @custom:access Controlled by AccessControlManager
      */
@@ -116,10 +130,13 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
     }
 
     /**
-     * @notice Processes an update from the RiskStewardReceiver
-     * @param update Validates and processes supplyCap and borrowCap updates
-     * @custom:error OnlyRiskStewardReceiver if the sender is not the RiskStewardReceiver
-     * @custom:error UnsupportedUpdateType if the update type is not supported
+     * @notice Processes a market cap update from the RiskStewardReceiver.
+     * Validates that the update is within range and then directly update the market supply or borrow cap on the market's comptroller.
+     * @param update RiskParameterUpdate update to process.
+     * @custom:error OnlyRiskStewardReceiver Thrown if the sender is not the RiskStewardReceiver
+     * @custom:error UnsupportedUpdateType Thrown if the update type is not supported
+     * @custom:error UpdateNotInRange Thrown if the update is not within the allowed range
+     * @custom:event Emits SupplyCapUpdated or BorrowCapUpdated depending on the update with the market and new cap
      * @custom:access Controlled by AccessControlManager
      */
     function processUpdate(RiskParameterUpdate calldata update) external {
@@ -135,6 +152,12 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         }
     }
 
+    /**
+     * @notice Updates the supply cap for the given market.
+     * @param market The market to update the supply cap for
+     * @param newValue The new supply cap value
+     * @custom:event Emits SupplyCapUpdated with the market and new supply cap
+     */
     function _updateSupplyCaps(address market, bytes memory newValue) internal {
         address comptroller = IVToken(market).comptroller();
         address[] memory newSupplyCapMarkets = new address[](1);
@@ -150,6 +173,12 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         emit SupplyCapUpdated(market, newSupplyCaps[0]);
     }
 
+    /**
+     * @notice Updates the borrow cap for the given market.
+     * @param market The market to update the borrow cap for
+     * @param newValue The new borrow cap value
+     * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
+     */
     function _updateBorrowCaps(address market, bytes memory newValue) internal {
         address comptroller = IVToken(market).comptroller();
         address[] memory newBorrowCapMarkets = new address[](1);
@@ -164,16 +193,31 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         emit BorrowCapUpdated(market, newBorrowCaps[0]);
     }
 
+    /**
+     * @notice Validates the new supply cap and if valid, updates the supply cap for the given market.
+     * @param update The update to process
+     * @custom:event Emits SupplyCapUpdated with the market and new supply cap
+     */
     function _processSupplyCapUpdate(RiskParameterUpdate memory update) internal {
         _validateSupplyCapUpdate(update);
         _updateSupplyCaps(update.market, update.newValue);
     }
 
+    /**
+     * @notice Validates the new borrow cap and if valid, updates the borrow cap for the given market.
+     * @param update The update to process
+     * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
+     */
     function _processBorrowCapUpdate(RiskParameterUpdate memory update) internal {
         _validateBorrowCapUpdate(update);
         _updateBorrowCaps(update.market, update.newValue);
     }
 
+    /**
+     * @notice Checks that the new supply cap is within the allowed range of the current supply cap.
+     * @param update The update to validate
+     * @custom:error UpdateNotInRange if the update is not within the allowed range
+     */
     function _validateSupplyCapUpdate(RiskParameterUpdate memory update) internal view {
         ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(update.market).comptroller());
         uint256 currentSupplyCap = comptroller.supplyCaps(address(update.market));
@@ -182,6 +226,11 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         _updateWithinAllowedRange(currentSupplyCap, newValue);
     }
 
+    /**
+     * @notice Checks that the new borrow cap is within the allowed range of the current borrow cap.
+     * @param update The update to validate
+     * @custom:error UpdateNotInRange if the update is not within the allowed range
+     */
     function _validateBorrowCapUpdate(RiskParameterUpdate memory update) internal view {
         ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(update.market).comptroller());
         uint256 currentBorrowCap = comptroller.borrowCaps(address(update.market));
@@ -194,9 +243,9 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
      * @notice Ensures the risk param update is within the allowed range
      * @param previousValue current risk param value
      * @param newValue new updated risk param value
-     * @return bool true, if difference is within the maxPercentChange
+     * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
-    function _updateWithinAllowedRange(uint256 previousValue, uint256 newValue) internal view returns (bool) {
+    function _updateWithinAllowedRange(uint256 previousValue, uint256 newValue) internal view {
         uint256 diff = newValue > previousValue ? newValue - previousValue : previousValue - newValue;
 
         uint256 maxDiff = (maxDeltaBps * previousValue) / 10000;
@@ -206,6 +255,11 @@ contract MarketCapsRiskSteward is IRiskSteward, Initializable, Ownable2StepUpgra
         }
     }
 
+    /**
+     * @notice Decodes un-padded bytes to a uint256
+     * @param data The un-padded bytes to decode
+     * @return uint256 The decoded uint256
+     */
     function _decodeBytesToUint256(bytes memory data) internal pure returns (uint256) {
         return abi.decode(abi.encodePacked(new bytes(32 - data.length), data), (uint256));
     }
