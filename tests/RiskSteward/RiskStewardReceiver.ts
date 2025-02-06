@@ -237,8 +237,18 @@ describe("Risk Steward", async function () {
       ).to.be.rejectedWith("InvalidDebounce");
     });
 
+    it("should revert if debounce is greater than UPDATE_EXPIRATION_TIME", async function () {
+      await expect(
+        riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 60 * 60 * 24 + 1),
+      ).to.be.rejectedWith("InvalidDebounce");
+    });
+
     it("should revert if maxDeltaBps is 0", async function () {
       await expect(marketCapsRiskSteward.setMaxDeltaBps(0)).to.be.rejectedWith("InvalidMaxDeltaBps");
+    });
+
+    it("should revert if maxDeltaBps is 10000 or greater", async function () {
+      await expect(marketCapsRiskSteward.setMaxDeltaBps(10001)).to.be.rejectedWith("InvalidMaxDeltaBps");
     });
   });
 

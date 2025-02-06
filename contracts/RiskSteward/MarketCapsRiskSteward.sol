@@ -105,7 +105,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      */
     function initialize(address accessControlManager_, uint256 maxDeltaBps_) external initializer {
         __AccessControlled_init(accessControlManager_);
-        if (maxDeltaBps_ == 0) {
+        if (maxDeltaBps_ == 0 || maxDeltaBps_ > MAX_BPS) {
             revert InvalidMaxDeltaBps();
         }
         maxDeltaBps = maxDeltaBps_;
@@ -120,7 +120,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      */
     function setMaxDeltaBps(uint256 maxDeltaBps_) external {
         _checkAccessAllowed("setMaxDeltaBps(uint256)");
-        if (maxDeltaBps_ == 0) {
+        if (maxDeltaBps_ == 0 || maxDeltaBps_ > MAX_BPS) {
             revert InvalidMaxDeltaBps();
         }
         emit MaxDeltaBpsUpdated(maxDeltaBps, maxDeltaBps_);

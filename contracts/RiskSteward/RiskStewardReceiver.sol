@@ -150,7 +150,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, PausableUpgradeable, Acces
         if (Strings.equal(updateType, "")) {
             revert UnsupportedUpdateType();
         }
-        if (debounce == 0) {
+        if (debounce == 0 || debounce > UPDATE_EXPIRATION_TIME) {
             revert InvalidDebounce();
         }
         RiskParamConfig memory previousConfig = riskParameterConfigs[updateType];
