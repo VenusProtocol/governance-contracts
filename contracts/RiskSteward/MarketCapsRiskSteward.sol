@@ -19,6 +19,9 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
+    /// @dev Max basis points i.e., 100%
+    uint256 private constant MAX_BPS = 10000;
+
     /**
      * @notice The max delta bps for the update relative to the current value
      */
@@ -242,7 +245,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     function _updateWithinAllowedRange(uint256 previousValue, uint256 newValue) internal view {
         uint256 diff = newValue > previousValue ? newValue - previousValue : previousValue - newValue;
 
-        uint256 maxDiff = (maxDeltaBps * previousValue) / 10000;
+        uint256 maxDiff = (maxDeltaBps * previousValue) / MAX_BPS;
 
         if (diff > maxDiff) {
             revert UpdateNotInRange();
