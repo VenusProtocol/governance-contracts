@@ -4,15 +4,13 @@ pragma solidity 0.8.25;
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
-import { IRiskOracle, RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
+import { RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
 import { IVToken } from "../interfaces/IVToken.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
-import { IRiskStewardReceiver, RiskParamConfig } from "./IRiskStewardReceiver.sol";
-import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
+import { IRiskStewardReceiver } from "./IRiskStewardReceiver.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { IRiskSteward } from "./IRiskSteward.sol";
-import { IRiskStewardReceiver } from "./IRiskStewardReceiver.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
 /**

@@ -6,7 +6,6 @@ import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/I
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import { IRiskSteward } from "./IRiskSteward.sol";
 import { IRiskOracle, RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
-import { IVToken } from "../interfaces/IVToken.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
 import { IRiskStewardReceiver, RiskParamConfig } from "./IRiskStewardReceiver.sol";
