@@ -13,6 +13,7 @@ export enum SUPPORTED_NETWORKS {
   OPMAINNET = "opmainnet",
   BASESEPOLIA = "basesepolia",
   BASEMAINNET = "basemainnet",
+  UNICHAINSEPOLIA = "unichainsepolia",
   HARDHAT = "hardhat",
 }
 
@@ -31,6 +32,7 @@ export const LZ_CHAINID: Record<SUPPORTED_NETWORKS, number> = {
   zksyncmainnet: 165,
   opsepolia: 10232,
   basesepolia: 10245,
+  unichainsepolia: 10333,
   hardhat: 10102,
 };
 

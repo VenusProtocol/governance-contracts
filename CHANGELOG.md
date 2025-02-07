@@ -1,3 +1,16 @@
+## [2.8.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.7.0...v2.8.0-dev.1) (2025-02-07)
+
+
+### Features
+
+* ACM deployment on unichain sepolia ([5d5e658](https://github.com/VenusProtocol/governance-contracts/commit/5d5e6580a19992ba54005dd42dccdb5aaaa7e78e))
+* updating deployment files ([324dea1](https://github.com/VenusProtocol/governance-contracts/commit/324dea1e2f6e463ea2bc74e3ae65268b7ad48600))
+
+
+### Bug Fixes
+
+* lint ([6b2764b](https://github.com/VenusProtocol/governance-contracts/commit/6b2764be51a81b741a2c2884ed20c050b2de24bb))
+
 ## [2.7.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.6.0...v2.7.0) (2024-12-18)
 
 
