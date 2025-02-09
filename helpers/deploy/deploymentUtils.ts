@@ -94,8 +94,6 @@ export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => 
     return "0x9831D3A641E8c7F082EEA75b8249c99be9D09a34"; // UNICHAIN SEPOLIA MULTISIG
   } else if (network === "unichainmainnet") {
     return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // UNICHAIN MAINNET MULTISIG
-  } else if (network === "unichainsepolia") {
-    return "0x9831D3A641E8c7F082EEA75b8249c99be9D09a34"; // UNICHAIN SEPOLIA MULTISIG
   }
   return deployer;
 };
