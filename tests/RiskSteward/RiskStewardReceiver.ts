@@ -20,6 +20,8 @@ const parseUnitsToHex = (value: number) => {
   return ethers.utils.hexZeroPad(hexValue(BigNumber.from(parseUnits(value.toString(), 18))), 32);
 };
 
+const DAY_AND_ONE_SECOND = 60 * 60 * 24 + 1;
+
 describe("Risk Steward", async function () {
   let deployer: SignerWithAddress,
     signer1: SignerWithAddress,
@@ -105,8 +107,8 @@ describe("Risk Steward", async function () {
       deployer.address,
     );
 
-    await riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 5);
-    await riskStewardReceiver.setRiskParameterConfig("borrowCap", marketCapsRiskSteward.address, 5);
+    await riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, DAY_AND_ONE_SECOND);
+    await riskStewardReceiver.setRiskParameterConfig("borrowCap", marketCapsRiskSteward.address, DAY_AND_ONE_SECOND);
   };
 
   beforeEach(async function () {
@@ -190,12 +192,12 @@ describe("Risk Steward", async function () {
     it("should get original risk parameter configs", async function () {
       expect(await riskStewardReceiver.riskParameterConfigs("supplyCap")).to.deep.equal([
         true,
-        BigNumber.from(5),
+        BigNumber.from(DAY_AND_ONE_SECOND),
         marketCapsRiskSteward.address,
       ]);
       expect(await riskStewardReceiver.riskParameterConfigs("borrowCap")).to.deep.equal([
         true,
-        BigNumber.from(5),
+        BigNumber.from(DAY_AND_ONE_SECOND),
         marketCapsRiskSteward.address,
       ]);
     });
@@ -210,25 +212,28 @@ describe("Risk Steward", async function () {
     });
 
     it("should update risk parameter configs", async function () {
-      await riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1);
+      await riskStewardReceiver.setRiskParameterConfig(
+        "supplyCap",
+        marketCapsRiskSteward.address,
+        DAY_AND_ONE_SECOND + 1,
+      );
       expect(await riskStewardReceiver.riskParameterConfigs("supplyCap")).to.deep.equal([
         true,
-        BigNumber.from(1),
+        BigNumber.from(DAY_AND_ONE_SECOND + 1),
         marketCapsRiskSteward.address,
       ]);
     });
 
     it("should emit RiskParameterConfigSet event", async function () {
-      await expect(riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1)).to.emit(
-        riskStewardReceiver,
-        "RiskParameterConfigSet",
-      );
+      await expect(
+        riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, DAY_AND_ONE_SECOND + 1),
+      ).to.emit(riskStewardReceiver, "RiskParameterConfigSet");
     });
 
     it("should revert if empty updateType is set", async function () {
-      await expect(riskStewardReceiver.setRiskParameterConfig("", marketCapsRiskSteward.address, 1)).to.be.rejectedWith(
-        "UnsupportedUpdateType",
-      );
+      await expect(
+        riskStewardReceiver.setRiskParameterConfig("", marketCapsRiskSteward.address, DAY_AND_ONE_SECOND + 1),
+      ).to.be.rejectedWith("UnsupportedUpdateType");
     });
 
     it("should revert if debounce is 0", async function () {
@@ -239,13 +244,13 @@ describe("Risk Steward", async function () {
 
     it("should not support zero risk steward address", async function () {
       await expect(
-        riskStewardReceiver.setRiskParameterConfig("supplyCap", ethers.constants.AddressZero, 1),
+        riskStewardReceiver.setRiskParameterConfig("supplyCap", ethers.constants.AddressZero, DAY_AND_ONE_SECOND + 1),
       ).to.be.rejectedWith("ZeroAddressNotAllowed");
     });
 
-    it("should revert if debounce is greater than UPDATE_EXPIRATION_TIME", async function () {
+    it("should revert if debounce is less than UPDATE_EXPIRATION_TIME", async function () {
       await expect(
-        riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 60 * 60 * 24 + 1),
+        riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, DAY_AND_ONE_SECOND - 1),
       ).to.be.rejectedWith("InvalidDebounce");
     });
 
@@ -298,7 +303,11 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await riskStewardReceiver.setRiskParameterConfig("RandomUpdateType", marketCapsRiskSteward.address, 5);
+      await riskStewardReceiver.setRiskParameterConfig(
+        "RandomUpdateType",
+        marketCapsRiskSteward.address,
+        DAY_AND_ONE_SECOND + 1,
+      );
       await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UnsupportedUpdateType");
     });
 
