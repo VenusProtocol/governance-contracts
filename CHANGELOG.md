@@ -1,3 +1,12 @@
+## [2.9.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.8.0...v2.9.0) (2025-02-11)
+
+
+### Features
+
+* add ACM deployments on unichain ([f85388b](https://github.com/VenusProtocol/governance-contracts/commit/f85388b83a166c352dc54b854513073fa06a9d88))
+* add unichain network in workflow and add missing configs ([dd76091](https://github.com/VenusProtocol/governance-contracts/commit/dd7609119fee43bcc9db859b990591cbddb65553))
+* updating deployment files ([25f6e30](https://github.com/VenusProtocol/governance-contracts/commit/25f6e30b577778ff4dda89bf6819cd4b54c9ef76))
+
 ## [2.9.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.8.0...v2.9.0-dev.1) (2025-02-11)
 
 
