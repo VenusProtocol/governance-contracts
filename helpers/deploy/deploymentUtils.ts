@@ -3,6 +3,22 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import bscMainnetGovernanceDeployments from "../../deployments/bscmainnet.json";
 import bscTestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
+import arbitrumoneGovernanceDeployments from "../../deployments/arbitrumone.json";
+import arbitrumsepoliaGovernanceDeployments from "../../deployments/arbitrumsepolia.json";
+import bscmainnetGovernanceDeployments from "../../deployments/bscmainnet.json";
+import bsctestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
+import ethereumGovernanceDeployments from "../../deployments/ethereum.json";
+import opbnbmainnetGovernanceDeployments from "../../deployments/opbnbmainnet.json";
+import opbnbtestnetGovernanceDeployments from "../../deployments/opbnbtestnet.json";
+import sepoliaGovernanceDeployments from "../../deployments/sepolia.json";
+import zksyncsepoliaGovernanceDeployments from "../../deployments/zksyncsepolia.json";
+import zksyncmainnetGovernanceDeployments from "../../deployments/zksyncmainnet.json";
+import opmainnetGovernanceDeployments from "../../deployments/opmainnet.json";
+import opsepoliaGovernanceDeployments from "../../deployments/opsepolia.json";
+import basemainnetGovernanceDeployments from "../../deployments/basemainnet.json";
+import basesepoliaGovernanceDeployments from "../../deployments/basesepolia.json";
+import unichainmainnetGovernanceDeployments from "../../deployments/unichainmainnet.json";
+import unichainsepoliaGovernanceDeployments from "../../deployments/unichainsepolia.json";
 import { LZ_CHAINID, SUPPORTED_NETWORKS } from "./constants";
 
 export const testnetNetworks = [
@@ -24,43 +40,6 @@ const mainnetNetworks = [
   "basemainnet",
   "hardhat",
 ];
-
-export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<string> => {
-  const { deployer } = await getNamedAccounts();
-  if (network === "hardhat") {
-    return deployer;
-  } else if (network === "sepolia") {
-    return "0x94fa6078b6b8a26f0b6edffbe6501b22a10470fb"; // SEPOLIA MULTISIG
-  } else if (network === "ethereum") {
-    return "0x285960C5B22fD66A736C7136967A3eB15e93CC67"; // ETHEREUM MULTISIG
-  } else if (network === "opbnbtestnet") {
-    return "0xb15f6EfEbC276A3b9805df81b5FB3D50C2A62BDf"; // OPBNBTESTNET MULTISIG
-  } else if (network === "opbnbmainnet") {
-    return "0xC46796a21a3A9FAB6546aF3434F2eBfFd0604207"; // OPBNBMAINNET MULTISIG
-  } else if (network === "arbitrumsepolia") {
-    return "0x1426A5Ae009c4443188DA8793751024E358A61C2"; // ARBITRUM SEPOLIA MULTISIG
-  } else if (network === "arbitrumone") {
-    return "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0"; // ARBITRUM ONE MULTISIG
-  } else if (network === "zksyncsepolia") {
-    return "0xa2f83de95E9F28eD443132C331B6a9C9B7a9F866"; // ZKSYNC SEPOLIA MULTISIG
-  } else if (network === "zksyncmainnet") {
-    return "0x751Aa759cfBB6CE71A43b48e40e1cCcFC66Ba4aa"; // ZKSYNC MAINNET MULTISIG
-  } else if (network === "opsepolia") {
-    return "0xd57365EE4E850e881229e2F8Aa405822f289e78d"; // OPSEPOLIA MULTISIG
-  } else if (network === "opmainnet") {
-    return "0x2e94dd14E81999CdBF5deDE31938beD7308354b3"; // OPMAINNET MULTISIG
-  } else if (network === "basesepolia") {
-    return "0xdf3b635d2b535f906BB02abb22AED71346E36a00"; // BASE SEPOLIA MULTISIG
-  } else if (network === "basemainnet") {
-    return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // BASE MAINNET MULTISIG
-  } else if (network === "unichainsepolia") {
-    return "0x9831D3A641E8c7F082EEA75b8249c99be9D09a34"; // UNICHAIN SEPOLIA MULTISIG
-  } else if (network === "unichainmainnet") {
-    return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // UNICHAIN MAINNET MULTISIG
-  }
-  const normalTimelock = await ethers.getContract("NormalTimelock");
-  return normalTimelock.address;
-};
 
 export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => {
   const { deployer } = await getNamedAccounts();
