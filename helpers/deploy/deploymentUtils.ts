@@ -55,8 +55,9 @@ export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<s
     return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // BASE MAINNET MULTISIG
   } else if (network === "unichainsepolia") {
     return "0x9831D3A641E8c7F082EEA75b8249c99be9D09a34"; // UNICHAIN SEPOLIA MULTISIG
+  } else if (network === "unichainmainnet") {
+    return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // UNICHAIN MAINNET MULTISIG
   }
-
   const normalTimelock = await ethers.getContract("NormalTimelock");
   return normalTimelock.address;
 };
@@ -91,8 +92,9 @@ export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => 
     return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // BASE MAINNET MULTISIG
   } else if (network === "unichainsepolia") {
     return "0x9831D3A641E8c7F082EEA75b8249c99be9D09a34"; // UNICHAIN SEPOLIA MULTISIG
+  } else if (network === "unichainmainnet") {
+    return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // UNICHAIN MAINNET MULTISIG
   }
-
   return deployer;
 };
 
@@ -126,6 +128,7 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
     basesepolia: "0x55370E0fBB5f5b8dAeD978BA1c075a499eB107B8",
     basemainnet: "0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7",
     unichainsepolia: "0x012f6eaE2A0Bf5916f48b5F37C62Bcfb7C1ffdA1",
+    unichainmainnet: "", // TODO
     hardhat: lzEndpointMock?.address || "",
   }[networkName];
 };
