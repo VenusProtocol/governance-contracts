@@ -15,6 +15,7 @@ export enum REMOTE_NETWORKS {
   OPMAINNET = "opmainnet",
   BASESEPOLIA = "basesepolia",
   BASEMAINNET = "basemainnet",
+  UNICHAINSEPOLIA = "unichainsepolia",
   HARDHAT = "hardhat",
 }
 type DelayTypes = {
@@ -91,6 +92,11 @@ export const delayConfig: DelayConfig = {
     normal: 172800,
     fast: 21600,
     critical: 3600,
+  },
+  unichainsepolia: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
   },
 };
 
