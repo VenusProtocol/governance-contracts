@@ -12,7 +12,7 @@ import {
   OmnichainGovernanceExecutorOwnerMethods,
   config,
 } from "../helpers/deploy/deploymentConfig";
-import { getOmnichainProposalSender, testnetNetworks } from "../helpers/deploy/deploymentUtils";
+import { getOmnichainProposalSender, guardian, testnetNetworks } from "../helpers/deploy/deploymentUtils";
 import { OmnichainGovernanceExecutor } from "../typechain";
 
 interface GovernanceCommand {
@@ -124,6 +124,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     },
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
   const omnichainExecutorOwner = await ethers.getContractAt(
     "OmnichainExecutorOwner",
