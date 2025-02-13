@@ -3,22 +3,6 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import bscMainnetGovernanceDeployments from "../../deployments/bscmainnet.json";
 import bscTestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
-import arbitrumoneGovernanceDeployments from "../../deployments/arbitrumone.json";
-import arbitrumsepoliaGovernanceDeployments from "../../deployments/arbitrumsepolia.json";
-import bscmainnetGovernanceDeployments from "../../deployments/bscmainnet.json";
-import bsctestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
-import ethereumGovernanceDeployments from "../../deployments/ethereum.json";
-import opbnbmainnetGovernanceDeployments from "../../deployments/opbnbmainnet.json";
-import opbnbtestnetGovernanceDeployments from "../../deployments/opbnbtestnet.json";
-import sepoliaGovernanceDeployments from "../../deployments/sepolia.json";
-import zksyncsepoliaGovernanceDeployments from "../../deployments/zksyncsepolia.json";
-import zksyncmainnetGovernanceDeployments from "../../deployments/zksyncmainnet.json";
-import opmainnetGovernanceDeployments from "../../deployments/opmainnet.json";
-import opsepoliaGovernanceDeployments from "../../deployments/opsepolia.json";
-import basemainnetGovernanceDeployments from "../../deployments/basemainnet.json";
-import basesepoliaGovernanceDeployments from "../../deployments/basesepolia.json";
-import unichainmainnetGovernanceDeployments from "../../deployments/unichainmainnet.json";
-import unichainsepoliaGovernanceDeployments from "../../deployments/unichainsepolia.json";
 import { LZ_CHAINID, SUPPORTED_NETWORKS } from "./constants";
 
 export const testnetNetworks = [
@@ -29,6 +13,7 @@ export const testnetNetworks = [
   "opsepolia",
   "basesepolia",
   "unichainsepolia",
+  "berachainbartio",
   "hardhat",
 ];
 const mainnetNetworks = [
@@ -73,6 +58,8 @@ export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => 
     return "0x9831D3A641E8c7F082EEA75b8249c99be9D09a34"; // UNICHAIN SEPOLIA MULTISIG
   } else if (network === "unichainmainnet") {
     return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // UNICHAIN MAINNET MULTISIG
+  } else if (network === "berachainbartio") {
+    return "0xdf3b635d2b535f906BB02abb22AED71346E36a00"; // BERACHAIN bArtio MULTISIG
   }
   return deployer;
 };
@@ -107,7 +94,8 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
     basesepolia: "0x55370E0fBB5f5b8dAeD978BA1c075a499eB107B8",
     basemainnet: "0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7",
     unichainsepolia: "0x012f6eaE2A0Bf5916f48b5F37C62Bcfb7C1ffdA1",
-    unichainmainnet: "", // TODO
+    unichainmainnet: "", // TODO,
+    berachainbartio: "0x6EDCE65403992e310A62460808c4b910D972f10f",
     hardhat: lzEndpointMock?.address || "",
   }[networkName];
 };
