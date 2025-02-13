@@ -52,7 +52,7 @@ contract Timelock {
     uint public constant GRACE_PERIOD = 14 days;
 
     /// @notice Minimum amount of time a proposal transaction must be queued
-    uint public constant MINIMUM_DELAY = 2 days;
+    uint public constant MINIMUM_DELAY = 1 hours;
 
     /// @notice Maximum amount of time a proposal transaction must be queued
     uint public constant MAXIMUM_DELAY = 30 days;
