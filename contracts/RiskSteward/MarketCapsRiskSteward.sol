@@ -267,4 +267,11 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     function _decodeBytesToUint256(bytes memory data) internal pure returns (uint256) {
         return abi.decode(abi.encodePacked(new bytes(32 - data.length), data), (uint256));
     }
+
+    /**
+     * @dev Disabling renounceOwnership function.
+     */
+    function renounceOwnership() public override {
+        revert(" renounceOwnership() is not allowed");
+    }
 }
