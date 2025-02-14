@@ -142,6 +142,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, PausableUpgradeable, Acces
      * @param riskSteward The address for the risk steward contract responsible for processing the update
      * @param debounce The debounce period for the update
      * @custom:access Controlled by AccessControlManager
+     * @custom:event Emits RiskParameterConfigSet with the update type, previous risk steward, new risk steward, previous debounce, new debounce, previous active status, and new active status
      * @custom:error Throws UnsupportedUpdateType if the update type is an empty string
      * @custom:error Throws InvalidDebounce if the debounce is 0
      * @custom:error Throws ZeroAddressNotAllowed if the risk steward address is zero
