@@ -158,12 +158,12 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @param newValue The new supply cap value
      * @custom:event Emits SupplyCapUpdated with the market and new supply cap
      */
-    function _updateSupplyCaps(address market, bytes memory newValue) internal {
+    function _updateSupplyCaps(address market, uint256 newValue) internal {
         address comptroller = IVToken(market).comptroller();
         address[] memory newSupplyCapMarkets = new address[](1);
         newSupplyCapMarkets[0] = market;
         uint256[] memory newSupplyCaps = new uint256[](1);
-        newSupplyCaps[0] = _decodeBytesToUint256(newValue);
+        newSupplyCaps[0] = newValue;
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
             ICorePoolComptroller(comptroller)._setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
         } else {
@@ -178,12 +178,12 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @param newValue The new borrow cap value
      * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
      */
-    function _updateBorrowCaps(address market, bytes memory newValue) internal {
+    function _updateBorrowCaps(address market, uint256 newValue) internal {
         address comptroller = IVToken(market).comptroller();
         address[] memory newBorrowCapMarkets = new address[](1);
         newBorrowCapMarkets[0] = market;
         uint256[] memory newBorrowCaps = new uint256[](1);
-        newBorrowCaps[0] = _decodeBytesToUint256(newValue);
+        newBorrowCaps[0] = newValue;
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
             ICorePoolComptroller(comptroller)._setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
         } else {
@@ -199,8 +199,9 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
     function _processSupplyCapUpdate(RiskParameterUpdate memory update) internal {
-        _validateSupplyCapUpdate(update);
-        _updateSupplyCaps(update.market, update.newValue);
+        uint256 newValue = _decodeBytesToUint256(update.newValue);
+        _validateSupplyCapUpdate(update.market, newValue);
+        _updateSupplyCaps(update.market, newValue);
     }
 
     /**
@@ -210,33 +211,34 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
     function _processBorrowCapUpdate(RiskParameterUpdate memory update) internal {
-        _validateBorrowCapUpdate(update);
-        _updateBorrowCaps(update.market, update.newValue);
+        uint256 newValue = _decodeBytesToUint256(update.newValue);
+        _validateBorrowCapUpdate(update.market, newValue);
+        _updateBorrowCaps(update.market, newValue);
     }
 
     /**
      * @notice Checks that the new supply cap is within the allowed range of the current supply cap.
-     * @param update RiskParameterUpdate update to validate
+     * @param market The market to validate the supply cap for
+     * @param newValue The new supply cap value
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
-    function _validateSupplyCapUpdate(RiskParameterUpdate memory update) internal view {
-        ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(update.market).comptroller());
-        uint256 currentSupplyCap = comptroller.supplyCaps(address(update.market));
+    function _validateSupplyCapUpdate(address market, uint256 newValue) internal view {
+        ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(market).comptroller());
+        uint256 currentSupplyCap = comptroller.supplyCaps(market);
 
-        uint256 newValue = _decodeBytesToUint256(update.newValue);
         _updateWithinAllowedRange(currentSupplyCap, newValue);
     }
 
     /**
      * @notice Checks that the new borrow cap is within the allowed range of the current borrow cap.
-     * @param update The update to validate
+     * @param market The market to validate the borrow cap for
+     * @param newValue The new borrow cap value
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
-    function _validateBorrowCapUpdate(RiskParameterUpdate memory update) internal view {
-        ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(update.market).comptroller());
-        uint256 currentBorrowCap = comptroller.borrowCaps(address(update.market));
+    function _validateBorrowCapUpdate(address market, uint256 newValue) internal view {
+        ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(market).comptroller());
+        uint256 currentBorrowCap = comptroller.borrowCaps(address(market));
 
-        uint256 newValue = _decodeBytesToUint256(update.newValue);
         _updateWithinAllowedRange(currentBorrowCap, newValue);
     }
 
