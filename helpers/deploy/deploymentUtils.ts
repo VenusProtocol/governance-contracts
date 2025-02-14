@@ -101,7 +101,7 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
     basemainnet: "0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7",
     unichainsepolia: "0x012f6eaE2A0Bf5916f48b5F37C62Bcfb7C1ffdA1",
     unichainmainnet: "0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7",
-    berachainbartio: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+    berachainbartio: "0x83c73Da98cf733B03315aFa8758834b36a195b87",
     hardhat: lzEndpointMock?.address || "",
   }[networkName];
 };

@@ -36,7 +36,7 @@ export const LZ_CHAINID: Record<SUPPORTED_NETWORKS, number> = {
   basesepolia: 10245,
   unichainsepolia: 10333,
   unichainmainnet: 320,
-  berachainbartio: 30362,
+  berachainbartio: 10291,
   hardhat: 10102,
 };
 
