@@ -271,4 +271,9 @@ contract RiskStewardReceiver is IRiskStewardReceiver, PausableUpgradeable, Acces
             revert UpdateTooFrequent();
         }
     }
+
+    /**
+     * @dev Disabling renounceOwnership function.
+     */
+    function renounceOwnership() public override {}
 }
