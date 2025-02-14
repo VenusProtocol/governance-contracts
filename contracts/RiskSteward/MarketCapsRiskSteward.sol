@@ -47,6 +47,8 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      */
     string public constant BORROW_CAP = "borrowCap";
 
+    uint256[50] private __gap;
+
     /**
      * @notice Emitted when a supply cap is updated
      */
