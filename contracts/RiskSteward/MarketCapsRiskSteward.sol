@@ -101,7 +101,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @dev Initializes the contract as ownable, access controlled, and pausable. Sets the max delta bps initial value.
      * @param accessControlManager_ The address of the access control manager
      * @param maxDeltaBps_ The max detla bps
-     * @custom:error Throws InvalidMaxDeltaBps if the max delta bps is 0
+     * @custom:error Throws InvalidMaxDeltaBps if the max delta bps is 0 or greater than MAX_BPS
      */
     function initialize(address accessControlManager_, uint256 maxDeltaBps_) external initializer {
         __AccessControlled_init(accessControlManager_);
@@ -115,7 +115,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Sets the max delta bps
      * @param maxDeltaBps_ The new max delta bps
      * @custom:event Emits MaxDeltaBpsUpdated with the old and new max delta bps
-     * @custom:error InvalidMaxDeltaBps if the max delta bps is 0
+     * @custom:error InvalidMaxDeltaBps if the max delta bps is 0 or greater than MAX_BPS
      * @custom:access Controlled by AccessControlManager
      */
     function setMaxDeltaBps(uint256 maxDeltaBps_) external {
@@ -194,6 +194,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Validates the new supply cap and if valid, updates the supply cap for the given market.
      * @param update RiskParameterUpdate update to process
      * @custom:event Emits SupplyCapUpdated with the market and new supply cap
+     * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
     function _processSupplyCapUpdate(RiskParameterUpdate memory update) internal {
         _validateSupplyCapUpdate(update);
@@ -204,6 +205,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Validates the new borrow cap and if valid, updates the borrow cap for the given market.
      * @param update RiskParameterUpdate update to process
      * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
+     * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
     function _processBorrowCapUpdate(RiskParameterUpdate memory update) internal {
         _validateBorrowCapUpdate(update);
