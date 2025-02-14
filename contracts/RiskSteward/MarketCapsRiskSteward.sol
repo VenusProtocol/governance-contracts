@@ -237,7 +237,8 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Ensures the risk param update is within the allowed range
+     * @notice Ensures the risk param update is within the allowed range.
+     * If the previous value is 0, this means the market is not yet supported or disabled and setting a new value is not allowed.
      * @param previousValue current risk param value
      * @param newValue new updated risk param value
      * @custom:error UpdateNotInRange if the update is not within the allowed range
