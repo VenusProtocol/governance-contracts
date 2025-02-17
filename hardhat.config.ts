@@ -20,12 +20,29 @@ extendConfig((config: HardhatConfig) => {
     config.external = {
       ...config.external,
       deployments: {
-        bsctestnet: ["node_modules/@venusprotocol/governance-contracts/deployments/bsctestnet"],
-        bscmainnet: ["node_modules/@venusprotocol/governance-contracts/deployments/bscmainnet"],
+        bsctestnet: [
+          "node_modules/@venusprotocol/governance-contracts/deployments/bsctestnet",
+          "node_modules/@venusprotocol/venus-protocol/deployments/bsctestnet",
+        ],
+        bscmainnet: [
+          "node_modules/@venusprotocol/governance-contracts/deployments/bscmainnet",
+          "node_modules/@venusprotocol/venus-protocol/deployments/bscmainnet",
+        ],
         sepolia: ["node_modules/@venusprotocol/governance-contracts/deployments/sepolia"],
         ethereum: ["node_modules/@venusprotocol/governance-contracts/deployments/ethereum"],
       },
     };
+
+    if (process.env.FORKED_NETWORK) {
+      config.external.deployments!.hardhat = [
+        `./deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/oracle/deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/venus-protocol/deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/protocol-reserve/deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/governance-contracts/deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/isolated-pools/deployments/${process.env.FORKED_NETWORK}`,
+      ];
+    }
   }
 });
 
@@ -77,9 +94,7 @@ const config: HardhatUserConfig = {
     bsctestnet: {
       url: process.env.ARCHIVE_NODE_bsctestnet || "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
-      accounts: {
-        mnemonic: process.env.MNEMONIC || "",
-      },
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
       gasPrice: 10000000000, // 10 gwei
       gasMultiplier: 10,
       timeout: 12000000,
@@ -331,6 +346,9 @@ const config: HardhatUserConfig = {
       {
         artifacts: "./node_modules/@venusprotocol/venus-protocol/artifacts",
       },
+      {
+        artifacts: "./node_modules/@venusprotocol/isolated-pools/artifacts",
+      },
     ],
     deployments: {},
   },
@@ -342,26 +360,28 @@ const config: HardhatUserConfig = {
 };
 
 function isFork() {
-  return process.env.FORK === "true"
+  return process.env.FORKED_NETWORK
     ? {
-        allowUnlimitedContractSize: false,
-        loggingEnabled: false,
-        forking: {
-          url:
-            process.env[`ARCHIVE_NODE_${process.env.FORKED_NETWORK}`] ||
-            "https://data-seed-prebsc-1-s1.binance.org:8545",
-          blockNumber: 21068448,
-        },
-        accounts: {
-          accountsBalance: "1000000000000000000",
-        },
-        live: false,
-      }
+      allowUnlimitedContractSize: false,
+      loggingEnabled: false,
+      forking: {
+        url:
+          process.env[`ARCHIVE_NODE_${process.env.FORKED_NETWORK}`] ||
+          "https://data-seed-prebsc-1-s1.binance.org:8545",
+        blockNumber: 21068448,
+      },
+      accounts: {
+        accountsBalance: "1000000000000000000",
+      },
+      live: true,
+      saveDeployments: false,
+    }
     : {
-        allowUnlimitedContractSize: true,
-        loggingEnabled: false,
-        live: false,
-      };
+      allowUnlimitedContractSize: true,
+      loggingEnabled: false,
+      live: false,
+      saveDeployments: false,
+    };
 }
 
 export default config;
