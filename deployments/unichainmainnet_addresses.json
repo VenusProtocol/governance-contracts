@@ -4,13 +4,13 @@
   "addresses": {
     "ACMCommandsAggregator": "0x904D11b00bdB2740d16176cc00DE139d0d626115",
     "AccessControlManager": "0x1f12014c497a9d905155eB9BfDD9FaC6885e61d0",
-    "CriticalTimelock": "0x91A58273EA9B2Cae1f72d431a7cB145aB9A3d1F3",
+    "CriticalTimelock": "0x1b05eCb489842786776a9A10e91AAb56e2CFe15e",
     "DefaultProxyAdmin": "0x78e9fff2ab8daAB8559070d897C399E5e1C5074c",
-    "FastTrackTimelock": "0x5F4ec2524A670139b760f95D0986Ef6b9d162989",
-    "NormalTimelock": "0xCb04dc78c99E20724023e5265fE177aa532E8164",
-    "OmnichainExecutorOwner": "0x65df5ba2Fa1F7A5bBDee1789bFd29b593108D15F",
-    "OmnichainExecutorOwner_Implementation": "0xdf7687e029E5C306083cEEE892538E984269D530",
-    "OmnichainExecutorOwner_Proxy": "0x65df5ba2Fa1F7A5bBDee1789bFd29b593108D15F",
-    "OmnichainGovernanceExecutor": "0x07F769044eC16e39c3AD3fE182A44334d6B1193a"
+    "FastTrackTimelock": "0x4121995b87f9EE8bA0a89e87470255e2E0fe48c7",
+    "NormalTimelock": "0x918532A78d22419Da4091930d472bDdf532BE89a",
+    "OmnichainExecutorOwner": "0x6E78a0d96257F8F2615d72F3ee48cb6fb2c970bd",
+    "OmnichainExecutorOwner_Implementation": "0xE9206F8D1DD75b203DD169CA7243DA661273D523",
+    "OmnichainExecutorOwner_Proxy": "0x6E78a0d96257F8F2615d72F3ee48cb6fb2c970bd",
+    "OmnichainGovernanceExecutor": "0x3E281461efb3D53EC20DB207674373Ed8Ef3BbA9"
   }
 }
