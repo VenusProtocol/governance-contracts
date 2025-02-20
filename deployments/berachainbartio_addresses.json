@@ -1,0 +1,16 @@
+{
+  "name": "berachainbartio",
+  "chainId": "80084",
+  "addresses": {
+    "ACMCommandsAggregator": "0x1ba10ca9a744131aD8428D719767816A693c3b71",
+    "AccessControlManager": "0xEf368e4c1f9ACC9241E66CD67531FEB195fF7536",
+    "CriticalTimelock": "0x920eeE8A5581e80Ca9C47CbF11B7A6cDB30204BD",
+    "DefaultProxyAdmin": "0xccF1655d49bD9f94106524Cc416277135A811815",
+    "FastTrackTimelock": "0x723b7CB226d86bd89638ec77936463453a46C656",
+    "NormalTimelock": "0x8699D418D8bae5CFdc566E4fce897B08bd9B03B0",
+    "OmnichainExecutorOwner": "0x94ba324b639F2C4617834dFcF45EA23188a17124",
+    "OmnichainExecutorOwner_Implementation": "0x5ea62b02dacC7cA05e2402f0aBef60E7591e8653",
+    "OmnichainExecutorOwner_Proxy": "0x94ba324b639F2C4617834dFcF45EA23188a17124",
+    "OmnichainGovernanceExecutor": "0xf1A468Db7787CE1BEA022e46156Fe6A30e0C7847"
+  }
+}
