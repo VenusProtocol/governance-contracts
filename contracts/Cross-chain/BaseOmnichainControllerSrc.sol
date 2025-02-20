@@ -43,7 +43,8 @@ contract BaseOmnichainControllerSrc is Ownable, Pausable {
      * @notice Emitted when the maximum daily limit of commands from the local chain is modified
      */
     event SetMaxDailyLimit(uint16 indexed chainId, uint256 oldMaxLimit, uint256 newMaxLimit);
-    /*
+
+    /**
      * @notice Emitted when the address of ACM is updated
      */
     event NewAccessControlManager(address indexed oldAccessControlManager, address indexed newAccessControlManager);
