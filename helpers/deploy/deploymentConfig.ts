@@ -196,7 +196,7 @@ export const config: Config = {
   },
   unichainmainnet: {
     methods: [
-      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bsctestnet"], 0, 200000] },
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bscmainnet"], 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
     ],
   },

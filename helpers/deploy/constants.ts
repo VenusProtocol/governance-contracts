@@ -26,7 +26,6 @@ export const LZ_CHAINID: Record<SUPPORTED_NETWORKS, number> = {
   arbitrumone: 110,
   opmainnet: 111,
   basemainnet: 184,
-  unichainmainnet: 0,
   sepolia: 10161,
   bsctestnet: 10102,
   opbnbtestnet: 10202,
@@ -36,6 +35,7 @@ export const LZ_CHAINID: Record<SUPPORTED_NETWORKS, number> = {
   opsepolia: 10232,
   basesepolia: 10245,
   unichainsepolia: 10333,
+  unichainmainnet: 320,
   berachainbartio: 10291,
   hardhat: 10102,
 };
