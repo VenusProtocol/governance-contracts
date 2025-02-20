@@ -1,0 +1,366 @@
+{
+  "address": "0xb0067C9CD83B00DE781e9b456Bf0Fec86D687Bb2",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "contract IAccessControlManagerV8",
+          "name": "_acm",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "EmptyPermissions",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroAddressNotAllowed",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "GrantPermissionsAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "GrantPermissionsExecuted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "RevokePermissionsAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "RevokePermissionsExecuted",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "ACM",
+      "outputs": [
+        {
+          "internalType": "contract IAccessControlManagerV8",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "contractAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "functionSig",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct ACMCommandsAggregator.Permission[]",
+          "name": "_permissions",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "addGrantPermissions",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "contractAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "functionSig",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            }
+          ],
+          "internalType": "struct ACMCommandsAggregator.Permission[]",
+          "name": "_permissions",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "addRevokePermissions",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "executeGrantPermissions",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "executeRevokePermissions",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "grantPermissions",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "contractAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "functionSig",
+          "type": "string"
+        },
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "revokePermissions",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "contractAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "functionSig",
+          "type": "string"
+        },
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xb114fe76a8084aacf456ec88e4ad2e537d39411da0d1ecd39393964a060f61fd",
+  "receipt": {
+    "to": null,
+    "from": "0xEaaeF99260E6822eAE172930bdc5eBB39a2eb63E",
+    "contractAddress": "0xb0067C9CD83B00DE781e9b456Bf0Fec86D687Bb2",
+    "transactionIndex": 17,
+    "gasUsed": "937641",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0xd3045410041d4e066e70dfdf05f175a8320fef7975bcbe40d7e548e6b40e3fc2",
+    "transactionHash": "0xb114fe76a8084aacf456ec88e4ad2e537d39411da0d1ecd39393964a060f61fd",
+    "logs": [],
+    "blockNumber": 12514674,
+    "cumulativeGasUsed": "4908142",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": ["0x854C064EA6b503A97980F481FA3B7279012fdeDd"],
+  "numDeployments": 1,
+  "solcInputHash": "802667e405c8ffe4c217bec1625fcc2b",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.25+commit.b61c2a91\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"contract IAccessControlManagerV8\",\"name\":\"_acm\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"EmptyPermissions\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ZeroAddressNotAllowed\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"GrantPermissionsAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"GrantPermissionsExecuted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"RevokePermissionsAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"RevokePermissionsExecuted\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"ACM\",\"outputs\":[{\"internalType\":\"contract IAccessControlManagerV8\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"contractAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"functionSig\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"internalType\":\"struct ACMCommandsAggregator.Permission[]\",\"name\":\"_permissions\",\"type\":\"tuple[]\"}],\"name\":\"addGrantPermissions\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"contractAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"functionSig\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"internalType\":\"struct ACMCommandsAggregator.Permission[]\",\"name\":\"_permissions\",\"type\":\"tuple[]\"}],\"name\":\"addRevokePermissions\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"executeGrantPermissions\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"executeRevokePermissions\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"grantPermissions\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"contractAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"functionSig\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"revokePermissions\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"contractAddress\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"functionSig\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"author\":\"Venus\",\"kind\":\"dev\",\"methods\":{},\"title\":\"ACMCommandsAggregator\",\"version\":1},\"userdoc\":{\"errors\":{\"ZeroAddressNotAllowed()\":[{\"notice\":\"Thrown if the supplied address is a zero address where it is not allowed\"}]},\"kind\":\"user\",\"methods\":{\"ACM()\":{\"notice\":\"Access control manager contract\"}},\"notice\":\"This contract is a helper to aggregate multiple grant and revoke permissions in batches and execute them in one go.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/Utils/ACMCommandsAggregator.sol\":\"ACMCommandsAggregator\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":10000},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/access/IAccessControl.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts v4.4.1 (access/IAccessControl.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev External interface of AccessControl declared to support ERC165 detection.\\n */\\ninterface IAccessControl {\\n    /**\\n     * @dev Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole`\\n     *\\n     * `DEFAULT_ADMIN_ROLE` is the starting admin for all roles, despite\\n     * {RoleAdminChanged} not being emitted signaling this.\\n     *\\n     * _Available since v3.1._\\n     */\\n    event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole);\\n\\n    /**\\n     * @dev Emitted when `account` is granted `role`.\\n     *\\n     * `sender` is the account that originated the contract call, an admin role\\n     * bearer except when using {AccessControl-_setupRole}.\\n     */\\n    event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender);\\n\\n    /**\\n     * @dev Emitted when `account` is revoked `role`.\\n     *\\n     * `sender` is the account that originated the contract call:\\n     *   - if using `revokeRole`, it is the admin role bearer\\n     *   - if using `renounceRole`, it is the role bearer (i.e. `account`)\\n     */\\n    event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);\\n\\n    /**\\n     * @dev Returns `true` if `account` has been granted `role`.\\n     */\\n    function hasRole(bytes32 role, address account) external view returns (bool);\\n\\n    /**\\n     * @dev Returns the admin role that controls `role`. See {grantRole} and\\n     * {revokeRole}.\\n     *\\n     * To change a role's admin, use {AccessControl-_setRoleAdmin}.\\n     */\\n    function getRoleAdmin(bytes32 role) external view returns (bytes32);\\n\\n    /**\\n     * @dev Grants `role` to `account`.\\n     *\\n     * If `account` had not been already granted `role`, emits a {RoleGranted}\\n     * event.\\n     *\\n     * Requirements:\\n     *\\n     * - the caller must have ``role``'s admin role.\\n     */\\n    function grantRole(bytes32 role, address account) external;\\n\\n    /**\\n     * @dev Revokes `role` from `account`.\\n     *\\n     * If `account` had been granted `role`, emits a {RoleRevoked} event.\\n     *\\n     * Requirements:\\n     *\\n     * - the caller must have ``role``'s admin role.\\n     */\\n    function revokeRole(bytes32 role, address account) external;\\n\\n    /**\\n     * @dev Revokes `role` from the calling account.\\n     *\\n     * Roles are often managed via {grantRole} and {revokeRole}: this function's\\n     * purpose is to provide a mechanism for accounts to lose their privileges\\n     * if they are compromised (such as when a trusted device is misplaced).\\n     *\\n     * If the calling account had been granted `role`, emits a {RoleRevoked}\\n     * event.\\n     *\\n     * Requirements:\\n     *\\n     * - the caller must be `account`.\\n     */\\n    function renounceRole(bytes32 role, address account) external;\\n}\\n\",\"keccak256\":\"0x59ce320a585d7e1f163cd70390a0ef2ff9cec832e2aa544293a00692465a7a57\",\"license\":\"MIT\"},\"@venusprotocol/solidity-utilities/contracts/validators.sol\":{\"content\":\"// SPDX-License-Identifier: BSD-3-Clause\\npragma solidity 0.8.25;\\n\\n/// @notice Thrown if the supplied address is a zero address where it is not allowed\\nerror ZeroAddressNotAllowed();\\n\\n/// @notice Thrown if the supplied value is 0 where it is not allowed\\nerror ZeroValueNotAllowed();\\n\\n/// @notice Checks if the provided address is nonzero, reverts otherwise\\n/// @param address_ Address to check\\n/// @custom:error ZeroAddressNotAllowed is thrown if the provided address is a zero address\\nfunction ensureNonzeroAddress(address address_) pure {\\n    if (address_ == address(0)) {\\n        revert ZeroAddressNotAllowed();\\n    }\\n}\\n\\n/// @notice Checks if the provided value is nonzero, reverts otherwise\\n/// @param value_ Value to check\\n/// @custom:error ZeroValueNotAllowed is thrown if the provided value is 0\\nfunction ensureNonzeroValue(uint256 value_) pure {\\n    if (value_ == 0) {\\n        revert ZeroValueNotAllowed();\\n    }\\n}\\n\",\"keccak256\":\"0xdb88e14d50dd21889ca3329d755673d022c47e8da005b6a545c7f69c2c4b7b86\",\"license\":\"BSD-3-Clause\"},\"contracts/Governance/IAccessControlManagerV8.sol\":{\"content\":\"// SPDX-License-Identifier: BSD-3-Clause\\npragma solidity ^0.8.25;\\n\\nimport \\\"@openzeppelin/contracts/access/IAccessControl.sol\\\";\\n\\n/**\\n * @title IAccessControlManagerV8\\n * @author Venus\\n * @notice Interface implemented by the `AccessControlManagerV8` contract.\\n */\\ninterface IAccessControlManagerV8 is IAccessControl {\\n    function giveCallPermission(address contractAddress, string calldata functionSig, address accountToPermit) external;\\n\\n    function revokeCallPermission(\\n        address contractAddress,\\n        string calldata functionSig,\\n        address accountToRevoke\\n    ) external;\\n\\n    function isAllowedToCall(address account, string calldata functionSig) external view returns (bool);\\n\\n    function hasPermission(\\n        address account,\\n        address contractAddress,\\n        string calldata functionSig\\n    ) external view returns (bool);\\n}\\n\",\"keccak256\":\"0xaa29b098440d0b3a131c5ecdf25ce548790c1b5ac7bf9b5c0264b6af6f7a1e0b\",\"license\":\"BSD-3-Clause\"},\"contracts/Utils/ACMCommandsAggregator.sol\":{\"content\":\"// SPDX-License-Identifier: BSD-3-Clause\\npragma solidity 0.8.25;\\n\\nimport { IAccessControlManagerV8 } from \\\"../Governance/IAccessControlManagerV8.sol\\\";\\nimport { ensureNonzeroAddress } from \\\"@venusprotocol/solidity-utilities/contracts/validators.sol\\\";\\n\\n/**\\n * @title ACMCommandsAggregator\\n * @author Venus\\n * @notice This contract is a helper to aggregate multiple grant and revoke permissions in batches and execute them in one go.\\n */\\ncontract ACMCommandsAggregator {\\n    /*\\n     * @notice Struct to store permission details\\n     */\\n    struct Permission {\\n        /*\\n         * @notice Address of the contract\\n         */\\n        address contractAddress;\\n        /*\\n         * @notice Function signature\\n         */\\n        string functionSig;\\n        /*\\n         * @notice Address of the account\\n         */\\n        address account;\\n    }\\n\\n    /**\\n     * @notice Access control manager contract\\n     */\\n    IAccessControlManagerV8 public immutable ACM;\\n\\n    /*\\n     * @notice 2D array to store grant permissions in batches\\n     */\\n    Permission[][] public grantPermissions;\\n\\n    /*\\n     * @notice 2D array to store revoke permissions in batches\\n     */\\n    Permission[][] public revokePermissions;\\n\\n    /*\\n     * @notice Event emitted when grant permissions are added\\n     */\\n    event GrantPermissionsAdded(uint256 index);\\n\\n    /*\\n     * @notice Event emitted when revoke permissions are added\\n     */\\n    event RevokePermissionsAdded(uint256 index);\\n\\n    /*\\n     * @notice Event emitted when grant permissions are executed\\n     */\\n    event GrantPermissionsExecuted(uint256 index);\\n\\n    /*\\n     * @notice Event emitted when revoke permissions are executed\\n     */\\n    event RevokePermissionsExecuted(uint256 index);\\n\\n    /*\\n     * @notice Error to be thrown when permissions are empty\\n     */\\n    error EmptyPermissions();\\n\\n    /*\\n     * @notice Constructor to set the access control manager\\n     * @param _acm Address of the access control manager\\n     */\\n    constructor(IAccessControlManagerV8 _acm) {\\n        ensureNonzeroAddress(address(_acm));\\n        ACM = _acm;\\n    }\\n\\n    /*\\n     * @notice Function to add grant permissions\\n     * @param _permissions Array of permissions\\n     * @custom:event Emits GrantPermissionsAdded event\\n     */\\n    function addGrantPermissions(Permission[] memory _permissions) external {\\n        if (_permissions.length == 0) {\\n            revert EmptyPermissions();\\n        }\\n\\n        uint256 index = grantPermissions.length;\\n        grantPermissions.push();\\n\\n        for (uint256 i; i < _permissions.length; ++i) {\\n            grantPermissions[index].push(\\n                Permission(_permissions[i].contractAddress, _permissions[i].functionSig, _permissions[i].account)\\n            );\\n        }\\n\\n        emit GrantPermissionsAdded(index);\\n    }\\n\\n    /*\\n     * @notice Function to add revoke permissions\\n     * @param _permissions Array of permissions\\n     * @custom:event Emits RevokePermissionsAdded event\\n     */\\n    function addRevokePermissions(Permission[] memory _permissions) external {\\n        if (_permissions.length == 0) {\\n            revert EmptyPermissions();\\n        }\\n\\n        uint256 index = revokePermissions.length;\\n        revokePermissions.push();\\n\\n        for (uint256 i; i < _permissions.length; ++i) {\\n            revokePermissions[index].push(\\n                Permission(_permissions[i].contractAddress, _permissions[i].functionSig, _permissions[i].account)\\n            );\\n        }\\n\\n        emit RevokePermissionsAdded(index);\\n    }\\n\\n    /*\\n     * @notice Function to execute grant permissions\\n     * @param index Index of the permissions array\\n     * @custom:event Emits GrantPermissionsExecuted event\\n     */\\n    function executeGrantPermissions(uint256 index) external {\\n        uint256 length = grantPermissions[index].length;\\n        for (uint256 i; i < length; ++i) {\\n            Permission memory permission = grantPermissions[index][i];\\n            ACM.giveCallPermission(permission.contractAddress, permission.functionSig, permission.account);\\n        }\\n\\n        emit GrantPermissionsExecuted(index);\\n    }\\n\\n    /*\\n     * @notice Function to execute revoke permissions\\n     * @param index Index of the permissions array\\n     * @custom:event Emits RevokePermissionsExecuted event\\n     */\\n    function executeRevokePermissions(uint256 index) external {\\n        uint256 length = revokePermissions[index].length;\\n        for (uint256 i; i < length; ++i) {\\n            Permission memory permission = revokePermissions[index][i];\\n            ACM.revokeCallPermission(permission.contractAddress, permission.functionSig, permission.account);\\n        }\\n\\n        emit RevokePermissionsExecuted(index);\\n    }\\n}\\n\",\"keccak256\":\"0xe642b8f0e0fedc74d31196197bc7d78b43b44eab556c07ec74d6b75ccf8d0f8c\",\"license\":\"BSD-3-Clause\"}},\"version\":1}",
+  "bytecode": "0x60a0604052348015600f57600080fd5b506040516110c73803806110c7833981016040819052602c91606c565b6033816043565b6001600160a01b0316608052609a565b6001600160a01b0381166069576040516342bcdf7f60e11b815260040160405180910390fd5b50565b600060208284031215607d57600080fd5b81516001600160a01b0381168114609357600080fd5b9392505050565b6080516110046100c360003960008181610100015281816102de0152610a0101526110046000f3fe608060405234801561001057600080fd5b506004361061007d5760003560e01c80639d6c76b81161005b5780639d6c76b8146100d5578063de46a235146100e8578063f9b80da1146100fb578063ff1575e11461014757600080fd5b806322473d8c14610082578063514aab87146100975780635666a5ea146100c2575b600080fd5b610095610090366004610ab8565b61015a565b005b6100aa6100a5366004610ad1565b61038d565b6040516100b993929190610af3565b60405180910390f35b6100956100d0366004610c59565b610492565b6100956100e3366004610c59565b610689565b6100956100f6366004610ab8565b61087f565b6101227f000000000000000000000000000000000000000000000000000000000000000081565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020016100b9565b6100aa610155366004610ad1565b610aa8565b60006001828154811061016f5761016f610de1565b600091825260208220015491505b818110156103545760006001848154811061019a5761019a610de1565b9060005260206000200182815481106101b5576101b5610de1565b60009182526020918290206040805160608101909152600390920201805473ffffffffffffffffffffffffffffffffffffffff168252600181018054929391929184019161020290610e10565b80601f016020809104026020016040519081016040528092919081815260200182805461022e90610e10565b801561027b5780601f106102505761010080835404028352916020019161027b565b820191906000526020600020905b81548152906001019060200180831161025e57829003601f168201915b50505091835250506002919091015473ffffffffffffffffffffffffffffffffffffffff90811660209283015282519183015160408085015190517f545f7a320000000000000000000000000000000000000000000000000000000081529495507f00000000000000000000000000000000000000000000000000000000000000009092169363545f7a329361031693909291600401610af3565b600060405180830381600087803b15801561033057600080fd5b505af1158015610344573d6000803e3d6000fd5b505050505080600101905061017d565b506040518281527f1382323d6618527d8b03daa05db815f0490966e8b80679fe5ad3d868f84e1a71906020015b60405180910390a15050565b6000828154811061039d57600080fd5b9060005260206000200181815481106103b557600080fd5b60009182526020909120600390910201805460018201805473ffffffffffffffffffffffffffffffffffffffff90921694509192506103f390610e10565b80601f016020809104026020016040519081016040528092919081815260200182805461041f90610e10565b801561046c5780601f106104415761010080835404028352916020019161046c565b820191906000526020600020905b81548152906001019060200180831161044f57829003601f168201915b5050506002909301549192505073ffffffffffffffffffffffffffffffffffffffff1683565b80516000036104cd576040517f4494013c00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6001805480820182556000918252905b825181101561065857600182815481106104f9576104f9610de1565b90600052602060002001604051806060016040528085848151811061052057610520610de1565b60200260200101516000015173ffffffffffffffffffffffffffffffffffffffff16815260200185848151811061055957610559610de1565b602002602001015160200151815260200185848151811061057c5761057c610de1565b6020908102919091018101516040015173ffffffffffffffffffffffffffffffffffffffff908116909252835460018082018655600095865294829020845160039092020180547fffffffffffffffffffffffff0000000000000000000000000000000000000000169190931617825582015191929091908201906106019082610eb4565b5060409190910151600290910180547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff9092169190911790556001016104dd565b506040518181527f75922591bf2cec980645dc4a32bb7d5e8da9a15fda86dacf06f8402cecd1478f90602001610381565b80516000036106c4576040517f4494013c00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60008054600181018255818052905b825181101561084e57600082815481106106ef576106ef610de1565b90600052602060002001604051806060016040528085848151811061071657610716610de1565b60200260200101516000015173ffffffffffffffffffffffffffffffffffffffff16815260200185848151811061074f5761074f610de1565b602002602001015160200151815260200185848151811061077257610772610de1565b6020908102919091018101516040015173ffffffffffffffffffffffffffffffffffffffff908116909252835460018082018655600095865294829020845160039092020180547fffffffffffffffffffffffff0000000000000000000000000000000000000000169190931617825582015191929091908201906107f79082610eb4565b5060409190910151600290910180547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff9092169190911790556001016106d3565b506040518181527ff8ca6ea7cc31be8572501c37ef5e9e8298be717fb881e0b1ca785aecc4d25e9f90602001610381565b600080828154811061089357610893610de1565b600091825260208220015491505b81811015610a775760008084815481106108bd576108bd610de1565b9060005260206000200182815481106108d8576108d8610de1565b60009182526020918290206040805160608101909152600390920201805473ffffffffffffffffffffffffffffffffffffffff168252600181018054929391929184019161092590610e10565b80601f016020809104026020016040519081016040528092919081815260200182805461095190610e10565b801561099e5780601f106109735761010080835404028352916020019161099e565b820191906000526020600020905b81548152906001019060200180831161098157829003601f168201915b50505091835250506002919091015473ffffffffffffffffffffffffffffffffffffffff90811660209283015282519183015160408085015190517f584f6b600000000000000000000000000000000000000000000000000000000081529495507f00000000000000000000000000000000000000000000000000000000000000009092169363584f6b6093610a3993909291600401610af3565b600060405180830381600087803b158015610a5357600080fd5b505af1158015610a67573d6000803e3d6000fd5b50505050508060010190506108a1565b506040518281527f01a805f459381af632ecab72ec192c3f9a4c72d26be089026ffd6636d82de98890602001610381565b6001828154811061039d57600080fd5b600060208284031215610aca57600080fd5b5035919050565b60008060408385031215610ae457600080fd5b50508035926020909101359150565b600073ffffffffffffffffffffffffffffffffffffffff8086168352602060606020850152855180606086015260005b81811015610b3f57878101830151868201608001528201610b23565b5060006080828701015260807fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0601f83011686010193505050808416604084015250949350505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b6040516060810167ffffffffffffffff81118282101715610bdb57610bdb610b89565b60405290565b604051601f82017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe016810167ffffffffffffffff81118282101715610c2857610c28610b89565b604052919050565b803573ffffffffffffffffffffffffffffffffffffffff81168114610c5457600080fd5b919050565b60006020808385031215610c6c57600080fd5b823567ffffffffffffffff80821115610c8457600080fd5b818501915085601f830112610c9857600080fd5b813581811115610caa57610caa610b89565b8060051b610cb9858201610be1565b9182528381018501918581019089841115610cd357600080fd5b86860192505b83831015610dd457823585811115610cf057600080fd5b86017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe06060828d0382011215610d265760008081fd5b610d2e610bb8565b610d398a8401610c30565b815260408084013589811115610d4f5760008081fd5b8401603f81018f13610d615760008081fd5b8b8101358a811115610d7557610d75610b89565b610d858d86601f84011601610be1565b94508085528f83828401011115610d9c5760008081fd5b808383018e87013760008d82870101525050828b830152610dbf60608501610c30565b90820152845250509186019190860190610cd9565b9998505050505050505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b600181811c90821680610e2457607f821691505b602082108103610e5d577f4e487b7100000000000000000000000000000000000000000000000000000000600052602260045260246000fd5b50919050565b601f821115610eaf576000816000526020600020601f850160051c81016020861015610e8c5750805b601f850160051c820191505b81811015610eab57828155600101610e98565b5050505b505050565b815167ffffffffffffffff811115610ece57610ece610b89565b610ee281610edc8454610e10565b84610e63565b602080601f831160018114610f355760008415610eff5750858301515b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600386901b1c1916600185901b178555610eab565b6000858152602081207fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08616915b82811015610f8257888601518255948401946001909101908401610f63565b5085821015610fbe57878501517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600388901b60f8161c191681555b5050505050600190811b0190555056fea264697066735822122090d4936e163063dfe747da5bf04cc06002b17436a13e78a30b2797e6219ebb2264736f6c63430008190033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061007d5760003560e01c80639d6c76b81161005b5780639d6c76b8146100d5578063de46a235146100e8578063f9b80da1146100fb578063ff1575e11461014757600080fd5b806322473d8c14610082578063514aab87146100975780635666a5ea146100c2575b600080fd5b610095610090366004610ab8565b61015a565b005b6100aa6100a5366004610ad1565b61038d565b6040516100b993929190610af3565b60405180910390f35b6100956100d0366004610c59565b610492565b6100956100e3366004610c59565b610689565b6100956100f6366004610ab8565b61087f565b6101227f000000000000000000000000000000000000000000000000000000000000000081565b60405173ffffffffffffffffffffffffffffffffffffffff90911681526020016100b9565b6100aa610155366004610ad1565b610aa8565b60006001828154811061016f5761016f610de1565b600091825260208220015491505b818110156103545760006001848154811061019a5761019a610de1565b9060005260206000200182815481106101b5576101b5610de1565b60009182526020918290206040805160608101909152600390920201805473ffffffffffffffffffffffffffffffffffffffff168252600181018054929391929184019161020290610e10565b80601f016020809104026020016040519081016040528092919081815260200182805461022e90610e10565b801561027b5780601f106102505761010080835404028352916020019161027b565b820191906000526020600020905b81548152906001019060200180831161025e57829003601f168201915b50505091835250506002919091015473ffffffffffffffffffffffffffffffffffffffff90811660209283015282519183015160408085015190517f545f7a320000000000000000000000000000000000000000000000000000000081529495507f00000000000000000000000000000000000000000000000000000000000000009092169363545f7a329361031693909291600401610af3565b600060405180830381600087803b15801561033057600080fd5b505af1158015610344573d6000803e3d6000fd5b505050505080600101905061017d565b506040518281527f1382323d6618527d8b03daa05db815f0490966e8b80679fe5ad3d868f84e1a71906020015b60405180910390a15050565b6000828154811061039d57600080fd5b9060005260206000200181815481106103b557600080fd5b60009182526020909120600390910201805460018201805473ffffffffffffffffffffffffffffffffffffffff90921694509192506103f390610e10565b80601f016020809104026020016040519081016040528092919081815260200182805461041f90610e10565b801561046c5780601f106104415761010080835404028352916020019161046c565b820191906000526020600020905b81548152906001019060200180831161044f57829003601f168201915b5050506002909301549192505073ffffffffffffffffffffffffffffffffffffffff1683565b80516000036104cd576040517f4494013c00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b6001805480820182556000918252905b825181101561065857600182815481106104f9576104f9610de1565b90600052602060002001604051806060016040528085848151811061052057610520610de1565b60200260200101516000015173ffffffffffffffffffffffffffffffffffffffff16815260200185848151811061055957610559610de1565b602002602001015160200151815260200185848151811061057c5761057c610de1565b6020908102919091018101516040015173ffffffffffffffffffffffffffffffffffffffff908116909252835460018082018655600095865294829020845160039092020180547fffffffffffffffffffffffff0000000000000000000000000000000000000000169190931617825582015191929091908201906106019082610eb4565b5060409190910151600290910180547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff9092169190911790556001016104dd565b506040518181527f75922591bf2cec980645dc4a32bb7d5e8da9a15fda86dacf06f8402cecd1478f90602001610381565b80516000036106c4576040517f4494013c00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60008054600181018255818052905b825181101561084e57600082815481106106ef576106ef610de1565b90600052602060002001604051806060016040528085848151811061071657610716610de1565b60200260200101516000015173ffffffffffffffffffffffffffffffffffffffff16815260200185848151811061074f5761074f610de1565b602002602001015160200151815260200185848151811061077257610772610de1565b6020908102919091018101516040015173ffffffffffffffffffffffffffffffffffffffff908116909252835460018082018655600095865294829020845160039092020180547fffffffffffffffffffffffff0000000000000000000000000000000000000000169190931617825582015191929091908201906107f79082610eb4565b5060409190910151600290910180547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff9092169190911790556001016106d3565b506040518181527ff8ca6ea7cc31be8572501c37ef5e9e8298be717fb881e0b1ca785aecc4d25e9f90602001610381565b600080828154811061089357610893610de1565b600091825260208220015491505b81811015610a775760008084815481106108bd576108bd610de1565b9060005260206000200182815481106108d8576108d8610de1565b60009182526020918290206040805160608101909152600390920201805473ffffffffffffffffffffffffffffffffffffffff168252600181018054929391929184019161092590610e10565b80601f016020809104026020016040519081016040528092919081815260200182805461095190610e10565b801561099e5780601f106109735761010080835404028352916020019161099e565b820191906000526020600020905b81548152906001019060200180831161098157829003601f168201915b50505091835250506002919091015473ffffffffffffffffffffffffffffffffffffffff90811660209283015282519183015160408085015190517f584f6b600000000000000000000000000000000000000000000000000000000081529495507f00000000000000000000000000000000000000000000000000000000000000009092169363584f6b6093610a3993909291600401610af3565b600060405180830381600087803b158015610a5357600080fd5b505af1158015610a67573d6000803e3d6000fd5b50505050508060010190506108a1565b506040518281527f01a805f459381af632ecab72ec192c3f9a4c72d26be089026ffd6636d82de98890602001610381565b6001828154811061039d57600080fd5b600060208284031215610aca57600080fd5b5035919050565b60008060408385031215610ae457600080fd5b50508035926020909101359150565b600073ffffffffffffffffffffffffffffffffffffffff8086168352602060606020850152855180606086015260005b81811015610b3f57878101830151868201608001528201610b23565b5060006080828701015260807fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0601f83011686010193505050808416604084015250949350505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b6040516060810167ffffffffffffffff81118282101715610bdb57610bdb610b89565b60405290565b604051601f82017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe016810167ffffffffffffffff81118282101715610c2857610c28610b89565b604052919050565b803573ffffffffffffffffffffffffffffffffffffffff81168114610c5457600080fd5b919050565b60006020808385031215610c6c57600080fd5b823567ffffffffffffffff80821115610c8457600080fd5b818501915085601f830112610c9857600080fd5b813581811115610caa57610caa610b89565b8060051b610cb9858201610be1565b9182528381018501918581019089841115610cd357600080fd5b86860192505b83831015610dd457823585811115610cf057600080fd5b86017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe06060828d0382011215610d265760008081fd5b610d2e610bb8565b610d398a8401610c30565b815260408084013589811115610d4f5760008081fd5b8401603f81018f13610d615760008081fd5b8b8101358a811115610d7557610d75610b89565b610d858d86601f84011601610be1565b94508085528f83828401011115610d9c5760008081fd5b808383018e87013760008d82870101525050828b830152610dbf60608501610c30565b90820152845250509186019190860190610cd9565b9998505050505050505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b600181811c90821680610e2457607f821691505b602082108103610e5d577f4e487b7100000000000000000000000000000000000000000000000000000000600052602260045260246000fd5b50919050565b601f821115610eaf576000816000526020600020601f850160051c81016020861015610e8c5750805b601f850160051c820191505b81811015610eab57828155600101610e98565b5050505b505050565b815167ffffffffffffffff811115610ece57610ece610b89565b610ee281610edc8454610e10565b84610e63565b602080601f831160018114610f355760008415610eff5750858301515b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600386901b1c1916600185901b178555610eab565b6000858152602081207fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe08616915b82811015610f8257888601518255948401946001909101908401610f63565b5085821015610fbe57878501517fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600388901b60f8161c191681555b5050505050600190811b0190555056fea264697066735822122090d4936e163063dfe747da5bf04cc06002b17436a13e78a30b2797e6219ebb2264736f6c63430008190033",
+  "devdoc": {
+    "author": "Venus",
+    "kind": "dev",
+    "methods": {},
+    "title": "ACMCommandsAggregator",
+    "version": 1
+  },
+  "userdoc": {
+    "errors": {
+      "ZeroAddressNotAllowed()": [
+        {
+          "notice": "Thrown if the supplied address is a zero address where it is not allowed"
+        }
+      ]
+    },
+    "kind": "user",
+    "methods": {
+      "ACM()": {
+        "notice": "Access control manager contract"
+      }
+    },
+    "notice": "This contract is a helper to aggregate multiple grant and revoke permissions in batches and execute them in one go.",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 8955,
+        "contract": "contracts/Utils/ACMCommandsAggregator.sol:ACMCommandsAggregator",
+        "label": "grantPermissions",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_array(t_array(t_struct(Permission)8946_storage)dyn_storage)dyn_storage"
+      },
+      {
+        "astId": 8960,
+        "contract": "contracts/Utils/ACMCommandsAggregator.sol:ACMCommandsAggregator",
+        "label": "revokePermissions",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_array(t_array(t_struct(Permission)8946_storage)dyn_storage)dyn_storage"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_array(t_struct(Permission)8946_storage)dyn_storage)dyn_storage": {
+        "base": "t_array(t_struct(Permission)8946_storage)dyn_storage",
+        "encoding": "dynamic_array",
+        "label": "struct ACMCommandsAggregator.Permission[][]",
+        "numberOfBytes": "32"
+      },
+      "t_array(t_struct(Permission)8946_storage)dyn_storage": {
+        "base": "t_struct(Permission)8946_storage",
+        "encoding": "dynamic_array",
+        "label": "struct ACMCommandsAggregator.Permission[]",
+        "numberOfBytes": "32"
+      },
+      "t_string_storage": {
+        "encoding": "bytes",
+        "label": "string",
+        "numberOfBytes": "32"
+      },
+      "t_struct(Permission)8946_storage": {
+        "encoding": "inplace",
+        "label": "struct ACMCommandsAggregator.Permission",
+        "members": [
+          {
+            "astId": 8941,
+            "contract": "contracts/Utils/ACMCommandsAggregator.sol:ACMCommandsAggregator",
+            "label": "contractAddress",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_address"
+          },
+          {
+            "astId": 8943,
+            "contract": "contracts/Utils/ACMCommandsAggregator.sol:ACMCommandsAggregator",
+            "label": "functionSig",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_string_storage"
+          },
+          {
+            "astId": 8945,
+            "contract": "contracts/Utils/ACMCommandsAggregator.sol:ACMCommandsAggregator",
+            "label": "account",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_address"
+          }
+        ],
+        "numberOfBytes": "96"
+      }
+    }
+  }
+}
