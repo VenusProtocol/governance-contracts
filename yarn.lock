@@ -1056,6 +1056,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@layerzerolabs/lz-evm-protocol-v2@npm:^3.0.38":
+  version: 3.0.38
+  resolution: "@layerzerolabs/lz-evm-protocol-v2@npm:3.0.38"
+  peerDependencies:
+    "@openzeppelin/contracts": ^4.8.1 || ^5.0.0
+    "@openzeppelin/contracts-upgradeable": ^4.8.1 || ^5.0.0
+    hardhat-deploy: ^0.12.4
+    solidity-bytes-utils: ^0.8.0
+  checksum: d2560a745fb96c57f93fd083ffafa9f9640fb0c39a31c42d15eb0c095329764bb541c64cb388dfdbb115d628debdfa4fa1ac70198094809c00bc5bcca8ad5235
+  languageName: node
+  linkType: hard
+
 "@layerzerolabs/lz-evm-sdk-v1-0.7@npm:^1.5.14":
   version: 1.5.16
   resolution: "@layerzerolabs/lz-evm-sdk-v1-0.7@npm:1.5.16"
@@ -1063,6 +1075,21 @@ __metadata:
     "@openzeppelin/contracts": 3.4.2-solc-0.7
     "@openzeppelin/contracts-upgradeable": 3.4.2-solc-0.7
   checksum: c4a42f446fe4c961bdfc5cbdd848b98ba1f2352ddd539d04affba7d9760905b0604a3422a1a9a7e89808466e6fcbb05e40498948b663beb21e47127b00d9cd9f
+  languageName: node
+  linkType: hard
+
+"@layerzerolabs/oapp-evm@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@layerzerolabs/oapp-evm@npm:0.3.0"
+  dependencies:
+    ethers: ^5.7.2
+  peerDependencies:
+    "@layerzerolabs/lz-evm-messagelib-v2": ^3.0.12
+    "@layerzerolabs/lz-evm-protocol-v2": ^3.0.12
+    "@layerzerolabs/lz-evm-v1-0.7": ^3.0.12
+    "@openzeppelin/contracts": ^4.8.1 || ^5.0.0
+    "@openzeppelin/contracts-upgradeable": ^4.8.1 || ^5.0.0
+  checksum: 308751307f4082818f6607be0f99842788a2d889a2570e5365d5d46ee407f2404128458051928ddb1af9e485ebc01c4b60fe15b7fb12abc77378f8780a5073ba
   languageName: node
   linkType: hard
 
@@ -3178,6 +3205,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/json-stable-stringify@npm:^1.0.36":
+  version: 1.0.36
+  resolution: "@types/json-stable-stringify@npm:1.0.36"
+  checksum: 765b07589e11a3896c3d06bb9e3a9be681e7edd95adf27370df0647a91bd2bfcfaf0e091fd4a13729343b388973f73f7e789d6cc62ab988240518a2d27c4a4e2
+  languageName: node
+  linkType: hard
+
 "@types/lru-cache@npm:^5.1.0":
   version: 5.1.1
   resolution: "@types/lru-cache@npm:5.1.1"
@@ -3462,6 +3496,8 @@ __metadata:
     "@ethersproject/bignumber": ^5.7.0
     "@ethersproject/bytes": ^5.7.0
     "@ethersproject/providers": ^5.7.2
+    "@layerzerolabs/lz-evm-protocol-v2": ^3.0.38
+    "@layerzerolabs/oapp-evm": ^0.3.0
     "@layerzerolabs/solidity-examples": ^1.0.0
     "@matterlabs/hardhat-zksync": ^0.2.0
     "@matterlabs/hardhat-zksync-deploy": ^0.11.0
@@ -3471,7 +3507,7 @@ __metadata:
     "@nomicfoundation/hardhat-network-helpers": ^1.0.6
     "@nomicfoundation/hardhat-toolbox": ^2.0.0
     "@nomicfoundation/hardhat-verify": ^2.0.8
-    "@nomiclabs/hardhat-ethers": ^2.2.1
+    "@nomiclabs/hardhat-ethers": ^2.2.3
     "@nomiclabs/hardhat-etherscan": ^3.1.2
     "@openzeppelin/contracts": ^4.8.2
     "@openzeppelin/contracts-upgradeable": ^4.8.2
@@ -3484,6 +3520,7 @@ __metadata:
     "@types/chai": ^4.3.4
     "@types/debug": ^4.1.12
     "@types/fs-extra": ^9.0.13
+    "@types/json-stable-stringify": ^1.0.36
     "@types/mocha": ^10.0.0
     "@types/node": ^18.16.3
     "@typescript-eslint/eslint-plugin": ^5.44.0
@@ -3507,6 +3544,7 @@ __metadata:
     hardhat-docgen: ^1.3.0
     hardhat-gas-reporter: ^1.0.9
     husky: ^8.0.3
+    json-stable-stringify: ^1.1.1
     lint-staged: ^13.0.4
     lodash: ^4.17.21
     mocha: ^10.1.0
@@ -9851,6 +9889,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"json-stable-stringify@npm:^1.1.1":
+  version: 1.1.1
+  resolution: "json-stable-stringify@npm:1.1.1"
+  dependencies:
+    call-bind: ^1.0.5
+    isarray: ^2.0.5
+    jsonify: ^0.0.1
+    object-keys: ^1.1.1
+  checksum: e1ba06600fd278767eeff53f28e408e29c867e79abf564e7aadc3ce8f31f667258f8db278ef28831e45884dd687388fa1910f46e599fc19fb94c9afbbe3a4de8
+  languageName: node
+  linkType: hard
+
 "json-stringify-nice@npm:^1.1.4":
   version: 1.1.4
   resolution: "json-stringify-nice@npm:1.1.4"
@@ -9919,6 +9969,13 @@ __metadata:
     graceful-fs:
       optional: true
   checksum: 7af3b8e1ac8fe7f1eccc6263c6ca14e1966fcbc74b618d3c78a0a2075579487547b94f72b7a1114e844a1e15bb00d440e5d1720bfc4612d790a6f285d5ea8354
+  languageName: node
+  linkType: hard
+
+"jsonify@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "jsonify@npm:0.0.1"
+  checksum: 027287e1c0294fce15f18c0ff990cfc2318e7f01fb76515f784d5cd0784abfec6fc5c2355c3a2f2cb0ad7f4aa2f5b74ebbfe4e80476c35b2d13cabdb572e1134
   languageName: node
   linkType: hard
 
