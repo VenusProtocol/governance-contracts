@@ -198,6 +198,23 @@ contract RiskStewardReceiver is IRiskStewardReceiver, PausableUpgradeable, Acces
     }
 
     /**
+     * @notice Processes an update by its ID. Will validate that the update configuration is active, is not expired, unprocessed, and that the debounce period has passed.
+     * Validated updates will be processed by the associated risk steward contract which will perform update specific validations and apply validated updates.
+     * @param updateId The ID of the update to process
+     * @custom:event Emits RiskParameterUpdated with the update ID
+     * @custom:error Throws ConfigNotActive if the config is not active
+     * @custom:error Throws UpdateIsExpired if the update is expired
+     * @custom:error Throws ConfigAlreadyProcessed if the update has already been processed
+     * @custom:error Throws UpdateTooFrequent if the update is too frequent
+     */
+    function processUpdateById(uint256 updateId) external whenNotPaused {
+        RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
+        bytes memory marketUpdateTypeKey = _getMarketUpdateTypeKey(update.market, update.updateType);
+        _validateUpdateStatus(update, marketUpdateTypeKey);
+        _processUpdate(update, marketUpdateTypeKey);
+    }
+
+    /**
      * @notice Processes the latest update for a given parameter and market. Will validate that the update configuration is active, is not expired,
      * unprocessed, and that the debounce period has passed.
      * Validated updates will be processed by the associated risk steward contract which will perform update specific validations and apply validated updates.

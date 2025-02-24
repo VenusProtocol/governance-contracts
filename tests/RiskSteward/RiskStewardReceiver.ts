@@ -271,7 +271,7 @@ describe("Risk Steward", async function () {
 
     it("should revert if contract is paused", async function () {
       await riskStewardReceiver.pause();
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address)).to.be.rejectedWith("Pausable: paused");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("Pausable: paused");
     });
 
     it("should revert if contract is paused", async function () {
@@ -308,7 +308,7 @@ describe("Risk Steward", async function () {
         marketCapsRiskSteward.address,
         DAY_AND_ONE_SECOND + 1,
       );
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("RandomUpdateType", mockCoreVToken.address)).to.be.rejectedWith("UnsupportedUpdateType");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UnsupportedUpdateType");
     });
 
     it("should revert if updateType is not active", async function () {
@@ -327,10 +327,10 @@ describe("Risk Steward", async function () {
         "0x",
       );
       await riskStewardReceiver.toggleConfigActive("supplyCap");
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address)).to.be.rejectedWith("ConfigNotActive");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("ConfigNotActive");
 
       await riskStewardReceiver.toggleConfigActive("borrowCap");
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address)).to.be.rejectedWith("ConfigNotActive");
+      await expect(riskStewardReceiver.processUpdateById(2)).to.be.rejectedWith("ConfigNotActive");
     });
 
     it("should revert if the update is expired", async function () {
@@ -349,8 +349,8 @@ describe("Risk Steward", async function () {
         "0x",
       );
       await time.increase(60 * 60 * 24 + 1);
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address)).to.be.rejectedWith("UpdateIsExpired");
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address)).to.be.rejectedWith("UpdateIsExpired");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateIsExpired");
+      await expect(riskStewardReceiver.processUpdateById(2)).to.be.rejectedWith("UpdateIsExpired");
     });
 
     it("should revert if market is not supported", async function () {
@@ -361,7 +361,7 @@ describe("Risk Steward", async function () {
         mockCoreComptroller.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address)).to.be.reverted;
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.reverted;
 
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
@@ -370,7 +370,7 @@ describe("Risk Steward", async function () {
         mockCoreComptroller.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address)).to.be.reverted;
+      await expect(riskStewardReceiver.processUpdateById(2)).to.be.reverted;
     });
 
     it("should revert if the update is too frequent", async function () {
@@ -381,8 +381,6 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address);
-      
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(12),
@@ -390,7 +388,8 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address)).to.be.rejectedWith("UpdateTooFrequent");
+      await riskStewardReceiver.processUpdateById(1);
+      await expect(riskStewardReceiver.processUpdateById(2)).to.be.rejectedWith("UpdateTooFrequent");
 
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
@@ -399,8 +398,6 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address);
-      
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(12),
@@ -408,11 +405,12 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address)).to.be.rejectedWith("UpdateTooFrequent");
+      await riskStewardReceiver.processUpdateById(3);
+      await expect(riskStewardReceiver.processUpdateById(4)).to.be.rejectedWith("UpdateTooFrequent");
     });
 
-    it("should error on invalid update market", async function () {
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockComptroller.address)).to.be.revertedWith("No update found for the specified parameter and market.");
+    it("should error on invalid update ID", async function () {
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.revertedWith("Invalid update ID.");
     });
 
     it("should revert if the update has already been applied", async function () {
@@ -423,8 +421,8 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address);
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address)).to.be.rejectedWith("ConfigAlreadyProcessed");
+      await riskStewardReceiver.processUpdateById(1);
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("ConfigAlreadyProcessed");
     });
 
     it("should revert if the update is out of bounds", async function () {
@@ -436,7 +434,7 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address)).to.be.rejectedWith("UpdateNotInRange");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateNotInRange");
 
       // Too high
       await mockRiskOracle.publishRiskParameterUpdate(
@@ -446,7 +444,7 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address)).to.be.rejectedWith("UpdateNotInRange");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateNotInRange");
 
       // Too Low
       await mockRiskOracle.publishRiskParameterUpdate(
@@ -456,7 +454,7 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address)).to.be.rejectedWith("UpdateNotInRange");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateNotInRange");
 
       // Too high
       await mockRiskOracle.publishRiskParameterUpdate(
@@ -466,7 +464,7 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address)).to.be.rejectedWith("UpdateNotInRange");
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateNotInRange");
     });
   });
 
@@ -489,10 +487,10 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await expect(await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address))
+      await expect(await riskStewardReceiver.processUpdateById(1))
         .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
         .withArgs(mockCoreVToken.address, parseUnits("10", 18));
-      await expect(await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address))
+      await expect(await riskStewardReceiver.processUpdateById(2))
         .to.emit(marketCapsRiskSteward, "BorrowCapUpdated")
         .withArgs(mockCoreVToken.address, parseUnits("10", 18));
       expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("10", 18));
@@ -514,10 +512,10 @@ describe("Risk Steward", async function () {
         mockVToken.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockVToken.address))
+      await expect(riskStewardReceiver.processUpdateById(3))
         .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
         .withArgs(mockVToken.address, parseUnits("10", 18));
-      await expect(riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockVToken.address))
+      await expect(riskStewardReceiver.processUpdateById(4))
         .to.emit(marketCapsRiskSteward, "BorrowCapUpdated")
         .withArgs(mockVToken.address, parseUnits("10", 18));
       expect(await mockComptroller.supplyCaps(mockVToken.address)).to.equal(parseUnits("10", 18));
