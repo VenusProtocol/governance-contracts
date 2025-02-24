@@ -17,7 +17,5 @@ interface IRiskStewardReceiver {
 
     function toggleConfigActive(string calldata updateType) external;
 
-    function processUpdateById(uint256 updateId) external;
-
     function processUpdateByParameterAndMarket(string memory updateType, address market) external;
 }
