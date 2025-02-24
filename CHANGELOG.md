@@ -1,3 +1,14 @@
+## [2.10.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.9.0...v2.10.0) (2025-02-24)
+
+
+### Features
+
+* add multichain governance deployments on unichainsepolia ([da37dc3](https://github.com/VenusProtocol/governance-contracts/commit/da37dc38913a8a1cb452e32403823b9c032a2c75))
+* deploy multichain governance on unichain mainnet ([63f571a](https://github.com/VenusProtocol/governance-contracts/commit/63f571a723aae2f62b042be10ebf4fa00f2f5f47))
+* updating deployment files ([f458121](https://github.com/VenusProtocol/governance-contracts/commit/f45812110e370307bf440c2aa0b1930780a79a38))
+* updating deployment files ([91e924c](https://github.com/VenusProtocol/governance-contracts/commit/91e924c6c819e40f017c469da19ff515db434565))
+* updating deployment files ([35f844d](https://github.com/VenusProtocol/governance-contracts/commit/35f844d41dba264d15f7a85ac553be9c653ad205))
+
 ## [2.10.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.9.0...v2.10.0-dev.1) (2025-02-20)
 
 
