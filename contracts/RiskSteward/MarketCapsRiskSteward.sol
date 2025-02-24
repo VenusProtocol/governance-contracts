@@ -277,6 +277,6 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @dev Disabling renounceOwnership function.
      */
     function renounceOwnership() public override {
-        revert(" renounceOwnership() is not allowed");
+        revert("renounceOwnership() is not allowed");
     }
 }
