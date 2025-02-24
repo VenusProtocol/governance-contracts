@@ -3693,7 +3693,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@venusprotocol/governance-contracts@^2.9.0, @venusprotocol/governance-contracts@workspace:.":
+"@venusprotocol/governance-contracts@workspace:.":
   version: 0.0.0-use.local
   resolution: "@venusprotocol/governance-contracts@workspace:."
   dependencies:

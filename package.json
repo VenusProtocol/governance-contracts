@@ -119,5 +119,8 @@
   },
   "_moduleAliases": {
     "@nomiclabs/hardhat-ethers": "node_modules/hardhat-deploy-ethers"
+  },
+  "resolutions": {
+    "@venusprotocol/governance-contracts": "workspace:."
   }
 }
