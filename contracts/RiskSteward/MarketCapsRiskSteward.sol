@@ -47,7 +47,12 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      */
     string public constant BORROW_CAP = "borrowCap";
 
-    uint256[50] private __gap;
+    /**
+     * @dev This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+     */
+    uint256[49] private __gap;
 
     /**
      * @notice Emitted when a supply cap is updated
