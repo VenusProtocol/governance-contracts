@@ -381,6 +381,8 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
+      await riskStewardReceiver.processUpdateById(1);
+
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(12),
@@ -388,7 +390,6 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await riskStewardReceiver.processUpdateById(1);
       await expect(riskStewardReceiver.processUpdateById(2)).to.be.rejectedWith("UpdateTooFrequent");
 
       await mockRiskOracle.publishRiskParameterUpdate(
@@ -398,6 +399,8 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
+      await riskStewardReceiver.processUpdateById(3);
+
       await mockRiskOracle.publishRiskParameterUpdate(
         "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
         parseUnitsToHex(12),
@@ -405,7 +408,6 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await riskStewardReceiver.processUpdateById(3);
       await expect(riskStewardReceiver.processUpdateById(4)).to.be.rejectedWith("UpdateTooFrequent");
     });
 
@@ -444,7 +446,7 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateNotInRange");
+      await expect(riskStewardReceiver.processUpdateById(2)).to.be.rejectedWith("UpdateNotInRange");
 
       // Too Low
       await mockRiskOracle.publishRiskParameterUpdate(
@@ -454,7 +456,7 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateNotInRange");
+      await expect(riskStewardReceiver.processUpdateById(3)).to.be.rejectedWith("UpdateNotInRange");
 
       // Too high
       await mockRiskOracle.publishRiskParameterUpdate(
@@ -464,7 +466,25 @@ describe("Risk Steward", async function () {
         mockCoreVToken.address,
         "0x",
       );
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateNotInRange");
+      await expect(riskStewardReceiver.processUpdateById(4)).to.be.rejectedWith("UpdateNotInRange");
+    });
+
+    it("should revert if the update id is not the latest", async function () {
+      await mockRiskOracle.publishRiskParameterUpdate(
+        "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
+        parseUnitsToHex(10),
+        "supplyCap",
+        mockCoreVToken.address,
+        "0x",
+      );
+      await mockRiskOracle.publishRiskParameterUpdate(
+        "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
+        parseUnitsToHex(10),
+        "supplyCap",
+        mockCoreVToken.address,
+        "0x",
+      );
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("UpdateIsExpired");
     });
   });
 
