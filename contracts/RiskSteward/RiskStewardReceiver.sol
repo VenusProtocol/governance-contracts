@@ -209,6 +209,14 @@ contract RiskStewardReceiver is IRiskStewardReceiver, PausableUpgradeable, Acces
      */
     function processUpdateById(uint256 updateId) external whenNotPaused {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
+        RiskParameterUpdate memory latestForMarketAndType = RISK_ORACLE.getLatestUpdateByParameterAndMarket(
+            update.updateType,
+            update.market
+        );
+        if (latestForMarketAndType.updateId != updateId) {
+            revert UpdateIsExpired();
+        }
+
         bytes memory marketUpdateTypeKey = _getMarketUpdateTypeKey(update.market, update.updateType);
         _validateUpdateStatus(update, marketUpdateTypeKey);
         _processUpdate(update, marketUpdateTypeKey);
