@@ -103,16 +103,18 @@ describe("Governor Bravo State Tests", () => {
   });
 
   it("Invalid for proposal not found", async () => {
-    await expect(governorBravoDelegate.state(5)).to.be.revertedWith("GovernorBravo::state: invalid proposal id");
+    await expect(governorBravoDelegate.state(5)).to.be.rejectedWith("InvalidProposalId");
   });
 
   it("Pending", async () => {
     expect(await governorBravoDelegate.state(trivialProposal.id)).to.equal(ProposalState.Pending);
   });
+
   it("Active", async () => {
     await mineBlock();
     expect(await governorBravoDelegate.state(trivialProposal.id)).to.equal(ProposalState.Active);
   });
+
   it("Canceled", async () => {
     await governorBravoDelegate
       .connect(customer)
@@ -124,6 +126,7 @@ describe("Governor Bravo State Tests", () => {
 
     expect(await governorBravoDelegate.state(newProposalId)).to.equal(ProposalState.Canceled);
   });
+
   it("Canceled by Guardian", async () => {
     governorBravoDelegate.setVariable("guardian", rootAddress);
     await governorBravoDelegate
@@ -134,11 +137,13 @@ describe("Governor Bravo State Tests", () => {
 
     expect(await governorBravoDelegate.state(newProposalId)).to.equal(ProposalState.Canceled);
   });
+
   it("Defeated", async () => {
     // travel to end block
     await advanceBlocks(18);
     expect(await governorBravoDelegate.state(trivialProposal.id)).to.equal(ProposalState.Defeated);
   });
+
   it("Succeeded", async () => {
     xvsVault.getPriorVotes.returns(convertToUnit("300000", 18));
     await governorBravoDelegate
@@ -151,6 +156,7 @@ describe("Governor Bravo State Tests", () => {
     await advanceBlocks(18);
     expect(await governorBravoDelegate.state(newProposalId)).to.equal(ProposalState.Succeeded);
   });
+
   it("Expired", async () => {
     xvsVault.getPriorVotes.returns(convertToUnit("300000", 18));
     await governorBravoDelegate
@@ -164,6 +170,7 @@ describe("Governor Bravo State Tests", () => {
     await governorBravoDelegate.queue(newProposalId);
     expect(await governorBravoDelegate.state(newProposalId)).to.equal(ProposalState.Expired);
   });
+
   it("Queued", async () => {
     timelock.delay.returns(100);
     await mineBlock();
