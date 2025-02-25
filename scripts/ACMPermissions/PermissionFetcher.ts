@@ -28,7 +28,7 @@ export class PermissionFetcher {
 
     const { permissions: existingPermissions } = this.getPermissionsJson();
     this.existingPermissions = existingPermissions;
-    this.blocksParsed = this.getLastBlockNumber();
+    this.blocksParsed = parseInt(this.getPermissionsJson().height, 10);
     this.addPrevPermissionsInMap();
   }
 
@@ -97,7 +97,7 @@ export class PermissionFetcher {
         mdContent += `## Contract Address: ${permission.contractAddress}\n`;
         mdContent += `- **Function Signature**: \`${permission.functionSignature}\`\n`;
         mdContent += `- **Addresses**:\n`;
-        permission.addresses.forEach(address => {
+        permission.addresses.forEach((address: string) => {
           mdContent += `  - \`${address} (${addressMap[address] || "unknown"})\`\n`;
         });
         mdContent += "\n";
@@ -167,7 +167,7 @@ export class PermissionFetcher {
     for (const contract of data.contracts) {
       for (const address of contract.address) {
         for (const funcSig of contract.functions) {
-          const role = ethers.utils.solidityPack(["address", "string"], [address, funcSig]);
+          const role = this.getHash(address, funcSig);
           const roleHash = ethers.utils.keccak256(role);
           hashTable[roleHash] = {
             contractAddress: address,
@@ -304,19 +304,8 @@ export class PermissionFetcher {
     }
   }
 
-  private getLastBlockNumber(): number {
-    const fileContent = fs.readFileSync(this.jsonFilePath, "utf8");
-
-    const blockNumberRegex = /"height":\s*"(\d+)"/g;
-    const match = blockNumberRegex.exec(fileContent);
-    if (match) {
-      return parseInt(match[1], 10);
-    }
-    return startingBlockForACM[this.network];
-  }
-
   private getHash(contractAddress: string, functionSignature: string): string {
-    const hash = ethers.utils.solidityKeccak256(["string", "string"], [contractAddress, functionSignature]);
+    const hash = ethers.utils.solidityKeccak256(["address", "string"], [contractAddress, functionSignature]);
     return hash;
   }
 }

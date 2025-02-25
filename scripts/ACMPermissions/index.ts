@@ -15,7 +15,7 @@ const network = hre.network.name as SUPPORTED_NETWORKS;
         name: "BNBFunctionSignatureFile",
         message:
           "Please enter path of the .json file containing contract addresses and function signatures of BNB mainnet {optional}",
-        default: "./networks/bscmainnet/BNBPermissions.json",
+        default: "scripts/ACMPermissions/networks/bscmainnet/BNBPermissions.json",
       },
       {
         name: "chunkSize",
