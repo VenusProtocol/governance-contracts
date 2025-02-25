@@ -98,7 +98,7 @@ export class PermissionFetcher {
         mdContent += `- **Function Signature**: \`${permission.functionSignature}\`\n`;
         mdContent += `- **Addresses**:\n`;
         permission.addresses.forEach((address: string) => {
-          mdContent += `  - \`${address} (${addressMap[address] || "unknown"})\`\n`;
+          mdContent += `  - \`${addressMap[this.network][address] || address}\`\n`;
         });
         mdContent += "\n";
       });
