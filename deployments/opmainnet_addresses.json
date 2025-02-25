@@ -1,0 +1,16 @@
+{
+  "name": "opmainnet",
+  "chainId": "10",
+  "addresses": {
+    "ACMCommandsAggregator": "0xbbEBaF646e7a3E4064a899e68565B1b439eFdf70",
+    "AccessControlManager": "0xD71b1F33f6B0259683f11174EE4Ddc2bb9cE4eD6",
+    "CriticalTimelock": "0xB82479bc345CAA7326D7d21306972033226fC185",
+    "DefaultProxyAdmin": "0xeaF9490cBEA6fF9bA1D23671C39a799CeD0DCED2",
+    "FastTrackTimelock": "0x508bD9C31E8d6760De04c70fe6c2b24B3cDea7E7",
+    "NormalTimelock": "0x0C6f1E6B4fDa846f63A0d5a8a73EB811E0e0C04b",
+    "OmnichainExecutorOwner": "0xe6d9Eb3A07a1dc4496fc71417D7A7b9d5666BaA3",
+    "OmnichainExecutorOwner_Implementation": "0x8fe659199E01630D3154fcbb396f0c4d842C3438",
+    "OmnichainExecutorOwner_Proxy": "0xe6d9Eb3A07a1dc4496fc71417D7A7b9d5666BaA3",
+    "OmnichainGovernanceExecutor": "0x09b11b1CAdC08E239970A8993783f0f8EeC60ABf"
+  }
+}

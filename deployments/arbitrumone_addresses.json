@@ -2,6 +2,7 @@
   "name": "arbitrumone",
   "chainId": "42161",
   "addresses": {
+    "ACMCommandsAggregator": "0x74AFeA28456a683b8fF907699Ff77138edef00f3",
     "AccessControlManager": "0xD9dD18EB0cf10CbA837677f28A8F9Bda4bc2b157",
     "CriticalTimelock": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
     "DefaultProxyAdmin": "0xF6fF3e9459227f0cDE8B102b90bE25960317b216",

@@ -6,7 +6,7 @@ contract TestTimelockV8 is TimelockV8 {
     constructor(address admin_, uint256 delay_) public TimelockV8(admin_, delay_) {}
 
     function GRACE_PERIOD() public view override returns (uint256) {
-        return 1;
+        return 1 hours;
     }
 
     function MINIMUM_DELAY() public view override returns (uint256) {

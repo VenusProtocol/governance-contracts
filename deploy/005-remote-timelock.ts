@@ -9,6 +9,14 @@ export enum REMOTE_NETWORKS {
   SEPOLIA = "sepolia",
   OPBNBTESTNET = "opbnbtestnet",
   ARBITRUM_SEPOLIA = "arbitrumsepolia",
+  ZKSYNCSEPOLIA = "zksyncsepolia",
+  ZKSYNCMAINNET = "zksyncmainnet",
+  OPSEPOLIA = "opsepolia",
+  OPMAINNET = "opmainnet",
+  BASESEPOLIA = "basesepolia",
+  BASEMAINNET = "basemainnet",
+  UNICHAINSEPOLIA = "unichainsepolia",
+  UNICHAINMAINNET = "unichainmainnet",
   HARDHAT = "hardhat",
 }
 type DelayTypes = {
@@ -56,7 +64,48 @@ export const delayConfig: DelayConfig = {
     fast: 21600,
     critical: 3600,
   },
+  zksyncsepolia: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  zksyncmainnet: {
+    normal: 172800,
+    fast: 21600,
+    critical: 3600,
+  },
+  opsepolia: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  opmainnet: {
+    normal: 172800,
+    fast: 21600,
+    critical: 3600,
+  },
+  basesepolia: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  basemainnet: {
+    normal: 172800,
+    fast: 21600,
+    critical: 3600,
+  },
+  unichainsepolia: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
+  },
+  unichainmainnet: {
+    normal: 172800,
+    fast: 21600,
+    critical: 3600,
+  },
 };
+
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
@@ -67,28 +116,31 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const omnichainGovernanceExecutorAddress = (await ethers.getContract("OmnichainGovernanceExecutor")).address;
 
-  await deploy("NormalTimelock", {
+  await deploy(live ? "NormalTimelock" : "NormalTimelockRemote", {
     contract: live ? "TimelockV8" : "TestTimelockV8",
     from: deployer,
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].normal],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 
-  await deploy("FastTrackTimelock", {
+  await deploy(live ? "FastTrackTimelock" : "FastTrackTimelockRemote", {
     contract: live ? "TimelockV8" : "TestTimelockV8",
     from: deployer,
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].fast],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 
-  await deploy("CriticalTimelock", {
+  await deploy(live ? "CriticalTimelock" : "CriticalTimelockRemote", {
     contract: live ? "TimelockV8" : "TestTimelockV8",
     from: deployer,
     args: [omnichainGovernanceExecutorAddress, delayConfig[networkName].critical],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 };
 

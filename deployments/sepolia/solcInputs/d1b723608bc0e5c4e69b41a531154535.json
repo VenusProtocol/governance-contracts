@@ -1,0 +1,40 @@
+{
+  "language": "Solidity",
+  "sources": {
+    "@openzeppelin/contracts/access/IAccessControl.sol": {
+      "content": "// SPDX-License-Identifier: MIT\n// OpenZeppelin Contracts v4.4.1 (access/IAccessControl.sol)\n\npragma solidity ^0.8.0;\n\n/**\n * @dev External interface of AccessControl declared to support ERC165 detection.\n */\ninterface IAccessControl {\n    /**\n     * @dev Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole`\n     *\n     * `DEFAULT_ADMIN_ROLE` is the starting admin for all roles, despite\n     * {RoleAdminChanged} not being emitted signaling this.\n     *\n     * _Available since v3.1._\n     */\n    event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole);\n\n    /**\n     * @dev Emitted when `account` is granted `role`.\n     *\n     * `sender` is the account that originated the contract call, an admin role\n     * bearer except when using {AccessControl-_setupRole}.\n     */\n    event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender);\n\n    /**\n     * @dev Emitted when `account` is revoked `role`.\n     *\n     * `sender` is the account that originated the contract call:\n     *   - if using `revokeRole`, it is the admin role bearer\n     *   - if using `renounceRole`, it is the role bearer (i.e. `account`)\n     */\n    event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);\n\n    /**\n     * @dev Returns `true` if `account` has been granted `role`.\n     */\n    function hasRole(bytes32 role, address account) external view returns (bool);\n\n    /**\n     * @dev Returns the admin role that controls `role`. See {grantRole} and\n     * {revokeRole}.\n     *\n     * To change a role's admin, use {AccessControl-_setRoleAdmin}.\n     */\n    function getRoleAdmin(bytes32 role) external view returns (bytes32);\n\n    /**\n     * @dev Grants `role` to `account`.\n     *\n     * If `account` had not been already granted `role`, emits a {RoleGranted}\n     * event.\n     *\n     * Requirements:\n     *\n     * - the caller must have ``role``'s admin role.\n     */\n    function grantRole(bytes32 role, address account) external;\n\n    /**\n     * @dev Revokes `role` from `account`.\n     *\n     * If `account` had been granted `role`, emits a {RoleRevoked} event.\n     *\n     * Requirements:\n     *\n     * - the caller must have ``role``'s admin role.\n     */\n    function revokeRole(bytes32 role, address account) external;\n\n    /**\n     * @dev Revokes `role` from the calling account.\n     *\n     * Roles are often managed via {grantRole} and {revokeRole}: this function's\n     * purpose is to provide a mechanism for accounts to lose their privileges\n     * if they are compromised (such as when a trusted device is misplaced).\n     *\n     * If the calling account had been granted `role`, emits a {RoleRevoked}\n     * event.\n     *\n     * Requirements:\n     *\n     * - the caller must be `account`.\n     */\n    function renounceRole(bytes32 role, address account) external;\n}\n"
+    },
+    "contracts/Governance/ACMCommandsAggregator.sol": {
+      "content": "// SPDX-License-Identifier: BSD-3-Clause\npragma solidity 0.8.25;\n\nimport {IAccessControlManagerV8} from \"../Governance/IAccessControlManagerV8.sol\";\n\ncontract ACMCommandsAggregator {\n    /*\n     * @notice Enum to differentiate between giving and revoking permissions\n     */\n    enum PermissionType {\n        GIVE,\n        REVOKE\n    }\n\n    /*\n     * @notice Struct to store permission details\n     */\n    struct Permission {\n        /*\n         * @notice Type of permission\n         */   \n        PermissionType permissionType;\n\n        /*\n         * @notice Address of the contract\n         */\n        address contractAddress;\n\n        /*\n         * @notice Function signature\n         */\n        string functionSig;\n\n        /*\n         * @notice Address of the account\n         */\n        address account;\n    }\n\n    /**\n     * @notice Access control manager contract\n     */\n    IAccessControlManagerV8 immutable public ACM;\n\n    /*\n     * @notice Mapping to store permissions\n     */\n    mapping (uint256 => Permission[]) public permissions;\n\n    /*\n     * @notice Index for the next permissions\n     */\n    uint256 nextIndex;\n\n    /*\n     * @notice Event emitted when permissions are added\n     */\n    event PermissionsAdded(uint256 index);\n\n    /*\n     * @notice Event emitted when permissions are executed\n     */\n    event PermissionsExecuted(uint256 index);\n\n    /*\n     * @notice Constructor to set the access control manager\n     * @param _acm Address of the access control manager\n     */\n    constructor(IAccessControlManagerV8 _acm) {\n        ACM = _acm;\n    }\n\n    /*\n     * @notice Function to add permissions\n     * @param _permissions Array of permissions\n     */\n    function addPermissions(Permission[] memory _permissions) external {\n        for (uint256 i = 0; i < _permissions.length; i++) {\n            permissions[nextIndex].push(Permission(_permissions[i].permissionType, _permissions[i].contractAddress, _permissions[i].functionSig, _permissions[i].account));\n        }\n\n        emit PermissionsAdded(nextIndex);\n        nextIndex++;\n    }\n\n    /*\n     * @notice Function to execute permissions\n     * @param index Index of the permissions array\n     */\n    function executePermissions(uint256 index) external {\n        for (uint256 i = 0; i < permissions[index].length; i++) {\n            if (permissions[index][i].permissionType == PermissionType.GIVE) {\n                ACM.giveCallPermission(permissions[index][i].contractAddress, permissions[index][i].functionSig, permissions[index][i].account);\n            } else {\n                ACM.revokeCallPermission(permissions[index][i].contractAddress, permissions[index][i].functionSig, permissions[index][i].account);\n            }\n        }\n\n        emit PermissionsExecuted(index);\n    }\n}"
+    },
+    "contracts/Governance/IAccessControlManagerV8.sol": {
+      "content": "// SPDX-License-Identifier: BSD-3-Clause\npragma solidity ^0.8.25;\n\nimport \"@openzeppelin/contracts/access/IAccessControl.sol\";\n\n/**\n * @title IAccessControlManagerV8\n * @author Venus\n * @notice Interface implemented by the `AccessControlManagerV8` contract.\n */\ninterface IAccessControlManagerV8 is IAccessControl {\n    function giveCallPermission(address contractAddress, string calldata functionSig, address accountToPermit) external;\n\n    function revokeCallPermission(\n        address contractAddress,\n        string calldata functionSig,\n        address accountToRevoke\n    ) external;\n\n    function isAllowedToCall(address account, string calldata functionSig) external view returns (bool);\n\n    function hasPermission(\n        address account,\n        address contractAddress,\n        string calldata functionSig\n    ) external view returns (bool);\n}\n"
+    }
+  },
+  "settings": {
+    "optimizer": {
+      "enabled": true,
+      "runs": 10000
+    },
+    "evmVersion": "paris",
+    "outputSelection": {
+      "*": {
+        "*": [
+          "storageLayout",
+          "abi",
+          "evm.bytecode",
+          "evm.deployedBytecode",
+          "evm.methodIdentifiers",
+          "metadata",
+          "devdoc",
+          "userdoc",
+          "evm.gasEstimates"
+        ],
+        "": ["ast"]
+      }
+    },
+    "metadata": {
+      "useLiteralContent": true
+    }
+  }
+}

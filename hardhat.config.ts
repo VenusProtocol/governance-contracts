@@ -13,7 +13,6 @@ import "solidity-docgen";
 
 require("dotenv").config();
 
-const BSCSCAN_API_KEY = process.env.BSCSCAN_API_KEY;
 const DEPLOYER_PRIVATE_KEY = process.env.DEPLOYER_PRIVATE_KEY;
 
 extendConfig((config: HardhatConfig) => {
@@ -128,6 +127,42 @@ const config: HardhatUserConfig = {
       live: true,
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
+    opsepolia: {
+      url: process.env.ARCHIVE_NODE_opsepolia || "https://sepolia.optimism.io",
+      chainId: 11155420,
+      live: true,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
+    opmainnet: {
+      url: process.env.ARCHIVE_NODE_opmainnet || "https://mainnet.optimism.io",
+      chainId: 10,
+      live: true,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
+    basesepolia: {
+      url: process.env.ARCHIVE_NODE_basesepolia || "https://sepolia.base.org",
+      chainId: 84532,
+      live: true,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
+    basemainnet: {
+      url: process.env.ARCHIVE_NODE_basemainnet || "https://mainnet.base.org",
+      chainId: 8453,
+      live: true,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
+    unichainsepolia: {
+      url: process.env.ARCHIVE_NODE_unichainsepolia || "https://sepolia.unichain.org",
+      chainId: 1301,
+      live: true,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
+    unichainmainnet: {
+      url: process.env.ARCHIVE_NODE_unichainmainnet || "https://mainnet.unichain.org",
+      chainId: 130,
+      live: true,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
   },
   etherscan: {
     apiKey: {
@@ -139,6 +174,12 @@ const config: HardhatUserConfig = {
       opbnbmainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
       arbitrumsepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
       arbitrumone: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      opsepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      opmainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      basesepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      basemainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      unichainsepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      unichainmainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
     },
     customChains: [
       {
@@ -205,6 +246,54 @@ const config: HardhatUserConfig = {
           browserURL: "https://arbiscan.io/",
         },
       },
+      {
+        network: "opsepolia",
+        chainId: 11155420,
+        urls: {
+          apiURL: "https://api-sepolia-optimistic.etherscan.io/api/",
+          browserURL: "https://sepolia-optimistic.etherscan.io/",
+        },
+      },
+      {
+        network: "opmainnet",
+        chainId: 10,
+        urls: {
+          apiURL: "https://api-optimistic.etherscan.io/api",
+          browserURL: "https://optimistic.etherscan.io/",
+        },
+      },
+      {
+        network: "basesepolia",
+        chainId: 84532,
+        urls: {
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org/",
+        },
+      },
+      {
+        network: "basemainnet",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org/",
+        },
+      },
+      {
+        network: "unichainsepolia",
+        chainId: 1301,
+        urls: {
+          apiURL: "https://api-sepolia.uniscan.xyz/api/",
+          browserURL: "https://sepolia.uniscan.xyz/",
+        },
+      },
+      {
+        network: "unichainmainnet",
+        chainId: 130,
+        urls: {
+          apiURL: "https://api.uniscan.xyz/api/",
+          browserURL: "https://uniscan.xyz/",
+        },
+      },
     ],
   },
   paths: {
@@ -233,6 +322,8 @@ const config: HardhatUserConfig = {
       "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVaultProxy.sol",
       "@venusprotocol/venus-protocol/contracts/XVSVault/XVSVaultStorage.sol",
       "@venusprotocol/venus-protocol/contracts/Tokens/XVS/XVS.sol",
+      "hardhat-deploy/solc_0.8/proxy/OptimizedTransparentUpgradeableProxy.sol",
+      "hardhat-deploy/solc_0.8/openzeppelin/proxy/transparent/ProxyAdmin.sol",
     ],
   },
   external: {

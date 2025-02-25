@@ -9,7 +9,7 @@ export type AccessControlEntry = {
 export const OmnichainProposalSenderNormalMethods: string[] = [
   "setTrustedRemoteAddress(uint16,bytes)",
   "setMaxDailyLimit(uint16,uint256)",
-  "execute(uint16,bytes,bytes)",
+  "execute(uint16,bytes,bytes,address)",
   "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
   "pause()",
   "unpause()",
@@ -18,7 +18,7 @@ export const OmnichainProposalSenderNormalMethods: string[] = [
 ];
 export const OmnichainProposalSenderFasttrackMethods: string[] = [
   "setMaxDailyLimit(uint16,uint256)",
-  "execute(uint16,bytes,bytes)",
+  "execute(uint16,bytes,bytes,address)",
   "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
   "pause()",
   "unpause()",
@@ -27,7 +27,7 @@ export const OmnichainProposalSenderFasttrackMethods: string[] = [
 ];
 export const OmnichainProposalSenderCriticalMethods: string[] = [
   "setMaxDailyLimit(uint16,uint256)",
-  "execute(uint16,bytes,bytes)",
+  "execute(uint16,bytes,bytes,address)",
   "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
   "pause()",
   "unpause()",
@@ -100,6 +100,9 @@ export const config: Config = {
       { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["ethereum"], 100] },
       { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["opbnbmainnet"], 100] },
       { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["arbitrumone"], 100] },
+      { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["zksyncmainnet"], 100] },
+      { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["opmainnet"], 100] },
+      { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["basemainnet"], 100] },
     ],
   },
   bsctestnet: {
@@ -107,6 +110,9 @@ export const config: Config = {
       { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["sepolia"], 100] },
       { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["opbnbtestnet"], 100] },
       { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["arbitrumsepolia"], 100] },
+      { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["zksyncsepolia"], 100] },
+      { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["opsepolia"], 100] },
+      { method: "setMaxDailyLimit(uint16,uint256)", args: [LZ_CHAINID["basesepolia"], 100] },
     ],
   },
 
@@ -143,6 +149,54 @@ export const config: Config = {
   arbitrumsepolia: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bsctestnet"], 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+    ],
+  },
+  zksyncsepolia: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bsctestnet"], 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+    ],
+  },
+  zksyncmainnet: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bscmainnet"], 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+    ],
+  },
+  opmainnet: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bscmainnet"], 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+    ],
+  },
+  opsepolia: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bsctestnet"], 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+    ],
+  },
+  basesepolia: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bsctestnet"], 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+    ],
+  },
+  basemainnet: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bscmainnet"], 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+    ],
+  },
+  unichainsepolia: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bsctestnet"], 0, 200000] },
+      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
+    ],
+  },
+  unichainmainnet: {
+    methods: [
+      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bscmainnet"], 0, 200000] },
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
     ],
   },
