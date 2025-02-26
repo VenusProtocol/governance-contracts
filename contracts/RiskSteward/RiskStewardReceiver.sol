@@ -72,19 +72,15 @@ contract RiskStewardReceiver is IRiskStewardSourceReceiver, RiskStewardReceiverB
     }
 
     /**
-     * @notice Event emitted when an update is successfully processed
-     */
-    event RiskParameterUpdateProcessed(uint256 indexed updateId);
-
-    /**
      * @notice Event emitted when an update is proposed with proposal id and update id
      */
     event RiskParameterUpdateProposed(uint256 indexed updateId);
 
+
     /**
      * @notice Emitted when applying an update fails to validate or execute
      */
-    event UpdateFailed(uint256 indexed updateId, UPDATE_STATUS indexed error);
+    event RiskParameterUpdateFailed(uint256 indexed updateId, UPDATE_STATUS indexed error);
 
     event DestinationChainRiskStewardRemoteReceiverUpdated(
         uint16 indexed destChainId,
@@ -199,7 +195,7 @@ contract RiskStewardReceiver is IRiskStewardSourceReceiver, RiskStewardReceiverB
             _executeOrProposeRemoteProposal(update, destChainId);
         } else {
             processedUpdates[update.updateId] = error;
-            emit UpdateFailed(update.updateId, error);
+            emit RiskParameterUpdateFailed(update.updateId, error);
         }
     }
 
@@ -224,7 +220,7 @@ contract RiskStewardReceiver is IRiskStewardSourceReceiver, RiskStewardReceiverB
             _executeOrProposeRemoteProposal(update, destChainId);
         } else {
             processedUpdates[update.updateId] = error;
-            emit UpdateFailed(update.updateId, error);
+            emit RiskParameterUpdateFailed(update.updateId, error);
         }
     }
 
@@ -257,7 +253,7 @@ contract RiskStewardReceiver is IRiskStewardSourceReceiver, RiskStewardReceiverB
      * @custom:event Emits RiskParameterUpdateProcessed with the update ID
      */
     function _processUpdate(RiskParameterUpdate memory update) internal {
-        IRiskSteward(riskParameterConfigs[update.updateType].riskSteward).processUpdate(update);
+        IRiskSteward(riskParameterConfigs[update.updateType].riskSteward).processUpdate(update.updateId, update.newValue, update.updateType, update.market, update.additionalData);
         processedUpdates[update.updateId] = UPDATE_STATUS.PROCESSED;
         emit RiskParameterUpdateProcessed(update.updateId);
     }
@@ -349,11 +345,11 @@ contract RiskStewardReceiver is IRiskStewardSourceReceiver, RiskStewardReceiverB
         IRiskSteward riskSteward = riskParameterConfigs[update.updateType].riskSteward;
         (address _underlying, uint16 destChainId_) = riskSteward.decodeAdditionalData(update.additionalData);
         if (LAYER_ZERO_CHAIN_ID == destChainId_) {
-            try riskSteward.processUpdate(update) {
+            try riskSteward.processUpdate(update.updateId, update.newValue, update.updateType, update.market, update.additionalData) {
                 processedUpdates[update.updateId] = UPDATE_STATUS.PROCESSED;
                 emit RiskParameterUpdateProcessed(update.updateId);
             } catch {
-                emit UpdateFailed(update.updateId, UPDATE_STATUS.FAILED);
+                emit RiskParameterUpdateFailed(update.updateId, UPDATE_STATUS.FAILED);
                 processedUpdates[update.updateId] = UPDATE_STATUS.FAILED;
             }
         } else {
@@ -374,10 +370,10 @@ contract RiskStewardReceiver is IRiskStewardSourceReceiver, RiskStewardReceiverB
     function _executeOrProposeRemoteProposal(RiskParameterUpdate memory update, uint16 destChainId) internal {
         IRiskSteward riskSteward = IRiskSteward(riskParameterConfigs[update.updateType].riskSteward);
         if (LAYER_ZERO_CHAIN_ID == destChainId) {
-            try riskSteward.processUpdate(update) {
+            try riskSteward.processUpdate(update.updateId, update.newValue, update.updateType, update.market, update.additionalData) {
                 processedUpdates[update.updateId] = UPDATE_STATUS.PROCESSED;
             } catch {
-                emit UpdateFailed(update.updateId, UPDATE_STATUS.FAILED);
+                emit RiskParameterUpdateFailed(update.updateId, UPDATE_STATUS.FAILED);
                 processedUpdates[update.updateId] = UPDATE_STATUS.FAILED;
             }
         } else {
@@ -443,13 +439,15 @@ contract RiskStewardReceiver is IRiskStewardSourceReceiver, RiskStewardReceiverB
         address remoteReceiver = destinationChainRiskStewardRemoteReceiver[destChainId];
 
         bytes memory payload = abi.encode(
+            update.updateId,
             riskSteward.packNewValue(update.newValue),
             update.updateType,
             update.market,
-            update.additionalData
+            update.additionalData,
+            update.timestamp
         );
 
-        return (remoteReceiver, 0, "processUpdate(bytes,string,address,bytes)", payload);
+        return (remoteReceiver, 0, "processUpdate(uint256,bytes,string,address,bytes,uint256)", payload);
     }
 
     /**
@@ -676,7 +674,7 @@ contract RiskStewardReceiver is IRiskStewardSourceReceiver, RiskStewardReceiverB
                 }
                 updates[i] = update;
             } else {
-                emit UpdateFailed(update.updateId, error);
+                emit RiskParameterUpdateFailed(update.updateId, error);
             }
         }
         return (baseOneIndex - 1, validRemoteUpdateCount, updates);

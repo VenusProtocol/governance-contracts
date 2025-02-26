@@ -7,7 +7,7 @@ interface IRiskSteward {
 
     function decodeAdditionalData(bytes calldata additionalData) external pure returns (address underlying, uint16 destChainId);
 
-    function processUpdate(RiskParameterUpdate calldata update) external;
+    function processUpdate(uint256 updateId, bytes memory newValue, string memory updateType, address market, bytes memory additionalData) external;
 
     function packNewValue(bytes memory data) external pure returns (bytes memory);
 }
