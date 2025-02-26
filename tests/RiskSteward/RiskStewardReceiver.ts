@@ -106,10 +106,11 @@ describe("Risk Steward", async function () {
       value.forEach(update => {
         addresses.push("0x1234567890123456789012345678901234567890");
         values.push(0);
-        signatures.push("processUpdate(string,bytes,string,address,bytes)");
-        calldatas.push(defaultAbiCoder.encode(["string", "bytes", "string", "address", "bytes"], update));
+        signatures.push("processUpdate(bytes,string,address,bytes)");
+        calldatas.push(defaultAbiCoder.encode(["bytes", "string", "address", "bytes"], [update[1], update[2], update[3], update[4]]));
       })
       calldatas.reverse();
+
       const payload = defaultAbiCoder.encode(
         ["address[]", "uint256[]", "string[]", "bytes[]", "uint8"],
         [addresses, values, signatures, calldatas, proposalType]
