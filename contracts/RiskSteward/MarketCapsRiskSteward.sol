@@ -192,7 +192,10 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Processes a market cap update from the RiskStewardReceiver.
      * Validates that the update is within range and then directly update the market supply or borrow cap on the market's comptroller.
-     * @param update RiskParameterUpdate update to process.
+     * @param updateId The ID of the update
+     * @param newValue The new supply cap value
+     * @param updateType The type of update
+     * @param market The market to update the supply cap for
      * @custom:error OnlyRiskStewardReceiver Thrown if the sender is not the RiskStewardReceiver
      * @custom:error UnsupportedUpdateType Thrown if the update type is not supported
      * @custom:error UpdateNotInRange Thrown if the update is not within the allowed range
@@ -200,17 +203,17 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:access Only callable by the RiskStewardReceiver
      */
     function processUpdate(
-        RiskParameterUpdate calldata update
+        uint256 updateId, bytes memory newValue, string memory updateType, address market, bytes memory additionalData
     )
         external
         onlyRiskStewardReceiver
     {
-        if (Strings.equal(update.updateType, SUPPLY_CAP)) {
-            _processSupplyCapUpdate(update);
-        } else if (Strings.equal(update.updateType, BORROW_CAP)) {
-            _processBorrowCapUpdate(update);
+        if (Strings.equal(updateType, SUPPLY_CAP)) {
+            _processSupplyCapUpdate(updateId, newValue, updateType, market);
+        } else if (Strings.equal(updateType, BORROW_CAP)) {
+            _processBorrowCapUpdate(updateId, newValue, updateType, market);
         } else {
-            revert UnsupportedUpdateType(update.updateId);
+            revert UnsupportedUpdateType(updateId);
         }
     }
 
@@ -272,38 +275,51 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
 
     /**
      * @notice Validates the new supply cap and if valid, updates the supply cap for the given market.
-     * @param update RiskParameterUpdate update to process
+     * @param updateId The ID of the update
+     * @param newValue The new supply cap value
+     * @param updateType The type of update
+     * @param market The market to update the supply cap for
      * @custom:event Emits SupplyCapUpdated with the market and new supply cap
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
     function _processSupplyCapUpdate(
-        RiskParameterUpdate calldata update
+        uint256 updateId,
+        bytes memory newValue,
+        string memory updateType,
+        address market
     ) internal {
-        uint256 newCap = _decodeBytesToUint256(update.newValue);
-        IUnifiedComptroller comptroller = IUnifiedComptroller(IVToken(update.market).comptroller());
-        _validateSupplyCapUpdate(comptroller, update.market, update.updateId, newCap);
-        _updateSupplyCaps(comptroller, update.market, newCap);
-        lastProcessedTime[_getMarketUpdateTypeKey(update.market, update.updateType)] = block.timestamp;
+        uint256 newCap = _decodeBytesToUint256(newValue);
+        IUnifiedComptroller comptroller = IUnifiedComptroller(IVToken(market).comptroller());
+        _validateSupplyCapUpdate(comptroller, market, updateId, newCap);
+        _updateSupplyCaps(comptroller, market, newCap);
+        lastProcessedTime[_getMarketUpdateTypeKey(market, updateType)] = block.timestamp;
     }
 
     /**
      * @notice Validates the new borrow cap and if valid, updates the borrow cap for the given market.
-     * @param update RiskParameterUpdate update to process
+     * @param updateId The ID of the update
+     * @param newValue The new borrow cap value
+     * @param updateType The type of update
+     * @param market The market to update the borrow cap for
      * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
     function _processBorrowCapUpdate(
-        RiskParameterUpdate calldata update
+        uint256 updateId,
+        bytes memory newValue,
+        string memory updateType,
+        address market
     ) internal {
-        uint256 newCap = _decodeBytesToUint256(update.newValue);
-        IUnifiedComptroller comptroller = IUnifiedComptroller(IVToken(update.market).comptroller());
-        _validateBorrowCapUpdate(comptroller, update.market, update.updateId, newCap);
-        _updateBorrowCaps(comptroller, update.market, newCap);
-        lastProcessedTime[_getMarketUpdateTypeKey(update.market, update.updateType)] = block.timestamp;
+        uint256 newCap = _decodeBytesToUint256(newValue);
+        IUnifiedComptroller comptroller = IUnifiedComptroller(IVToken(market).comptroller());
+        _validateBorrowCapUpdate(comptroller, market, updateId, newCap);
+        _updateBorrowCaps(comptroller, market, newCap);
+        lastProcessedTime[_getMarketUpdateTypeKey(market, updateType)] = block.timestamp;
     }
 
     /**
      * @notice Checks that the new supply cap is within the allowed range of the current supply cap.
+     * @param comptroller The comptroller of the market
      * @param market The market whose supply cap is being updated
      * @param updateId The ID of the update
      * @param newCap The new market cap value to validate
@@ -316,6 +332,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
 
     /**
      * @notice Checks that the new borrow cap is within the allowed range of the current borrow cap.
+     * @param comptroller The comptroller of the market
      * @param market The market whose borrow cap is being updated
      * @param updateId The ID of the update
      * @param newCap The new market cap value to validate
@@ -329,6 +346,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Verifies that the update is not too frequent and within the allowed range
      * @param market The market whose update is being verified
+     * @param updateId The ID of the update
      * @param updateType The type of update being verified
      * @param previousValue The previous value of the update
      * @param newValue The new value of the update

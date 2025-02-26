@@ -46,6 +46,11 @@ abstract contract RiskStewardReceiverBase is IRiskStewardReceiver, PausableUpgra
         bool active
     );
 
+        /**
+     * @notice Event emitted when an update is successfully processed
+     */
+    event RiskParameterUpdateProcessed(uint256 indexed updateId);
+
     /**
      * @notice Thrown when an update type that is not supported is operated on
      */
