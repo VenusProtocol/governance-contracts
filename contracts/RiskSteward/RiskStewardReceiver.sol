@@ -541,7 +541,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, PausableUpgradeable, Acces
      * @param update The update to create a remote proposal for
      * @return target The target of the update
      * @return value Hardcoded as zero since no value is required to process an update
-     * @return signature Hardcoded as "processUpdate(string,bytes,bytes,string,address,bytes)" since this is the signature for the processUpdate function
+     * @return signature Hardcoded as "processUpdate(bytes,bytes,string,address,bytes)" since this is the signature for the processUpdate function
      * @return data The data in bytes of the update
      */
     function _createUpdateProposal(
@@ -553,14 +553,13 @@ contract RiskStewardReceiver is IRiskStewardReceiver, PausableUpgradeable, Acces
         address remoteReceiver = destinationChainRiskStewardRemoteReceiver[destChainId];
 
         bytes memory payload = abi.encode(
-            update.referenceId,
             riskSteward.packNewValue(update.newValue),
             update.updateType,
             update.market,
             update.additionalData
         );
 
-        return (remoteReceiver, 0, "processUpdate(string,bytes,string,address,bytes)", payload);
+        return (remoteReceiver, 0, "processUpdate(bytes,string,address,bytes)", payload);
     }
 
     /**
