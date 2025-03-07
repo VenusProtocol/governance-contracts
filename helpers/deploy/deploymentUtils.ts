@@ -142,12 +142,26 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
   }[networkName];
 };
 
-export const getRiskOracle = async (networkName: "bsctestnet" | "bscmainnet" | "hardhat") => {
+export const getRiskOracle = async (networkName: SUPPORTED_NETWORKS) => {
   const mockRiskOracle = await ethers.getContractOrNull("MockRiskOracle");
   return {
     bscmainnet: "",
     bsctestnet: "0x7bd97dd6c199532d11cf5f55e13a120db6dd0f4f",
     hardhat: mockRiskOracle?.address || "",
+    sepolia: "0x36663F41c50e2B34D9e1457A81d0B9183Fc737be",
+    ethereum: "",
+    opbnbtestnet: "0xA343Cb2c00A25fe22c3E45c9C1c19Ed9f4D15d8a",
+    opbnbmainnet: "",
+    arbitrumsepolia: "0x0463a7E5221EAE1990cEddB51A5821a68cdA6008",
+    arbitrumone: "",
+    opsepolia: "0xa0e724847C9d8149023e6a956091eF5f4DFaDc5b",
+    opmainnet: "",
+    basesepolia: "0x3d0e20D4caD958bc848B045e1da19Fe378f86f03",
+    basemainnet: "",
+    unichainsepolia: "0x9cB50e0F2709A829e4B6DA7C0A317a48a029E827",
+    unichainmainnet: "",
+    zksyncsepolia: "0x1f7474B549840158464Eca63735429815867b40e",
+    zksyncmainnet: "",
   }[networkName];
 };
 
