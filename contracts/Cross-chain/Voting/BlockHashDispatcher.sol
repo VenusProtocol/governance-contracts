@@ -27,6 +27,11 @@ contract BlockHashDispatcher is Pausable, OApp {
     uint32 public BSC_CHAIN_ID;
 
     /**
+     * @notice LZ chain id of this chain
+     */
+    uint32 public chainId;
+
+    /**
      * @notice Emitted when a block hash is dispatched to the proposal chain
      * @param pId Proposal Id
      * @param blockNum Block number
@@ -43,12 +48,18 @@ contract BlockHashDispatcher is Pausable, OApp {
      * @param bnbChainEId_ Chain ID for the BNB Chain
      * @param owner_ Address of the contract owner
      */
-    constructor(address endpoint_, uint16 bnbChainEId_, address owner_) OApp(endpoint_, owner_) Ownable() {
+    constructor(
+        address endpoint_,
+        uint32 bnbChainEId_,
+        address owner_,
+        uint32 chainId_
+    ) OApp(endpoint_, owner_) Ownable() {
         ensureNonzeroAddress(address(endpoint_));
-        if (bnbChainEId_ == 0) {
-            revert InvalidChainEid(bnbChainEId_);
+        if (bnbChainEId_ == 0 || chainId_ == 0) {
+            revert InvalidChainEid(0);
         }
         BSC_CHAIN_ID = bnbChainEId_;
+        chainId = chainId_;
     }
 
     /**
@@ -75,7 +86,7 @@ contract BlockHashDispatcher is Pausable, OApp {
      */
     function getPayload(uint256 pId, uint256 blockNumber) public view returns (bytes memory payload) {
         bytes32 blockHash_ = blockhash(blockNumber);
-        payload = abi.encode(pId, blockNumber, blockHash_);
+        payload = abi.encode(pId, blockNumber, blockHash_, chainId);
     }
 
     /**
@@ -119,6 +130,7 @@ contract BlockHashDispatcher is Pausable, OApp {
             // Refund address in case of failed source message.
             payable(msg.sender)
         );
+        emit HashDispatched(pId, blockNumber, payload);
     }
 
     /**
@@ -140,8 +152,11 @@ contract BlockHashDispatcher is Pausable, OApp {
      * @return blockNumber The block number
      * @return blockHash_ The block hash
      */
-    function getHash(uint256 blockNumber, uint256 pId) external view whenNotPaused returns (uint256, uint256, bytes32) {
+    function getHash(
+        uint256 blockNumber,
+        uint256 pId
+    ) external view whenNotPaused returns (uint256, uint256, bytes32, uint32) {
         bytes32 blockHash_ = blockhash(blockNumber);
-        return (pId, blockNumber, blockHash_);
+        return (pId, blockNumber, blockHash_, chainId);
     }
 }

@@ -402,14 +402,16 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
      * Decodes the received payload and processes it as per the business logic defined in the function.
      */
     function _lzReceive(
-        Origin calldata origin,
+        Origin calldata,
         bytes32 /*_guid*/,
         bytes calldata payload,
         address /*_executor*/,
         bytes calldata /*_extraData*/
     ) internal override {
-        (uint256 pId, uint256 blockNumber, bytes32 blockHash) = abi.decode(payload, (uint256, uint256, bytes32));
-        uint32 remoteChainId = origin.srcEid;
+        (uint256 pId, uint256 blockNumber, bytes32 blockHash, uint32 remoteChainId) = abi.decode(
+            payload,
+            (uint256, uint256, bytes32, uint32)
+        );
 
         if (proposalBlockDetails[pId][remoteChainId].blockNumber == 0) {
             revert LZReceiveProposalNotExists("Remote proposal does not exist");
