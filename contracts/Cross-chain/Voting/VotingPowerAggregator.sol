@@ -73,14 +73,16 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
     // pId -> (remoteChainEid, blockNumber)
     mapping(uint256 => LzReadParams[]) public lzReadParams;
 
+    event BlockHashReceived(uint256 pId, uint32 remoteChainid, uint256 blockNumber);
+
     constructor(
-        address endpoint,
+        address endpoint_,
         uint32 readChannel,
         address warehouseAddress,
         address governorBravoAddress,
         address delegate,
         address bscXvsVaultAddress
-    ) OAppRead(endpoint, delegate) {
+    ) OAppRead(endpoint_, delegate) {
         ensureNonzeroAddress(warehouseAddress);
         ensureNonzeroAddress(governorBravoAddress);
         ensureNonzeroAddress(bscXvsVaultAddress);
@@ -152,7 +154,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
      *
      * @param pId proposal Id to start syncing voting power of
      * @param proposer The address of the proposer
-     * @param syncingParameters Array of syncing parameters containing remote chain id with their corresponding 
+     * @param syncingParameters Array of syncing parameters containing remote chain id with their corresponding
      * block hash, remote block header RLP, and XVS vault state proof RLP
      * @param proposerVotingProofs Array of proofs containing remote chain id with their corresponding proofs (numCheckpointsProof, checkpointsProof) where
      * numCheckpointsProof is the proof data needed to verify the number of checkpoints and
@@ -240,7 +242,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
             _lzSend(
                 READ_CHANNEL,
                 cmd,
-                combineOptions(READ_CHANNEL, READ_MSG_TYPE, _extraOptions),
+                _extraOptions,
                 MessagingFee(msg.value, 0),
                 payable(msg.sender) // It will be proposer address
             );
@@ -260,7 +262,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
         bool _payInLzToken
     ) public view returns (MessagingFee memory fee) {
         bytes memory cmd = getCmd(proposalId, remoteTargetEids, blockNumbers);
-        return _quote(READ_CHANNEL, cmd, combineOptions(READ_CHANNEL, READ_MSG_TYPE, _extraOptions), _payInLzToken);
+        return _quote(READ_CHANNEL, cmd, _extraOptions, _payInLzToken);
     }
 
     /**
@@ -287,8 +289,8 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
 
             bytes memory callData = abi.encodeWithSelector(
                 IBlockHashDispatcher.getHash.selector,
-                proposalId,
-                blockNumbers[i]
+                blockNumbers[i],
+                proposalId
             );
 
             readRequests[i] = EVMCallRequestV1({
@@ -296,7 +298,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
                 targetEid: remoteTargetEids[i],
                 isBlockNum: false,
                 blockNumOrTimestamp: uint64(block.timestamp),
-                confirmations: 5,
+                confirmations: 0,
                 to: networkConfig[remoteTargetEids[i]].blockHashDispatcher,
                 callData: callData
             });
@@ -304,7 +306,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
 
         EVMCallComputeV1 memory computeSettings = EVMCallComputeV1({
             computeSetting: 3, // None
-            targetEid: ILayerZeroEndpointV2(endpoint).eid(),
+            targetEid: 0,
             isBlockNum: false,
             blockNumOrTimestamp: uint64(block.timestamp),
             confirmations: 15,
@@ -414,6 +416,8 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
         }
 
         remoteBlockHash[remoteChainId][blockNumber] = blockHash;
+
+        emit BlockHashReceived(pId, remoteChainId, blockNumber);
 
         if (isProposalSynced(pId)) {
             governorBravo.activateProposal(pId);
