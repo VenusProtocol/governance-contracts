@@ -16,6 +16,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     args: [await getLzEndpoint(networkName), await guardian(networkName), await getSourceChainId(networkName)],
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
 };
 func.tags = ["OmnichainGovernanceExecutor", "Remote"];

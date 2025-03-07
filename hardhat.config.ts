@@ -140,6 +140,36 @@ const config: HardhatUserConfig = {
       live: true,
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
+    basesepolia: {
+      url: process.env.ARCHIVE_NODE_basesepolia || "https://sepolia.base.org",
+      chainId: 84532,
+      live: true,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
+    basemainnet: {
+      url: process.env.ARCHIVE_NODE_basemainnet || "https://mainnet.base.org",
+      chainId: 8453,
+      live: true,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
+    berachainbartio: {
+      url: process.env.ARCHIVE_NODE_berachainbartio || "https://bartio.rpc.berachain.com",
+      chainId: 80084,
+      live: true,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
+    unichainsepolia: {
+      url: process.env.ARCHIVE_NODE_unichainsepolia || "https://sepolia.unichain.org",
+      chainId: 1301,
+      live: true,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
+    unichainmainnet: {
+      url: process.env.ARCHIVE_NODE_unichainmainnet || "https://mainnet.unichain.org",
+      chainId: 130,
+      live: true,
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
+    },
   },
   etherscan: {
     apiKey: {
@@ -153,6 +183,11 @@ const config: HardhatUserConfig = {
       arbitrumone: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
       opsepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
       opmainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      basesepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      basemainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      unichainsepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      unichainmainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      berachainbartio: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
     },
     customChains: [
       {
@@ -233,6 +268,46 @@ const config: HardhatUserConfig = {
         urls: {
           apiURL: "https://api-optimistic.etherscan.io/api",
           browserURL: "https://optimistic.etherscan.io/",
+        },
+      },
+      {
+        network: "basesepolia",
+        chainId: 84532,
+        urls: {
+          apiURL: "https://api-sepolia.basescan.org/api",
+          browserURL: "https://sepolia.basescan.org/",
+        },
+      },
+      {
+        network: "basemainnet",
+        chainId: 8453,
+        urls: {
+          apiURL: "https://api.basescan.org/api",
+          browserURL: "https://basescan.org/",
+        },
+      },
+      {
+        network: "unichainsepolia",
+        chainId: 1301,
+        urls: {
+          apiURL: "https://api-sepolia.uniscan.xyz/api/",
+          browserURL: "https://sepolia.uniscan.xyz/",
+        },
+      },
+      {
+        network: "unichainmainnet",
+        chainId: 130,
+        urls: {
+          apiURL: "https://api.uniscan.xyz/api/",
+          browserURL: "https://uniscan.xyz/",
+        },
+      },
+      {
+        network: "berachainbartio",
+        chainId: 80084,
+        urls: {
+          apiURL: "https://api.routescan.io/v2/network/testnet/evm/80084/etherscan",
+          browserURL: "https://bartio.beratrail.io",
         },
       },
     ],

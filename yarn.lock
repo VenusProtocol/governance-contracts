@@ -474,9 +474,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@defi-wonderland/smock@npm:^2.3.4":
-  version: 2.3.4
-  resolution: "@defi-wonderland/smock@npm:2.3.4"
+"@defi-wonderland/smock@npm:2.3.5":
+  version: 2.3.5
+  resolution: "@defi-wonderland/smock@npm:2.3.5"
   dependencies:
     "@nomicfoundation/ethereumjs-evm": ^1.0.0-rc.3
     "@nomicfoundation/ethereumjs-util": ^8.0.0-rc.3
@@ -493,7 +493,7 @@ __metadata:
     "@nomiclabs/hardhat-ethers": ^2
     ethers: ^5
     hardhat: ^2
-  checksum: 316026d672364a02c5d83c15110b2d5df4358768a6f645e9fd0786fbb230c0c7983a39b928521ee7d0b917a478e07c454b7d7bdf22ff10ed140f520340c28267
+  checksum: b3c408fb43cd7b02bf6f3b3a392758944ee4d4ad9d92a5bcb595b2bdf7ebe702d052b8631afba0b408e80185b1db22d655dc63feba82365f5f1f6786eb98d859
   languageName: node
   linkType: hard
 
@@ -3490,7 +3490,7 @@ __metadata:
   dependencies:
     "@commitlint/cli": ^17.4.4
     "@commitlint/config-conventional": ^17.4.4
-    "@defi-wonderland/smock": ^2.3.4
+    "@defi-wonderland/smock": 2.3.5
     "@ethersproject/abi": ^5.7.0
     "@ethersproject/abstract-signer": ^5.7.0
     "@ethersproject/bignumber": ^5.7.0
@@ -3537,7 +3537,7 @@ __metadata:
     eslint-config-prettier: ^8.5.0
     ethers: ^5.7.2
     fs-extra: ^10.1.0
-    hardhat: ^2.16.1
+    hardhat: 2.19.4
     hardhat-dependency-compiler: ^1.1.3
     hardhat-deploy: ^0.12.4
     hardhat-deploy-ethers: ^0.3.0-beta.13
@@ -8499,70 +8499,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"hardhat@npm:^2.14.0":
-  version: 2.22.6
-  resolution: "hardhat@npm:2.22.6"
-  dependencies:
-    "@ethersproject/abi": ^5.1.2
-    "@metamask/eth-sig-util": ^4.0.0
-    "@nomicfoundation/edr": ^0.4.1
-    "@nomicfoundation/ethereumjs-common": 4.0.4
-    "@nomicfoundation/ethereumjs-tx": 5.0.4
-    "@nomicfoundation/ethereumjs-util": 9.0.4
-    "@nomicfoundation/solidity-analyzer": ^0.1.0
-    "@sentry/node": ^5.18.1
-    "@types/bn.js": ^5.1.0
-    "@types/lru-cache": ^5.1.0
-    adm-zip: ^0.4.16
-    aggregate-error: ^3.0.0
-    ansi-escapes: ^4.3.0
-    boxen: ^5.1.2
-    chalk: ^2.4.2
-    chokidar: ^3.4.0
-    ci-info: ^2.0.0
-    debug: ^4.1.1
-    enquirer: ^2.3.0
-    env-paths: ^2.2.0
-    ethereum-cryptography: ^1.0.3
-    ethereumjs-abi: ^0.6.8
-    find-up: ^2.1.0
-    fp-ts: 1.19.3
-    fs-extra: ^7.0.1
-    glob: 7.2.0
-    immutable: ^4.0.0-rc.12
-    io-ts: 1.10.4
-    keccak: ^3.0.2
-    lodash: ^4.17.11
-    mnemonist: ^0.38.0
-    mocha: ^10.0.0
-    p-map: ^4.0.0
-    raw-body: ^2.4.1
-    resolve: 1.17.0
-    semver: ^6.3.0
-    solc: 0.8.26
-    source-map-support: ^0.5.13
-    stacktrace-parser: ^0.1.10
-    tsort: 0.0.1
-    undici: ^5.14.0
-    uuid: ^8.3.2
-    ws: ^7.4.6
-  peerDependencies:
-    ts-node: "*"
-    typescript: "*"
-  peerDependenciesMeta:
-    ts-node:
-      optional: true
-    typescript:
-      optional: true
-  bin:
-    hardhat: internal/cli/bootstrap.js
-  checksum: 5aec1824db3575d63754de18c2629bcd820bc836d836f8a6346bcd9aa2ae4c397e090c43ea482ee765b704e018001015b5c84c5ded301a6a1144129c1a4c509b
-  languageName: node
-  linkType: hard
-
-"hardhat@npm:^2.16.1":
-  version: 2.19.1
-  resolution: "hardhat@npm:2.19.1"
+"hardhat@npm:2.19.4":
+  version: 2.19.4
+  resolution: "hardhat@npm:2.19.4"
   dependencies:
     "@ethersproject/abi": ^5.1.2
     "@metamask/eth-sig-util": ^4.0.0
@@ -8622,7 +8561,68 @@ __metadata:
       optional: true
   bin:
     hardhat: internal/cli/bootstrap.js
-  checksum: 0c12069e8eae47419d595e38d22716049136cf74390f9e89121ae73fdc716ffcb6cd3283e3ca8676ce00e3ff90804dfa95473830d96340ec01860dfa6237d8d3
+  checksum: 05dcaeab5bb641e74426ad47acfda903dcd3fd229b0d30f45b9de1d3c54fe6364161f3c88517984233d18f5b9294a050500ca7336b6ca069fa259fede6f5acb1
+  languageName: node
+  linkType: hard
+
+"hardhat@npm:^2.14.0":
+  version: 2.22.6
+  resolution: "hardhat@npm:2.22.6"
+  dependencies:
+    "@ethersproject/abi": ^5.1.2
+    "@metamask/eth-sig-util": ^4.0.0
+    "@nomicfoundation/edr": ^0.4.1
+    "@nomicfoundation/ethereumjs-common": 4.0.4
+    "@nomicfoundation/ethereumjs-tx": 5.0.4
+    "@nomicfoundation/ethereumjs-util": 9.0.4
+    "@nomicfoundation/solidity-analyzer": ^0.1.0
+    "@sentry/node": ^5.18.1
+    "@types/bn.js": ^5.1.0
+    "@types/lru-cache": ^5.1.0
+    adm-zip: ^0.4.16
+    aggregate-error: ^3.0.0
+    ansi-escapes: ^4.3.0
+    boxen: ^5.1.2
+    chalk: ^2.4.2
+    chokidar: ^3.4.0
+    ci-info: ^2.0.0
+    debug: ^4.1.1
+    enquirer: ^2.3.0
+    env-paths: ^2.2.0
+    ethereum-cryptography: ^1.0.3
+    ethereumjs-abi: ^0.6.8
+    find-up: ^2.1.0
+    fp-ts: 1.19.3
+    fs-extra: ^7.0.1
+    glob: 7.2.0
+    immutable: ^4.0.0-rc.12
+    io-ts: 1.10.4
+    keccak: ^3.0.2
+    lodash: ^4.17.11
+    mnemonist: ^0.38.0
+    mocha: ^10.0.0
+    p-map: ^4.0.0
+    raw-body: ^2.4.1
+    resolve: 1.17.0
+    semver: ^6.3.0
+    solc: 0.8.26
+    source-map-support: ^0.5.13
+    stacktrace-parser: ^0.1.10
+    tsort: 0.0.1
+    undici: ^5.14.0
+    uuid: ^8.3.2
+    ws: ^7.4.6
+  peerDependencies:
+    ts-node: "*"
+    typescript: "*"
+  peerDependenciesMeta:
+    ts-node:
+      optional: true
+    typescript:
+      optional: true
+  bin:
+    hardhat: internal/cli/bootstrap.js
+  checksum: 5aec1824db3575d63754de18c2629bcd820bc836d836f8a6346bcd9aa2ae4c397e090c43ea482ee765b704e018001015b5c84c5ded301a6a1144129c1a4c509b
   languageName: node
   linkType: hard
 
