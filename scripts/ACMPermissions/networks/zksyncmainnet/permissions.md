@@ -786,3 +786,9 @@
 
 - **Function Signature**: `addMarket(AddMarketInput)`
 - **Addresses**:
+
+## Contract Address: 0x183dE3C349fCf546aAe925E1c7F364EA6FB4033c
+
+- **Function Signature**: `setReserveFactor(uint256)`
+- **Addresses**:
+  - `Guardian`
