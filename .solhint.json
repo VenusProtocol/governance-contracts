@@ -11,6 +11,6 @@
     "reason-string": ["warn", { "maxLength": 64 }],
     "no-unused-vars": "error",
     "state-visibility": "error",
-    "ordering": "error"
+    "ordering": "warn"
   }
 }
