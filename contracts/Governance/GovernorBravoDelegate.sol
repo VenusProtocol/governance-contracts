@@ -2,7 +2,7 @@
 pragma solidity 0.8.25;
 pragma experimental ABIEncoderV2;
 
-import { GovernorBravoDelegateStorageV2, GovernorBravoEvents, TimelockInterface, XvsVaultInterface, GovernorAlphaInterface } from "./GovernorBravoInterfacesV8.sol";
+import { GovernorBravoDelegateStorageV3, GovernorBravoEvents, TimelockInterface, XvsVaultInterface, GovernorAlphaInterface } from "./GovernorBravoInterfacesV8.sol";
 import { AccessControlledV8 } from "./AccessControlledV8.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
@@ -73,7 +73,7 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * The delegation of votes happens through the `XVSVault` contract by calling the `delegate` or `delegateBySig` functions. These same functions can revert
  * vote delegation by calling the same function with a value of `0`.
  */
-contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoEvents, AccessControlledV8 {
+contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoEvents, AccessControlledV8 {
     /// @notice The name of this contract
     string public constant name = "Venus Governor Bravo";
 
@@ -104,87 +104,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
 
     /// @notice The EIP-712 typehash for the ballot struct used by the contract
     bytes32 public constant BALLOT_TYPEHASH = keccak256("Ballot(uint256 proposalId,uint8 support)");
-
-    /// @notice Mapping to store whitelisted proposers and the timelock they are authorized to use
-    mapping(address => address) public whitelistedProposers;
-
-    /// @notice Error thrown when the caller is not the admin
-    error OnlyAdmin();
-
-    /// @notice Error thrown when the caller is not the admin or the guardian
-    error OnlyAdminOrGuardian();
-
-    /// @notice Error thrown when the contract is already initialized
-    error AlreadyInitialized();
-
-    /// @notice Error thrown when the arity of the proposal function parameters are not equal
-    error ArityMismatch(string parameterName);
-
-    /// @notice Error thrown when the min voting period is invalid
-    error InvalidMinVotingPeriod();
-
-    /// @notice Error thrown when the max voting period is invalid
-    error InvalidMaxVotingPeriod();
-
-    /// @notice Error thrown when the min voting delay is invalid
-    error InvalidMinVotingDelay();
-
-    /// @notice Error thrown when the max voting delay is invalid
-    error InvalidMaxVotingDelay();
-
-    /// @notice Error thrown when the min proposal threshold is invalid
-    error InvalidMinProposalThreshold();
-
-    /// @notice Error thrown when the max proposal threshold is invalid
-    error InvalidMaxProposalThreshold();
-
-    /// @notice Error thrown when the governor is not active
-    error GovernorNotActive();
-
-    /// @notice Error thrown when user has insufficient voting power to execute a command
-    error InsufficientVotingPower();
-
-    /// @notice Error thrown when no actions are provided
-    error NoActionsProvided();
-
-    /// @notice Error thrown when too many actions are provided
-    error TooManyActions();
-
-    /// @notice Error thrown when a proposer has an active or pending proposal
-    error OneLiveProposalPerProposer();
-
-    /// @notice Error thrown when a proposal is not active
-    error ProposalNotActive();
-
-    /// @notice Error thrown when a proposal has not succeeded
-    error ProposalNotSucceeded();
-
-    /// @notice Error thrown when a proposal has not been queued
-    error ProposalNotQueued();
-
-    /// @notice Error thrown when a proposal has already been executed
-    error ProposalAlreadyExecuted();
-
-    /// @notice Error thrown when a proposal tries to queue identical actions
-    error DuplicateAction();
-
-    /// @notice Error thrown when the proposal id is too high (doesn't exist)
-    error InvalidProposalId();
-
-    /// @notice Error thrown when the signature is invalid
-    error InvalidSignature();
-
-    /// @notice Error thrown when vote type is not correct
-    error InvalidVoteType();
-
-    /// @notice Error thrown when user has already voted
-    error UserAlreadyVoted();
-
-    /// @notice Error thrown when sender is not pending admin
-    error SenderIsNotPendingAdmin();
-
-    /// @notice Error thrown when the proposer is not whitelisted
-    error TimelockNotWhitelistedForProposer();
 
     modifier requireActiveGovernor() {
         if (initialProposalId == 0) {
