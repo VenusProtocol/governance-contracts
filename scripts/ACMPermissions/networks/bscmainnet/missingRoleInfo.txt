@@ -1,0 +1,15 @@
+role = "0x602f7d911e6f993af52a9b265578c70f773d5ee538283e0bcd794f57467f37f1" // This role has been revoked now
+contractAddress: "0xfD36E2c2a6789Db23113685031d7F16329158384", // Unitroller
+functionSignature: "_setActionsPaused(address[],uint256[],bool)",  // Wrong functionSignature, it should be _setActionsPaused(address[],uint8[],bool), this role has been granted
+addressess : ["NORMAL_TIMELOCK", "Guardian 2" ]
+
+role = "0x63462cb3412b7702a003f98e0f66d61e08f3a044080a9544f25cbcba42da3955"
+contractAddress: "0xBbCD063efE506c3D42a0Fa2dB5C08430288C71FC", // PRIME
+functionSignature: "addMarket(address,uint256,uint256)",  // Wrong function functionSignature, it should be addMarket(address,address, uint256,uint256)
+addressess : ["NORMAL_TIMELOCK","FAST_TRACK_TIMELOCK", "CRITICAL_TIMELOCK" ]
+
+role = "0x2c218d94e60aa4c8dbf7f3983eaff74b6b7bbe66ae4d6e8f5ce248af5e80b291"
+contractAddress: "0xfD36E2c2a6789Db23113685031d7F16329158384", // Unitroller
+functionSignature: "setLastRewardingBlocks(address[],uint32[],uint32[])",  // Function signature not exists in core pool repo
+addressess : [ "NORMAL_TIMELOCK" ]
+

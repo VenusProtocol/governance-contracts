@@ -3,7 +3,7 @@
   "bracketSpacing": true,
   "endOfLine": "auto",
   "importOrder": ["module-alias/register", "<THIRD_PARTY_MODULES>", "^[./]"],
-  "importOrderParserPlugins": ["typescript"],
+  "importOrderParserPlugins": ["typescript", "decorators-legacy"],
   "importOrderSeparation": true,
   "importOrderSortSpecifiers": true,
   "printWidth": 120,
