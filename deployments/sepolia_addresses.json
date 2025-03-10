@@ -7,10 +7,15 @@
     "CriticalTimelock": "0xA24A7A65b8968a749841988Bd7d05F6a94329fDe",
     "DefaultProxyAdmin": "0x01435866babd91311b1355cf3af488cca36db68e",
     "FastTrackTimelock": "0x7F043F43Adb392072a3Ba0cC9c96e894C6f7e182",
+    "MarketCapsRiskSteward_Implementation": "0x046355ff06DFc7A24f34208bCb81260BF7EF5D77",
+    "MockRiskOracle": "0x36663F41c50e2B34D9e1457A81d0B9183Fc737be",
     "NormalTimelock": "0xc332F7D8D5eA72cf760ED0E1c0485c8891C6E0cF",
     "OmnichainExecutorOwner": "0xf964158C67439D01e5f17F0A3F39DfF46823F27A",
     "OmnichainExecutorOwner_Implementation": "0x553f01f2c693Cf9B81cC77BACc59dD71E7a14740",
     "OmnichainExecutorOwner_Proxy": "0xf964158C67439D01e5f17F0A3F39DfF46823F27A",
-    "OmnichainGovernanceExecutor": "0xD9B18a43Ee9964061c1A1925Aa907462F0249109"
+    "OmnichainGovernanceExecutor": "0xD9B18a43Ee9964061c1A1925Aa907462F0249109",
+    "RiskStewardReceiver": "0x99BDf00d61ebF8357F1ED1B895C65d57e3385f26",
+    "RiskStewardReceiver_Implementation": "0x26F594531eE83FB0fFbFCeA64c348fE572185282",
+    "RiskStewardReceiver_Proxy": "0x99BDf00d61ebF8357F1ED1B895C65d57e3385f26"
   }
 }
