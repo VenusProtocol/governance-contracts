@@ -72,9 +72,6 @@ contract GovernorBravoEvents {
     /// @notice Error thrown when the caller is not the admin
     error OnlyAdmin();
 
-    /// @notice Error thrown when the caller is not the admin or the guardian
-    error OnlyAdminOrGuardian();
-
     /// @notice Error thrown when the contract is already initialized
     error AlreadyInitialized();
 

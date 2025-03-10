@@ -6,6 +6,7 @@ import { ethers } from "hardhat";
 
 import {
   AccessControlManager,
+  AccessControlManager__factory,
   GovernorBravoDelegate,
   GovernorBravoDelegate__factory,
   XVSVault,
@@ -19,19 +20,20 @@ let customer: Signer;
 let accounts: Signer[];
 let governorBravoDelegate: MockContract<GovernorBravoDelegate>;
 let xvsVault: FakeContract<XVSVault>;
-let accessControlManager: FakeContract<AccessControlManager>;
+let accessControlManager: MockContract<AccessControlManager>;
 
 type GovernorBravoDelegateFixture = {
   governorBravoDelegate: MockContract<GovernorBravoDelegate>;
   xvsVault: FakeContract<XVSVault>;
-  accessControlManager: FakeContract<AccessControlManager>;
+  accessControlManager: MockContract<AccessControlManager>;
 };
 
 async function governorBravoFixture(): Promise<GovernorBravoDelegateFixture> {
   const GovernorBravoDelegateFactory = await smock.mock<GovernorBravoDelegate__factory>("GovernorBravoDelegate");
   const governorBravoDelegate = await GovernorBravoDelegateFactory.deploy();
   const xvsVault = await smock.fake<XVSVault>("MockXVSVault");
-  const accessControlManager = await smock.fake<AccessControlManager>("AccessControlManager");
+  const accessControlFactory = await smock.mock<AccessControlManager__factory>("AccessControlManager");
+  const accessControlManager = await accessControlFactory.deploy();
   return { governorBravoDelegate, xvsVault, accessControlManager };
 }
 
@@ -190,5 +192,62 @@ describe("Governor Bravo Initializing Test", () => {
     });
 
     //TODO: implement tests for min, max value validation of voting period, voting delay, proposal threshold
+  });
+
+  describe("Check setter functions", () => {
+    beforeEach(async () => {
+      [root, customer, ...accounts] = await ethers.getSigners();
+      const contracts = await loadFixture(governorBravoFixture);
+      ({ governorBravoDelegate, xvsVault, accessControlManager } = contracts);
+      await governorBravoDelegate.setVariable("admin", await root.getAddress());
+      const guardianAddress = await accounts[0].getAddress();
+      const minVotingDelay = await governorBravoDelegate.MIN_VOTING_DELAY();
+      const minVotingPeriod = await governorBravoDelegate.MIN_VOTING_PERIOD();
+      const minProposalThreshold = await governorBravoDelegate.MIN_PROPOSAL_THRESHOLD();
+      const timelocks = [accounts[0].getAddress(), accounts[1].getAddress(), accounts[2].getAddress()];
+      const proposalConfigs = [
+        {
+          votingDelay: minVotingDelay.add(10),
+          votingPeriod: minVotingPeriod.add(100),
+          proposalThreshold: minProposalThreshold.add(100),
+        },
+        {
+          votingDelay: minVotingDelay.add(10),
+          votingPeriod: minVotingPeriod.add(100),
+          proposalThreshold: minProposalThreshold.add(100),
+        },
+        {
+          votingDelay: minVotingDelay.add(10),
+          votingPeriod: minVotingPeriod.add(100),
+          proposalThreshold: minProposalThreshold.add(100),
+        },
+      ];
+
+      await governorBravoDelegate.initialize(
+        xvsVault.address,
+        proposalConfigs,
+        timelocks,
+        guardianAddress,
+        accessControlManager.address,
+      );
+    });
+
+    it("should revert if not called by admin", async () => {
+      await expect(governorBravoDelegate.connect(customer)._setGuardian(accounts[0].getAddress())).to.be.rejectedWith(
+        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0xB0D4afd8879eD9F52b28595d31B441D079B2Ca07", "_setGuardian(address)")',
+      );
+    });
+
+    it("should allow setting guardian with access permission", async () => {
+      await expect(
+        await accessControlManager
+          .connect(root)
+          .giveCallPermission(governorBravoDelegate.address, "_setGuardian(address)", await root.getAddress()),
+      ).to.emit(accessControlManager, "PermissionGranted");
+
+      await expect(governorBravoDelegate.connect(root)._setGuardian(await customer.getAddress()))
+        .to.emit(governorBravoDelegate, "NewGuardian")
+        .withArgs("0x3C44CdDdB6a900fa2b585dd299e03d12FA4293BC", await customer.getAddress());
+    });
   });
 });
