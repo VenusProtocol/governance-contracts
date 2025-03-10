@@ -12,7 +12,7 @@ import {
   OmnichainGovernanceExecutorOwnerMethods,
   config,
 } from "../helpers/deploy/deploymentConfig";
-import { getOmnichainProposalSender, guardian, testnetNetworks } from "../helpers/deploy/deploymentUtils";
+import { getOmnichainProposalSender, getAcmAdminAccount, testnetNetworks } from "../helpers/deploy/deploymentUtils";
 import { OmnichainGovernanceExecutor } from "../typechain";
 
 interface GovernanceCommand {
@@ -83,7 +83,7 @@ const executeCommands = async (
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const srcChainId = testnetNetworks.includes(hre.network.name) ? LZ_CHAINID["bsctestnet"] : LZ_CHAINID["bscmainnet"];
-  const Guardian = await guardian(hre.network.name as SUPPORTED_NETWORKS);
+  const Guardian = await getAcmAdminAccount(hre.network.name as SUPPORTED_NETWORKS);
 
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
@@ -102,13 +102,15 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     "hardhat-deploy/solc_0.8/openzeppelin/proxy/transparent/ProxyAdmin.sol:ProxyAdmin",
   );
 
+  const normalTimelock = await ethers.getContract("NormalTimelock");
+
   const omnichainGovernanceExecutorAddress = (await ethers.getContract("OmnichainGovernanceExecutor")).address;
   const OmnichainExecutorOwner = await deploy("OmnichainExecutorOwner", {
     from: deployer,
     args: [omnichainGovernanceExecutorAddress],
     contract: "OmnichainExecutorOwner",
     proxy: {
-      owner: hre.network.live ? Guardian : deployer, // Guardian will be replaced by normalTimelock once ownership of DefaultProxyAdmin is transferred to normalTimelock.
+      owner: hre.network.live ? normalTimelock.address : deployer,
       proxyContract: "OptimizedTransparentUpgradeableProxy",
       execute: {
         methodName: "initialize",
@@ -122,6 +124,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     },
     log: true,
     autoMine: true,
+    skipIfAlreadyDeployed: true,
   });
   const omnichainExecutorOwner = await ethers.getContractAt(
     "OmnichainExecutorOwner",
