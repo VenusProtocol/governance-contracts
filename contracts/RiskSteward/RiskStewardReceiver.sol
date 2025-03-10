@@ -76,7 +76,6 @@ contract RiskStewardReceiver is IRiskStewardSourceReceiver, RiskStewardReceiverB
      */
     event RiskParameterUpdateProposed(uint256 indexed updateId);
 
-
     /**
      * @notice Emitted when applying an update fails to validate or execute
      */
@@ -253,7 +252,13 @@ contract RiskStewardReceiver is IRiskStewardSourceReceiver, RiskStewardReceiverB
      * @custom:event Emits RiskParameterUpdateProcessed with the update ID
      */
     function _processUpdate(RiskParameterUpdate memory update) internal {
-        IRiskSteward(riskParameterConfigs[update.updateType].riskSteward).processUpdate(update.updateId, update.newValue, update.updateType, update.market, update.additionalData);
+        IRiskSteward(riskParameterConfigs[update.updateType].riskSteward).processUpdate(
+            update.updateId,
+            update.newValue,
+            update.updateType,
+            update.market,
+            update.additionalData
+        );
         processedUpdates[update.updateId] = UPDATE_STATUS.PROCESSED;
         emit RiskParameterUpdateProcessed(update.updateId);
     }
@@ -345,7 +350,15 @@ contract RiskStewardReceiver is IRiskStewardSourceReceiver, RiskStewardReceiverB
         IRiskSteward riskSteward = riskParameterConfigs[update.updateType].riskSteward;
         (address _underlying, uint16 destChainId_) = riskSteward.decodeAdditionalData(update.additionalData);
         if (LAYER_ZERO_CHAIN_ID == destChainId_) {
-            try riskSteward.processUpdate(update.updateId, update.newValue, update.updateType, update.market, update.additionalData) {
+            try
+                riskSteward.processUpdate(
+                    update.updateId,
+                    update.newValue,
+                    update.updateType,
+                    update.market,
+                    update.additionalData
+                )
+            {
                 processedUpdates[update.updateId] = UPDATE_STATUS.PROCESSED;
                 emit RiskParameterUpdateProcessed(update.updateId);
             } catch {
@@ -370,7 +383,15 @@ contract RiskStewardReceiver is IRiskStewardSourceReceiver, RiskStewardReceiverB
     function _executeOrProposeRemoteProposal(RiskParameterUpdate memory update, uint16 destChainId) internal {
         IRiskSteward riskSteward = IRiskSteward(riskParameterConfigs[update.updateType].riskSteward);
         if (LAYER_ZERO_CHAIN_ID == destChainId) {
-            try riskSteward.processUpdate(update.updateId, update.newValue, update.updateType, update.market, update.additionalData) {
+            try
+                riskSteward.processUpdate(
+                    update.updateId,
+                    update.newValue,
+                    update.updateType,
+                    update.market,
+                    update.additionalData
+                )
+            {
                 processedUpdates[update.updateId] = UPDATE_STATUS.PROCESSED;
             } catch {
                 emit RiskParameterUpdateFailed(update.updateId, UPDATE_STATUS.FAILED);

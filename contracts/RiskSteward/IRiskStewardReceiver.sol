@@ -28,5 +28,12 @@ interface IRiskStewardSourceReceiver {
 }
 
 interface IRiskStewardDestinationReceiver {
-    function processUpdate(uint256 updateId, bytes calldata newValue, string calldata updateType, address market, bytes calldata additionalData, uint256 timestamp) external;
+    function processUpdate(
+        uint256 updateId,
+        bytes calldata newValue,
+        string calldata updateType,
+        address market,
+        bytes calldata additionalData,
+        uint256 timestamp
+    ) external;
 }

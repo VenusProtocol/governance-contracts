@@ -442,9 +442,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
             return ProposalState.Succeeded;
         } else if (proposal.executed) {
             return ProposalState.Executed;
-        } else if (
-            block.timestamp >= proposal.eta + proposalTimelocks[uint8(proposal.proposalType)].GRACE_PERIOD()
-        ) {
+        } else if (block.timestamp >= proposal.eta + proposalTimelocks[uint8(proposal.proposalType)].GRACE_PERIOD()) {
             return ProposalState.Expired;
         } else {
             return ProposalState.Queued;

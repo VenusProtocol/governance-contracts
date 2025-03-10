@@ -5,22 +5,22 @@ import { expect } from "chai";
 import { BigNumber, ContractFactory } from "ethers";
 import { ethers, upgrades } from "hardhat";
 import { SignerWithAddress } from "hardhat-deploy-ethers/signers";
-import { LZ_CHAINID } from "../../helpers/deploy/constants";
-import { convertToUnit } from "../../helpers/utils";
-import { SUPPORTED_NETWORKS } from "../../helpers/deploy/constants";
 
+import { LZ_CHAINID } from "../../helpers/deploy/constants";
+import { SUPPORTED_NETWORKS } from "../../helpers/deploy/constants";
+import { convertToUnit } from "../../helpers/utils";
 import {
+  GovernorBravoDelegate,
+  GovernorBravoDelegate__factory,
   MarketCapsRiskSteward,
   MockComptroller,
   MockCoreComptroller,
   MockRiskOracle,
   MockVToken,
-  RiskStewardReceiver,
-  GovernorBravoDelegate__factory,
-  GovernorBravoDelegate,
-  OmnichainProposalSender,
   OmnichainExecutorOwner,
-  XVSVault
+  OmnichainProposalSender,
+  RiskStewardReceiver,
+  XVSVault,
 } from "../../typechain";
 
 const { parseUnits, hexValue, defaultAbiCoder, solidityPack } = ethers.utils;
@@ -75,7 +75,9 @@ describe("Risk Steward", async function () {
     ethereumOmnichainExecutorOwner: OmnichainExecutorOwner,
     arbitrumOmnichainExecutorOwner: OmnichainExecutorOwner;
 
-  const publishRiskParameterUpdate = async (updates: { updateType: 'supplyCap' | 'borrowCap', market: string, value: number, destinationChainId: number }[]) => {
+  const publishRiskParameterUpdate = async (
+    updates: { updateType: "supplyCap" | "borrowCap"; market: string; value: number; destinationChainId: number }[],
+  ) => {
     const updatesByDestinationChainId = {};
     for (const { updateType, market, value, destinationChainId } of updates) {
       const update: [string, string, string, string, string] = [
@@ -83,21 +85,25 @@ describe("Risk Steward", async function () {
         parseUnitsToHex(value),
         updateType,
         market,
-        defaultAbiCoder.encode(["address", "uint16"], ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", destinationChainId]),
-      ]
+        defaultAbiCoder.encode(
+          ["address", "uint16"],
+          ["0xcF27439fA231af9931ee40c4f27Bb77B83826F3C", destinationChainId],
+        ),
+      ];
       await mockRiskOracle.publishRiskParameterUpdate(...update);
-
 
       if (updatesByDestinationChainId[destinationChainId]) {
         updatesByDestinationChainId[destinationChainId].push(update);
       } else if (destinationChainId !== HARDHAT_LAYER_ZERO_CHAIN_ID) {
-        updatesByDestinationChainId[destinationChainId] = [update]
+        updatesByDestinationChainId[destinationChainId] = [update];
       }
     }
     const payloadsByDestinationChainId = {};
     const proposalId = await omnichainProposalSender.proposalCount();
 
-    for (const [key, value] of Object.entries<[string, string, string, string, string][]>(updatesByDestinationChainId)) {
+    for (const [key, value] of Object.entries<[string, string, string, string, string][]>(
+      updatesByDestinationChainId,
+    )) {
       const addresses: string[] = [];
       const values: number[] = [];
       const signatures: string[] = [];
@@ -109,22 +115,30 @@ describe("Risk Steward", async function () {
         addresses.push("0x1234567890123456789012345678901234567890");
         values.push(0);
         signatures.push("processUpdate(uint256,bytes,string,address,bytes,uint256)");
-        calldatas.push(defaultAbiCoder.encode(["uint256", "bytes", "string", "address", "bytes", "uint256"], [latestUpdate.updateId, update[1], update[2], update[3], update[4], latestUpdate.timestamp]));
+        calldatas.push(
+          defaultAbiCoder.encode(
+            ["uint256", "bytes", "string", "address", "bytes", "uint256"],
+            [latestUpdate.updateId, update[1], update[2], update[3], update[4], latestUpdate.timestamp],
+          ),
+        );
       }
       calldatas.reverse();
 
       const payload = defaultAbiCoder.encode(
         ["address[]", "uint256[]", "string[]", "bytes[]", "uint8"],
-        [addresses, values, signatures, calldatas, proposalType]
-      )
+        [addresses, values, signatures, calldatas, proposalType],
+      );
       const payloadWithId = defaultAbiCoder.encode(["bytes", "uint256"], [payload, proposalId]);
       const remoteAdapterParam = solidityPack(["uint16", "uint256"], [1, 300000]);
-      const remoteCalldata = defaultAbiCoder.encode(["uint16", "bytes", "bytes", "address"], [key, payloadWithId, remoteAdapterParam, ethers.constants.AddressZero]);
+      const remoteCalldata = defaultAbiCoder.encode(
+        ["uint16", "bytes", "bytes", "address"],
+        [key, payloadWithId, remoteAdapterParam, ethers.constants.AddressZero],
+      );
       payloadsByDestinationChainId[key] = remoteCalldata;
     }
 
-    return payloadsByDestinationChainId
-  }
+    return payloadsByDestinationChainId;
+  };
 
   const riskStewardFixture = async () => {
     deployer = (await ethers.getSigners())[0];
@@ -178,32 +192,49 @@ describe("Risk Steward", async function () {
     const LZEndpointMock = await ethers.getContractFactory("LZEndpointMock");
     const OmnichainProposalSenderFactory = await ethers.getContractFactory("OmnichainProposalSender");
     const localEndpoint = await LZEndpointMock.deploy(HARDHAT_LAYER_ZERO_CHAIN_ID);
-    omnichainProposalSender = await OmnichainProposalSenderFactory.deploy(localEndpoint.address, accessControlManager.address);
+    omnichainProposalSender = await OmnichainProposalSenderFactory.deploy(
+      localEndpoint.address,
+      accessControlManager.address,
+    );
 
     const OmnichainGovernanceExecutorFactory = await ethers.getContractFactory("OmnichainGovernanceExecutor");
     const ethereumRemoteEndpoint = await LZEndpointMock.deploy(ETHEREUM_LAYER_ZERO_CHAIN_ID);
     const arbitrumRemoteEndpoint = await LZEndpointMock.deploy(ARBITRUM_LAYER_ZERO_CHAIN_ID);
-    const ethereumOmnichainGovernanceExecutor = await OmnichainGovernanceExecutorFactory.deploy(ethereumRemoteEndpoint.address, deployer.address, HARDHAT_LAYER_ZERO_CHAIN_ID);
-    const arbitrumOmnichainGovernanceExecutor = await OmnichainGovernanceExecutorFactory.deploy(arbitrumRemoteEndpoint.address, deployer.address, HARDHAT_LAYER_ZERO_CHAIN_ID);
+    const ethereumOmnichainGovernanceExecutor = await OmnichainGovernanceExecutorFactory.deploy(
+      ethereumRemoteEndpoint.address,
+      deployer.address,
+      HARDHAT_LAYER_ZERO_CHAIN_ID,
+    );
+    const arbitrumOmnichainGovernanceExecutor = await OmnichainGovernanceExecutorFactory.deploy(
+      arbitrumRemoteEndpoint.address,
+      deployer.address,
+      HARDHAT_LAYER_ZERO_CHAIN_ID,
+    );
 
     const OmnichainProposalExecutorOwner = await ethers.getContractFactory("OmnichainExecutorOwner");
-    ethereumOmnichainExecutorOwner = await upgrades.deployProxy(OmnichainProposalExecutorOwner, [accessControlManager.address], {
-      constructorArgs: [ethereumOmnichainGovernanceExecutor.address],
-      initializer: "initialize",
-      unsafeAllow: ["state-variable-immutable"],
-    });
+    ethereumOmnichainExecutorOwner = await upgrades.deployProxy(
+      OmnichainProposalExecutorOwner,
+      [accessControlManager.address],
+      {
+        constructorArgs: [ethereumOmnichainGovernanceExecutor.address],
+        initializer: "initialize",
+        unsafeAllow: ["state-variable-immutable"],
+      },
+    );
 
-    arbitrumOmnichainExecutorOwner = await upgrades.deployProxy(OmnichainProposalExecutorOwner, [accessControlManager.address], {
-      constructorArgs: [arbitrumOmnichainGovernanceExecutor.address],
-      initializer: "initialize",
-      unsafeAllow: ["state-variable-immutable"],
-    });
-
+    arbitrumOmnichainExecutorOwner = await upgrades.deployProxy(
+      OmnichainProposalExecutorOwner,
+      [accessControlManager.address],
+      {
+        constructorArgs: [arbitrumOmnichainGovernanceExecutor.address],
+        initializer: "initialize",
+        unsafeAllow: ["state-variable-immutable"],
+      },
+    );
 
     const ethereumRemotePath = ethers.utils.solidityPack(["address"], [ethereumOmnichainGovernanceExecutor.address]);
     const arbitrumRemotePath = ethers.utils.solidityPack(["address"], [arbitrumOmnichainGovernanceExecutor.address]);
     const localPath = ethers.utils.solidityPack(["address"], [omnichainProposalSender.address]);
-
 
     await accessControlManager
       .connect(deployer)
@@ -211,11 +242,19 @@ describe("Risk Steward", async function () {
 
     await accessControlManager
       .connect(deployer)
-      .giveCallPermission(ethereumOmnichainExecutorOwner.address, "setTrustedRemoteAddress(uint16,bytes)", deployer.address);
+      .giveCallPermission(
+        ethereumOmnichainExecutorOwner.address,
+        "setTrustedRemoteAddress(uint16,bytes)",
+        deployer.address,
+      );
 
     await accessControlManager
       .connect(deployer)
-      .giveCallPermission(arbitrumOmnichainExecutorOwner.address, "setTrustedRemoteAddress(uint16,bytes)", deployer.address);
+      .giveCallPermission(
+        arbitrumOmnichainExecutorOwner.address,
+        "setTrustedRemoteAddress(uint16,bytes)",
+        deployer.address,
+      );
 
     await accessControlManager
       .connect(deployer)
@@ -224,11 +263,20 @@ describe("Risk Steward", async function () {
     await omnichainProposalSender.setTrustedRemoteAddress(LZ_CHAINID.ethereum, ethereumRemotePath);
     await omnichainProposalSender.setTrustedRemoteAddress(LZ_CHAINID.arbitrumone, arbitrumRemotePath);
 
-    await ethereumOmnichainGovernanceExecutor.connect(deployer).setTrustedRemoteAddress(HARDHAT_LAYER_ZERO_CHAIN_ID, localPath);
-    await arbitrumOmnichainGovernanceExecutor.connect(deployer).setTrustedRemoteAddress(HARDHAT_LAYER_ZERO_CHAIN_ID, localPath);
+    await ethereumOmnichainGovernanceExecutor
+      .connect(deployer)
+      .setTrustedRemoteAddress(HARDHAT_LAYER_ZERO_CHAIN_ID, localPath);
+    await arbitrumOmnichainGovernanceExecutor
+      .connect(deployer)
+      .setTrustedRemoteAddress(HARDHAT_LAYER_ZERO_CHAIN_ID, localPath);
 
     riskStewardReceiver = await upgrades.deployProxy(RiskStewardReceiverFactory, [accessControlManager.address], {
-      constructorArgs: [mockRiskOracle.address, governorBravoDelegate.address, omnichainProposalSender.address, HARDHAT_LAYER_ZERO_CHAIN_ID],
+      constructorArgs: [
+        mockRiskOracle.address,
+        governorBravoDelegate.address,
+        omnichainProposalSender.address,
+        HARDHAT_LAYER_ZERO_CHAIN_ID,
+      ],
       initializer: "initialize",
       unsafeAllow: ["state-variable-immutable"],
     });
@@ -259,9 +307,17 @@ describe("Risk Steward", async function () {
 
     await accessControlManager.giveCallPermission(riskStewardReceiver.address, "unpause()", deployer.address);
 
-    await accessControlManager.giveCallPermission(riskStewardReceiver.address, "setDestinationChainRiskStewardRemoteReceiver(uint16,address)", deployer.address);
+    await accessControlManager.giveCallPermission(
+      riskStewardReceiver.address,
+      "setDestinationChainRiskStewardRemoteReceiver(uint16,address)",
+      deployer.address,
+    );
 
-    await accessControlManager.giveCallPermission(riskStewardReceiver.address, "deleteDestinationChainRiskStewardRemoteReceiver(uint16)", deployer.address);
+    await accessControlManager.giveCallPermission(
+      riskStewardReceiver.address,
+      "deleteDestinationChainRiskStewardRemoteReceiver(uint16)",
+      deployer.address,
+    );
 
     await accessControlManager.giveCallPermission(
       marketCapsRiskSteward.address,
@@ -271,8 +327,14 @@ describe("Risk Steward", async function () {
 
     await riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, DAY_AND_ONE_SECOND);
     await riskStewardReceiver.setRiskParameterConfig("borrowCap", marketCapsRiskSteward.address, DAY_AND_ONE_SECOND);
-    await riskStewardReceiver.setDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.ethereum, "0x1234567890123456789012345678901234567890");
-    await riskStewardReceiver.setDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.arbitrumone, "0x1234567890123456789012345678901234567890");
+    await riskStewardReceiver.setDestinationChainRiskStewardRemoteReceiver(
+      LZ_CHAINID.ethereum,
+      "0x1234567890123456789012345678901234567890",
+    );
+    await riskStewardReceiver.setDestinationChainRiskStewardRemoteReceiver(
+      LZ_CHAINID.arbitrumone,
+      "0x1234567890123456789012345678901234567890",
+    );
   };
 
   beforeEach(async function () {
@@ -290,7 +352,8 @@ describe("Risk Steward", async function () {
 
     it("should revert if access is not granted for toggling config active", async function () {
       await expect(riskStewardReceiver.connect(signer1).toggleConfigActive("supplyCap")).to.be.rejectedWith(
-        `Unauthorized("${signer1.address}", "${riskStewardReceiver.address}", "toggleConfigActive(string)")`, ``
+        `Unauthorized("${signer1.address}", "${riskStewardReceiver.address}", "toggleConfigActive(string)")`,
+        ``,
       );
     });
 
@@ -308,7 +371,7 @@ describe("Risk Steward", async function () {
 
     it("should revert if access is not granted for processing update", async function () {
       await expect(
-        marketCapsRiskSteward.connect(signer1).processUpdate(1, "0x", "supplyCap", mockCoreVToken.address, "0x")
+        marketCapsRiskSteward.connect(signer1).processUpdate(1, "0x", "supplyCap", mockCoreVToken.address, "0x"),
       ).to.be.rejectedWith("OnlyRiskStewardReceiver()");
     });
 
@@ -319,13 +382,22 @@ describe("Risk Steward", async function () {
     });
 
     it("should revert if access is not granted for setting allowed destination chain receivers", async function () {
-      await expect(riskStewardReceiver.connect(signer1).setDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet, "0x1234567890123456789012345678901234567890")).to.be.rejectedWith(
+      await expect(
+        riskStewardReceiver
+          .connect(signer1)
+          .setDestinationChainRiskStewardRemoteReceiver(
+            LZ_CHAINID.basemainnet,
+            "0x1234567890123456789012345678901234567890",
+          ),
+      ).to.be.rejectedWith(
         `Unauthorized("${signer1.address}", "${riskStewardReceiver.address}", "setDestinationChainRiskStewardRemoteReceiver(uint16,address)")`,
       );
     });
 
     it("should revert if access is not granted for deleting allowed destination chain receivers", async function () {
-      await expect(riskStewardReceiver.connect(signer1).deleteDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet)).to.be.rejectedWith(
+      await expect(
+        riskStewardReceiver.connect(signer1).deleteDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet),
+      ).to.be.rejectedWith(
         `Unauthorized("${signer1.address}", "${riskStewardReceiver.address}", "deleteDestinationChainRiskStewardRemoteReceiver(uint16)")`,
       );
     });
@@ -339,7 +411,12 @@ describe("Risk Steward", async function () {
         ["supplyCap", "borrowCap"],
       )) as MockRiskOracle;
       await upgrades.upgradeProxy(riskStewardReceiver, RiskStewardReceiverFactory, {
-        constructorArgs: [mockRiskOracle.address, governorBravoDelegate.address, omnichainProposalSender.address, HARDHAT_LAYER_ZERO_CHAIN_ID],
+        constructorArgs: [
+          mockRiskOracle.address,
+          governorBravoDelegate.address,
+          omnichainProposalSender.address,
+          HARDHAT_LAYER_ZERO_CHAIN_ID,
+        ],
         unsafeAllow: ["state-variable-immutable"],
       });
       expect(await riskStewardReceiver.RISK_ORACLE()).to.equal(mockRiskOracle.address);
@@ -421,23 +498,43 @@ describe("Risk Steward", async function () {
     });
 
     it("should set allowed destination chain receivers", async function () {
-      expect(await riskStewardReceiver.setDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet, '0x1234567890123456789012345678901234567890')).to.emit("DestinationChainRiskStewardRemoteReceiverSet").withArgs(LZ_CHAINID.basemainnet, ethers.constants.AddressZero, '0x1234567890123456789012345678901234567890');
-      expect(await riskStewardReceiver.destinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet)).to.equal('0x1234567890123456789012345678901234567890');
-    })
+      expect(
+        await riskStewardReceiver.setDestinationChainRiskStewardRemoteReceiver(
+          LZ_CHAINID.basemainnet,
+          "0x1234567890123456789012345678901234567890",
+        ),
+      )
+        .to.emit("DestinationChainRiskStewardRemoteReceiverSet")
+        .withArgs(LZ_CHAINID.basemainnet, ethers.constants.AddressZero, "0x1234567890123456789012345678901234567890");
+      expect(await riskStewardReceiver.destinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet)).to.equal(
+        "0x1234567890123456789012345678901234567890",
+      );
+    });
 
     it("should revert if receiver address is 0", async function () {
-      await expect(riskStewardReceiver.setDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet, ethers.constants.AddressZero)).to.be.rejectedWith("ZeroAddressNotAllowed");
+      await expect(
+        riskStewardReceiver.setDestinationChainRiskStewardRemoteReceiver(
+          LZ_CHAINID.basemainnet,
+          ethers.constants.AddressZero,
+        ),
+      ).to.be.rejectedWith("ZeroAddressNotAllowed");
     });
 
     it("should only delete destination chain receivers if it exists", async function () {
-      await expect(riskStewardReceiver.deleteDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet)).to.be.rejectedWith("ZeroAddressNotAllowed");
+      await expect(
+        riskStewardReceiver.deleteDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet),
+      ).to.be.rejectedWith("ZeroAddressNotAllowed");
     });
 
     it("should delete destination chain receivers", async function () {
-      await riskStewardReceiver.setDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet, '0x1234567890123456789012345678901234567890');
-      expect(await riskStewardReceiver.deleteDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet)).to.emit("DestinationChainRiskStewardRemoteReceiverSet").withArgs(LZ_CHAINID.basemainnet, '0x1234567890123456789012345678901234567890', ethers.constants.AddressZero);
+      await riskStewardReceiver.setDestinationChainRiskStewardRemoteReceiver(
+        LZ_CHAINID.basemainnet,
+        "0x1234567890123456789012345678901234567890",
+      );
+      expect(await riskStewardReceiver.deleteDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet))
+        .to.emit("DestinationChainRiskStewardRemoteReceiverSet")
+        .withArgs(LZ_CHAINID.basemainnet, "0x1234567890123456789012345678901234567890", ethers.constants.AddressZero);
     });
-
   });
 
   describe("Risk Steward Pause", async function () {
@@ -460,85 +557,224 @@ describe("Risk Steward", async function () {
   });
 
   describe("Risk Parameter Update Reverts under incorrect conditions", async function () {
-
     it("should error if updateType is not implemented", async function () {
-      await publishRiskParameterUpdate([{ updateType: 'randomUpdateType' as any, market: mockCoreVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "randomUpdateType" as any,
+          market: mockCoreVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
-      await expect(riskStewardReceiver.processUpdateById(1)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(1, 3);
+      await expect(riskStewardReceiver.processUpdateById(1))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(1, 3);
       expect(await riskStewardReceiver.processedUpdates(1)).to.equal(3);
     });
 
     it("should error if updateType is not active", async function () {
-      await publishRiskParameterUpdate([{ updateType: 'supplyCap', market: mockCoreVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockCoreVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "supplyCap",
+          market: mockCoreVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockCoreVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
       await riskStewardReceiver.toggleConfigActive("supplyCap");
-      await expect(riskStewardReceiver.processUpdateById(1)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(1, 3);
+      await expect(riskStewardReceiver.processUpdateById(1))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(1, 3);
 
       await riskStewardReceiver.toggleConfigActive("borrowCap");
-      await expect(riskStewardReceiver.processUpdateById(2)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(2, 3);
+      await expect(riskStewardReceiver.processUpdateById(2))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(2, 3);
     });
 
     it("should error if the update is expired", async function () {
-      await publishRiskParameterUpdate([{ updateType: 'supplyCap', market: mockCoreVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockCoreVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "supplyCap",
+          market: mockCoreVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockCoreVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
       await time.increase(60 * 60 * 24 + 1);
-      await expect(riskStewardReceiver.processUpdateById(1)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(1, 4);
-      await expect(riskStewardReceiver.processUpdateById(2)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(2, 4);
+      await expect(riskStewardReceiver.processUpdateById(1))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(1, 4);
+      await expect(riskStewardReceiver.processUpdateById(2))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(2, 4);
     });
 
     it("should revert if market is not supported", async function () {
       // Wrong address
-      await publishRiskParameterUpdate([{ updateType: 'supplyCap', market: mockCoreComptroller.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "supplyCap",
+          market: mockCoreComptroller.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
-      await expect(riskStewardReceiver.processUpdateById(1)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(1, 6);
+      await expect(riskStewardReceiver.processUpdateById(1))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(1, 6);
       // Wrong address
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockCoreComptroller.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
-      await expect(riskStewardReceiver.processUpdateById(2)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(2, 6);
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockCoreComptroller.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
+      await expect(riskStewardReceiver.processUpdateById(2))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(2, 6);
     });
 
     it("should error if the update is too frequent", async function () {
-      await publishRiskParameterUpdate([{ updateType: 'supplyCap', market: mockCoreVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "supplyCap",
+          market: mockCoreVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
       await riskStewardReceiver.processUpdateById(1);
-      await publishRiskParameterUpdate([{ updateType: 'supplyCap', market: mockCoreVToken.address, value: 12, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
-      await expect(riskStewardReceiver.processUpdateById(2)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(2, 6);
+      await publishRiskParameterUpdate([
+        {
+          updateType: "supplyCap",
+          market: mockCoreVToken.address,
+          value: 12,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
+      await expect(riskStewardReceiver.processUpdateById(2))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(2, 6);
 
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockCoreVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockCoreVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
       await riskStewardReceiver.processUpdateById(3);
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockCoreVToken.address, value: 12, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
-      await expect(riskStewardReceiver.processUpdateById(4)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(4, 6);
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockCoreVToken.address,
+          value: 12,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
+      await expect(riskStewardReceiver.processUpdateById(4))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(4, 6);
     });
 
     it("should revert on invalid update ID", async function () {
-      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith('Invalid update ID.');
+      await expect(riskStewardReceiver.processUpdateById(1)).to.be.rejectedWith("Invalid update ID.");
     });
 
     it("should revert if the update has already been applied", async function () {
-      await publishRiskParameterUpdate([{ updateType: 'supplyCap', market: mockCoreVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "supplyCap",
+          market: mockCoreVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
       await riskStewardReceiver.processUpdateById(1);
-      await expect(riskStewardReceiver.processUpdateById(1)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(1, 1);
+      await expect(riskStewardReceiver.processUpdateById(1))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(1, 1);
     });
 
     it("should revert if the update is out of bounds", async function () {
       // Too low
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockCoreVToken.address, value: 2, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
-      await expect(riskStewardReceiver.processUpdateById(1)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(1, 6);
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockCoreVToken.address,
+          value: 2,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
+      await expect(riskStewardReceiver.processUpdateById(1))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(1, 6);
 
       // Too high
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockCoreVToken.address, value: 20, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockCoreVToken.address,
+          value: 20,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
-      await expect(riskStewardReceiver.processUpdateById(2)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(2, 6);
+      await expect(riskStewardReceiver.processUpdateById(2))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(2, 6);
 
       // Too Low
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockVToken.address, value: 2, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockVToken.address,
+          value: 2,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
-      await expect(riskStewardReceiver.processUpdateById(3)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(3, 6);
+      await expect(riskStewardReceiver.processUpdateById(3))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(3, 6);
 
       // Too high
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockVToken.address, value: 20, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockVToken.address,
+          value: 20,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
-      await expect(riskStewardReceiver.processUpdateById(4)).to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(4, 6);
+      await expect(riskStewardReceiver.processUpdateById(4))
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(4, 6);
     });
   });
 
@@ -548,8 +784,22 @@ describe("Risk Steward", async function () {
       expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
       expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
 
-      await publishRiskParameterUpdate([{ updateType: 'supplyCap', market: mockCoreVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockCoreVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "supplyCap",
+          market: mockCoreVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockCoreVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
       await expect(await riskStewardReceiver.processUpdateById(1))
         .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
@@ -563,8 +813,22 @@ describe("Risk Steward", async function () {
       expect(await mockComptroller.supplyCaps(mockVToken.address)).to.equal(parseUnits("8", 18));
       expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("8", 18));
 
-      await publishRiskParameterUpdate([{ updateType: 'supplyCap', market: mockVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "supplyCap",
+          market: mockVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
       await expect(riskStewardReceiver.processUpdateById(3))
         .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
@@ -581,8 +845,22 @@ describe("Risk Steward", async function () {
       expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
       expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
 
-      await publishRiskParameterUpdate([{ updateType: 'supplyCap', market: mockCoreVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockCoreVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "supplyCap",
+          market: mockCoreVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockCoreVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
       await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address);
       await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address);
@@ -592,8 +870,22 @@ describe("Risk Steward", async function () {
       expect(await mockComptroller.supplyCaps(mockVToken.address)).to.equal(parseUnits("8", 18));
       expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("8", 18));
 
-      await publishRiskParameterUpdate([{ updateType: 'supplyCap', market: mockVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "supplyCap",
+          market: mockVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
       await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockVToken.address);
       await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockVToken.address);
@@ -606,8 +898,22 @@ describe("Risk Steward", async function () {
       expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
       expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
 
-      await publishRiskParameterUpdate([{ updateType: 'supplyCap', market: mockCoreVToken.address, value: 6, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockCoreVToken.address, value: 6, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "supplyCap",
+          market: mockCoreVToken.address,
+          value: 6,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockCoreVToken.address,
+          value: 6,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
       await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockCoreVToken.address);
       await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockCoreVToken.address);
@@ -617,8 +923,22 @@ describe("Risk Steward", async function () {
       expect(await mockComptroller.supplyCaps(mockVToken.address)).to.equal(parseUnits("8", 18));
       expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("8", 18));
 
-      await publishRiskParameterUpdate([{ updateType: 'supplyCap', market: mockVToken.address, value: 6, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
-      await publishRiskParameterUpdate([{ updateType: 'borrowCap', market: mockVToken.address, value: 6, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }])
+      await publishRiskParameterUpdate([
+        {
+          updateType: "supplyCap",
+          market: mockVToken.address,
+          value: 6,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
+      await publishRiskParameterUpdate([
+        {
+          updateType: "borrowCap",
+          market: mockVToken.address,
+          value: 6,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
       await riskStewardReceiver.processUpdateByParameterAndMarket("supplyCap", mockVToken.address);
       await riskStewardReceiver.processUpdateByParameterAndMarket("borrowCap", mockVToken.address);
@@ -628,13 +948,18 @@ describe("Risk Steward", async function () {
   });
 
   describe("Risk Parameter Updates on Destination chain under correct conditions", async function () {
-
     it("should process update by a single id", async function () {
       const destinationChainUpdates = await publishRiskParameterUpdate([
-        { updateType: 'supplyCap', market: mockVToken.address, value: 10, destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID }
-      ])
+        {
+          updateType: "supplyCap",
+          market: mockVToken.address,
+          value: 10,
+          destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
       await expect(riskStewardReceiver.processUpdateById(1))
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(1);
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(1);
 
       // Check proposal created
       const proposal = await governorBravoDelegate.proposals(2);
@@ -644,29 +969,64 @@ describe("Risk Steward", async function () {
       const actions = await governorBravoDelegate.getActions(2);
 
       expect(actions.targets).to.deep.equal([omnichainProposalSender.address]);
-      expect(actions.signatures).to.deep.equal(['execute(uint16,bytes,bytes,address)']);
+      expect(actions.signatures).to.deep.equal(["execute(uint16,bytes,bytes,address)"]);
       expect(actions.calldatas[0]).to.deep.equal(destinationChainUpdates[ETHEREUM_LAYER_ZERO_CHAIN_ID]);
     });
 
     it("should execute source update and reduce remote updates to a single proposal", async function () {
       const destinationChainUpdates = await publishRiskParameterUpdate([
-        { updateType: 'supplyCap', market: mockEthereumVToken.address, value: 10, destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'borrowCap', market: mockEthereumVToken.address, value: 10, destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'supplyCap', market: mockArbitrumVToken.address, value: 10, destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'borrowCap', market: mockArbitrumVToken.address, value: 10, destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID },
+        {
+          updateType: "supplyCap",
+          market: mockEthereumVToken.address,
+          value: 10,
+          destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "borrowCap",
+          market: mockEthereumVToken.address,
+          value: 10,
+          destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "supplyCap",
+          market: mockArbitrumVToken.address,
+          value: 10,
+          destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "borrowCap",
+          market: mockArbitrumVToken.address,
+          value: 10,
+          destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID,
+        },
         // local
-        { updateType: 'supplyCap', market: mockVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'borrowCap', market: mockVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }
-      ])
-
+        {
+          updateType: "supplyCap",
+          market: mockVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "borrowCap",
+          market: mockVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
       await expect(riskStewardReceiver.processUpdatesByIds([1, 2, 3, 4, 5, 6]))
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(1)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(2)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(3)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(4)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProcessed").withArgs(5)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProcessed").withArgs(6);
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(1)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(2)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(3)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(4)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProcessed")
+        .withArgs(5)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProcessed")
+        .withArgs(6);
       // Check proposal created
       const proposal = await governorBravoDelegate.proposals(2);
       expect(proposal.id).to.equal(2);
@@ -680,21 +1040,57 @@ describe("Risk Steward", async function () {
 
     it("should execute source update and reduce remote updates to a single proposal event when out of order", async function () {
       const destinationChainUpdates = await publishRiskParameterUpdate([
-        { updateType: 'borrowCap', market: mockVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'supplyCap', market: mockEthereumVToken.address, value: 10, destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'supplyCap', market: mockVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'borrowCap', market: mockArbitrumVToken.address, value: 10, destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'supplyCap', market: mockArbitrumVToken.address, value: 10, destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'borrowCap', market: mockEthereumVToken.address, value: 10, destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID },
-      ])
+        {
+          updateType: "borrowCap",
+          market: mockVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "supplyCap",
+          market: mockEthereumVToken.address,
+          value: 10,
+          destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "supplyCap",
+          market: mockVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "borrowCap",
+          market: mockArbitrumVToken.address,
+          value: 10,
+          destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "supplyCap",
+          market: mockArbitrumVToken.address,
+          value: 10,
+          destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "borrowCap",
+          market: mockEthereumVToken.address,
+          value: 10,
+          destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID,
+        },
+      ]);
 
       await expect(riskStewardReceiver.processUpdatesByIds([1, 2, 3, 4, 5, 6]))
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProcessed").withArgs(1)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(2)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProcessed").withArgs(3)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(4)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(5)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(6)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProcessed")
+        .withArgs(1)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(2)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProcessed")
+        .withArgs(3)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(4)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(5)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(6);
       // Check proposal created
       const proposal = await governorBravoDelegate.proposals(2);
       expect(proposal.id).to.equal(2);
@@ -704,34 +1100,88 @@ describe("Risk Steward", async function () {
 
       expect(actions.calldatas[0]).to.deep.equal(destinationChainUpdates[ETHEREUM_LAYER_ZERO_CHAIN_ID]);
       expect(actions.calldatas[1]).to.deep.equal(destinationChainUpdates[ARBITRUM_LAYER_ZERO_CHAIN_ID]);
-    })
+    });
 
     it("should execute source update and reduce remote updates to a single proposal event when out of order skipping invalid updates", async function () {
-
       await publishRiskParameterUpdate([
-        { updateType: 'borrowCap', market: mockVToken.address, value: 1, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }, // too low
-        { updateType: 'supplyCap', market: mockEthereumVToken.address, value: 10, destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'supplyCap', market: mockVToken.address, value: 10, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'supplyCap', market: mockCoreVToken.address, value: 100, destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID }, // too high
-        { updateType: 'borrowCap', market: mockArbitrumVToken.address, value: 10, destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID }, // not latest update
-        { updateType: 'borrowCap', market: mockArbitrumVToken.address, value: 10, destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'supplyCap', market: mockArbitrumVToken.address, value: 10, destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'borrowCap', market: mockEthereumVToken.address, value: 10, destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID },
-        { updateType: 'randomUpdateType', market: mockEthereumVToken.address, value: 10, destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID }, // invalid update type
-        { updateType: 'borrowCap', market: mockCoreVToken.address, value: 10, destinationChainId: 90 }, // invalid destination chain id
-      ])
+        {
+          updateType: "borrowCap",
+          market: mockVToken.address,
+          value: 1,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        }, // too low
+        {
+          updateType: "supplyCap",
+          market: mockEthereumVToken.address,
+          value: 10,
+          destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "supplyCap",
+          market: mockVToken.address,
+          value: 10,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "supplyCap",
+          market: mockCoreVToken.address,
+          value: 100,
+          destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
+        }, // too high
+        {
+          updateType: "borrowCap",
+          market: mockArbitrumVToken.address,
+          value: 10,
+          destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID,
+        }, // not latest update
+        {
+          updateType: "borrowCap",
+          market: mockArbitrumVToken.address,
+          value: 10,
+          destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "supplyCap",
+          market: mockArbitrumVToken.address,
+          value: 10,
+          destinationChainId: ARBITRUM_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "borrowCap",
+          market: mockEthereumVToken.address,
+          value: 10,
+          destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID,
+        },
+        {
+          updateType: "randomUpdateType",
+          market: mockEthereumVToken.address,
+          value: 10,
+          destinationChainId: ETHEREUM_LAYER_ZERO_CHAIN_ID,
+        }, // invalid update type
+        { updateType: "borrowCap", market: mockCoreVToken.address, value: 10, destinationChainId: 90 }, // invalid destination chain id
+      ]);
 
       await expect(riskStewardReceiver.processUpdatesByIds([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]))
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(1, 6)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(2)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProcessed").withArgs(3)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(4, 6)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(5, 4)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(6)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(7)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed").withArgs(8)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(9, 3)
-        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed").withArgs(10, 7)
-    })
-  })
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(1, 6)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(2)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProcessed")
+        .withArgs(3)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(4, 6)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(5, 4)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(6)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(7)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
+        .withArgs(8)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(9, 3)
+        .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
+        .withArgs(10, 7);
+    });
+  });
 });
