@@ -71,6 +71,7 @@ describe("Governor Bravo Cast Vote Test", () => {
   });
   describe("We must revert if:", () => {
     let customerAddress;
+
     it("We cannot propose without enough voting power by depositing xvs to the vault", async () => {
       customerAddress = await customer.getAddress();
       xvsVault.getPriorVotes.returns(convertToUnit("249999", 18));
@@ -83,8 +84,9 @@ describe("Governor Bravo Cast Vote Test", () => {
           "do nothing",
           ProposalType.CRITICAL,
         ),
-      ).to.be.revertedWith("GovernorBravo::propose: proposer votes below proposal threshold");
+      ).to.be.rejectedWith("InsufficientVotingPower");
     });
+
     describe("after we deposit xvs to the vault", () => {
       let proposalId: BigNumber;
       beforeEach(async () => {
@@ -105,9 +107,7 @@ describe("Governor Bravo Cast Vote Test", () => {
       });
 
       it("There does not exist a proposal with matching proposal id where the current block number is between the proposal's start block (exclusive) and end block (inclusive)", async () => {
-        await expect(governorBravoDelegate.castVote(proposalId, 1)).to.be.revertedWith(
-          "GovernorBravo::castVoteInternal: voting is closed",
-        );
+        await expect(governorBravoDelegate.castVote(proposalId, 1)).to.be.rejectedWith("ProposalNotActive");
       });
 
       it("Such proposal already has an entry in its voters set matching the sender", async () => {
@@ -116,8 +116,8 @@ describe("Governor Bravo Cast Vote Test", () => {
 
         await governorBravoDelegate.connect(accounts[4]).castVote(proposalId, 1);
         await governorBravoDelegate.connect(accounts[3]).castVoteWithReason(proposalId, 1, "");
-        await expect(governorBravoDelegate.connect(accounts[4]).castVote(proposalId, 1)).to.be.revertedWith(
-          "GovernorBravo::castVoteInternal: voter already voted",
+        await expect(governorBravoDelegate.connect(accounts[4]).castVote(proposalId, 1)).to.be.rejectedWith(
+          "UserAlreadyVoted",
         );
       });
       describe("Otherwise", () => {
@@ -199,7 +199,7 @@ describe("Governor Bravo Cast Vote Test", () => {
               ethers.utils.formatBytes32String("r"),
               ethers.utils.formatBytes32String("s"),
             ),
-          ).to.be.revertedWith("GovernorBravo::castVoteBySig: invalid signature");
+          ).to.be.rejectedWith("InvalidSignature");
         });
 
         it("casts vote on behalf of the signatory", async () => {

@@ -57,7 +57,7 @@ const config: HardhatUserConfig = {
             enabled: true,
             runs: 10000,
           },
-          evmVersion: "paris",
+          evmVersion: "cancun",
           outputSelection: {
             "*": {
               "*": ["storageLayout"],
@@ -115,7 +115,7 @@ const config: HardhatUserConfig = {
 };
 
 function isFork() {
-  return process.env.FORK === "true"
+  return process.env.FORKED_NETWORK
     ? {
         allowUnlimitedContractSize: false,
         loggingEnabled: false,
