@@ -12,7 +12,7 @@ import {
   OmnichainGovernanceExecutorOwnerMethods,
   config,
 } from "../helpers/deploy/deploymentConfig";
-import { getOmnichainProposalSender, guardian, testnetNetworks } from "../helpers/deploy/deploymentUtils";
+import { getOmnichainProposalSender, getAcmAdminAccount, testnetNetworks } from "../helpers/deploy/deploymentUtils";
 import { OmnichainGovernanceExecutor } from "../typechain";
 
 interface GovernanceCommand {
@@ -83,7 +83,7 @@ const executeCommands = async (
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const srcChainId = testnetNetworks.includes(hre.network.name) ? LZ_CHAINID["bsctestnet"] : LZ_CHAINID["bscmainnet"];
-  const Guardian = await guardian(hre.network.name as SUPPORTED_NETWORKS);
+  const Guardian = await getAcmAdminAccount(hre.network.name as SUPPORTED_NETWORKS);
 
   const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
