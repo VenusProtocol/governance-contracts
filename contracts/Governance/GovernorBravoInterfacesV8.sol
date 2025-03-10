@@ -68,6 +68,84 @@ contract GovernorBravoEvents {
 
     /// @notice Emitted when a proposer is removed from the whitelist
     event WhitelistedProposerRemoved(address indexed proposer);
+
+    /// @notice Error thrown when the caller is not the admin
+    error OnlyAdmin();
+
+    /// @notice Error thrown when the caller is not the admin or the guardian
+    error OnlyAdminOrGuardian();
+
+    /// @notice Error thrown when the contract is already initialized
+    error AlreadyInitialized();
+
+    /// @notice Error thrown when the arity of the proposal function parameters are not equal
+    error ArityMismatch(string parameterName);
+
+    /// @notice Error thrown when the min voting period is invalid
+    error InvalidMinVotingPeriod();
+
+    /// @notice Error thrown when the max voting period is invalid
+    error InvalidMaxVotingPeriod();
+
+    /// @notice Error thrown when the min voting delay is invalid
+    error InvalidMinVotingDelay();
+
+    /// @notice Error thrown when the max voting delay is invalid
+    error InvalidMaxVotingDelay();
+
+    /// @notice Error thrown when the min proposal threshold is invalid
+    error InvalidMinProposalThreshold();
+
+    /// @notice Error thrown when the max proposal threshold is invalid
+    error InvalidMaxProposalThreshold();
+
+    /// @notice Error thrown when the governor is not active
+    error GovernorNotActive();
+
+    /// @notice Error thrown when user has insufficient voting power to execute a command
+    error InsufficientVotingPower();
+
+    /// @notice Error thrown when no actions are provided
+    error NoActionsProvided();
+
+    /// @notice Error thrown when too many actions are provided
+    error TooManyActions();
+
+    /// @notice Error thrown when a proposer has an active or pending proposal
+    error OneLiveProposalPerProposer();
+
+    /// @notice Error thrown when a proposal is not active
+    error ProposalNotActive();
+
+    /// @notice Error thrown when a proposal has not succeeded
+    error ProposalNotSucceeded();
+
+    /// @notice Error thrown when a proposal has not been queued
+    error ProposalNotQueued();
+
+    /// @notice Error thrown when a proposal has already been executed
+    error ProposalAlreadyExecuted();
+
+    /// @notice Error thrown when a proposal tries to queue identical actions
+    error DuplicateAction();
+
+    /// @notice Error thrown when the proposal id is too high (doesn't exist)
+    error InvalidProposalId();
+
+    /// @notice Error thrown when the signature is invalid
+    error InvalidSignature();
+
+    /// @notice Error thrown when vote type is not correct
+    error InvalidVoteType();
+
+    /// @notice Error thrown when user has already voted
+    error UserAlreadyVoted();
+
+    /// @notice Error thrown when sender is not pending admin
+    error SenderIsNotPendingAdmin();
+
+    /// @notice Error thrown when the proposer is not whitelisted
+    error TimelockNotWhitelistedForProposer();
 }
 
 /**
@@ -211,6 +289,11 @@ contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
 
     /// @notice mapping containing Timelock addresses for each proposal type
     mapping(uint256 => TimelockInterface) public proposalTimelocks;
+}
+
+contract GovernorBravoDelegateStorageV3 is GovernorBravoDelegateStorageV2 {
+    /// @notice Mapping to store whitelisted proposers and the timelock they are authorized to use
+    mapping(address => address) public whitelistedProposers;
 }
 
 interface IGovernorBravoDelegate {
