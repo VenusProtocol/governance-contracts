@@ -268,7 +268,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         ProposalType proposalType
     ) public requireActiveGovernor returns (uint256) {
         if (
-            xvsVault.getPriorVotes(msg.sender, sub256(block.number, 1)) <
+            xvsVault.getPriorVotes(msg.sender, block.number - 1) <
             proposalConfigs[uint8(proposalType)].proposalThreshold &&
             whitelistedProposers[msg.sender] == address(0)
         ) {
@@ -306,8 +306,8 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
             }
         }
 
-        uint256 startBlock = add256(block.number, proposalConfigs[uint8(proposalType)].votingDelay);
-        uint256 endBlock = add256(startBlock, proposalConfigs[uint8(proposalType)].votingPeriod);
+        uint256 startBlock = block.number + proposalConfigs[uint8(proposalType)].votingDelay;
+        uint256 endBlock = startBlock + proposalConfigs[uint8(proposalType)].votingPeriod;
 
         proposalCount++;
 
@@ -349,7 +349,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         }
 
         Proposal storage proposal = proposals[proposalId];
-        uint256 eta = add256(block.timestamp, proposalTimelocks[uint8(proposal.proposalType)].delay());
+        uint256 eta = block.timestamp + proposalTimelocks[uint8(proposal.proposalType)].delay();
         for (uint256 i; i < proposal.targets.length; ++i) {
             queueOrRevertInternal(
                 proposal.targets[i],
@@ -444,7 +444,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         if (
             msg.sender != guardian &&
             msg.sender != proposal.proposer &&
-            xvsVault.getPriorVotes(proposal.proposer, sub256(block.number, 1)) >=
+            xvsVault.getPriorVotes(proposal.proposer, block.number - 1) >=
             proposalConfigs[proposal.proposalType].proposalThreshold
         ) {
             revert InsufficientVotingPower();
@@ -524,7 +524,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         } else if (proposal.executed) {
             return ProposalState.Executed;
         } else if (
-            block.timestamp >= add256(proposal.eta, proposalTimelocks[uint8(proposal.proposalType)].GRACE_PERIOD())
+            block.timestamp >= proposal.eta + proposalTimelocks[uint8(proposal.proposalType)].GRACE_PERIOD()
         ) {
             return ProposalState.Expired;
         } else {
@@ -595,11 +595,11 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         uint96 votes = xvsVault.getPriorVotes(voter, proposal.startBlock);
 
         if (support == 0) {
-            proposal.againstVotes = add256(proposal.againstVotes, votes);
+            proposal.againstVotes = proposal.againstVotes + votes;
         } else if (support == 1) {
-            proposal.forVotes = add256(proposal.forVotes, votes);
+            proposal.forVotes = proposal.forVotes + votes;
         } else if (support == 2) {
-            proposal.abstainVotes = add256(proposal.abstainVotes, votes);
+            proposal.abstainVotes = proposal.abstainVotes + votes;
         }
 
         receipt.hasVoted = true;
@@ -726,17 +726,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
             proposalConfigs[i] = proposalConfigs_[i];
             proposalTimelocks[i] = timelocks[i];
         }
-    }
-
-    function add256(uint256 a, uint256 b) internal pure returns (uint256) {
-        uint256 c = a + b;
-        require(c >= a, "addition overflow");
-        return c;
-    }
-
-    function sub256(uint256 a, uint256 b) internal pure returns (uint256) {
-        require(b <= a, "subtraction underflow");
-        return a - b;
     }
 
     function getChainIdInternal() internal view returns (uint256) {
