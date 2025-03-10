@@ -119,13 +119,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
         _;
     }
 
-    modifier onlyGuardianOrAdmin() {
-        if (msg.sender != guardian && msg.sender != admin) {
-            revert OnlyAdminOrGuardian();
-        }
-        _;
-    }
-
     /**
      * @notice Used to initialize the contract during delegator contructor
      * @param xvsVault_ The address of the XvsVault
@@ -530,7 +523,8 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
      * @notice Sets the new governance guardian
      * @param newGuardian the address of the new guardian
      */
-    function _setGuardian(address newGuardian) external onlyGuardianOrAdmin {
+    function _setGuardian(address newGuardian) external {
+        _checkAccessAllowed("_setGuardian(address)");
         ensureNonzeroAddress(newGuardian);
         address oldGuardian = guardian;
         guardian = newGuardian;
