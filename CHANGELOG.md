@@ -1,3 +1,19 @@
+## [2.11.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.10.0...v2.11.0-dev.1) (2025-03-04)
+
+
+### Features
+
+* deployed aggregator ([fef53f7](https://github.com/VenusProtocol/governance-contracts/commit/fef53f7172f41669bd8e98981d5553fb2f5b8775))
+* deployed contracts ([3f87841](https://github.com/VenusProtocol/governance-contracts/commit/3f87841dc65880415cfb5ec0a944caf6dcffe5fe))
+* redeployed contracts ([37b5f47](https://github.com/VenusProtocol/governance-contracts/commit/37b5f472e4bec4efac7ff09480de4e7a91654f0a))
+* updating deployment files ([cae8655](https://github.com/VenusProtocol/governance-contracts/commit/cae8655c3631ce555b2f01892cd160a9484a42cc))
+
+
+### Bug Fixes
+
+* revert timelock change ([14935f0](https://github.com/VenusProtocol/governance-contracts/commit/14935f0463c0cb2d7906cd4480d1b3427c30e393))
+* use timelock instead of guardian ([0c4e14a](https://github.com/VenusProtocol/governance-contracts/commit/0c4e14ab74573ec925fc472b3990f2327b799667))
+
 ## [2.10.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.9.0...v2.10.0) (2025-02-24)
 
 
