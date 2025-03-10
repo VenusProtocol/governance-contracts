@@ -1,6 +1,6 @@
+import * as helpers from "@nomicfoundation/hardhat-network-helpers";
 import BigNumber from "bignumber.js";
 import { ethers, network } from "hardhat";
-import * as helpers from "@nomicfoundation/hardhat-network-helpers"
 
 BigNumber.config({
   FORMAT: {
@@ -48,7 +48,6 @@ export const getArgTypesFromSignature = (methodSignature: string): string[] => {
   const [, argumentString] = methodSignature.split("(")[1].split(")");
   return argumentString.split(",").map(arg => arg.trim());
 };
-
 
 export async function setForkBlock(blockNumber: number) {
   await network.provider.request({

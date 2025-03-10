@@ -10,7 +10,6 @@ struct RiskParamConfig {
 }
 
 interface IRiskStewardRemoteReceiver {
-
     function initialize(address accessControlManager_) external;
 
     function processUpdateById(uint256 updateId) external;

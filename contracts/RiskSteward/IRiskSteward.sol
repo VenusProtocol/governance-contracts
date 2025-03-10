@@ -4,10 +4,17 @@ pragma solidity 0.8.25;
 import { RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
 
 interface IRiskSteward {
+    function decodeAdditionalData(
+        bytes calldata additionalData
+    ) external pure returns (address underlying, uint16 destChainId);
 
-    function decodeAdditionalData(bytes calldata additionalData) external pure returns (address underlying, uint16 destChainId);
-
-    function processUpdate(uint256 updateId, bytes memory newValue, string memory updateType, address market, bytes memory additionalData) external;
+    function processUpdate(
+        uint256 updateId,
+        bytes memory newValue,
+        string memory updateType,
+        address market,
+        bytes memory additionalData
+    ) external;
 
     function packNewValue(bytes memory data) external pure returns (bytes memory);
 }

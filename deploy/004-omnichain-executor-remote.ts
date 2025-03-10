@@ -2,7 +2,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 import { SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { getLzEndpoint, getSourceChainId, getAcmAdminAccount } from "../helpers/deploy/deploymentUtils";
+import { getAcmAdminAccount, getLzEndpoint, getSourceChainId } from "../helpers/deploy/deploymentUtils";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const { deployments, getNamedAccounts } = hre;
@@ -13,7 +13,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deploy("OmnichainGovernanceExecutor", {
     from: deployer,
-    args: [await getLzEndpoint(networkName), await getAcmAdminAccount(networkName), await getSourceChainId(networkName)],
+    args: [
+      await getLzEndpoint(networkName),
+      await getAcmAdminAccount(networkName),
+      await getSourceChainId(networkName),
+    ],
     log: true,
     autoMine: true,
     skipIfAlreadyDeployed: true,

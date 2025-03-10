@@ -203,11 +203,12 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:access Only callable by the RiskStewardReceiver
      */
     function processUpdate(
-        uint256 updateId, bytes memory newValue, string memory updateType, address market, bytes memory additionalData
-    )
-        external
-        onlyRiskStewardReceiver
-    {
+        uint256 updateId,
+        bytes memory newValue,
+        string memory updateType,
+        address market,
+        bytes memory additionalData
+    ) external onlyRiskStewardReceiver {
         if (Strings.equal(updateType, SUPPLY_CAP)) {
             _processSupplyCapUpdate(updateId, newValue, updateType, market);
         } else if (Strings.equal(updateType, BORROW_CAP)) {
@@ -325,7 +326,12 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @param newCap The new market cap value to validate
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
-    function _validateSupplyCapUpdate(IUnifiedComptroller comptroller, address market, uint256 updateId, uint256 newCap) internal view {
+    function _validateSupplyCapUpdate(
+        IUnifiedComptroller comptroller,
+        address market,
+        uint256 updateId,
+        uint256 newCap
+    ) internal view {
         uint256 currentSupplyCap = comptroller.supplyCaps(address(market));
         _verifyUpdate(market, updateId, SUPPLY_CAP, currentSupplyCap, newCap);
     }
@@ -338,7 +344,12 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @param newCap The new market cap value to validate
      * @custom:error UpdateNotInRange if the update is not within the allowed range
      */
-    function _validateBorrowCapUpdate(IUnifiedComptroller comptroller, address market, uint256 updateId, uint256 newCap) internal view {
+    function _validateBorrowCapUpdate(
+        IUnifiedComptroller comptroller,
+        address market,
+        uint256 updateId,
+        uint256 newCap
+    ) internal view {
         uint256 currentBorrowCap = comptroller.borrowCaps(address(market));
         _verifyUpdate(market, updateId, BORROW_CAP, currentBorrowCap, newCap);
     }
