@@ -675,6 +675,7 @@ describe("Risk Steward", async function () {
           destinationChainId: HARDHAT_LAYER_ZERO_CHAIN_ID,
         },
       ]);
+
       await expect(riskStewardReceiver.processUpdateById(2))
         .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
         .withArgs(2, 6);

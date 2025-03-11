@@ -28,6 +28,7 @@ contract RiskStewardDestinationReceiver is IRiskStewardDestinationReceiver, Risk
      * @notice Mapping of processed updates. Used to prevent re-execution
      */
     mapping(uint256 updateId => UPDATE_STATUS) public processedUpdates;
+
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
      * variables without shifting down storage in the inheritance chain.
@@ -49,6 +50,7 @@ contract RiskStewardDestinationReceiver is IRiskStewardDestinationReceiver, Risk
      */
     event RiskParameterUpdateFailed(uint256 indexed updateId, UPDATE_STATUS indexed error);
 
+    /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
         _disableInitializers();
     }
@@ -62,6 +64,17 @@ contract RiskStewardDestinationReceiver is IRiskStewardDestinationReceiver, Risk
         __AccessControlled_init(accessControlManager_);
     }
 
+    /**
+     * @notice Processes an update from the RiskStewardReceiver. First validates that the update has not be processed, the config is active, and is not expired.
+     * If the update is valid then it is executed, otherwise an update failed error is emitted.
+     * @param updateId The ID of the update
+     * @param newValue The new value of the update
+     * @param updateType The type of update
+     * @param market The market of the update
+     * @param additionalData Additional data for the update
+     * @param timestamp The timestamp of the update
+     * @custom:access This function should only be callable by timelocks that are trusted to receive cross chain messages 
+     */
     function processUpdate(
         uint256 updateId,
         bytes calldata newValue,
@@ -69,9 +82,9 @@ contract RiskStewardDestinationReceiver is IRiskStewardDestinationReceiver, Risk
         address market,
         bytes calldata additionalData,
         uint256 timestamp
-    ) external {
-        _checkAccessAllowed("processUpdate(bytes,string,address,bytes)");
-        UPDATE_STATUS error = _validateUpdateStatus(newValue, updateType, market, additionalData, timestamp);
+    ) external whenNotPaused {
+        _checkAccessAllowed("processUpdate(uint256,bytes,string,address,bytes,uint256)");
+        UPDATE_STATUS error = _validateUpdateStatus(updateId, newValue, updateType, market, additionalData, timestamp);
         if (error == UPDATE_STATUS.NONE) {
             _executeUpdate(updateId, newValue, updateType, market, additionalData);
         } else {
@@ -81,10 +94,17 @@ contract RiskStewardDestinationReceiver is IRiskStewardDestinationReceiver, Risk
     }
 
     /**
-     * @notice Validates the status of an update silently. Will validate that the update configuration is active, is not expired, unprocessed, and that the debounce period has passed.
+     * @notice Validates the status of an update silently. Will validate that the update configuration is active, is not expired and unprocessed.
+     * @param updateId The ID of the update
+     * @param newValue The new value of the update
+     * @param updateType The type of update
+     * @param market The market of the update
+     * @param additionalData Additional data for the update
+     * @param timestamp The timestamp of the update
      * @return error The UPDATE_STATUS error code if the update is not valid or 0
      */
     function _validateUpdateStatus(
+        uint256 updateId,
         bytes calldata newValue,
         string calldata updateType,
         address market,
@@ -101,6 +121,12 @@ contract RiskStewardDestinationReceiver is IRiskStewardDestinationReceiver, Risk
             return UPDATE_STATUS.EXPIRED;
         }
 
+        if (
+            processedUpdates[updateId] == UPDATE_STATUS.PROCESSED
+        ) {
+            return processedUpdates[updateId];
+        }
+
         return UPDATE_STATUS.NONE;
     }
 
@@ -111,8 +137,15 @@ contract RiskStewardDestinationReceiver is IRiskStewardDestinationReceiver, Risk
         address market,
         bytes calldata additionalData
     ) internal {
-        IRiskSteward riskSteward = IRiskSteward(riskParameterConfigs[updateType].riskSteward);
-        riskSteward.processUpdate(updateId, newValue, updateType, market, additionalData);
-        processedUpdates[updateId] = UPDATE_STATUS.PROCESSED;
+        IRiskSteward riskSteward = riskParameterConfigs[updateType].riskSteward;
+         try
+                riskSteward.processUpdate(updateId, newValue, updateType, market, additionalData)
+            {
+                processedUpdates[updateId] = UPDATE_STATUS.PROCESSED;
+                emit RiskParameterUpdateProcessed(updateId);
+            } catch {
+                emit RiskParameterUpdateFailed(updateId, UPDATE_STATUS.FAILED);
+                processedUpdates[updateId] = UPDATE_STATUS.FAILED;
+            }
     }
 }

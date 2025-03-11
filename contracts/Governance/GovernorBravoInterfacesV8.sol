@@ -64,10 +64,13 @@ contract GovernorBravoEvents {
     event ProposalMaxOperationsUpdated(uint256 oldMaxOperations, uint256 newMaxOperations);
 
     /// @notice Emitted when a proposer is added to the whitelist
-    event WhitelistedProposerAdded(address indexed proposer);
+    event WhitelistedProposerAdded(address indexed proposer, GovernorBravoDelegateStorageV2.ProposalType proposalType);
 
     /// @notice Emitted when a proposer is removed from the whitelist
-    event WhitelistedProposerRemoved(address indexed proposer);
+    event WhitelistedProposerRemoved(
+        address indexed proposer,
+        GovernorBravoDelegateStorageV2.ProposalType proposalType
+    );
 
     /// @notice Error thrown when the caller is not the admin
     error OnlyAdmin();
@@ -290,7 +293,7 @@ contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
 
 contract GovernorBravoDelegateStorageV3 is GovernorBravoDelegateStorageV2 {
     /// @notice Mapping to store whitelisted proposers and the timelock they are authorized to use
-    mapping(address => address) public whitelistedProposers;
+    mapping(address => mapping(GovernorBravoDelegateStorageV2.ProposalType => bool)) public whitelistedProposers;
 }
 
 interface IGovernorBravoDelegate {

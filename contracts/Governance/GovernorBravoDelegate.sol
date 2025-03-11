@@ -182,16 +182,9 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
         if (
             xvsVault.getPriorVotes(msg.sender, block.number - 1) <
             proposalConfigs[uint8(proposalType)].proposalThreshold &&
-            whitelistedProposers[msg.sender] == address(0)
+            whitelistedProposers[msg.sender][proposalType] == false
         ) {
             revert InsufficientVotingPower();
-        }
-
-        if (
-            whitelistedProposers[msg.sender] != address(0) &&
-            whitelistedProposers[msg.sender] != address(proposalTimelocks[uint8(proposalType)])
-        ) {
-            revert TimelockNotWhitelistedForProposer();
         }
 
         if (
@@ -284,22 +277,22 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
     function whitelistProposer(address proposer, ProposalType proposalType) external {
         _checkAccessAllowed("whitelistProposer(address,ProposalType)");
         ensureNonzeroAddress(proposer);
-        whitelistedProposers[proposer] = address(proposalTimelocks[uint8(proposalType)]);
+        whitelistedProposers[proposer][proposalType] = true;
 
-        emit WhitelistedProposerAdded(proposer);
+        emit WhitelistedProposerAdded(proposer, proposalType);
     }
 
     /**
      * @notice Removes a whitelisted proposer
      * @param proposer The address of the proposer to remove from whitelist
      */
-    function removeWhitelistedProposer(address proposer) external {
+    function removeWhitelistedProposer(address proposer, ProposalType proposalType) external {
         if (msg.sender != guardian) {
-            _checkAccessAllowed("removeWhitelistedProposer(address)");
+            _checkAccessAllowed("removeWhitelistedProposer(address,ProposalType)");
         }
-        whitelistedProposers[proposer] = address(0);
+        whitelistedProposers[proposer][proposalType] = false;
 
-        emit WhitelistedProposerRemoved(proposer);
+        emit WhitelistedProposerRemoved(proposer, proposalType);
     }
 
     function queueOrRevertInternal(
