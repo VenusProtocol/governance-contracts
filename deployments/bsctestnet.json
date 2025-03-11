@@ -6580,7 +6580,7 @@
       ]
     },
     "MarketCapsRiskSteward": {
-      "address": "0x67dD3aD52f6b575654651B5228de88fEF9462724",
+      "address": "0x9b40390771cAeEa69DE55EEd176aeDC72d70cA3E",
       "abi": [
         {
           "anonymous": false,
@@ -6694,7 +6694,7 @@
         },
         {
           "inputs": [],
-          "name": "InvalidMaxIncreaseBps",
+          "name": "InvalidMaxDeltaBps",
           "type": "error"
         },
         {
@@ -6734,16 +6734,21 @@
           "type": "error"
         },
         {
+          "inputs": [],
+          "name": "ZeroAddressNotAllowed",
+          "type": "error"
+        },
+        {
           "anonymous": false,
           "inputs": [
             {
-              "indexed": false,
+              "indexed": true,
               "internalType": "address",
               "name": "market",
               "type": "address"
             },
             {
-              "indexed": false,
+              "indexed": true,
               "internalType": "uint256",
               "name": "newBorrowCap",
               "type": "uint256"
@@ -6771,17 +6776,17 @@
             {
               "indexed": false,
               "internalType": "uint256",
-              "name": "oldMaxIncreaseBps",
+              "name": "oldMaxDeltaBps",
               "type": "uint256"
             },
             {
-              "indexed": false,
+              "indexed": true,
               "internalType": "uint256",
-              "name": "newMaxIncreaseBps",
+              "name": "newMaxDeltaBps",
               "type": "uint256"
             }
           ],
-          "name": "MaxIncreaseBpsUpdated",
+          "name": "MaxDeltaBpsUpdated",
           "type": "event"
         },
         {
@@ -6845,13 +6850,13 @@
           "anonymous": false,
           "inputs": [
             {
-              "indexed": false,
+              "indexed": true,
               "internalType": "address",
               "name": "market",
               "type": "address"
             },
             {
-              "indexed": false,
+              "indexed": true,
               "internalType": "uint256",
               "name": "newSupplyCap",
               "type": "uint256"
@@ -6859,6 +6864,19 @@
           ],
           "name": "SupplyCapUpdated",
           "type": "event"
+        },
+        {
+          "inputs": [],
+          "name": "BORROW_CAP",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
         },
         {
           "inputs": [],
@@ -6881,6 +6899,19 @@
               "internalType": "contract IRiskStewardReceiver",
               "name": "",
               "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "SUPPLY_CAP",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
             }
           ],
           "stateMutability": "view",
@@ -6915,7 +6946,7 @@
             },
             {
               "internalType": "uint256",
-              "name": "maxIncreaseBps_",
+              "name": "maxDeltaBps_",
               "type": "uint256"
             }
           ],
@@ -6926,7 +6957,7 @@
         },
         {
           "inputs": [],
-          "name": "maxIncreaseBps",
+          "name": "maxDeltaBps",
           "outputs": [
             {
               "internalType": "uint256",
@@ -7042,11 +7073,11 @@
           "inputs": [
             {
               "internalType": "uint256",
-              "name": "maxIncreaseBps_",
+              "name": "maxDeltaBps_",
               "type": "uint256"
             }
           ],
-          "name": "setMaxIncreaseBps",
+          "name": "setMaxDeltaBps",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -7088,7 +7119,7 @@
       ]
     },
     "MarketCapsRiskSteward_Implementation": {
-      "address": "0xD5C8Bbe05F198796d78c2845c860fE92F47C926f",
+      "address": "0x4170a44bCa56A8152E0De45Dfe871bf018dcF815",
       "abi": [
         {
           "inputs": [
@@ -7108,7 +7139,7 @@
         },
         {
           "inputs": [],
-          "name": "InvalidMaxIncreaseBps",
+          "name": "InvalidMaxDeltaBps",
           "type": "error"
         },
         {
@@ -7148,16 +7179,21 @@
           "type": "error"
         },
         {
+          "inputs": [],
+          "name": "ZeroAddressNotAllowed",
+          "type": "error"
+        },
+        {
           "anonymous": false,
           "inputs": [
             {
-              "indexed": false,
+              "indexed": true,
               "internalType": "address",
               "name": "market",
               "type": "address"
             },
             {
-              "indexed": false,
+              "indexed": true,
               "internalType": "uint256",
               "name": "newBorrowCap",
               "type": "uint256"
@@ -7185,17 +7221,17 @@
             {
               "indexed": false,
               "internalType": "uint256",
-              "name": "oldMaxIncreaseBps",
+              "name": "oldMaxDeltaBps",
               "type": "uint256"
             },
             {
-              "indexed": false,
+              "indexed": true,
               "internalType": "uint256",
-              "name": "newMaxIncreaseBps",
+              "name": "newMaxDeltaBps",
               "type": "uint256"
             }
           ],
-          "name": "MaxIncreaseBpsUpdated",
+          "name": "MaxDeltaBpsUpdated",
           "type": "event"
         },
         {
@@ -7259,13 +7295,13 @@
           "anonymous": false,
           "inputs": [
             {
-              "indexed": false,
+              "indexed": true,
               "internalType": "address",
               "name": "market",
               "type": "address"
             },
             {
-              "indexed": false,
+              "indexed": true,
               "internalType": "uint256",
               "name": "newSupplyCap",
               "type": "uint256"
@@ -7273,6 +7309,19 @@
           ],
           "name": "SupplyCapUpdated",
           "type": "event"
+        },
+        {
+          "inputs": [],
+          "name": "BORROW_CAP",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
         },
         {
           "inputs": [],
@@ -7295,6 +7344,19 @@
               "internalType": "contract IRiskStewardReceiver",
               "name": "",
               "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "SUPPLY_CAP",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
             }
           ],
           "stateMutability": "view",
@@ -7329,7 +7391,7 @@
             },
             {
               "internalType": "uint256",
-              "name": "maxIncreaseBps_",
+              "name": "maxDeltaBps_",
               "type": "uint256"
             }
           ],
@@ -7340,7 +7402,7 @@
         },
         {
           "inputs": [],
-          "name": "maxIncreaseBps",
+          "name": "maxDeltaBps",
           "outputs": [
             {
               "internalType": "uint256",
@@ -7456,11 +7518,11 @@
           "inputs": [
             {
               "internalType": "uint256",
-              "name": "maxIncreaseBps_",
+              "name": "maxDeltaBps_",
               "type": "uint256"
             }
           ],
-          "name": "setMaxIncreaseBps",
+          "name": "setMaxDeltaBps",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -7481,7 +7543,7 @@
       ]
     },
     "MarketCapsRiskSteward_Proxy": {
-      "address": "0x67dD3aD52f6b575654651B5228de88fEF9462724",
+      "address": "0x9b40390771cAeEa69DE55EEd176aeDC72d70cA3E",
       "abi": [
         {
           "inputs": [
@@ -7613,6 +7675,492 @@
         {
           "stateMutability": "payable",
           "type": "receive"
+        }
+      ]
+    },
+    "MockRiskOracle": {
+      "address": "0xFD28623359397880F822cD09d42D54058fc47Ce7",
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "_description",
+              "type": "string"
+            },
+            {
+              "internalType": "address[]",
+              "name": "initialSenders",
+              "type": "address[]"
+            },
+            {
+              "internalType": "string[]",
+              "name": "initialUpdateTypes",
+              "type": "string[]"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "AuthorizedSenderAdded",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "AuthorizedSenderRemoved",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "referenceId",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes",
+              "name": "newValue",
+              "type": "bytes"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes",
+              "name": "previousValue",
+              "type": "bytes"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "string",
+              "name": "updateType",
+              "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "market",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes",
+              "name": "additionalData",
+              "type": "bytes"
+            }
+          ],
+          "name": "ParameterUpdated",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "string",
+              "name": "updateType",
+              "type": "string"
+            }
+          ],
+          "name": "UpdateTypeAdded",
+          "type": "event"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "addAuthorizedSender",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "newUpdateType",
+              "type": "string"
+            }
+          ],
+          "name": "addUpdateType",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "description",
+          "outputs": [
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getAllUpdateTypes",
+          "outputs": [
+            {
+              "internalType": "string[]",
+              "name": "",
+              "type": "string[]"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "updateType",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "market",
+              "type": "address"
+            }
+          ],
+          "name": "getLatestUpdateByParameterAndMarket",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "newValue",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "string",
+                  "name": "referenceId",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "previousValue",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "string",
+                  "name": "updateType",
+                  "type": "string"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "updateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "market",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "additionalData",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct MockRiskOracle.RiskParameterUpdate",
+              "name": "",
+              "type": "tuple"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            }
+          ],
+          "name": "getUpdateById",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "timestamp",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "newValue",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "string",
+                  "name": "referenceId",
+                  "type": "string"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "previousValue",
+                  "type": "bytes"
+                },
+                {
+                  "internalType": "string",
+                  "name": "updateType",
+                  "type": "string"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "updateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "address",
+                  "name": "market",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "additionalData",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct MockRiskOracle.RiskParameterUpdate",
+              "name": "",
+              "type": "tuple"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "isAuthorized",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "",
+              "type": "string"
+            }
+          ],
+          "name": "latestUpdateIdByMarketAndType",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "string[]",
+              "name": "referenceIds",
+              "type": "string[]"
+            },
+            {
+              "internalType": "bytes[]",
+              "name": "newValues",
+              "type": "bytes[]"
+            },
+            {
+              "internalType": "string[]",
+              "name": "updateTypes",
+              "type": "string[]"
+            },
+            {
+              "internalType": "address[]",
+              "name": "markets",
+              "type": "address[]"
+            },
+            {
+              "internalType": "bytes[]",
+              "name": "additionalData",
+              "type": "bytes[]"
+            }
+          ],
+          "name": "publishBulkRiskParameterUpdates",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "referenceId",
+              "type": "string"
+            },
+            {
+              "internalType": "bytes",
+              "name": "newValue",
+              "type": "bytes"
+            },
+            {
+              "internalType": "string",
+              "name": "updateType",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "market",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "additionalData",
+              "type": "bytes"
+            }
+          ],
+          "name": "publishRiskParameterUpdate",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "removeAuthorizedSender",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "renounceOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "transferOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "updateCounter",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
         }
       ]
     },
@@ -8826,7 +9374,7 @@
       ]
     },
     "RiskStewardReceiver": {
-      "address": "0xec20a50A9c162f64eF8D215eD7f688bf57f8cDB9",
+      "address": "0x31DEb4D1326838522697f7a012992f0824d80f2b",
       "abi": [
         {
           "anonymous": false,
@@ -9081,10 +9629,16 @@
           "anonymous": false,
           "inputs": [
             {
-              "indexed": true,
+              "indexed": false,
               "internalType": "string",
               "name": "updateType",
               "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousRiskSteward",
+              "type": "address"
             },
             {
               "indexed": true,
@@ -9095,8 +9649,26 @@
             {
               "indexed": false,
               "internalType": "uint256",
+              "name": "previousDebounce",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
               "name": "debounce",
               "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "previousActive",
+              "type": "bool"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "active",
+              "type": "bool"
             }
           ],
           "name": "RiskParameterConfigSet",
@@ -9113,6 +9685,25 @@
             }
           ],
           "name": "RiskParameterUpdated",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "updateType",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "active",
+              "type": "bool"
+            }
+          ],
+          "name": "ToggleConfigActive",
           "type": "event"
         },
         {
@@ -9169,42 +9760,6 @@
               "internalType": "contract IAccessControlManagerV8",
               "name": "",
               "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "string",
-              "name": "updateType",
-              "type": "string"
-            }
-          ],
-          "name": "getRiskParameterConfig",
-          "outputs": [
-            {
-              "components": [
-                {
-                  "internalType": "bool",
-                  "name": "active",
-                  "type": "bool"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "debounce",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "address",
-                  "name": "riskSteward",
-                  "type": "address"
-                }
-              ],
-              "internalType": "struct RiskParamConfig",
-              "name": "",
-              "type": "tuple"
             }
           ],
           "stateMutability": "view",
@@ -9348,6 +9903,35 @@
         {
           "inputs": [
             {
+              "internalType": "string",
+              "name": "updateType",
+              "type": "string"
+            }
+          ],
+          "name": "riskParameterConfigs",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "active",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "debounce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "riskSteward",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
               "internalType": "address",
               "name": "accessControlManager_",
               "type": "address"
@@ -9438,7 +10022,7 @@
       ]
     },
     "RiskStewardReceiver_Implementation": {
-      "address": "0x7DfC686A2db405b5bC0Ca1dE54e061b287Fb61C6",
+      "address": "0x5B6c7C0797404Fe77242e14D672E4F85e768353f",
       "abi": [
         {
           "inputs": [
@@ -9594,10 +10178,16 @@
           "anonymous": false,
           "inputs": [
             {
-              "indexed": true,
+              "indexed": false,
               "internalType": "string",
               "name": "updateType",
               "type": "string"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousRiskSteward",
+              "type": "address"
             },
             {
               "indexed": true,
@@ -9608,8 +10198,26 @@
             {
               "indexed": false,
               "internalType": "uint256",
+              "name": "previousDebounce",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
               "name": "debounce",
               "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "previousActive",
+              "type": "bool"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "active",
+              "type": "bool"
             }
           ],
           "name": "RiskParameterConfigSet",
@@ -9626,6 +10234,25 @@
             }
           ],
           "name": "RiskParameterUpdated",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "updateType",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "active",
+              "type": "bool"
+            }
+          ],
+          "name": "ToggleConfigActive",
           "type": "event"
         },
         {
@@ -9682,42 +10309,6 @@
               "internalType": "contract IAccessControlManagerV8",
               "name": "",
               "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "string",
-              "name": "updateType",
-              "type": "string"
-            }
-          ],
-          "name": "getRiskParameterConfig",
-          "outputs": [
-            {
-              "components": [
-                {
-                  "internalType": "bool",
-                  "name": "active",
-                  "type": "bool"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "debounce",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "address",
-                  "name": "riskSteward",
-                  "type": "address"
-                }
-              ],
-              "internalType": "struct RiskParamConfig",
-              "name": "",
-              "type": "tuple"
             }
           ],
           "stateMutability": "view",
@@ -9861,6 +10452,35 @@
         {
           "inputs": [
             {
+              "internalType": "string",
+              "name": "updateType",
+              "type": "string"
+            }
+          ],
+          "name": "riskParameterConfigs",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "active",
+              "type": "bool"
+            },
+            {
+              "internalType": "uint256",
+              "name": "debounce",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "riskSteward",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
               "internalType": "address",
               "name": "accessControlManager_",
               "type": "address"
@@ -9930,7 +10550,7 @@
       ]
     },
     "RiskStewardReceiver_Proxy": {
-      "address": "0xec20a50A9c162f64eF8D215eD7f688bf57f8cDB9",
+      "address": "0x31DEb4D1326838522697f7a012992f0824d80f2b",
       "abi": [
         {
           "inputs": [

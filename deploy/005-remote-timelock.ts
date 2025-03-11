@@ -95,7 +95,7 @@ export const delayConfig: DelayConfig = {
     fast: 21600,
     critical: 3600,
   },
-  berachainbartio: {
+  unichainsepolia: {
     normal: 600,
     fast: 300,
     critical: 100,
@@ -104,6 +104,11 @@ export const delayConfig: DelayConfig = {
     normal: 172800,
     fast: 21600,
     critical: 3600,
+  },
+  berachainbartio: {
+    normal: 600,
+    fast: 300,
+    critical: 100,
   },
 };
 

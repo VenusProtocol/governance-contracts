@@ -4,7 +4,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 import { ACMCommandsAggregator } from "typechain";
 
 import { SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { guardian } from "../helpers/deploy/deploymentUtils";
+import { getAcmAdminAccount } from "../helpers/deploy/deploymentUtils";
 
 const functionSignatures = {
   normal: [
@@ -72,7 +72,7 @@ const func: DeployFunction = async function () {
   const FASTTRACK_TIMELOCK = await ethers.getContract("FastTrackTimelock");
   const CRITICAL_TIMELOCK = await ethers.getContract("CriticalTimelock");
   const OMNICHAIN_EXECUTOR_OWNER = await ethers.getContract("OmnichainExecutorOwner");
-  const GUARDIAN = await guardian(network.name as SUPPORTED_NETWORKS);
+  const GUARDIAN = await getAcmAdminAccount(network.name as SUPPORTED_NETWORKS);
   const acmCommandsAggregator: ACMCommandsAggregator = await ethers.getContract("ACMCommandsAggregator");
 
   // Grant permissions for each category
