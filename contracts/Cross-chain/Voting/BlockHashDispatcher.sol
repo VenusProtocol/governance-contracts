@@ -5,13 +5,14 @@ import { OApp, MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oa
 import { Pausable } from "@openzeppelin/contracts/security/Pausable.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 /**
  * @title BlockHashDispatcher
  * @notice A contract for dispatching block hashes to a proposal chain and managing messaging between chains.
  * @dev Inherits functionality from OApp, Pausable, and Ownable. Implements LayerZero messaging and access control.
  */
-contract BlockHashDispatcher is Pausable, OApp {
+contract BlockHashDispatcher is Pausable, OApp, Initializable {
     /// @notice Messaging parameters structure
     struct MessagingParams {
         uint32 dstEid; // Destination chain ID
@@ -42,22 +43,15 @@ contract BlockHashDispatcher is Pausable, OApp {
     /// @notice Error thrown when an invalid chain ID is provided
     error InvalidChainEid(uint32 eid);
 
-    /**
-     * @notice Constructor to initialize the contract
-     * @param endpoint_ Address of the LayerZero endpoint
-     * @param bnbChainEId_ Chain ID for the BNB Chain
-     * @param owner_ Address of the contract owner
-     */
-    constructor(
-        address endpoint_,
-        uint32 bnbChainEId_,
-        address owner_,
-        uint32 chainId_
-    ) OApp(endpoint_, owner_) Ownable() {
+    constructor(address endpoint_, address owner_) OApp(endpoint_, owner_) Ownable() {
         ensureNonzeroAddress(address(endpoint_));
+    }
+
+    function initialize(uint32 bnbChainEId_, uint32 chainId_) external initializer {
         if (bnbChainEId_ == 0 || chainId_ == 0) {
             revert InvalidChainEid(0);
         }
+
         BSC_CHAIN_ID = bnbChainEId_;
         chainId = chainId_;
     }

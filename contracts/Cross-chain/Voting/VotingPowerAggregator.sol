@@ -16,9 +16,9 @@ import { ReadCodecV1, EVMCallComputeV1, EVMCallRequestV1 } from "@layerzerolabs/
 import { OAppOptionsType3 } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
 import { AddressCast } from "@layerzerolabs/lz-evm-protocol-v2/contracts/libs/AddressCast.sol";
 import { IXvsVault } from "../interfaces/IXvsVault.sol";
-import { IVotingPowerAggregator } from "../interfaces/IVotingPowerAggregator.sol";
+import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingPowerAggregator {
+contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, Initializable {
     using ExcessivelySafeCall for address;
 
     struct NetworkProposalBlockDetails {
@@ -42,6 +42,12 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
     struct LzReadParams {
         uint32 remoteChainEid;
         uint256 blockNumber;
+    }
+
+    struct Proofs {
+        uint32 remoteChainEid;
+        bytes numCheckpointsProof;
+        bytes checkpointsProof;
     }
 
     /// @notice LayerZero read message type.
@@ -73,16 +79,91 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
     // pId -> (remoteChainEid, blockNumber)
     mapping(uint256 => LzReadParams[]) public lzReadParams;
 
+    /**
+     * @notice Emitted when remote block hash is received
+     */
     event BlockHashReceived(uint256 pId, uint32 remoteChainid, uint256 blockNumber);
 
-    constructor(
-        address endpoint_,
+    /**
+     * @notice Emitted when proposal failed
+     */
+    event ReceivePayloadFailed(uint32 indexed remoteChainEid, bytes indexed remoteAddress, uint64 nonce, bytes reason);
+
+    /**
+     * @notice Emitted when block hash of remote chain is received
+     */
+    event HashReceived(uint256 indexed remoteIdentifier, uint32 indexed remoteChainEid, bytes blockHash);
+
+    /**
+     * @notice Emitted when remote configurations are updated
+     */
+    event UpdateDeactivatedremoteChainEid(uint32 indexed remoteChainEid, bool isSupported);
+
+    /**
+     * @notice Emitted when vault address is updated
+     */
+    event UpdateNetworkConfig(
+        uint32 indexed remoteChainEid,
+        address xvsVault,
+        address dispatcher,
+        bool isLzreadSupported
+    );
+
+    /**
+     * @notice Emitted when call send to dispatcher on remote chain
+     */
+    event ReadRemoteBlockHash(uint256 indexed pId, bytes cmd, bytes option);
+
+    /**
+     * @notice Thrown when syncing details for an unsupported network is provided
+     */
+    error RemoteChainNotSupported(uint32 chainId);
+
+    /**
+     * @notice Thrown when chain id is deactivated
+     */
+    error DeactivatedChainId(uint32 chainId);
+
+    /**
+     * @notice Thrown when an access controlled function is called
+     */
+    error InvalidCaller(address providedAddress, address requiredAddress);
+
+    /**
+     * @notice Thrown when an invalid block timestamp is provided
+     */
+    error InvalidBlockTimestamp(uint32 remoteChainEid, uint256 providedTimestamp);
+
+    /**
+     * @notice Thrown when array lengths mismatch
+     */
+    error LengthMismatch(string additionalReason);
+
+    /**
+     * @notice Thrown when proposal threshold is not met
+     */
+    error ProposalThresholdNotMet(uint256 providedPower, uint256 acceptablePower);
+
+    /**
+     * @notice Thrown when an invalid chain id is provided
+     */
+    error InvalidChainEid(uint32 remoteChainEid);
+
+    /**
+     * @notice Thrown when a proposal does not exist
+     */
+    error LZReceiveProposalNotExists(string reason);
+
+    constructor(address endpoint_, address delegate) OAppRead(endpoint_, delegate) {
+        _disableInitializers();
+    }
+
+    function initialize(
         uint32 readChannel,
         address warehouseAddress,
         address governorBravoAddress,
-        address delegate,
         address bscXvsVaultAddress
-    ) OAppRead(endpoint_, delegate) {
+    ) external initializer {
         ensureNonzeroAddress(warehouseAddress);
         ensureNonzeroAddress(governorBravoAddress);
         ensureNonzeroAddress(bscXvsVaultAddress);
@@ -92,7 +173,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
 
         // Set the read channel
         READ_CHANNEL = readChannel;
-        _setPeer(READ_CHANNEL, AddressCast.toBytes32(address(this)));
+        setReadChannel(READ_CHANNEL, true);
     }
 
     /**
@@ -147,7 +228,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
             isLzReadSupported: isLzReadSupported
         });
 
-        emit UpdateVaultAddress(remoteChainEid, xvsVaultAddress);
+        emit UpdateNetworkConfig(remoteChainEid, xvsVaultAddress, blockHashDispatcherAddress, isLzReadSupported);
     }
 
     /**
@@ -238,6 +319,8 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, IVotingP
         }
 
         bytes memory cmd = getCmd(proposalId, remoteTargetEids, blockNumbers);
+
+        emit ReadRemoteBlockHash(proposalId, cmd, _extraOptions);
         return
             _lzSend(
                 READ_CHANNEL,
