@@ -137,6 +137,12 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Processes a market cap update from the RiskStewardReceiver.
      * Validates that the update is within range and then directly update the market supply or borrow cap on the market's comptroller.
+     * 
+     * RiskParameterUpdate shape is as follows:
+     *  * newValue - encoded uint256 value of un padded bytes
+     *  * previousValue - encoded uint256 value of un padded bytes
+     *  * updateType - supplyCap | borrowCap
+     *  * additionalData - encoded bytes of (address underlying, uint16 destChainId)
      * @param update RiskParameterUpdate update to process.
      * @custom:error OnlyRiskStewardReceiver Thrown if the sender is not the RiskStewardReceiver
      * @custom:error UnsupportedUpdateType Thrown if the update type is not supported
