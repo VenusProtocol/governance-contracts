@@ -291,7 +291,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, Initiali
             }
         }
 
-        proposalBlockDetails[pId][BSC_CHAIN_ID] = NetworkProposalBlockDetails(block.number, blockhash(block.number));
+        proposalBlockDetails[pId][BSC_CHAIN_ID] = NetworkProposalBlockDetails(block.number - 1, blockhash(block.number - 1));
 
         uint96 power = getVotingPower(proposer, pId, proposerVotingProofs);
         if (power < proposalThreshold) {
@@ -468,8 +468,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, Initiali
 
         // Reverts if voting power not exists
         require(votingPower.exists, "Invalid checkpoint proof");
-
-        return votingPower.value >> 32;
+        return uint96(votingPower.value >> 32);
     }
 
     /**

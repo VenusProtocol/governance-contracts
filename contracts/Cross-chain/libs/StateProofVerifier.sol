@@ -33,7 +33,7 @@ library StateProofVerifier {
 
     struct SlotValue {
         bool exists;
-        uint96 value;
+        uint256 value;
     }
 
     /**
@@ -122,7 +122,7 @@ library StateProofVerifier {
 
         if (valueRlpBytes.length != 0) {
             value.exists = true;
-            value.value = uint96(valueRlpBytes.toRlpItem().toUint());
+            value.value = valueRlpBytes.toRlpItem().toUint();
         }
 
         return value;

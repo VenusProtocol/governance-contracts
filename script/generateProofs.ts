@@ -19,7 +19,7 @@ export type ProofData = {
   blockHash?: string;
   accountStateProofRLP?: string;
   blockHeaderRLP?: string;
-  xvsVaultAddress?: string;
+  xvsVault?: string;
   checkpointsSlot?: string;
   numCheckpointsSlot?: string;
   checkpointsSlotHash?: string;
@@ -31,6 +31,7 @@ export type ProofData = {
     votes?: string;
   };
   xvsVaultCheckpointsStorageProofRlp?: string;
+  voter?: string;
 };
 
 const xvsVault = {
@@ -57,18 +58,18 @@ const saveJson = (stringifiedJson: string) => {
 
 export const getProofsJson = (): ProofData => {
   try {
-    const file = fs.readFileSync(`./tests/Syncing-of-votes/${process.env.REMOTE_NETWORK}Proofs.json`);
+    const file = fs.readFileSync(`./tests/Syncing-of-votes/syncingParameters/${process.env.REMOTE_NETWORK}Proofs.json`);
     return JSON.parse(file.toString());
   } catch (error) {
     return {};
   }
 };
 
-const generateRoots = async (xvsVaultAddress: string, numCheckpointSlotRaw: number, checkpointSlotRaw: number) => {
+const generateRoots = async (xvsVault: string, numCheckpointSlotRaw: number, checkpointSlotRaw: number) => {
   const proofsJson = getProofsJson();
 
-  if (!proofsJson["xvsVaultAddress"]) {
-    proofsJson["xvsVaultAddress"] = xvsVaultAddress;
+  if (!proofsJson["xvsVault"]) {
+    proofsJson["xvsVault"] = xvsVault;
   }
 
   // calculate blockHeaderRLP
@@ -90,7 +91,7 @@ const generateRoots = async (xvsVaultAddress: string, numCheckpointSlotRaw: numb
   proofsJson.numCheckpointsSlot = numCheckpointSlot;
 
   // get account state proof rlp
-  const rawAccountProofData = await getProof(xvsVaultAddress, slots, proofsJson.blockNumber);
+  const rawAccountProofData = await getProof(xvsVault, slots, proofsJson.blockNumber);
   const accountStateProofRLP = formatToProofRLP(rawAccountProofData.accountProof);
   proofsJson.accountStateProofRLP = accountStateProofRLP;
   saveJson(stringify(proofsJson));
@@ -118,7 +119,8 @@ const generateProofsNumCheckpointsSlot = async (vault: string, rawSlot: number, 
   proofsJson.numCheckpointsSlotHash = slot;
   proofsJson.numCheckpoints = numCheckpoints;
   proofsJson.xvsVaultNumCheckpointsStorageProofRlp = storageProofRlp;
-
+  proofsJson.voter = voter;
+  
   saveJson(stringify(proofsJson));
 };
 
