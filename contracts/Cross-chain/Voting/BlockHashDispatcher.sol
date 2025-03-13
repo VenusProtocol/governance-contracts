@@ -43,11 +43,13 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
     /// @notice Error thrown when an invalid chain ID is provided
     error InvalidChainEid(uint32 eid);
 
-    constructor(address endpoint_, address owner_) OApp(endpoint_, owner_) Ownable() {
+    constructor(
+        address endpoint_,
+        address owner_,
+        uint32 bnbChainEId_,
+        uint32 chainId_
+    ) OApp(endpoint_, owner_) Ownable() {
         ensureNonzeroAddress(address(endpoint_));
-    }
-
-    function initialize(uint32 bnbChainEId_, uint32 chainId_) external initializer {
         if (bnbChainEId_ == 0 || chainId_ == 0) {
             revert InvalidChainEid(0);
         }

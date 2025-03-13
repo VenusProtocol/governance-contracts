@@ -16,9 +16,8 @@ import { ReadCodecV1, EVMCallComputeV1, EVMCallRequestV1 } from "@layerzerolabs/
 import { OAppOptionsType3 } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OAppOptionsType3.sol";
 import { AddressCast } from "@layerzerolabs/lz-evm-protocol-v2/contracts/libs/AddressCast.sol";
 import { IXvsVault } from "../interfaces/IXvsVault.sol";
-import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
-contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, Initializable {
+contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
     using ExcessivelySafeCall for address;
 
     struct NetworkProposalBlockDetails {
@@ -154,16 +153,14 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, Initiali
      */
     error LZReceiveProposalNotExists(string reason);
 
-    constructor(address endpoint_, address delegate) OAppRead(endpoint_, delegate) {
-        _disableInitializers();
-    }
-
-    function initialize(
+    constructor(
+        address endpoint_,
+        address delegate,
         uint32 readChannel,
         address warehouseAddress,
         address governorBravoAddress,
         address bscXvsVaultAddress
-    ) external initializer {
+    ) OAppRead(endpoint_, delegate) {
         ensureNonzeroAddress(warehouseAddress);
         ensureNonzeroAddress(governorBravoAddress);
         ensureNonzeroAddress(bscXvsVaultAddress);
@@ -172,8 +169,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, Initiali
         bscXvsVault = IXvsVault(bscXvsVaultAddress);
 
         // Set the read channel
-        READ_CHANNEL = readChannel;
-        setReadChannel(READ_CHANNEL, true);
+        setReadChannel(readChannel, true);
     }
 
     /**
@@ -190,16 +186,6 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, Initiali
      */
     function unpause() external onlyOwner {
         _unpause();
-    }
-
-    /**
-     * @notice Sets the LayerZero read channel, enabling or disabling it based on `_active`.
-     * @param _channelId The channel ID to set.
-     * @param _active Flag to activate or deactivate the channel.
-     */
-    function setReadChannel(uint32 _channelId, bool _active) public override onlyOwner {
-        _setPeer(_channelId, _active ? AddressCast.toBytes32(address(this)) : bytes32(0));
-        READ_CHANNEL = _channelId;
     }
 
     /**
@@ -291,7 +277,10 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, Initiali
             }
         }
 
-        proposalBlockDetails[pId][BSC_CHAIN_ID] = NetworkProposalBlockDetails(block.number - 1, blockhash(block.number - 1));
+        proposalBlockDetails[pId][BSC_CHAIN_ID] = NetworkProposalBlockDetails(
+            block.number - 1,
+            blockhash(block.number - 1)
+        );
 
         uint96 power = getVotingPower(proposer, pId, proposerVotingProofs);
         if (power < proposalThreshold) {
@@ -302,7 +291,26 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, Initiali
     }
 
     /**
-     * @notice Sends a read request to LayerZero, querying Uniswap QuoterV2 for WETH/USDC prices on configured chains.
+     * @notice Sets the LayerZero read channel, enabling or disabling it based on `_active`.
+     * @param _channelId The channel ID to set.
+     * @param _active Flag to activate or deactivate the channel.
+     */
+    function setReadChannel(uint32 _channelId, bool _active) public override onlyOwner {
+        _setPeer(_channelId, _active ? AddressCast.toBytes32(address(this)) : bytes32(0));
+        READ_CHANNEL = _channelId;
+    }
+
+    /**
+     * @notice It will change the delegate in the endpoint.
+     * @param delegate delegate is authorized by the oapp to configure anything in layerzero
+     */
+    function setEndpointDelegate(address delegate) external onlyOwner {
+        endpoint.setDelegate(delegate);
+    }
+
+    /**
+     * @notice Sends a read request to LayerZero, querying block hashes from remote chains for a given proposal.
+     * @param proposalId Unique Id of the proposal.
      * @param _extraOptions Additional messaging options, including gas and fee settings.
      * @return receipt The LayerZero messaging receipt for the request.
      */
@@ -332,7 +340,10 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, Initiali
     }
 
     /**
-     * @notice Quotes the estimated messaging fee for querying Uniswap QuoterV2 for WETH/USDC prices.
+     * @notice Quotes the estimated messaging fee for querying block hashes from remote chains for a given proposal.
+     * @param proposalId Unique id of a proposal .
+     * @param remoteTargetEids Array of LayerZero Endpoint ids for the target remote chains.
+     * @param blockNumbers Array of block numbers to query hashes for on the remote chains.
      * @param _extraOptions Additional messaging options.
      * @param _payInLzToken Boolean flag indicating whether to pay in LayerZero tokens.
      * @return fee The estimated messaging fee.
@@ -350,6 +361,9 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3, Initiali
 
     /**
      * @notice Constructs a command to query the Uniswap QuoterV2 for WETH/USDC prices on all configured chains.
+     * @param proposalId Unique id of proposal.
+     * @param remoteTargetEids Array of LayerZero Endpoint IDs for the target remote chains.
+     * @param blockNumbers Array of block numbers to query hashes for on the remote chains.
      * @return cmd The encoded command to request Uniswap quotes.
      */
     function getCmd(
