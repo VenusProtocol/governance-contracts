@@ -1,7 +1,6 @@
 import "module-alias/register";
 
 import "@nomicfoundation/hardhat-chai-matchers";
-import "@nomiclabs/hardhat-ethers";
 import "@nomiclabs/hardhat-etherscan";
 import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
@@ -74,7 +73,7 @@ const config: HardhatUserConfig = {
     ],
   },
   networks: {
-    hardhat: {...isFork(), initialDate: "2025-03-11T05:30:00"},
+    hardhat: { ...isFork(), initialDate: process.env.INITIAL_DATE ? process.env.INITIAL_DATE : "2025-03-11T05:30:00" },
     bsctestnet: {
       url: process.env.ARCHIVE_NODE_bsctestnet || "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,

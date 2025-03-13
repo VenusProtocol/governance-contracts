@@ -109,6 +109,17 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
     );
 
     /**
+     * @notice Emitted when syncing of voting power starts
+     */
+    event StartVotingPowerSync(
+        uint256 indexed pId,
+        address proposer,
+        SyncingParameters[] syncingParameters,
+        Proofs[] proposerVotingProofs,
+        uint256 proposalThreshold,
+        bytes extraOptions
+    );
+    /**
      * @notice Emitted when call send to dispatcher on remote chain
      */
     event ReadRemoteBlockHash(uint256 indexed pId, bytes cmd, bytes option);
@@ -286,6 +297,14 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
         if (power < proposalThreshold) {
             revert ProposalThresholdNotMet(power, proposalThreshold);
         }
+        emit StartVotingPowerSync(
+            pId,
+            proposer,
+            syncingParameters,
+            proposerVotingProofs,
+            proposalThreshold,
+            extraOptions
+        );
 
         readRemoteBlockHash(pId, extraOptions);
     }
