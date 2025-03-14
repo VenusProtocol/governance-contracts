@@ -104,9 +104,7 @@ describe("Governor Bravo Queue Tests", () => {
       await governorBravoDelegate.connect(customer).castVote(proposalId, 1);
       await advanceBlocks(17);
       timelock.queuedTransactions.returns(true);
-      await expect(governorBravoDelegate.queue(proposalId)).to.be.revertedWith(
-        "GovernorBravo::queueOrRevertInternal: identical proposal action already queued at eta",
-      );
+      await expect(governorBravoDelegate.queue(proposalId)).to.be.rejectedWith("DuplicateAction");
     });
 
     it("reverts on queueing overlapping actions in different proposals", async () => {
@@ -136,9 +134,7 @@ describe("Governor Bravo Queue Tests", () => {
       timelock.queuedTransactions.returns(false);
       await governorBravoDelegate.queue(proposalId1);
       timelock.queuedTransactions.returns(true);
-      await expect(governorBravoDelegate.queue(proposalId2)).to.be.revertedWith(
-        "GovernorBravo::queueOrRevertInternal: identical proposal action already queued at eta",
-      );
+      await expect(governorBravoDelegate.queue(proposalId2)).to.be.rejectedWith("DuplicateAction");
     });
   });
 });

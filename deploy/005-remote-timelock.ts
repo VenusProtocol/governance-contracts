@@ -3,7 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 export enum REMOTE_NETWORKS {
-  ETHERUEM = "ethereum",
+  ETHEREUM = "ethereum",
   OPBNBMAINNET = "opbnbmainnet",
   ARBITRUM_ONE = "arbitrumone",
   SEPOLIA = "sepolia",

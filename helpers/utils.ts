@@ -1,3 +1,4 @@
+import * as helpers from "@nomicfoundation/hardhat-network-helpers";
 import BigNumber from "bignumber.js";
 import { ethers, network } from "hardhat";
 
@@ -22,12 +23,8 @@ export const convertToBigInt = (amount: string | number, decimals: number) => {
   return BigInt(convertToUnit(amount, decimals));
 };
 
-export const fundAccount = async (address: string) => {
-  const [deployer] = await ethers.getSigners();
-  await deployer.sendTransaction({
-    to: address,
-    value: ethers.utils.parseEther("1.0"),
-  });
+export const fundAccount = async (address: string, amount: string = "1.0") => {
+  await helpers.setBalance(address, ethers.utils.parseEther(amount));
 };
 
 export const impersonateSigner = async (address: string) => {
@@ -51,3 +48,17 @@ export const getArgTypesFromSignature = (methodSignature: string): string[] => {
   const [, argumentString] = methodSignature.split("(")[1].split(")");
   return argumentString.split(",").map(arg => arg.trim());
 };
+
+export async function setForkBlock(blockNumber: number) {
+  await network.provider.request({
+    method: "hardhat_reset",
+    params: [
+      {
+        forking: {
+          jsonRpcUrl: process.env[`ARCHIVE_NODE_${process.env.FORKED_NETWORK || "bscmainnet"}`],
+          blockNumber: blockNumber,
+        },
+      },
+    ],
+  });
+}

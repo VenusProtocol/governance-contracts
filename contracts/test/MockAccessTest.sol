@@ -9,6 +9,6 @@ contract MockAccessTest is AccessControlledV8 {
      * @param accessControlManager Access control manager contract address
      */
     function initialize(address accessControlManager) external initializer {
-        __AccessControlled_init_unchained(accessControlManager);
+        __AccessControlled_init(accessControlManager);
     }
 }
