@@ -73,7 +73,7 @@ contract RiskStewardDestinationReceiver is IRiskStewardDestinationReceiver, Risk
      * @param market The market of the update
      * @param additionalData Additional data for the update
      * @param timestamp The timestamp of the update
-     * @custom:access This function should only be callable by timelocks that are trusted to receive cross chain messages 
+     * @custom:access This function should only be callable by timelocks that are trusted to receive cross chain messages
      */
     function processUpdate(
         uint256 updateId,
@@ -121,9 +121,7 @@ contract RiskStewardDestinationReceiver is IRiskStewardDestinationReceiver, Risk
             return UPDATE_STATUS.EXPIRED;
         }
 
-        if (
-            processedUpdates[updateId] == UPDATE_STATUS.PROCESSED
-        ) {
+        if (processedUpdates[updateId] == UPDATE_STATUS.PROCESSED) {
             return processedUpdates[updateId];
         }
 
@@ -138,14 +136,12 @@ contract RiskStewardDestinationReceiver is IRiskStewardDestinationReceiver, Risk
         bytes calldata additionalData
     ) internal {
         IRiskSteward riskSteward = riskParameterConfigs[updateType].riskSteward;
-         try
-                riskSteward.processUpdate(updateId, newValue, updateType, market, additionalData)
-            {
-                processedUpdates[updateId] = UPDATE_STATUS.PROCESSED;
-                emit RiskParameterUpdateProcessed(updateId);
-            } catch {
-                emit RiskParameterUpdateFailed(updateId, UPDATE_STATUS.FAILED);
-                processedUpdates[updateId] = UPDATE_STATUS.FAILED;
-            }
+        try riskSteward.processUpdate(updateId, newValue, updateType, market, additionalData) {
+            processedUpdates[updateId] = UPDATE_STATUS.PROCESSED;
+            emit RiskParameterUpdateProcessed(updateId);
+        } catch {
+            emit RiskParameterUpdateFailed(updateId, UPDATE_STATUS.FAILED);
+            processedUpdates[updateId] = UPDATE_STATUS.FAILED;
+        }
     }
 }

@@ -7,9 +7,9 @@ import { ethers, upgrades } from "hardhat";
 import { SignerWithAddress } from "hardhat-deploy-ethers/signers";
 
 import { LZ_CHAINID } from "../../helpers/deploy/constants";
-import { SUPPORTED_NETWORKS } from "../../helpers/deploy/constants";
-import { convertToUnit } from "../../helpers/utils";
+import { convertToUnit, fundAccount, impersonateSigner, releaseImpersonation } from "../../helpers/utils";
 import {
+  AccessControlManager,
   GovernorBravoDelegate,
   GovernorBravoDelegate__factory,
   MarketCapsRiskSteward,
@@ -73,7 +73,8 @@ describe("Risk Steward", async function () {
     governorBravoDelegate: MockContract<GovernorBravoDelegate>,
     omnichainProposalSender: OmnichainProposalSender,
     ethereumOmnichainExecutorOwner: OmnichainExecutorOwner,
-    arbitrumOmnichainExecutorOwner: OmnichainExecutorOwner;
+    arbitrumOmnichainExecutorOwner: OmnichainExecutorOwner,
+    accessControlManager: AccessControlManager;
 
   const publishRiskParameterUpdate = async (
     updates: { updateType: "supplyCap" | "borrowCap"; market: string; value: number; destinationChainId: number }[],
@@ -145,7 +146,7 @@ describe("Risk Steward", async function () {
     signer1 = (await ethers.getSigners())[1];
     const accessControlManagerFactory = await ethers.getContractFactory("AccessControlManager");
 
-    const accessControlManager = await accessControlManagerFactory.deploy();
+    accessControlManager = await accessControlManagerFactory.deploy();
 
     // Set up mock comptroller and markets
     const MockVTokenFactory = await ethers.getContractFactory("MockVToken");
@@ -325,6 +326,12 @@ describe("Risk Steward", async function () {
       deployer.address,
     );
 
+    await accessControlManager.giveCallPermission(
+      marketCapsRiskSteward.address,
+      "setDebouncePeriod(uint256)",
+      deployer.address,
+    );
+
     await riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, DAY_AND_ONE_SECOND);
     await riskStewardReceiver.setRiskParameterConfig("borrowCap", marketCapsRiskSteward.address, DAY_AND_ONE_SECOND);
     await riskStewardReceiver.setDestinationChainRiskStewardRemoteReceiver(
@@ -421,6 +428,24 @@ describe("Risk Steward", async function () {
       });
       expect(await riskStewardReceiver.RISK_ORACLE()).to.equal(mockRiskOracle.address);
     });
+
+    it("should revert if initialized with invalid max bps", async function () {
+      await expect(
+        upgrades.deployProxy(MockMarketCapsRiskStewardFactory, [accessControlManager.address, 0, 5], {
+          constructorArgs: [riskStewardReceiver.address, HARDHAT_LAYER_ZERO_CHAIN_ID],
+          initializer: "initialize",
+          unsafeAllow: ["state-variable-immutable"],
+        }),
+      ).to.be.rejectedWith("InvalidMaxDeltaBps");
+
+      await expect(
+        upgrades.deployProxy(MockMarketCapsRiskStewardFactory, [accessControlManager.address, 10001, 5], {
+          constructorArgs: [riskStewardReceiver.address, HARDHAT_LAYER_ZERO_CHAIN_ID],
+          initializer: "initialize",
+          unsafeAllow: ["state-variable-immutable"],
+        }),
+      ).to.be.rejectedWith("InvalidMaxDeltaBps");
+    });
   });
 
   describe("Risk Parameter Config", async function () {
@@ -489,14 +514,6 @@ describe("Risk Steward", async function () {
       ).to.be.rejectedWith("InvalidDebounce");
     });
 
-    it("should revert if maxDeltaBps is 0", async function () {
-      await expect(marketCapsRiskSteward.setMaxDeltaBps(0)).to.be.rejectedWith("InvalidMaxDeltaBps");
-    });
-
-    it("should revert if maxDeltaBps is 10000 or greater", async function () {
-      await expect(marketCapsRiskSteward.setMaxDeltaBps(10001)).to.be.rejectedWith("InvalidMaxDeltaBps");
-    });
-
     it("should set allowed destination chain receivers", async function () {
       expect(
         await riskStewardReceiver.setDestinationChainRiskStewardRemoteReceiver(
@@ -534,6 +551,10 @@ describe("Risk Steward", async function () {
       expect(await riskStewardReceiver.deleteDestinationChainRiskStewardRemoteReceiver(LZ_CHAINID.basemainnet))
         .to.emit("DestinationChainRiskStewardRemoteReceiverSet")
         .withArgs(LZ_CHAINID.basemainnet, "0x1234567890123456789012345678901234567890", ethers.constants.AddressZero);
+    });
+
+    it("should not be able to renounce ownership", async function () {
+      await expect(riskStewardReceiver.renounceOwnership()).to.revertedWith("renounceOwnership() is not allowed");
     });
   });
 
@@ -1183,6 +1204,57 @@ describe("Risk Steward", async function () {
         .withArgs(9, 3)
         .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
         .withArgs(10, 7);
+    });
+  });
+
+  describe("MarketCapsRiskSteward", async function () {
+    it("should emit MaxDeltaBpsUpdated when updating maxDeltaBps", async function () {
+      await expect(marketCapsRiskSteward.setMaxDeltaBps(7500))
+        .to.emit(marketCapsRiskSteward, "MaxDeltaBpsUpdated")
+        .withArgs(5000, 7500);
+    });
+
+    it("should revert if max delta bps is set to 0", async function () {
+      await expect(marketCapsRiskSteward.setMaxDeltaBps(0)).to.rejectedWith("InvalidMaxDeltaBps");
+    });
+
+    it("should revert if max delta bps is larger than maxBps", async function () {
+      await expect(marketCapsRiskSteward.setMaxDeltaBps(10001)).to.rejectedWith("InvalidMaxDeltaBps");
+    });
+
+    it("should emit DebouncePeriodUpdated when updating setDebouncePeriod", async function () {
+      await expect(marketCapsRiskSteward.setDebouncePeriod(90000))
+        .to.emit(marketCapsRiskSteward, "DebouncePeriodUpdated")
+        .withArgs(5, 90000);
+    });
+
+    it("should revert if debounce period is set to 0", async function () {
+      await expect(marketCapsRiskSteward.setDebouncePeriod(0)).to.rejectedWith("InvalidDebouncePeriod");
+    });
+
+    it("should revert if debounce period is less than or equal to update expiration time", async function () {
+      await expect(
+        marketCapsRiskSteward.setDebouncePeriod(await riskStewardReceiver.UPDATE_EXPIRATION_TIME()),
+      ).to.rejectedWith("InvalidDebouncePeriod");
+
+      await expect(
+        marketCapsRiskSteward.setDebouncePeriod((await riskStewardReceiver.UPDATE_EXPIRATION_TIME()).sub(1)),
+      ).to.rejectedWith("InvalidDebouncePeriod");
+    });
+
+    it("should emit DebouncePeriodUpdated when updating setDebouncePeriod", async function () {
+      const riskStewardReceiverSigner = await impersonateSigner(riskStewardReceiver.address);
+      await fundAccount(riskStewardReceiver.address);
+      await expect(
+        marketCapsRiskSteward
+          .connect(riskStewardReceiverSigner)
+          .processUpdate(1, parseUnitsToHex(10), "randomUpdateType", mockVToken.address, "0x"),
+      ).to.rejectedWith("UnsupportedUpdateType");
+      await releaseImpersonation(riskStewardReceiver.address);
+    });
+
+    it("should not be able to renounce ownership", async function () {
+      await expect(marketCapsRiskSteward.renounceOwnership()).to.revertedWith("renounceOwnership() is not allowed");
     });
   });
 });

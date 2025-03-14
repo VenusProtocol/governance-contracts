@@ -6,12 +6,7 @@ import { ethers, upgrades } from "hardhat";
 import { SignerWithAddress } from "hardhat-deploy-ethers/signers";
 
 import { LZ_CHAINID } from "../../helpers/deploy/constants";
-import {
-  MarketCapsRiskSteward,
-  MockComptroller,
-  MockVToken,
-  RiskStewardDestinationReceiver,
-} from "../../typechain";
+import { MarketCapsRiskSteward, MockComptroller, MockVToken, RiskStewardDestinationReceiver } from "../../typechain";
 
 const { parseUnits, hexValue } = ethers.utils;
 
@@ -30,7 +25,7 @@ describe("Risk Steward", async function () {
     MockMarketCapsRiskStewardFactory: ContractFactory,
     mockVToken: MockVToken,
     mockComptroller: MockComptroller,
-    marketCapsRiskSteward: MarketCapsRiskSteward
+    marketCapsRiskSteward: MarketCapsRiskSteward;
 
   const riskStewardFixture = async () => {
     deployer = (await ethers.getSigners())[0];
@@ -55,16 +50,19 @@ describe("Risk Steward", async function () {
 
     RiskStewardDestinationReceiverFactory = await ethers.getContractFactory("RiskStewardDestinationReceiver");
 
-
     await accessControlManager
       .connect(deployer)
       .giveCallPermission(deployer.address, "removeTrustedRemote(uint16)", deployer.address);
 
-      riskStewardDestinationReceiver = await upgrades.deployProxy(RiskStewardDestinationReceiverFactory, [accessControlManager.address], {
-      constructorArgs: [],
-      initializer: "initialize",
-      unsafeAllow: ["state-variable-immutable"],
-    });
+    riskStewardDestinationReceiver = await upgrades.deployProxy(
+      RiskStewardDestinationReceiverFactory,
+      [accessControlManager.address],
+      {
+        constructorArgs: [],
+        initializer: "initialize",
+        unsafeAllow: ["state-variable-immutable"],
+      },
+    );
 
     marketCapsRiskSteward = await upgrades.deployProxy(
       MockMarketCapsRiskStewardFactory,
@@ -90,9 +88,17 @@ describe("Risk Steward", async function () {
 
     await accessControlManager.giveCallPermission(riskStewardDestinationReceiver.address, "pause()", deployer.address);
 
-    await accessControlManager.giveCallPermission(riskStewardDestinationReceiver.address, "unpause()", deployer.address);
+    await accessControlManager.giveCallPermission(
+      riskStewardDestinationReceiver.address,
+      "unpause()",
+      deployer.address,
+    );
 
-    await accessControlManager.giveCallPermission(riskStewardDestinationReceiver.address, "processUpdate(uint256,bytes,string,address,bytes,uint256)", deployer.address);
+    await accessControlManager.giveCallPermission(
+      riskStewardDestinationReceiver.address,
+      "processUpdate(uint256,bytes,string,address,bytes,uint256)",
+      deployer.address,
+    );
 
     await accessControlManager.giveCallPermission(
       riskStewardDestinationReceiver.address,
@@ -112,8 +118,16 @@ describe("Risk Steward", async function () {
       deployer.address,
     );
 
-    await riskStewardDestinationReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, DAY_AND_ONE_SECOND);
-    await riskStewardDestinationReceiver.setRiskParameterConfig("borrowCap", marketCapsRiskSteward.address, DAY_AND_ONE_SECOND);
+    await riskStewardDestinationReceiver.setRiskParameterConfig(
+      "supplyCap",
+      marketCapsRiskSteward.address,
+      DAY_AND_ONE_SECOND,
+    );
+    await riskStewardDestinationReceiver.setRiskParameterConfig(
+      "borrowCap",
+      marketCapsRiskSteward.address,
+      DAY_AND_ONE_SECOND,
+    );
   };
 
   beforeEach(async function () {
@@ -121,9 +135,21 @@ describe("Risk Steward", async function () {
   });
 
   describe("Access Control", async function () {
+    it("should revert if access control manager is set to zero address", async function () {
+      await expect(
+        upgrades.deployProxy(RiskStewardDestinationReceiverFactory, [ethers.constants.AddressZero], {
+          constructorArgs: [],
+          initializer: "initialize",
+          unsafeAllow: ["state-variable-immutable"],
+        }),
+      ).to.be.rejectedWith("invalid acess control manager address");
+    });
+
     it("should revert if access is not granted for processing update", async function () {
       await expect(
-        riskStewardDestinationReceiver.connect(signer1).setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1),
+        riskStewardDestinationReceiver
+          .connect(signer1)
+          .setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1),
       ).to.be.rejectedWith(
         `Unauthorized("${signer1.address}", "${riskStewardDestinationReceiver.address}", "setRiskParameterConfig(string,address,uint256)")`,
       );
@@ -148,7 +174,17 @@ describe("Risk Steward", async function () {
       );
     });
 
-    it("should revert if access is not granted for processing update", async function () {
+    it("should revert if access is not granted for processing update on RiskStewardDestinationReceiver", async function () {
+      await expect(
+        riskStewardDestinationReceiver
+          .connect(signer1)
+          .processUpdate(1, "0x", "supplyCap", mockVToken.address, "0x", new Date().getTime()),
+      ).to.be.rejectedWith(
+        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x367761085BF3C12e5DA2Df99AC6E1a824612b8fb", "processUpdate(uint256,bytes,string,address,bytes,uint256)")',
+      );
+    });
+
+    it("should revert if access is not granted for processing update on MarketCapsRiskSteward", async function () {
       await expect(
         marketCapsRiskSteward.connect(signer1).processUpdate(1, "0x", "supplyCap", mockVToken.address, "0x"),
       ).to.be.rejectedWith("OnlyRiskStewardReceiver()");
@@ -172,75 +208,153 @@ describe("Risk Steward", async function () {
 
     it("should revert if contract is paused", async function () {
       await riskStewardDestinationReceiver.pause();
-      await expect(riskStewardDestinationReceiver.processUpdate(1, "0x", "supplyCap", mockVToken.address, "0x", 1)).to.be.rejectedWith("Pausable: paused");
+      await expect(
+        riskStewardDestinationReceiver.processUpdate(1, "0x", "supplyCap", mockVToken.address, "0x", 1),
+      ).to.be.rejectedWith("Pausable: paused");
     });
   });
 
   describe("Risk Parameter Update Reverts under incorrect conditions", async function () {
     it("should error if updateType is not implemented", async function () {
-
-      await expect(riskStewardDestinationReceiver.processUpdate(1, parseUnitsToHex(10), "randomUpdateType", mockVToken.address, "0x", new Date().getTime()))
+      await expect(
+        riskStewardDestinationReceiver.processUpdate(
+          1,
+          parseUnitsToHex(10),
+          "randomUpdateType",
+          mockVToken.address,
+          "0x",
+          new Date().getTime(),
+        ),
+      )
         .to.emit(riskStewardDestinationReceiver, "RiskParameterUpdateFailed")
         .withArgs(1, 2);
       expect(await riskStewardDestinationReceiver.processedUpdates(1)).to.equal(2);
     });
 
     it("should error if updateType is not active", async function () {
-
       await riskStewardDestinationReceiver.toggleConfigActive("supplyCap");
-      await expect(riskStewardDestinationReceiver.processUpdate(1, parseUnitsToHex(10), "supplyCap", mockVToken.address, "0x", 1))
+      await expect(
+        riskStewardDestinationReceiver.processUpdate(1, parseUnitsToHex(10), "supplyCap", mockVToken.address, "0x", 1),
+      )
         .to.emit(riskStewardDestinationReceiver, "RiskParameterUpdateFailed")
         .withArgs(1, 2);
-        expect(await riskStewardDestinationReceiver.processedUpdates(1)).to.equal(2);
+      expect(await riskStewardDestinationReceiver.processedUpdates(1)).to.equal(2);
 
       await riskStewardDestinationReceiver.toggleConfigActive("borrowCap");
-      await expect(riskStewardDestinationReceiver.processUpdate(2, parseUnitsToHex(10), "borrowCap", mockVToken.address, "0x", 1))
+      await expect(
+        riskStewardDestinationReceiver.processUpdate(2, parseUnitsToHex(10), "borrowCap", mockVToken.address, "0x", 1),
+      )
         .to.emit(riskStewardDestinationReceiver, "RiskParameterUpdateFailed")
         .withArgs(2, 2);
-        expect(await riskStewardDestinationReceiver.processedUpdates(1)).to.equal(2);
+      expect(await riskStewardDestinationReceiver.processedUpdates(1)).to.equal(2);
     });
 
     it("should error if the update is expired", async function () {
-      await expect(riskStewardDestinationReceiver.processUpdate(1, parseUnitsToHex(10), "supplyCap", mockVToken.address, "0x", 1))
+      await expect(
+        riskStewardDestinationReceiver.processUpdate(1, parseUnitsToHex(10), "supplyCap", mockVToken.address, "0x", 1),
+      )
         .to.emit(riskStewardDestinationReceiver, "RiskParameterUpdateFailed")
         .withArgs(1, 3);
-      await expect(riskStewardDestinationReceiver.processUpdate(2, parseUnitsToHex(10), "borrowCap", mockVToken.address, "0x", 1))
+      await expect(
+        riskStewardDestinationReceiver.processUpdate(2, parseUnitsToHex(10), "borrowCap", mockVToken.address, "0x", 1),
+      )
         .to.emit(riskStewardDestinationReceiver, "RiskParameterUpdateFailed")
         .withArgs(2, 3);
     });
 
     it("should revert if market is not supported", async function () {
       // Wrong address
-      await expect(riskStewardDestinationReceiver.processUpdate(1, parseUnitsToHex(10), "supplyCap", mockComptroller.address, "0x", new Date().getTime()))
+      await expect(
+        riskStewardDestinationReceiver.processUpdate(
+          1,
+          parseUnitsToHex(10),
+          "supplyCap",
+          mockComptroller.address,
+          "0x",
+          new Date().getTime(),
+        ),
+      )
         .to.emit(riskStewardDestinationReceiver, "RiskParameterUpdateFailed")
         .withArgs(1, 5);
     });
 
     it("should error if the update is too frequent", async function () {
-      await expect(await riskStewardDestinationReceiver.processUpdate(3, parseUnitsToHex(10), "borrowCap", mockVToken.address, "0x", new Date().getTime())).to.emit(riskStewardDestinationReceiver, "RiskParameterUpdateProcessed").withArgs(3);
-      
-      await expect(riskStewardDestinationReceiver.processUpdate(4, parseUnitsToHex(10), "borrowCap", mockVToken.address, "0x", new Date().getTime()))
+      await expect(
+        await riskStewardDestinationReceiver.processUpdate(
+          3,
+          parseUnitsToHex(10),
+          "borrowCap",
+          mockVToken.address,
+          "0x",
+          new Date().getTime(),
+        ),
+      )
+        .to.emit(riskStewardDestinationReceiver, "RiskParameterUpdateProcessed")
+        .withArgs(3);
+
+      await expect(
+        riskStewardDestinationReceiver.processUpdate(
+          4,
+          parseUnitsToHex(10),
+          "borrowCap",
+          mockVToken.address,
+          "0x",
+          new Date().getTime(),
+        ),
+      )
         .to.emit(riskStewardDestinationReceiver, "RiskParameterUpdateFailed")
         .withArgs(4, 5);
     });
 
     it("should revert if the update has already been applied", async function () {
-
-      await riskStewardDestinationReceiver.processUpdate(1, parseUnitsToHex(10), "supplyCap", mockVToken.address, "0x", new Date().getTime());
-      await expect(riskStewardDestinationReceiver.processUpdate(1, parseUnitsToHex(10), "supplyCap", mockVToken.address, "0x", new Date().getTime()))
+      await riskStewardDestinationReceiver.processUpdate(
+        1,
+        parseUnitsToHex(10),
+        "supplyCap",
+        mockVToken.address,
+        "0x",
+        new Date().getTime(),
+      );
+      await expect(
+        riskStewardDestinationReceiver.processUpdate(
+          1,
+          parseUnitsToHex(10),
+          "supplyCap",
+          mockVToken.address,
+          "0x",
+          new Date().getTime(),
+        ),
+      )
         .to.emit(riskStewardDestinationReceiver, "RiskParameterUpdateFailed")
         .withArgs(1, 1);
     });
 
     it("should revert if the update is out of bounds", async function () {
       // Too low
-      await expect(riskStewardDestinationReceiver.processUpdate(1, parseUnitsToHex(1), "supplyCap", mockVToken.address, "0x", new Date().getTime()))
+      await expect(
+        riskStewardDestinationReceiver.processUpdate(
+          1,
+          parseUnitsToHex(1),
+          "supplyCap",
+          mockVToken.address,
+          "0x",
+          new Date().getTime(),
+        ),
+      )
         .to.emit(riskStewardDestinationReceiver, "RiskParameterUpdateFailed")
         .withArgs(1, 5);
 
-
       // Too high
-      await expect(riskStewardDestinationReceiver.processUpdate(3, parseUnitsToHex(20), "borrowCap", mockVToken.address, "0x", new Date().getTime()))
+      await expect(
+        riskStewardDestinationReceiver.processUpdate(
+          3,
+          parseUnitsToHex(20),
+          "borrowCap",
+          mockVToken.address,
+          "0x",
+          new Date().getTime(),
+        ),
+      )
         .to.emit(riskStewardDestinationReceiver, "RiskParameterUpdateFailed")
         .withArgs(3, 5);
     });

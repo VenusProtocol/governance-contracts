@@ -139,6 +139,6 @@ abstract contract RiskStewardReceiverBase is IRiskStewardReceiver, PausableUpgra
      * @dev Disabling renounceOwnership function.
      */
     function renounceOwnership() public override {
-        revert(" renounceOwnership() is not allowed");
+        revert("renounceOwnership() is not allowed");
     }
 }
