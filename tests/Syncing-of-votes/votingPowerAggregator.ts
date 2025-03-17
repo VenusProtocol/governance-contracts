@@ -218,7 +218,7 @@ describe("VotingPowerAggregator Start Voting Power Sync Test", () => {
     ).to.emit(votingPowerAggregator, "UpdateNetworkConfig");
 
     // This time depends on the block number of the block details provided for remote chain.
-    await time.setNextBlockTimestamp(1741872575);
+    await time.setNextBlockTimestamp(1741872577);
 
     await mine();
 
@@ -229,7 +229,7 @@ describe("VotingPowerAggregator Start Voting Power Sync Test", () => {
       .connect(governanceBravo)
       .startVotingPowerSync(
         proposalId,
-        arbSepoliaProofData.voter,
+        arbSepoliaProofData.proposer,
         [arbSyncingParameters, opSyncingParameters],
         [arbProposerProofs, opsepoliaProposerProofs],
         BigNumber.from("50000000000000000000").sub(1),
@@ -255,7 +255,7 @@ describe("VotingPowerAggregator Start Voting Power Sync Test", () => {
     expect(proposalBlockDetailsBsc.blockNumber).to.be.eq(receipt.blockNumber - 1);
     expect(proposalBlockDetailsBsc.blockHash).to.be.eq(blockDetailsPrevBlock.hash);
 
-    const proposerVotingPower = await votingPowerAggregator.getVotingPower(arbSepoliaProofData.voter, proposalId, [
+    const proposerVotingPower = await votingPowerAggregator.getVotingPower(arbSepoliaProofData.proposer, proposalId, [
       arbProposerProofs,
       opsepoliaProposerProofs,
     ]);
