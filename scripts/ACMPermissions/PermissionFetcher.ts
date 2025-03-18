@@ -118,7 +118,7 @@ export class PermissionFetcher {
 
   private storeInJson(): void {
     const snapshot: Snapshot = {
-      permissions: Object.values(this.permissionsMap),
+      permissions: Object.values(this.permissionsMap).filter(permission => permission.addresses.length > 0),
       height: this.blocksParsed,
     };
 

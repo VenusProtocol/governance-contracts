@@ -816,26 +816,6 @@
       ]
     },
     {
-      "contractAddress": "0xc1Eb7689147C81aC840d4FF0D298489fc7986d52",
-      "functionSignature": "add(address,uint256,address,uint256,uint256)",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0xc1Eb7689147C81aC840d4FF0D298489fc7986d52",
-      "functionSignature": "set(address,uint256,uint256)",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0xc1Eb7689147C81aC840d4FF0D298489fc7986d52",
-      "functionSignature": "setRewardAmountPerBlockOrSecond(address,uint256)",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0xc1Eb7689147C81aC840d4FF0D298489fc7986d52",
-      "functionSignature": "setWithdrawalLockingPeriod(address,uint256,uint256)",
-      "addresses": []
-    },
-    {
       "contractAddress": "0x435Fac1B002d5D31f374E07c0177A1D709d5DC2D",
       "functionSignature": "setConversionConfig(address,address,ConversionConfig)",
       "addresses": [
@@ -1053,5 +1033,5 @@
       ]
     }
   ],
-  "height": 314288553
+  "height": 316848553
 }

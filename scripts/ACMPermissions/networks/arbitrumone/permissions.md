@@ -820,26 +820,6 @@
   - `CriticalTimelock`
   - `FastTrackTimelock`
 
-## Contract Address: 0xc1Eb7689147C81aC840d4FF0D298489fc7986d52
-
-- **Function Signature**: `add(address,uint256,address,uint256,uint256)`
-- **Addresses**:
-
-## Contract Address: 0xc1Eb7689147C81aC840d4FF0D298489fc7986d52
-
-- **Function Signature**: `set(address,uint256,uint256)`
-- **Addresses**:
-
-## Contract Address: 0xc1Eb7689147C81aC840d4FF0D298489fc7986d52
-
-- **Function Signature**: `setRewardAmountPerBlockOrSecond(address,uint256)`
-- **Addresses**:
-
-## Contract Address: 0xc1Eb7689147C81aC840d4FF0D298489fc7986d52
-
-- **Function Signature**: `setWithdrawalLockingPeriod(address,uint256,uint256)`
-- **Addresses**:
-
 ## Contract Address: 0x435Fac1B002d5D31f374E07c0177A1D709d5DC2D
 
 - **Function Signature**: `setConversionConfig(address,address,ConversionConfig)`

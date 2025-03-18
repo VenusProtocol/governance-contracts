@@ -194,11 +194,6 @@
     },
     {
       "contractAddress": "0x9C6C95632A8FB3A74f2fB4B7FfC50B003c992b96",
-      "functionSignature": "dropFailedMessage(uint16,bytes)",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0x9C6C95632A8FB3A74f2fB4B7FfC50B003c992b96",
       "functionSignature": "setPrecrime(address)",
       "addresses": ["Guardian", "0xd969E79406c35E80750aAae061D402Aab9325714"]
     },
@@ -356,11 +351,6 @@
       "contractAddress": "0xA0882C2D5DF29233A092d2887A258C2b90e9b994",
       "functionSignature": "set(address,uint256,uint256)",
       "addresses": ["Guardian", "0xd969E79406c35E80750aAae061D402Aab9325714"]
-    },
-    {
-      "contractAddress": "0xA0882C2D5DF29233A092d2887A258C2b90e9b994",
-      "functionSignature": "setRewardAmountPerBlock(address,uint256)",
-      "addresses": []
     },
     {
       "contractAddress": "0xA0882C2D5DF29233A092d2887A258C2b90e9b994",
@@ -995,37 +985,7 @@
         "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
         "0x8764F50616B62a99A997876C2DEAaa04554C5B2E"
       ]
-    },
-    {
-      "contractAddress": "0xd3CC9d8f3689B83c91b7B59cAB4946B063EB894A",
-      "functionSignature": "add(address,uint256,address,uint256,uint256)",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0xd3CC9d8f3689B83c91b7B59cAB4946B063EB894A",
-      "functionSignature": "set(address,uint256,uint256)",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0xd3CC9d8f3689B83c91b7B59cAB4946B063EB894A",
-      "functionSignature": "setRewardAmountPerBlockOrSecond(address,uint256)",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0xd3CC9d8f3689B83c91b7B59cAB4946B063EB894A",
-      "functionSignature": "setWithdrawalLockingPeriod(address,uint256,uint256)",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0xaE39C38AF957338b3cEE2b3E5d825ea88df02EfE",
-      "functionSignature": "setMinAmountToConvert(uint256)",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0xaE39C38AF957338b3cEE2b3E5d825ea88df02EfE",
-      "functionSignature": "setConversionConfig(address,address,ConversionConfig)",
-      "addresses": []
     }
   ],
-  "height": 22014442
+  "height": 22071592
 }
