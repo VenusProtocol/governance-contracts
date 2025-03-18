@@ -61,6 +61,21 @@ contract GovernorBravoEvents {
 
     /// @notice Emitted when the maximum number of operations in one proposal is updated
     event ProposalMaxOperationsUpdated(uint oldMaxOperations, uint newMaxOperations);
+
+    event SubmitProposalPayload(
+        uint id,
+        address proposer,
+        address[] targets,
+        uint[] values,
+        string[] signatures,
+        bytes[] calldatas,
+        uint startBlock,
+        uint endBlock,
+        string description,
+        uint8 proposalType
+    );
+
+    event ProposalActivated(uint id);
 }
 
 /**
@@ -161,6 +176,7 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
     /// @notice Possible states that a proposal may be in
     enum ProposalState {
         Pending,
+        PendingSync,
         Active,
         Canceled,
         Defeated,
@@ -206,6 +222,28 @@ contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
     mapping(uint => TimelockInterface) public proposalTimelocks;
 }
 
+contract GovernorBravoDelegateStorageV3 is GovernorBravoDelegateStorageV2 {
+    struct VotingProof {
+        uint16 remoteChainId;
+        bytes numCheckPointproof;
+        bytes checkpointProof;
+    }
+    struct SyncingParams {
+        uint16 remoteChainId;
+        bytes32 blockHash;
+        bytes remoteBlockHeaderRLP;
+        bytes xvsVaultStateProofRLP;
+    }
+    /// @notice mapping containing submission Block for a proposal
+    mapping(uint256 => uint256) public submissionBlock;
+
+    /// @notice Maximum Delay allowed for activation
+    uint256 public proposalActivationDelay;
+
+    /// @notice Address of voting power aggregator
+    address public votingPowerAggregator;
+}
+
 /**
  * @title TimelockInterface
  * @author Venus
@@ -247,6 +285,34 @@ interface TimelockInterface {
 
 interface XvsVaultInterface {
     function getPriorVotes(address account, uint blockNumber) external view returns (uint96);
+}
+
+interface IVotingPowerAggregator {
+    struct Proofs {
+        uint16 remoteChainId;
+        bytes numCheckpointsProof;
+        bytes checkpointsProof;
+    }
+
+    struct SyncingParameters {
+        uint16 remoteChainId;
+        bytes32 blockHash;
+        bytes remoteBlockHeaderRLP;
+        bytes xvsVaultStateProofRLP;
+    }
+
+    function getVotingPower(address voter, uint256 pId, Proofs[] calldata proofs) external view returns (uint96);
+
+    function startVotingPowerSync(
+        uint256 pId,
+        address proposer,
+        SyncingParameters[] calldata syncingParameters,
+        Proofs[] calldata proposerVotingProofs,
+        uint256 proposalThreshold,
+        bytes calldata extraOptions
+    ) external payable;
+
+    function isProposalSynced(uint256) external returns (bool);
 }
 
 interface GovernorAlphaInterface {

@@ -73,7 +73,7 @@ const config: HardhatUserConfig = {
     ],
   },
   networks: {
-    hardhat: isFork(),
+    hardhat: { ...isFork(), initialDate: process.env.INITIAL_DATE ? process.env.INITIAL_DATE : "2025-03-11T05:30:00" },
     bsctestnet: {
       url: process.env.ARCHIVE_NODE_bsctestnet || "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
