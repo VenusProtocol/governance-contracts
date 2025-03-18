@@ -13,15 +13,6 @@ import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/I
  * @dev Inherits functionality from OApp, Pausable, and Ownable. Implements LayerZero messaging and access control.
  */
 contract BlockHashDispatcher is Pausable, OApp, Initializable {
-    /// @notice Messaging parameters structure
-    struct MessagingParams {
-        uint32 dstEid; // Destination chain ID
-        bytes32 receiver; // Receiver address on the destination chain
-        bytes payload; // Encoded data payload
-        bytes options; // Messaging options
-        bool payInLzToken; // Indicates payment in LayerZero tokens
-    }
-
     /**
      * @notice ID of the proposal chain (e.g., BNB Chain) where block hashes will be sent
      */
@@ -31,6 +22,9 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
      * @notice LZ chain id of this chain
      */
     uint32 public chainId;
+
+    // blockNumber -> blockHash
+    mapping(uint256 => bytes32) public blockNumToHash;
 
     /**
      * @notice Emitted when a block hash is dispatched to the proposal chain
@@ -81,7 +75,7 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
      * @return payload Encoded payload containing the proposal ID, block number, and block hash
      */
     function getPayload(uint256 pId, uint256 blockNumber) public view returns (bytes memory payload) {
-        bytes32 blockHash_ = blockhash(blockNumber);
+        bytes32 blockHash_ = getBlockHash(blockNumber);
         payload = abi.encode(pId, blockNumber, blockHash_, chainId);
     }
 
@@ -115,6 +109,10 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
         uint256 zroTokens,
         bytes calldata options
     ) external payable whenNotPaused {
+        bytes32 blockHash = blockNumToHash[blockNumber];
+        if (blockHash == bytes32(0)) {
+            _setHash(blockNumber);
+        }
         bytes memory payload = getPayload(pId, blockNumber);
 
         _lzSend(
@@ -127,6 +125,26 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
             payable(msg.sender)
         );
         emit HashDispatched(pId, blockNumber, payload);
+    }
+
+    /**
+     * @notice Internal function to retrieve the hash of a given block number
+     */
+    function getBlockHash(uint256 blockNumber) public view returns (bytes32 blockHash) {
+        blockHash = blockNumToHash[blockNumber];
+        if (blockHash == bytes32(0)) {
+            blockHash = blockhash(blockNumber);
+        }
+    }
+
+    /**
+     * @notice public function to store the hash of a given block number
+     */
+    function _setHash(uint256 blockNumber) public {
+        bytes32 _blockHash = blockhash(blockNumber);
+        if (_blockHash != bytes32(0)) {
+            blockNumToHash[blockNumber] = _blockHash;
+        }
     }
 
     /**
@@ -152,7 +170,7 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
         uint256 blockNumber,
         uint256 pId
     ) external view whenNotPaused returns (uint256, uint256, bytes32, uint32) {
-        bytes32 blockHash_ = blockhash(blockNumber);
+        bytes32 blockHash_ = getBlockHash(blockNumber);
         return (pId, blockNumber, blockHash_, chainId);
     }
 }
