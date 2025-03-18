@@ -54,8 +54,8 @@ export class PermissionFetcher {
       const endBlock = Math.min(start + this.chunkSize - 1, toBlock);
       const events = await this.fetchEvents(start, endBlock);
       this.processEvents(events);
-      this.storeInJson();
       this.blocksParsed = endBlock;
+      this.storeInJson();
 
       console.log(`Fetched events from block ${start} to ${endBlock}`);
       start = endBlock + 1;
