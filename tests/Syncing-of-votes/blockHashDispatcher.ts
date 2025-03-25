@@ -2,7 +2,7 @@ import { FakeContract, MockContract, smock } from "@defi-wonderland/smock";
 import { Options } from "@layerzerolabs/lz-v2-utilities";
 import { loadFixture, mine } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
-import { Signer } from "ethers";
+import { Signer, constants } from "ethers";
 import { ethers } from "hardhat";
 import { SignerWithAddress } from "hardhat-deploy-ethers/signers";
 
@@ -165,6 +165,14 @@ describe("BlockHashDispatcher", () => {
       await expect(
         blockHashDispatcher.dispatchHash(pId, blockNumber, ZRO_TOKENS, options, { value: QUOTE_FEE.nativeFee }),
       ).to.be.revertedWith("Pausable: paused");
+    });
+
+    it("should revert when block hash not found", async function () {
+      const invalidBlock = (await ethers.provider.getBlock(blockNumber)).number + 10;
+
+      await expect(
+        blockHashDispatcher.dispatchHash(pId, invalidBlock, ZRO_TOKENS, options, { value: QUOTE_FEE.nativeFee }),
+      ).to.be.revertedWithCustomError(blockHashDispatcher, "BlockHashNotFound", invalidBlock);
     });
   });
 });

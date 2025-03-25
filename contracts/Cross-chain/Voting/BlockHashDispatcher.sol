@@ -37,6 +37,9 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
     /// @notice Error thrown when an invalid chain ID is provided
     error InvalidChainEid(uint32 eid);
 
+    /// @notice Error thrown when a block hash is not found
+    error BlockHashNotFound(uint256 blockNumber);
+
     constructor(
         address endpoint_,
         address owner_,
@@ -141,10 +144,12 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
      * @notice Public function to store the hash of a given block number
      */
     function setHash(uint256 blockNumber) public {
-        bytes32 _blockHash = blockhash(blockNumber);
-        if (_blockHash != bytes32(0)) {
-            blockNumToHash[blockNumber] = _blockHash;
+        bytes32 _blockHash = getBlockHash(blockNumber);
+        if (_blockHash == bytes32(0)) {
+            revert BlockHashNotFound(blockNumber);
         }
+
+        blockNumToHash[blockNumber] = _blockHash;
     }
 
     /**
