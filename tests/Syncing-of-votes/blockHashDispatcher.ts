@@ -95,8 +95,10 @@ describe("BlockHashDispatcher", () => {
         ["uint256", "uint256", "bytes32", "uint32"],
         ethers.utils.arrayify(payload),
       );
+      const block = await ethers.provider.getBlock(blockNumber);
       expect(decoded[0]).to.equal(pId);
       expect(decoded[1]).to.equal(blockNumber);
+      expect(decoded[2]).to.equal(block.hash);
       expect(decoded[3]).to.equal(ETH_EID);
     });
 
@@ -110,7 +112,7 @@ describe("BlockHashDispatcher", () => {
 
   describe("getHash", function () {
     it("should return block hash data", async function () {
-      const [returnedPId, returnedBlockNum, blockHash, chainId] = await blockHashDispatcher.callStatic.getHash(
+      const [returnedPId, returnedBlockNum, blockHash, chainId] = await blockHashDispatcher.getHash(
         blockNumber,
         pId,
       );

@@ -1,4 +1,5 @@
 import { FakeContract, MockContract, smock } from "@defi-wonderland/smock";
+import { Options } from "@layerzerolabs/lz-v2-utilities";
 import { loadFixture, mine, time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import { BigNumber, Signer } from "ethers";
@@ -56,6 +57,10 @@ const ARB_EID = 40231;
 const BSC_CHAIN_ID = 5656;
 const RANDOM_ADDRESS = "0x1111111111111111111111111111111111111111";
 const readChannel = 123;
+const proposalId = 1;
+const proposalThreshold = BigNumber.from("50000000000000000000").sub(1);
+const priorVotes = parseUnits("100", 18);
+const QUOTE_FEE = { nativeFee: 1, lzTokenFee: 0 };
 
 let deployer: SignerWithAddress;
 let proposer: Signer;
@@ -66,8 +71,7 @@ let dataWarehouse: MockContract<DataWarehouse>;
 let governorBravoDelegate: FakeContract<GovernorBravoDelegate>;
 let xvsVault: FakeContract<MockXVSVault>;
 let endpoint: FakeContract<ILayerZeroEndpointV2>;
-let arbSepoliaProofData: ProofData;
-let opSepoliaProofData: ProofData;
+let governanceBravo: any;
 
 type VotingPowerAggregatorFixture = {
   votingPowerAggregator: MockContract<VotingPowerAggregator>;
@@ -85,6 +89,35 @@ const getProofsJson = (network: string): ProofData => {
   } catch (error) {
     return {};
   }
+};
+
+let arbSepoliaProofData = getProofsJson("arbitrumsepolia");
+let opSepoliaProofData = getProofsJson("opsepolia");
+
+let arbSyncingParameters = {
+  remoteChainEid: ARB_EID,
+  blockHash: arbSepoliaProofData.blockHash,
+  remoteBlockHeaderRLP: arbSepoliaProofData.blockHeaderRLP,
+  xvsVaultStateProofRLP: arbSepoliaProofData.accountStateProofRLP,
+};
+
+let arbProposerProofs = {
+  remoteChainEid: ARB_EID,
+  numCheckpointsProof: arbSepoliaProofData.proposerXvsVaultNumCheckpointsStorageProofRlp,
+  checkpointsProof: arbSepoliaProofData.proposerXvsVaultCheckpointsStorageProofRlp,
+};
+
+let opSyncingParameters = {
+  remoteChainEid: OPSEPOLIA_EID,
+  blockHash: opSepoliaProofData.blockHash,
+  remoteBlockHeaderRLP: opSepoliaProofData.blockHeaderRLP,
+  xvsVaultStateProofRLP: opSepoliaProofData.accountStateProofRLP,
+};
+
+let opsepoliaProposerProofs = {
+  remoteChainEid: OPSEPOLIA_EID,
+  numCheckpointsProof: opSepoliaProofData.proposerXvsVaultNumCheckpointsStorageProofRlp,
+  checkpointsProof: opSepoliaProofData.proposerXvsVaultCheckpointsStorageProofRlp,
 };
 
 async function updateFunctionRegistry(votingPowerAggregatorOwner: MockContract<VotingPowerAggregatorOwner>) {
@@ -148,46 +181,19 @@ async function xvsVaultAggregatorFixture(): Promise<VotingPowerAggregatorFixture
   };
 }
 
-describe("VotingPowerAggregator Start Voting Power Sync Test", () => {
+describe("VotingPowerAggregator Tests", () => {
   beforeEach(async () => {
     ({ votingPowerAggregator, dataWarehouse, governorBravoDelegate, xvsVault, endpoint } = await loadFixture(
       xvsVaultAggregatorFixture,
     ));
     [deployer, proposer, ...accounts] = await ethers.getSigners();
-    arbSepoliaProofData = getProofsJson("arbitrumsepolia");
-    opSepoliaProofData = getProofsJson("opsepolia");
 
     endpoint.send.returns();
-    xvsVault.getPriorVotes.returns(parseUnits("100", 18));
-  });
+    governorBravoDelegate.activateProposal.returns();
+    xvsVault.getPriorVotes.returns(priorVotes);
 
-  it("should start the voting power sync", async () => {
-    const proposalId = 1;
-    const arbSyncingParameters = {
-      remoteChainEid: ARB_EID,
-      blockHash: arbSepoliaProofData.blockHash,
-      remoteBlockHeaderRLP: arbSepoliaProofData.blockHeaderRLP,
-      xvsVaultStateProofRLP: arbSepoliaProofData.accountStateProofRLP,
-    };
-
-    const arbProposerProofs = {
-      remoteChainEid: ARB_EID,
-      numCheckpointsProof: arbSepoliaProofData.proposerXvsVaultNumCheckpointsStorageProofRlp,
-      checkpointsProof: arbSepoliaProofData.proposerXvsVaultCheckpointsStorageProofRlp,
-    };
-
-    const opSyncingParameters = {
-      remoteChainEid: OPSEPOLIA_EID,
-      blockHash: opSepoliaProofData.blockHash,
-      remoteBlockHeaderRLP: opSepoliaProofData.blockHeaderRLP,
-      xvsVaultStateProofRLP: opSepoliaProofData.accountStateProofRLP,
-    };
-
-    const opsepoliaProposerProofs = {
-      remoteChainEid: OPSEPOLIA_EID,
-      numCheckpointsProof: opSepoliaProofData.proposerXvsVaultNumCheckpointsStorageProofRlp,
-      checkpointsProof: opSepoliaProofData.proposerXvsVaultCheckpointsStorageProofRlp,
-    };
+    governanceBravo = await impersonateSigner(governorBravoDelegate.address);
+    await fundAccount(governorBravoDelegate.address);
 
     let data = votingPowerAggregator.interface.encodeFunctionData("updateNetworkConfig", [
       ARB_EID,
@@ -219,52 +225,315 @@ describe("VotingPowerAggregator Start Voting Power Sync Test", () => {
 
     // This time depends on the block number of the block details provided for remote chain.
     await time.setNextBlockTimestamp(1741872577);
-
     await mine();
+  });
 
-    const governanceBravo = await impersonateSigner(governorBravoDelegate.address);
-    await fundAccount(governorBravoDelegate.address);
+  describe("Pausable", () => {
+    it("should allow owner to pause and unpause", async () => {
+      let data = votingPowerAggregator.interface.encodeFunctionData("pause", []);
+      await expect(
+        deployer.sendTransaction({
+          to: votingPowerAggregatorOwner.address,
+          data: data,
+        }),
+      ).to.emit(votingPowerAggregator, "Paused");
+      expect(await votingPowerAggregator.paused()).to.be.true;
 
-    const tx = await votingPowerAggregator
-      .connect(governanceBravo)
-      .startVotingPowerSync(
-        proposalId,
-        arbSepoliaProofData.proposer,
-        [arbSyncingParameters, opSyncingParameters],
-        [arbProposerProofs, opsepoliaProposerProofs],
-        BigNumber.from("50000000000000000000").sub(1),
-        RANDOM_ADDRESS,
+      data = votingPowerAggregator.interface.encodeFunctionData("unpause", []);
+      await expect(
+        deployer.sendTransaction({
+          to: votingPowerAggregatorOwner.address,
+          data: data,
+        }),
+      ).to.emit(votingPowerAggregator, "Unpaused");
+      expect(await votingPowerAggregator.paused()).to.be.false;
+    });
+
+    it("should revert if non-owner tries to pause/unpause", async () => {
+      await expect(votingPowerAggregator.pause()).to.be.revertedWith("Ownable: caller is not the owner");
+
+      let data = votingPowerAggregator.interface.encodeFunctionData("pause", []);
+      await expect(
+        deployer.sendTransaction({
+          to: votingPowerAggregatorOwner.address,
+          data: data,
+        }),
+      ).to.emit(votingPowerAggregator, "Paused");
+
+      await expect(votingPowerAggregator.unpause()).to.be.revertedWith("Ownable: caller is not the owner");
+    });
+  });
+
+  describe("startVotingPowerSync", () => {
+    it("should start the voting power sync", async () => {
+      const tx = await votingPowerAggregator
+        .connect(governanceBravo)
+        .startVotingPowerSync(
+          proposalId,
+          arbSepoliaProofData.proposer,
+          [arbSyncingParameters, opSyncingParameters],
+          [arbProposerProofs, opsepoliaProposerProofs],
+          proposalThreshold,
+          RANDOM_ADDRESS,
+        );
+
+      const receipt = await tx.wait();
+      const blockDetailsPrevBlock = await ethers.provider.getBlock(receipt.blockNumber - 1);
+
+      const arbProposalBlockDetails = await votingPowerAggregator.proposalBlockDetails(proposalId, ARB_EID);
+      const opsepoliaProposalBlockDetails = await votingPowerAggregator.proposalBlockDetails(proposalId, OPSEPOLIA_EID);
+      const proposalBlockDetailsBsc = await votingPowerAggregator.proposalBlockDetails(proposalId, BSC_CHAIN_ID);
+
+      const arbProposalRemoteChainEid = await votingPowerAggregator.proposalRemoteChainEids(proposalId, 0);
+      const opsepoliaProposalRemoteChainEid = await votingPowerAggregator.proposalRemoteChainEids(proposalId, 1);
+      expect(arbProposalBlockDetails.blockNumber).to.be.eq(arbSepoliaProofData.blockNumber);
+      expect(arbProposalBlockDetails.blockHash).to.be.eq(arbSepoliaProofData.blockHash);
+      expect(opsepoliaProposalBlockDetails.blockNumber).to.be.eq(opSepoliaProofData.blockNumber);
+      expect(opsepoliaProposalBlockDetails.blockHash).to.be.eq(opSepoliaProofData.blockHash);
+
+      expect(arbProposalRemoteChainEid).to.be.eq(ARB_EID);
+      expect(opsepoliaProposalRemoteChainEid).to.be.eq(OPSEPOLIA_EID);
+      expect(proposalBlockDetailsBsc.blockNumber).to.be.eq(receipt.blockNumber - 1);
+      expect(proposalBlockDetailsBsc.blockHash).to.be.eq(blockDetailsPrevBlock.hash);
+
+      const proposerVotingPower = await votingPowerAggregator.getVotingPower(arbSepoliaProofData.proposer, proposalId, [
+        arbProposerProofs,
+        opsepoliaProposerProofs,
+      ]);
+
+      // Proposer total votes = arb votes + opsepolia votes + bnb votes
+      expect(proposerVotingPower).eq(
+        BigNumber.from(arbSepoliaProofData.proposerCheckpoint?.votes)
+          .add(BigNumber.from(opSepoliaProofData.proposerCheckpoint?.votes))
+          .add(priorVotes),
       );
+    });
 
-    const receipt = await tx.wait();
-    const blockDetailsPrevBlock = await ethers.provider.getBlock(receipt.blockNumber - 1);
+    it("should succeed with enough BSC votes and zero remote votes", async () => {
+      await expect(
+        await votingPowerAggregator.connect(governanceBravo).startVotingPowerSync(
+          proposalId,
+          arbSepoliaProofData.proposer,
+          [], // no remote votes
+          [],
+          proposalThreshold,
+          RANDOM_ADDRESS,
+        ),
+      ).to.be.not.revertedWithCustomError(votingPowerAggregator, "ProposalThresholdNotMet");
+      // needs to be called explicity when no remote proofs are sent
+      await expect(await votingPowerAggregator.isProposalSynced(proposalId)).to.be.true;
+    });
 
-    const arbProposalBlockDetails = await votingPowerAggregator.proposalBlockDetails(proposalId, ARB_EID);
-    const opsepoliaProposalBlockDetails = await votingPowerAggregator.proposalBlockDetails(proposalId, OPSEPOLIA_EID);
-    const proposalBlockDetailsBsc = await votingPowerAggregator.proposalBlockDetails(proposalId, BSC_CHAIN_ID);
+    it("should revert early if voting power below threshold", async () => {
+      const priorVotes = parseUnits("10", 18);
+      xvsVault.getPriorVotes.returns(priorVotes);
 
-    const arbProposalRemoteChainEid = await votingPowerAggregator.proposalRemoteChainEids(proposalId, 0);
-    const opsepoliaProposalRemoteChainEid = await votingPowerAggregator.proposalRemoteChainEids(proposalId, 1);
-    expect(arbProposalBlockDetails.blockNumber).to.be.eq(arbSepoliaProofData.blockNumber);
-    expect(arbProposalBlockDetails.blockHash).to.be.eq(arbSepoliaProofData.blockHash);
-    expect(opsepoliaProposalBlockDetails.blockNumber).to.be.eq(opSepoliaProofData.blockNumber);
-    expect(opsepoliaProposalBlockDetails.blockHash).to.be.eq(opSepoliaProofData.blockHash);
+      await expect(
+        votingPowerAggregator
+          .connect(governanceBravo)
+          .startVotingPowerSync(
+            proposalId,
+            arbSepoliaProofData.proposer,
+            [arbSyncingParameters],
+            [arbProposerProofs],
+            proposalThreshold,
+            RANDOM_ADDRESS,
+          ),
+      ).to.be.revertedWithCustomError(votingPowerAggregator, "ProposalThresholdNotMet");
+    });
 
-    expect(arbProposalRemoteChainEid).to.be.eq(ARB_EID);
-    expect(opsepoliaProposalRemoteChainEid).to.be.eq(OPSEPOLIA_EID);
-    expect(proposalBlockDetailsBsc.blockNumber).to.be.eq(receipt.blockNumber - 1);
-    expect(proposalBlockDetailsBsc.blockHash).to.be.eq(blockDetailsPrevBlock.hash);
+    it("should revert if block timestamp is invalid", async () => {
+      // Should revert if the block timestamp is set more than 600 seconds ahead of the provided proofs.
+      await time.setNextBlockTimestamp(1741873577);
+      await mine();
 
-    const proposerVotingPower = await votingPowerAggregator.getVotingPower(arbSepoliaProofData.proposer, proposalId, [
-      arbProposerProofs,
-      opsepoliaProposerProofs,
-    ]);
+      await expect(
+        votingPowerAggregator
+          .connect(governanceBravo)
+          .startVotingPowerSync(
+            proposalId,
+            arbSepoliaProofData.proposer,
+            [arbSyncingParameters],
+            [arbProposerProofs],
+            proposalThreshold,
+            RANDOM_ADDRESS,
+          ),
+      ).to.be.revertedWithCustomError(votingPowerAggregator, "InvalidBlockTimestamp");
+    });
 
-    // Proposer total votes = arb votes + opsepolia votes + bnb votes
-    expect(proposerVotingPower).eq(
-      BigNumber.from(arbSepoliaProofData.proposerCheckpoint?.votes)
-        .add(BigNumber.from(opSepoliaProofData.proposerCheckpoint?.votes))
-        .add(parseUnits("100", 18)),
-    );
+    it("should revert if caller is not governor", async () => {
+      const nonGovernor = accounts[0];
+      const proposerAdd = await proposer.getAddress();
+
+      await expect(
+        votingPowerAggregator
+          .connect(nonGovernor)
+          .startVotingPowerSync(
+            proposalId,
+            proposerAdd,
+            [arbSyncingParameters],
+            [arbProposerProofs],
+            proposalThreshold,
+            RANDOM_ADDRESS,
+          ),
+      ).to.be.revertedWithCustomError(votingPowerAggregator, "InvalidCaller");
+    });
+
+    it("should revert if proposerVotingProofs length exceeds syncingParameters length", async () => {
+      const proposerAdd = await proposer.getAddress();
+
+      await expect(
+        votingPowerAggregator.connect(governanceBravo).startVotingPowerSync(
+          proposalId,
+          proposerAdd,
+          [arbSyncingParameters], // 1 syncing parameter
+          [arbProposerProofs, opsepoliaProposerProofs], // 2 proofs
+          proposalThreshold,
+          "0x",
+        ),
+      ).to.be.revertedWithCustomError(votingPowerAggregator, "LengthMismatch");
+    });
+
+    it("should revert if remote chain is not supported", async () => {
+      const unsupportedChainEid = 9999; // unsupported chain ID
+      const unsupportedSyncingParameters = {
+        remoteChainEid: unsupportedChainEid,
+        blockHash: arbSepoliaProofData.blockHash,
+        remoteBlockHeaderRLP: arbSepoliaProofData.blockHeaderRLP,
+        xvsVaultStateProofRLP: arbSepoliaProofData.accountStateProofRLP,
+      };
+      const unsupportedProposerProofs = {
+        remoteChainEid: unsupportedChainEid,
+        numCheckpointsProof: arbSepoliaProofData.proposerXvsVaultNumCheckpointsStorageProofRlp,
+        checkpointsProof: arbSepoliaProofData.proposerXvsVaultCheckpointsStorageProofRlp,
+      };
+      const proposerAdd = await proposer.getAddress();
+
+      await expect(
+        votingPowerAggregator
+          .connect(governanceBravo)
+          .startVotingPowerSync(
+            proposalId,
+            proposerAdd,
+            [unsupportedSyncingParameters],
+            [unsupportedProposerProofs],
+            proposalThreshold,
+            RANDOM_ADDRESS,
+          ),
+      )
+        .to.be.revertedWithCustomError(votingPowerAggregator, "RemoteChainNotSupported")
+        .withArgs(unsupportedChainEid);
+    });
+  });
+
+  describe("isProposalSynced", () => {
+    it("should return false when all remote hash are not received", async () => {
+      await votingPowerAggregator
+        .connect(governanceBravo)
+        .startVotingPowerSync(
+          proposalId,
+          arbSepoliaProofData.proposer,
+          [arbSyncingParameters, opSyncingParameters],
+          [arbProposerProofs, opsepoliaProposerProofs],
+          proposalThreshold,
+          RANDOM_ADDRESS,
+        );
+
+      expect(await votingPowerAggregator.isProposalSynced(proposalId)).to.be.false;
+    });
+
+    it("should return true when all remote hash are received", async () => {
+      await votingPowerAggregator
+        .connect(governanceBravo)
+        .startVotingPowerSync(
+          proposalId,
+          arbSepoliaProofData.proposer,
+          [arbSyncingParameters],
+          [arbProposerProofs],
+          proposalThreshold,
+          RANDOM_ADDRESS,
+        );
+      const origin = {
+        srcEid: ARB_EID,
+        sender: ethers.utils.hexZeroPad(votingPowerAggregator.address, 32),
+        nonce: 1,
+      };
+      const payload = ethers.utils.defaultAbiCoder.encode(
+        ["uint256", "uint256", "bytes32", "uint32"],
+        [proposalId, arbSepoliaProofData.blockNumber, arbSepoliaProofData.blockHash, ARB_EID],
+      );
+      const endpointAdd = await impersonateSigner(endpoint.address);
+      await fundAccount(endpoint.address);
+
+      let data = votingPowerAggregator.interface.encodeFunctionData("setReadChannel", [ARB_EID, true]);
+      await deployer.sendTransaction({
+        to: votingPowerAggregatorOwner.address,
+        data: data,
+      }),
+        await votingPowerAggregator
+          .connect(endpointAdd)
+          .lzReceive(
+            origin,
+            ethers.utils.hexZeroPad("0x", 32),
+            payload,
+            "0x1111111111111111111111111111111111111111",
+            "0x",
+          );
+
+      expect(await votingPowerAggregator.isProposalSynced(proposalId)).to.be.true;
+    });
+  });
+
+  describe("getVotingPower", () => {
+    it("should return correct voting power from voting proofs", async () => {
+      const priorVotes = parseUnits("30", 18);
+      xvsVault.getPriorVotes.returns(priorVotes);
+
+      await votingPowerAggregator
+        .connect(governanceBravo)
+        .startVotingPowerSync(
+          proposalId,
+          arbSepoliaProofData.proposer,
+          [arbSyncingParameters],
+          [arbProposerProofs],
+          proposalThreshold,
+          RANDOM_ADDRESS,
+        );
+
+      const votesFromProof = BigNumber.from(arbSepoliaProofData.proposerCheckpoint?.votes || "0");
+
+      const votes = await votingPowerAggregator.getVotingPower(arbSepoliaProofData.proposer, proposalId, [
+        arbProposerProofs,
+      ]);
+
+      expect(votes).to.equal(votesFromProof.add(priorVotes));
+    });
+
+    it("should return voting power of BSC only when no remote proofs provided", async () => {
+      await votingPowerAggregator
+        .connect(governanceBravo)
+        .startVotingPowerSync(proposalId, arbSepoliaProofData.proposer, [], [], proposalThreshold, RANDOM_ADDRESS);
+
+      const votes = await votingPowerAggregator.getVotingPower(arbSepoliaProofData.proposer, proposalId, []);
+
+      expect(votes).to.equal(priorVotes);
+    });
+  });
+
+  describe("quoteRemoteBlockHash", function () {
+    it("should quote messaging fee correctly", async function () {
+      endpoint.quote.returns(QUOTE_FEE);
+      const options = Options.newOptions().addExecutorLzReceiveOption(50000, 0).toBytes();
+      const blockNumber = 132006869;
+      const result = await votingPowerAggregator.quoteRemoteBlockHash(
+        proposalId,
+        [ARB_EID],
+        [blockNumber],
+        options,
+        false,
+      );
+      expect(result.nativeFee).to.equal(QUOTE_FEE.nativeFee);
+      expect(result.nativeFee).to.equal(QUOTE_FEE.nativeFee);
+    });
   });
 });

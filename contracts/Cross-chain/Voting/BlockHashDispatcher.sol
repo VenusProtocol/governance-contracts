@@ -111,7 +111,7 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
     ) external payable whenNotPaused {
         bytes32 blockHash = blockNumToHash[blockNumber];
         if (blockHash == bytes32(0)) {
-            _setHash(blockNumber);
+            setHash(blockNumber);
         }
         bytes memory payload = getPayload(pId, blockNumber);
 
@@ -128,7 +128,7 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
     }
 
     /**
-     * @notice Internal function to retrieve the hash of a given block number
+     * @notice Public function to retrieve the hash of a given block number
      */
     function getBlockHash(uint256 blockNumber) public view returns (bytes32 blockHash) {
         blockHash = blockNumToHash[blockNumber];
@@ -138,9 +138,9 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
     }
 
     /**
-     * @notice public function to store the hash of a given block number
+     * @notice Public function to store the hash of a given block number
      */
-    function _setHash(uint256 blockNumber) public {
+    function setHash(uint256 blockNumber) public {
         bytes32 _blockHash = blockhash(blockNumber);
         if (_blockHash != bytes32(0)) {
             blockNumToHash[blockNumber] = _blockHash;
