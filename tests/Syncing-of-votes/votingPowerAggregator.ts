@@ -56,10 +56,10 @@ const OPSEPOLIA_EID = 40232;
 const ARB_EID = 40231;
 const BSC_CHAIN_ID = 5656;
 const RANDOM_ADDRESS = "0x1111111111111111111111111111111111111111";
-const readChannel = 123;
-const proposalId = 1;
-const proposalThreshold = BigNumber.from("50000000000000000000").sub(1);
-const priorVotes = parseUnits("100", 18);
+const READ_CHANNEL = 123;
+const PROPOSAL_ID = 1;
+const PROPOSAL_THRESHOLD = BigNumber.from("50000000000000000000").sub(1);
+const PRIOR_VOTES = parseUnits("100", 18);
 const QUOTE_FEE = { nativeFee: 1, lzTokenFee: 0 };
 
 let deployer: SignerWithAddress;
@@ -151,7 +151,7 @@ async function xvsVaultAggregatorFixture(): Promise<VotingPowerAggregatorFixture
   const votingPowerAggregator = await VotingPowerAggregatorFactory.deploy(
     endpoint.address,
     deployer.address,
-    readChannel,
+    READ_CHANNEL,
     dataWarehouse.address,
     governorBravoDelegate.address,
     xvsVault.address,
@@ -190,7 +190,7 @@ describe("VotingPowerAggregator Tests", () => {
 
     endpoint.send.returns();
     governorBravoDelegate.activateProposal.returns();
-    xvsVault.getPriorVotes.returns(priorVotes);
+    xvsVault.getPriorVotes.returns(PRIOR_VOTES);
 
     governanceBravo = await impersonateSigner(governorBravoDelegate.address);
     await fundAccount(governorBravoDelegate.address);
@@ -269,23 +269,26 @@ describe("VotingPowerAggregator Tests", () => {
       const tx = await votingPowerAggregator
         .connect(governanceBravo)
         .startVotingPowerSync(
-          proposalId,
+          PROPOSAL_ID,
           arbSepoliaProofData.proposer,
           [arbSyncingParameters, opSyncingParameters],
           [arbProposerProofs, opsepoliaProposerProofs],
-          proposalThreshold,
+          PROPOSAL_THRESHOLD,
           RANDOM_ADDRESS,
         );
 
       const receipt = await tx.wait();
       const blockDetailsPrevBlock = await ethers.provider.getBlock(receipt.blockNumber - 1);
 
-      const arbProposalBlockDetails = await votingPowerAggregator.proposalBlockDetails(proposalId, ARB_EID);
-      const opsepoliaProposalBlockDetails = await votingPowerAggregator.proposalBlockDetails(proposalId, OPSEPOLIA_EID);
-      const proposalBlockDetailsBsc = await votingPowerAggregator.proposalBlockDetails(proposalId, BSC_CHAIN_ID);
+      const arbProposalBlockDetails = await votingPowerAggregator.proposalBlockDetails(PROPOSAL_ID, ARB_EID);
+      const opsepoliaProposalBlockDetails = await votingPowerAggregator.proposalBlockDetails(
+        PROPOSAL_ID,
+        OPSEPOLIA_EID,
+      );
+      const proposalBlockDetailsBsc = await votingPowerAggregator.proposalBlockDetails(PROPOSAL_ID, BSC_CHAIN_ID);
 
-      const arbProposalRemoteChainEid = await votingPowerAggregator.proposalRemoteChainEids(proposalId, 0);
-      const opsepoliaProposalRemoteChainEid = await votingPowerAggregator.proposalRemoteChainEids(proposalId, 1);
+      const arbProposalRemoteChainEid = await votingPowerAggregator.proposalRemoteChainEids(PROPOSAL_ID, 0);
+      const opsepoliaProposalRemoteChainEid = await votingPowerAggregator.proposalRemoteChainEids(PROPOSAL_ID, 1);
       expect(arbProposalBlockDetails.blockNumber).to.be.eq(arbSepoliaProofData.blockNumber);
       expect(arbProposalBlockDetails.blockHash).to.be.eq(arbSepoliaProofData.blockHash);
       expect(opsepoliaProposalBlockDetails.blockNumber).to.be.eq(opSepoliaProofData.blockNumber);
@@ -296,47 +299,48 @@ describe("VotingPowerAggregator Tests", () => {
       expect(proposalBlockDetailsBsc.blockNumber).to.be.eq(receipt.blockNumber - 1);
       expect(proposalBlockDetailsBsc.blockHash).to.be.eq(blockDetailsPrevBlock.hash);
 
-      const proposerVotingPower = await votingPowerAggregator.getVotingPower(arbSepoliaProofData.proposer, proposalId, [
-        arbProposerProofs,
-        opsepoliaProposerProofs,
-      ]);
+      const proposerVotingPower = await votingPowerAggregator.getVotingPower(
+        arbSepoliaProofData.proposer,
+        PROPOSAL_ID,
+        [arbProposerProofs, opsepoliaProposerProofs],
+      );
 
       // Proposer total votes = arb votes + opsepolia votes + bnb votes
       expect(proposerVotingPower).eq(
         BigNumber.from(arbSepoliaProofData.proposerCheckpoint?.votes)
           .add(BigNumber.from(opSepoliaProofData.proposerCheckpoint?.votes))
-          .add(priorVotes),
+          .add(PRIOR_VOTES),
       );
     });
 
     it("should succeed with enough BSC votes and zero remote votes", async () => {
       await expect(
         await votingPowerAggregator.connect(governanceBravo).startVotingPowerSync(
-          proposalId,
+          PROPOSAL_ID,
           arbSepoliaProofData.proposer,
           [], // no remote votes
           [],
-          proposalThreshold,
+          PROPOSAL_THRESHOLD,
           RANDOM_ADDRESS,
         ),
       ).to.be.not.revertedWithCustomError(votingPowerAggregator, "ProposalThresholdNotMet");
       // needs to be called explicity when no remote proofs are sent
-      await expect(await votingPowerAggregator.isProposalSynced(proposalId)).to.be.true;
+      await expect(await votingPowerAggregator.isProposalSynced(PROPOSAL_ID)).to.be.true;
     });
 
     it("should revert early if voting power below threshold", async () => {
-      const priorVotes = parseUnits("10", 18);
-      xvsVault.getPriorVotes.returns(priorVotes);
+      const PRIOR_VOTES = parseUnits("10", 18);
+      xvsVault.getPriorVotes.returns(PRIOR_VOTES);
 
       await expect(
         votingPowerAggregator
           .connect(governanceBravo)
           .startVotingPowerSync(
-            proposalId,
+            PROPOSAL_ID,
             arbSepoliaProofData.proposer,
             [arbSyncingParameters],
             [arbProposerProofs],
-            proposalThreshold,
+            PROPOSAL_THRESHOLD,
             RANDOM_ADDRESS,
           ),
       ).to.be.revertedWithCustomError(votingPowerAggregator, "ProposalThresholdNotMet");
@@ -351,11 +355,11 @@ describe("VotingPowerAggregator Tests", () => {
         votingPowerAggregator
           .connect(governanceBravo)
           .startVotingPowerSync(
-            proposalId,
+            PROPOSAL_ID,
             arbSepoliaProofData.proposer,
             [arbSyncingParameters],
             [arbProposerProofs],
-            proposalThreshold,
+            PROPOSAL_THRESHOLD,
             RANDOM_ADDRESS,
           ),
       ).to.be.revertedWithCustomError(votingPowerAggregator, "InvalidBlockTimestamp");
@@ -369,11 +373,11 @@ describe("VotingPowerAggregator Tests", () => {
         votingPowerAggregator
           .connect(nonGovernor)
           .startVotingPowerSync(
-            proposalId,
+            PROPOSAL_ID,
             proposerAdd,
             [arbSyncingParameters],
             [arbProposerProofs],
-            proposalThreshold,
+            PROPOSAL_THRESHOLD,
             RANDOM_ADDRESS,
           ),
       ).to.be.revertedWithCustomError(votingPowerAggregator, "InvalidCaller");
@@ -384,11 +388,11 @@ describe("VotingPowerAggregator Tests", () => {
 
       await expect(
         votingPowerAggregator.connect(governanceBravo).startVotingPowerSync(
-          proposalId,
+          PROPOSAL_ID,
           proposerAdd,
           [arbSyncingParameters], // 1 syncing parameter
           [arbProposerProofs, opsepoliaProposerProofs], // 2 proofs
-          proposalThreshold,
+          PROPOSAL_THRESHOLD,
           "0x",
         ),
       ).to.be.revertedWithCustomError(votingPowerAggregator, "LengthMismatch");
@@ -413,11 +417,11 @@ describe("VotingPowerAggregator Tests", () => {
         votingPowerAggregator
           .connect(governanceBravo)
           .startVotingPowerSync(
-            proposalId,
+            PROPOSAL_ID,
             proposerAdd,
             [unsupportedSyncingParameters],
             [unsupportedProposerProofs],
-            proposalThreshold,
+            PROPOSAL_THRESHOLD,
             RANDOM_ADDRESS,
           ),
       )
@@ -431,41 +435,41 @@ describe("VotingPowerAggregator Tests", () => {
       await votingPowerAggregator
         .connect(governanceBravo)
         .startVotingPowerSync(
-          proposalId,
+          PROPOSAL_ID,
           arbSepoliaProofData.proposer,
           [arbSyncingParameters, opSyncingParameters],
           [arbProposerProofs, opsepoliaProposerProofs],
-          proposalThreshold,
+          PROPOSAL_THRESHOLD,
           RANDOM_ADDRESS,
         );
 
-      expect(await votingPowerAggregator.isProposalSynced(proposalId)).to.be.false;
+      expect(await votingPowerAggregator.isProposalSynced(PROPOSAL_ID)).to.be.false;
     });
 
     it("should return true when all remote hash are received", async () => {
       await votingPowerAggregator
         .connect(governanceBravo)
         .startVotingPowerSync(
-          proposalId,
+          PROPOSAL_ID,
           arbSepoliaProofData.proposer,
           [arbSyncingParameters],
           [arbProposerProofs],
-          proposalThreshold,
+          PROPOSAL_THRESHOLD,
           RANDOM_ADDRESS,
         );
       const origin = {
-        srcEid: ARB_EID,
+        srcEid: READ_CHANNEL,
         sender: ethers.utils.hexZeroPad(votingPowerAggregator.address, 32),
         nonce: 1,
       };
       const payload = ethers.utils.defaultAbiCoder.encode(
         ["uint256", "uint256", "bytes32", "uint32"],
-        [proposalId, arbSepoliaProofData.blockNumber, arbSepoliaProofData.blockHash, ARB_EID],
+        [PROPOSAL_ID, arbSepoliaProofData.blockNumber, arbSepoliaProofData.blockHash, ARB_EID],
       );
       const endpointAdd = await impersonateSigner(endpoint.address);
       await fundAccount(endpoint.address);
 
-      let data = votingPowerAggregator.interface.encodeFunctionData("setReadChannel", [ARB_EID, true]);
+      let data = votingPowerAggregator.interface.encodeFunctionData("setReadChannel", [READ_CHANNEL, true]);
       await deployer.sendTransaction({
         to: votingPowerAggregatorOwner.address,
         data: data,
@@ -480,43 +484,40 @@ describe("VotingPowerAggregator Tests", () => {
             "0x",
           );
 
-      expect(await votingPowerAggregator.isProposalSynced(proposalId)).to.be.true;
+      expect(await votingPowerAggregator.isProposalSynced(PROPOSAL_ID)).to.be.true;
     });
   });
 
   describe("getVotingPower", () => {
     it("should return correct voting power from voting proofs", async () => {
-      const priorVotes = parseUnits("30", 18);
-      xvsVault.getPriorVotes.returns(priorVotes);
+      const PRIOR_VOTES = parseUnits("30", 18);
+      xvsVault.getPriorVotes.returns(PRIOR_VOTES);
 
       await votingPowerAggregator
         .connect(governanceBravo)
         .startVotingPowerSync(
-          proposalId,
+          PROPOSAL_ID,
           arbSepoliaProofData.proposer,
           [arbSyncingParameters],
           [arbProposerProofs],
-          proposalThreshold,
+          PROPOSAL_THRESHOLD,
           RANDOM_ADDRESS,
         );
 
       const votesFromProof = BigNumber.from(arbSepoliaProofData.proposerCheckpoint?.votes || "0");
-
-      const votes = await votingPowerAggregator.getVotingPower(arbSepoliaProofData.proposer, proposalId, [
+      const votes = await votingPowerAggregator.getVotingPower(arbSepoliaProofData.proposer, PROPOSAL_ID, [
         arbProposerProofs,
       ]);
-
-      expect(votes).to.equal(votesFromProof.add(priorVotes));
+      expect(votes).to.equal(votesFromProof.add(PRIOR_VOTES));
     });
 
     it("should return voting power of BSC only when no remote proofs provided", async () => {
       await votingPowerAggregator
         .connect(governanceBravo)
-        .startVotingPowerSync(proposalId, arbSepoliaProofData.proposer, [], [], proposalThreshold, RANDOM_ADDRESS);
+        .startVotingPowerSync(PROPOSAL_ID, arbSepoliaProofData.proposer, [], [], PROPOSAL_THRESHOLD, RANDOM_ADDRESS);
 
-      const votes = await votingPowerAggregator.getVotingPower(arbSepoliaProofData.proposer, proposalId, []);
-
-      expect(votes).to.equal(priorVotes);
+        const votes = await votingPowerAggregator.getVotingPower(arbSepoliaProofData.proposer, PROPOSAL_ID, []);
+      expect(votes).to.equal(PRIOR_VOTES);
     });
   });
 
@@ -526,7 +527,7 @@ describe("VotingPowerAggregator Tests", () => {
       const options = Options.newOptions().addExecutorLzReceiveOption(50000, 0).toBytes();
       const blockNumber = 132006869;
       const result = await votingPowerAggregator.quoteRemoteBlockHash(
-        proposalId,
+        PROPOSAL_ID,
         [ARB_EID],
         [blockNumber],
         options,

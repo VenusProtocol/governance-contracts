@@ -8,11 +8,11 @@ import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
 import { Initializable } from "@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol";
 
 /**
- * @title BlockHashDispatcher
- * @notice A contract for dispatching block hashes to a proposal chain and managing messaging between chains.
- * @dev Inherits functionality from OApp, Pausable, and Ownable. Implements LayerZero messaging and access control.
+ * @title BlockHashDispatcherBase
+ * @notice Abstract base contract for dispatching block hashes to a proposal chain.
+ * @dev Provides shared functionality, with getBlockHash to be implemented by derived contracts.
  */
-contract BlockHashDispatcher is Pausable, OApp, Initializable {
+abstract contract BlockHashDispatcherBase is Pausable, OApp, Initializable {
     /**
      * @notice ID of the proposal chain (e.g., BNB Chain) where block hashes will be sent
      */
@@ -69,6 +69,26 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
      */
     function unpause() external onlyOwner {
         _unpause();
+    }
+
+    /**
+     * @notice Retrieves the block hash for a given block number.
+     * @dev Must be implemented by derived contracts to provide chain-specific block hash retrieval.
+     * @param blockNumber The block number to query.
+     * @return blockHash The hash of the specified block.
+     */
+    function getBlockHash(uint256 blockNumber) public view virtual returns (bytes32 blockHash);
+
+    /**
+     * @notice Public function to store the hash of a given block number
+     */
+    function setHash(uint256 blockNumber) public {
+        bytes32 _blockHash = getBlockHash(blockNumber);
+        if (_blockHash == bytes32(0)) {
+            revert BlockHashNotFound(blockNumber);
+        }
+
+        blockNumToHash[blockNumber] = _blockHash;
     }
 
     /**
@@ -131,39 +151,6 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
     }
 
     /**
-     * @notice Public function to retrieve the hash of a given block number
-     */
-    function getBlockHash(uint256 blockNumber) public view returns (bytes32 blockHash) {
-        blockHash = blockNumToHash[blockNumber];
-        if (blockHash == bytes32(0)) {
-            blockHash = blockhash(blockNumber);
-        }
-    }
-
-    /**
-     * @notice Public function to store the hash of a given block number
-     */
-    function setHash(uint256 blockNumber) public {
-        bytes32 _blockHash = getBlockHash(blockNumber);
-        if (_blockHash == bytes32(0)) {
-            revert BlockHashNotFound(blockNumber);
-        }
-
-        blockNumToHash[blockNumber] = _blockHash;
-    }
-
-    /**
-     * @notice Internal function to handle incoming LayerZero messages
-     */
-    function _lzReceive(
-        Origin calldata _origin,
-        bytes32 _guid,
-        bytes calldata payload,
-        address _executor,
-        bytes calldata _extraData
-    ) internal override {}
-
-    /**
      * @notice Retrieves the block hash for a given block number and proposal ID
      * @param blockNumber The block number
      * @param pId The proposal ID
@@ -178,4 +165,15 @@ contract BlockHashDispatcher is Pausable, OApp, Initializable {
         bytes32 blockHash_ = getBlockHash(blockNumber);
         return (pId, blockNumber, blockHash_, chainId);
     }
+
+    /**
+     * @notice Internal function to handle incoming LayerZero messages
+     */
+    function _lzReceive(
+        Origin calldata _origin,
+        bytes32 _guid,
+        bytes calldata payload,
+        address _executor,
+        bytes calldata _extraData
+    ) internal override {}
 }

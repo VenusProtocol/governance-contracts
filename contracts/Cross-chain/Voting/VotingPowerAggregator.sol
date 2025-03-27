@@ -420,16 +420,7 @@ contract VotingPowerAggregator is Pausable, OAppRead, OAppOptionsType3 {
             });
         }
 
-        EVMCallComputeV1 memory computeSettings = EVMCallComputeV1({
-            computeSetting: 3, // None
-            targetEid: 0,
-            isBlockNum: false,
-            blockNumOrTimestamp: uint64(block.timestamp),
-            confirmations: 15,
-            to: address(this)
-        });
-
-        return ReadCodecV1.encode(0, readRequests, computeSettings);
+        return ReadCodecV1.encode(0, readRequests);
     }
 
     /**
