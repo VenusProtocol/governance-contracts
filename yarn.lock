@@ -3402,10 +3402,34 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@types/json-schema@npm:*, @types/json-schema@npm:^7.0.9":
   version: 7.0.15
   resolution: "@types/json-schema@npm:7.0.15"
   checksum: 97ed0cb44d4070aecea772b7b2e2ed971e10c81ec87dd4ecc160322ffa55ff330dace1793489540e3e318d90942064bb697cc0f8989391797792d919737b3b98
+=======
+"@types/inquirer@npm:^9.0.7":
+  version: 9.0.7
+  resolution: "@types/inquirer@npm:9.0.7"
+  dependencies:
+    "@types/through": "*"
+    rxjs: ^7.2.0
+  checksum: c14c7a52797606a08ca7450d9263c01518b30e0b7610d0817fb530bc4fae7b3ffdcc9d50bb9f7befc2b220bb54195507cc423de3c8f320bbe9f7e5e8881a0226
+  languageName: node
+  linkType: hard
+
+"@types/json-schema@npm:*, @types/json-schema@npm:^7.0.8, @types/json-schema@npm:^7.0.9":
+  version: 7.0.11
+  resolution: "@types/json-schema@npm:7.0.11"
+  checksum: 527bddfe62db9012fccd7627794bd4c71beb77601861055d87e3ee464f2217c85fca7a4b56ae677478367bbd248dbde13553312b7d4dbc702a2f2bbf60c4018d
+>>>>>>> develop
+  languageName: node
+  linkType: hard
+
+"@types/lodash@npm:^4.17.6":
+  version: 4.17.6
+  resolution: "@types/lodash@npm:4.17.6"
+  checksum: f748c672f49c54ee631a0fab6f26d56ab99bd68a4fb91604b5d7525a72102dd1917209c12d7078c988a375edb5dc70ca600db05ac01785306fd64470048cd16c
   languageName: node
   linkType: hard
 
@@ -3564,6 +3588,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/through@npm:*":
+  version: 0.0.33
+  resolution: "@types/through@npm:0.0.33"
+  dependencies:
+    "@types/node": "*"
+  checksum: fd0b73f873a64ed5366d1d757c42e5dbbb2201002667c8958eda7ca02fff09d73de91360572db465ee00240c32d50c6039ea736d8eca374300f9664f93e8da39
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/eslint-plugin@npm:^5.44.0":
   version: 5.62.0
   resolution: "@typescript-eslint/eslint-plugin@npm:5.62.0"
@@ -3685,10 +3718,32 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "@ungap/structured-clone@npm:^1.2.0":
   version: 1.3.0
   resolution: "@ungap/structured-clone@npm:1.3.0"
   checksum: 64ed518f49c2b31f5b50f8570a1e37bde3b62f2460042c50f132430b2d869c4a6586f13aa33a58a4722715b8158c68cae2827389d6752ac54da2893c83e480fc
+=======
+"@venusprotocol/governance-contracts@npm:^1.4.0":
+  version: 1.4.0
+  resolution: "@venusprotocol/governance-contracts@npm:1.4.0"
+  dependencies:
+    "@venusprotocol/solidity-utilities": ^1.1.0
+    hardhat-deploy-ethers: ^0.3.0-beta.13
+    module-alias: ^2.2.2
+  checksum: 85c6b6a815edb0befa4c38e3652a58464827d390620210b99575c16960ee6505e95e7c2192ebc972da7ed758d3c62e150d32fbdd1f01acab1731f29b11d1884e
+  languageName: node
+  linkType: hard
+
+"@venusprotocol/governance-contracts@npm:^2.0.0":
+  version: 2.10.0
+  resolution: "@venusprotocol/governance-contracts@npm:2.10.0"
+  dependencies:
+    "@venusprotocol/solidity-utilities": 2.0.0
+    hardhat-deploy-ethers: ^0.3.0-beta.13
+    module-alias: ^2.2.2
+  checksum: cbcb9503402009cdf9eafc740e66e49d66ca4e0aee19526d42aa08ee7e7d2ae1f7251579ea0005a8b87fcdfe86c27170d75f08acf008fa24df03087371a24800
+>>>>>>> develop
   languageName: node
   linkType: hard
 
@@ -3725,6 +3780,8 @@ __metadata:
     "@types/chai": ^4.3.4
     "@types/debug": ^4.1.12
     "@types/fs-extra": ^9.0.13
+    "@types/inquirer": ^9.0.7
+    "@types/lodash": ^4.17.6
     "@types/mocha": ^10.0.0
     "@types/node": ^18.16.3
     "@typescript-eslint/eslint-plugin": ^5.44.0
@@ -3766,6 +3823,7 @@ __metadata:
     tsconfig-paths: ^4.1.2
     typechain: ^8.1.1
     typescript: ^4.9.3
+    typescript-retry-decorator: ^2.4.2
     zksync-ethers: ^5.9.1
   languageName: unknown
   linkType: soft
@@ -14293,9 +14351,22 @@ __metadata:
   languageName: node
   linkType: hard
 
+<<<<<<< HEAD
 "typescript@npm:^4.6.4 || ^5.2.2":
   version: 5.7.3
   resolution: "typescript@npm:5.7.3"
+=======
+"typescript-retry-decorator@npm:^2.4.2":
+  version: 2.4.2
+  resolution: "typescript-retry-decorator@npm:2.4.2"
+  checksum: 8d76cfd686aad19ab0c7c0aa85633de6877e6cedf1f6404679771b5772beb07b5d6464f7e73685d6c1c1caa4a7bf5c1c1eb85293a2a03596ae2f1ad0ecbb16bb
+  languageName: node
+  linkType: hard
+
+"typescript@npm:^4.6.4 || ^5.0.0":
+  version: 5.0.2
+  resolution: "typescript@npm:5.0.2"
+>>>>>>> develop
   bin:
     tsc: bin/tsc
     tsserver: bin/tsserver

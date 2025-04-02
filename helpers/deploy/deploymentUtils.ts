@@ -27,14 +27,10 @@ const mainnetNetworks = [
   "hardhat",
 ];
 
-export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<string> => {
+export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => {
   const { deployer } = await getNamedAccounts();
   if (network === "hardhat") {
     return deployer;
-  } else if (network === "bscmainnet") {
-    return "0x1C2CAc6ec528c20800B2fe734820D87b581eAA6B"; // BSCMAINNET MULTISIG 2
-  } else if (network === "bsctestnet") {
-    return "0xce10739590001705F7FF231611ba4A48B2820327"; // BSCTESTNET TIMELOCK
   } else if (network === "sepolia") {
     return "0x94fa6078b6b8a26f0b6edffbe6501b22a10470fb"; // SEPOLIA MULTISIG
   } else if (network === "ethereum") {
@@ -66,8 +62,7 @@ export const getAcmAdminAccount = async (network: SUPPORTED_NETWORKS): Promise<s
   } else if (network === "berachainbartio") {
     return "0xdf3b635d2b535f906BB02abb22AED71346E36a00"; // BERACHAIN bArtio MULTISIG
   }
-  const normalTimelock = await ethers.getContract("NormalTimelock");
-  return normalTimelock.address;
+  return deployer;
 };
 
 export const getOmnichainProposalSender = async (network: SUPPORTED_NETWORKS) => {
