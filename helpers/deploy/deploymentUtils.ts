@@ -110,22 +110,23 @@ export const getRiskOracle = async (networkName: SUPPORTED_NETWORKS) => {
   const mockRiskOracle = await ethers.getContractOrNull("MockRiskOracle");
   return {
     bscmainnet: "",
-    bsctestnet: "0x7bd97dd6c199532d11cf5f55e13a120db6dd0f4f",
+    bsctestnet: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
     hardhat: mockRiskOracle?.address || "",
-    sepolia: "0x36663F41c50e2B34D9e1457A81d0B9183Fc737be",
+    sepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
     ethereum: "",
-    opbnbtestnet: "0xA343Cb2c00A25fe22c3E45c9C1c19Ed9f4D15d8a",
+    opbnbtestnet: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
     opbnbmainnet: "",
-    arbitrumsepolia: "0x0463a7E5221EAE1990cEddB51A5821a68cdA6008",
+    arbitrumsepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
     arbitrumone: "",
-    opsepolia: "0xa0e724847C9d8149023e6a956091eF5f4DFaDc5b",
+    opsepolia: "0x66A8cb6c4230B044378aC3676D47Ed4fE18e3cFB",
     opmainnet: "",
-    basesepolia: "0x3d0e20D4caD958bc848B045e1da19Fe378f86f03",
+    basesepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
     basemainnet: "",
-    unichainsepolia: "0x9cB50e0F2709A829e4B6DA7C0A317a48a029E827",
+    unichainsepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
     unichainmainnet: "",
-    zksyncsepolia: "0x1f7474B549840158464Eca63735429815867b40e",
+    zksyncsepolia: "0x1f7474B549840158464Eca63735429815867b40e", // Mock
     zksyncmainnet: "",
+    berachainbartio: ""
   }[networkName];
 };
 
