@@ -12,7 +12,7 @@ import {
   OmnichainGovernanceExecutorOwnerMethods,
   config,
 } from "../helpers/deploy/deploymentConfig";
-import { getOmnichainProposalSender, getAcmAdminAccount, testnetNetworks } from "../helpers/deploy/deploymentUtils";
+import { getAcmAdminAccount, getOmnichainProposalSender, testnetNetworks } from "../helpers/deploy/deploymentUtils";
 import { OmnichainGovernanceExecutor } from "../typechain";
 
 interface GovernanceCommand {
