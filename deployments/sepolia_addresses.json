@@ -11,9 +11,6 @@
     "OmnichainExecutorOwner": "0xf964158C67439D01e5f17F0A3F39DfF46823F27A",
     "OmnichainExecutorOwner_Implementation": "0x553f01f2c693Cf9B81cC77BACc59dD71E7a14740",
     "OmnichainExecutorOwner_Proxy": "0xf964158C67439D01e5f17F0A3F39DfF46823F27A",
-    "OmnichainGovernanceExecutor": "0xD9B18a43Ee9964061c1A1925Aa907462F0249109",
-    "RiskStewardReceiver": "0x0d1634c0440B2BB7f6cD39178D50F3810156714B",
-    "RiskStewardReceiver_Implementation": "0x3C7d870e1d12B98d4DEC0489F12eb86ab6d84Ed4",
-    "RiskStewardReceiver_Proxy": "0x0d1634c0440B2BB7f6cD39178D50F3810156714B"
+    "OmnichainGovernanceExecutor": "0xD9B18a43Ee9964061c1A1925Aa907462F0249109"
   }
 }
