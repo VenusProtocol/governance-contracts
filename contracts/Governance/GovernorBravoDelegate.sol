@@ -70,7 +70,7 @@ import "./GovernorBravoInterfaces.sol";
  * The delegation of votes happens through the `XVSVault` contract by calling the `delegate` or `delegateBySig` functions. These same functions can revert
  * vote delegation by calling the same function with a value of `0`.
  */
-contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoEvents {
+contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoEvents {
     /// @notice The name of this contract
     string public constant name = "Venus Governor Bravo";
 
@@ -79,18 +79,6 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
 
     /// @notice The maximum setable proposal threshold
     uint public constant MAX_PROPOSAL_THRESHOLD = 300000e18; //300,000 Xvs
-
-    /// @notice The minimum setable voting period
-    uint public constant MIN_VOTING_PERIOD = 20 * 60 * 3; // About 3 hours, 3 secs per block
-
-    /// @notice The max setable voting period
-    uint public constant MAX_VOTING_PERIOD = 20 * 60 * 24 * 14; // About 2 weeks, 3 secs per block
-
-    /// @notice The min setable voting delay
-    uint public constant MIN_VOTING_DELAY = 1;
-
-    /// @notice The max setable voting delay
-    uint public constant MAX_VOTING_DELAY = 20 * 60 * 24 * 7; // About 1 week, 3 secs per block
 
     /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
     uint public constant quorumVotes = 600000e18; // 600,000 = 2% of Xvs
@@ -116,7 +104,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     ) public {
         require(address(proposalTimelocks[0]) == address(0), "GovernorBravo::initialize: cannot initialize twice");
         require(msg.sender == admin, "GovernorBravo::initialize: admin only");
-        require(xvsVault_ != address(0), "GovernorBravo::initialize: invalid xvs address");
+        require(xvsVault_ != address(0), "GovernorBravo::initialize: invalid xvs vault address");
         require(guardian_ != address(0), "GovernorBravo::initialize: invalid guardian");
         require(
             timelocks.length == uint8(ProposalType.CRITICAL) + 1,
@@ -131,37 +119,87 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
         proposalMaxOperations = 10;
         guardian = guardian_;
 
-        //Set parameters for each Governance Route
+        // Set parameters for each Governance Route
+
+        setProposalConfigs(proposalConfigs_);
+
+        uint256 arrLength = timelocks.length;
+        for (uint256 i; i < arrLength; ++i) {
+            require(address(timelocks[i]) != address(0), "GovernorBravo::initialize:invalid timelock address");
+            proposalTimelocks[i] = timelocks[i];
+        }
+    }
+
+    /**
+     ** @notice Sets the validation parameters for voting delay and voting period
+     ** @param newValidationParams Struct containing new minimum and maximum voting period and delay
+     */
+    function setValidationParams(ValidationParams memory newValidationParams) public {
+        require(msg.sender == admin, "GovernorBravo::setValidationParams: admin only");
+        require(
+            newValidationParams.minVotingPeriod > 0 && newValidationParams.minVotingDelay > 0,
+            "GovernorBravo::setValidationParams: invalid params"
+        );
+        emit SetValidationParams(
+            validationParams.minVotingPeriod,
+            newValidationParams.minVotingPeriod,
+            validationParams.maxVotingPeriod,
+            newValidationParams.maxVotingPeriod,
+            validationParams.minVotingDelay,
+            newValidationParams.minVotingDelay,
+            validationParams.maxVotingDelay,
+            newValidationParams.maxVotingDelay
+        );
+        validationParams = newValidationParams;
+    }
+
+    /**
+     ** @notice Sets the configuration for different proposal types
+     ** @dev Requires validationParams to be configured before
+     ** @param proposalConfigs_ Array of proposal configuration structs to update
+     */
+    function setProposalConfigs(ProposalConfig[] memory proposalConfigs_) public {
+        require(msg.sender == admin, "GovernorBravo::setProposalConfigs: admin only");
+        require(
+            validationParams.minVotingPeriod > 0 &&
+                validationParams.maxVotingPeriod > 0 &&
+                validationParams.minVotingDelay > 0 &&
+                validationParams.maxVotingDelay > 0,
+            "GovernorBravo::setProposalConfigs: validation params not configured yet"
+        );
         uint256 arrLength = proposalConfigs_.length;
         for (uint256 i; i < arrLength; ++i) {
             require(
-                proposalConfigs_[i].votingPeriod >= MIN_VOTING_PERIOD,
-                "GovernorBravo::initialize: invalid min voting period"
+                proposalConfigs_[i].votingPeriod >= validationParams.minVotingPeriod,
+                "GovernorBravo::setProposalConfigs: invalid min voting period"
             );
             require(
-                proposalConfigs_[i].votingPeriod <= MAX_VOTING_PERIOD,
-                "GovernorBravo::initialize: invalid max voting period"
+                proposalConfigs_[i].votingPeriod <= validationParams.maxVotingPeriod,
+                "GovernorBravo::setProposalConfigs: invalid max voting period"
             );
             require(
-                proposalConfigs_[i].votingDelay >= MIN_VOTING_DELAY,
-                "GovernorBravo::initialize: invalid min voting delay"
+                proposalConfigs_[i].votingDelay >= validationParams.minVotingDelay,
+                "GovernorBravo::setProposalConfigs: invalid min voting delay"
             );
             require(
-                proposalConfigs_[i].votingDelay <= MAX_VOTING_DELAY,
-                "GovernorBravo::initialize: invalid max voting delay"
+                proposalConfigs_[i].votingDelay <= validationParams.maxVotingDelay,
+                "GovernorBravo::setProposalConfigs: invalid max voting delay"
             );
             require(
                 proposalConfigs_[i].proposalThreshold >= MIN_PROPOSAL_THRESHOLD,
-                "GovernorBravo::initialize: invalid min proposal threshold"
+                "GovernorBravo::setProposalConfigs: invalid min proposal threshold"
             );
             require(
                 proposalConfigs_[i].proposalThreshold <= MAX_PROPOSAL_THRESHOLD,
-                "GovernorBravo::initialize: invalid max proposal threshold"
+                "GovernorBravo::setProposalConfigs: invalid max proposal threshold"
             );
-            require(address(timelocks[i]) != address(0), "GovernorBravo::initialize:invalid timelock address");
 
             proposalConfigs[i] = proposalConfigs_[i];
-            proposalTimelocks[i] = timelocks[i];
+            emit SetProposalConfigs(
+                proposalConfigs_[i].votingPeriod,
+                proposalConfigs_[i].votingDelay,
+                proposalConfigs_[i].proposalThreshold
+            );
         }
     }
 
