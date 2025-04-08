@@ -45,7 +45,7 @@ const proposalConfigs = [
 ];
 
 const updatedValidationParams = {
-  minVotingPeriod: 7200,  // 40 * 60 * 3;  About 3 hours, 1.5 secs per block
+  minVotingPeriod: 7200, // 40 * 60 * 3;  About 3 hours, 1.5 secs per block
   maxVotingPeriod: 806400, // 40 * 60 * 24 * 14; About 2 weeks, 1.5 secs per block
   minVotingDelay: 1,
   maxVotingDelay: 403200, // 40 * 60 * 24 * 7; About 1 week, 1.5 secs per block
