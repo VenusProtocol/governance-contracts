@@ -20,6 +20,31 @@ type GovernorBravoDelegateFixture = {
   xvsVault: FakeContract<XVSVault>;
 };
 
+const validationParams = {
+  maxVotingPeriod: 806400,
+  minVotingPeriod: 7200,
+  maxVotingDelay: 403200,
+  minVotingDelay: 1,
+};
+
+const proposalConfigs = [
+  {
+    votingDelay: 1,
+    votingPeriod: 28800,
+    proposalThreshold: "300000000000000000000000",
+  },
+  {
+    votingDelay: 1,
+    votingPeriod: 28800,
+    proposalThreshold: "300000000000000000000000",
+  },
+  {
+    votingDelay: 1,
+    votingPeriod: 7200,
+    proposalThreshold: "300000000000000000000000",
+  },
+];
+
 async function governorBravoFixture(): Promise<GovernorBravoDelegateFixture> {
   const GovernorBravoDelegateFactory = await smock.mock<GovernorBravoDelegate__factory>("GovernorBravoDelegate");
   const governorBravoDelegate = await GovernorBravoDelegateFactory.deploy();
@@ -40,27 +65,37 @@ describe("Governor Bravo Initializing Test", () => {
       await expect(
         governorBravoDelegate
           .connect(customer)
-          .initialize(ethers.constants.AddressZero, [], [], ethers.constants.AddressZero),
+          .initialize(ethers.constants.AddressZero, validationParams, [], [], ethers.constants.AddressZero),
       ).to.be.revertedWith("GovernorBravo::initialize: admin only");
     });
+
     it("should revert if invalid xvs address", async () => {
       await expect(
-        governorBravoDelegate.initialize(ethers.constants.AddressZero, [], [], ethers.constants.AddressZero),
-      ).to.be.revertedWith("GovernorBravo::initialize: invalid xvs address");
+        governorBravoDelegate.initialize(
+          ethers.constants.AddressZero,
+          validationParams,
+          [],
+          [],
+          ethers.constants.AddressZero,
+        ),
+      ).to.be.revertedWith("GovernorBravo::initialize: invalid xvs vault address");
     });
+
     it("should revert if invalid guardian address", async () => {
       await expect(
-        governorBravoDelegate.initialize(xvsVault.address, [], [], ethers.constants.AddressZero),
+        governorBravoDelegate.initialize(xvsVault.address, validationParams, [], [], ethers.constants.AddressZero),
       ).to.be.revertedWith("GovernorBravo::initialize: invalid guardian");
     });
+
     it("should revert if timelock adress count differs from governance routes count", async () => {
       const guardianAddress = await accounts[0].getAddress();
 
       const timelocks = [accounts[0].getAddress(), accounts[1].getAddress()];
       await expect(
-        governorBravoDelegate.initialize(xvsVault.address, [], timelocks, guardianAddress),
+        governorBravoDelegate.initialize(xvsVault.address, validationParams, [], timelocks, guardianAddress),
       ).to.be.revertedWith("GovernorBravo::initialize:number of timelocks should match number of governance routes");
     });
+
     it("should revert if proposal config count differs from governance routes count", async () => {
       const guardianAddress = await accounts[0].getAddress();
       const proposalConfigs = [
@@ -69,10 +104,16 @@ describe("Governor Bravo Initializing Test", () => {
         { votingDelay: 0, votingPeriod: 3, proposalThreshold: 4 },
         { votingDelay: 0, votingPeriod: 4, proposalThreshold: 5 },
       ];
-
       const timelocks = [accounts[0].getAddress(), accounts[1].getAddress(), accounts[2].getAddress()];
+
       await expect(
-        governorBravoDelegate.initialize(xvsVault.address, proposalConfigs, timelocks, guardianAddress),
+        governorBravoDelegate.initialize(
+          xvsVault.address,
+          validationParams,
+          proposalConfigs,
+          timelocks,
+          guardianAddress,
+        ),
       ).to.be.revertedWith(
         "GovernorBravo::initialize:number of proposal configs should match number of governance routes",
       );
@@ -80,34 +121,111 @@ describe("Governor Bravo Initializing Test", () => {
 
     it("should revert if initialized twice", async () => {
       const guardianAddress = await accounts[0].getAddress();
-      const minVotingDelay = await governorBravoDelegate.MIN_VOTING_DELAY();
-      const minVotingPeriod = await governorBravoDelegate.MIN_VOTING_PERIOD();
-      const minProposalThreshold = await governorBravoDelegate.MIN_PROPOSAL_THRESHOLD();
-      const proposalConfigs = [
-        {
-          votingDelay: minVotingDelay.add(10),
-          votingPeriod: minVotingPeriod.add(100),
-          proposalThreshold: minProposalThreshold.add(100),
-        },
-        {
-          votingDelay: minVotingDelay.add(10),
-          votingPeriod: minVotingPeriod.add(100),
-          proposalThreshold: minProposalThreshold.add(100),
-        },
-        {
-          votingDelay: minVotingDelay.add(10),
-          votingPeriod: minVotingPeriod.add(100),
-          proposalThreshold: minProposalThreshold.add(100),
-        },
-      ];
-
       const timelocks = [accounts[0].getAddress(), accounts[1].getAddress(), accounts[2].getAddress()];
-      await governorBravoDelegate.initialize(xvsVault.address, proposalConfigs, timelocks, guardianAddress);
+
+      await governorBravoDelegate.initialize(
+        xvsVault.address,
+        validationParams,
+        proposalConfigs,
+        timelocks,
+        guardianAddress,
+      );
+
       await expect(
-        governorBravoDelegate.initialize(xvsVault.address, proposalConfigs, timelocks, guardianAddress),
+        governorBravoDelegate.initialize(
+          xvsVault.address,
+          validationParams,
+          proposalConfigs,
+          timelocks,
+          guardianAddress,
+        ),
       ).to.be.revertedWith("GovernorBravo::initialize: cannot initialize twice");
     });
 
-    //TODO: implement tests for min, max value validation of voting period, voting delay, proposal threshold
+    it("should revert if initialized with invalid validationParams", async () => {
+      const guardianAddress = await accounts[0].getAddress();
+      const validationParams = {
+        maxVotingPeriod: 0,
+        minVotingPeriod: 0,
+        maxVotingDelay: 0,
+        minVotingDelay: 0,
+      };
+      const timelocks = [accounts[0].getAddress(), accounts[1].getAddress(), accounts[2].getAddress()];
+
+      await expect(
+        governorBravoDelegate.initialize(
+          xvsVault.address,
+          validationParams,
+          proposalConfigs,
+          timelocks,
+          guardianAddress,
+        ),
+      ).to.be.revertedWith("GovernorBravo::setValidationParams: invalid params");
+    });
+
+    it("should revert if initialized with invalid proposalConfigs", async () => {
+      const guardianAddress = await accounts[0].getAddress();
+      const timelocks = [accounts[0].getAddress(), accounts[1].getAddress(), accounts[2].getAddress()];
+      const proposalConfigs = [
+        {
+          votingDelay: 1,
+          votingPeriod: 7100, // lesser than the minVotingPeriod 7200
+          proposalThreshold: "300000000000000000000000",
+        },
+        {
+          votingDelay: 1,
+          votingPeriod: 28800,
+          proposalThreshold: "300000000000000000000000",
+        },
+        {
+          votingDelay: 1,
+          votingPeriod: 7200,
+          proposalThreshold: "300000000000000000000000",
+        },
+      ];
+
+      await expect(
+        governorBravoDelegate.initialize(
+          xvsVault.address,
+          validationParams,
+          proposalConfigs,
+          timelocks,
+          guardianAddress,
+        ),
+      ).to.be.revertedWith("GovernorBravo::setProposalConfigs: invalid min voting period");
+    });
+
+    it("should set correct validationParams and proposalConfig on initialization", async () => {
+      const guardianAddress = await accounts[0].getAddress();
+      const timelocks = [accounts[0].getAddress(), accounts[1].getAddress(), accounts[2].getAddress()];
+
+      await governorBravoDelegate.initialize(
+        xvsVault.address,
+        validationParams,
+        proposalConfigs,
+        timelocks,
+        guardianAddress,
+      );
+      const activeValidationParams = await governorBravoDelegate.validationParams();
+      expect(activeValidationParams.maxVotingPeriod).to.equal(validationParams.maxVotingPeriod);
+      expect(activeValidationParams.minVotingPeriod).to.equal(validationParams.minVotingPeriod);
+      expect(activeValidationParams.maxVotingDelay).to.equal(validationParams.maxVotingDelay);
+      expect(activeValidationParams.minVotingDelay).to.equal(validationParams.minVotingDelay);
+
+      const activeNormalProposalConfig = await governorBravoDelegate.proposalConfigs(0);
+      expect(activeNormalProposalConfig.votingPeriod).to.be.equal(proposalConfigs[0].votingPeriod);
+      expect(activeNormalProposalConfig.votingDelay).to.be.equal(proposalConfigs[0].votingDelay);
+      expect(activeNormalProposalConfig.proposalThreshold).to.be.equal(proposalConfigs[0].proposalThreshold);
+
+      const activeFastrackProposalConfig = await governorBravoDelegate.proposalConfigs(1);
+      expect(activeFastrackProposalConfig.votingPeriod).to.be.equal(proposalConfigs[1].votingPeriod);
+      expect(activeFastrackProposalConfig.votingDelay).to.be.equal(proposalConfigs[1].votingDelay);
+      expect(activeFastrackProposalConfig.proposalThreshold).to.be.equal(proposalConfigs[1].proposalThreshold);
+
+      const activeCriticalProposalConfig = await governorBravoDelegate.proposalConfigs(2);
+      expect(activeCriticalProposalConfig.votingPeriod).to.be.equal(proposalConfigs[2].votingPeriod);
+      expect(activeCriticalProposalConfig.votingDelay).to.be.equal(proposalConfigs[2].votingDelay);
+      expect(activeCriticalProposalConfig.proposalThreshold).to.be.equal(proposalConfigs[2].proposalThreshold);
+    });
   });
 });

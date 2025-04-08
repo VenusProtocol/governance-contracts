@@ -98,6 +98,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
      */
     function initialize(
         address xvsVault_,
+        ValidationParams memory validationParams_,
         ProposalConfig[] memory proposalConfigs_,
         TimelockInterface[] memory timelocks,
         address guardian_
@@ -120,7 +121,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
         guardian = guardian_;
 
         // Set parameters for each Governance Route
-
+        setValidationParams(validationParams_);
         setProposalConfigs(proposalConfigs_);
 
         uint256 arrLength = timelocks.length;
