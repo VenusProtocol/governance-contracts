@@ -215,11 +215,6 @@
 
 ## Contract Address: 0x051100480289e704d20e9DB4804837068f3f9204
 
-- **Function Signature**: `setRewardAmountPerBlock(address,uint256)`
-- **Addresses**:
-
-## Contract Address: 0x051100480289e704d20e9DB4804837068f3f9204
-
 - **Function Signature**: `setWithdrawalLockingPeriod(address,uint256,uint256)`
 - **Addresses**:
   - `NormalTimelock`
@@ -412,16 +407,6 @@
 - **Function Signature**: `setLastRewardingBlock(address[],uint32[],uint32[])`
 - **Addresses**:
   - `NormalTimelock`
-
-## Contract Address: 0x3344417c9360b963ca93A4e8305361AEde340Ab9
-
-- **Function Signature**: `removeMarket(address)`
-- **Addresses**:
-
-## Contract Address: 0x9F7b01A536aFA00EF10310A162877fd792cD0666
-
-- **Function Signature**: `removeMarket(address,address)`
-- **Addresses**:
 
 ## Contract Address: 0xC138aa4E424D1A8539e8F38Af5a754a2B7c3Cc36
 

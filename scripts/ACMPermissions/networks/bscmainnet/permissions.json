@@ -137,11 +137,6 @@
     },
     {
       "contractAddress": "0x051100480289e704d20e9DB4804837068f3f9204",
-      "functionSignature": "setRewardAmountPerBlock(address,uint256)",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0x051100480289e704d20e9DB4804837068f3f9204",
       "functionSignature": "setWithdrawalLockingPeriod(address,uint256,uint256)",
       "addresses": ["NormalTimelock"]
     },
@@ -269,16 +264,6 @@
       "contractAddress": "0x0000000000000000000000000000000000000000000000000000000000000000",
       "functionSignature": "setLastRewardingBlock(address[],uint32[],uint32[])",
       "addresses": ["NormalTimelock"]
-    },
-    {
-      "contractAddress": "0x3344417c9360b963ca93A4e8305361AEde340Ab9",
-      "functionSignature": "removeMarket(address)",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0x9F7b01A536aFA00EF10310A162877fd792cD0666",
-      "functionSignature": "removeMarket(address,address)",
-      "addresses": []
     },
     {
       "contractAddress": "0xC138aa4E424D1A8539e8F38Af5a754a2B7c3Cc36",
@@ -882,5 +867,5 @@
       "addresses": ["NormalTimelock", "FastTrackTimelock", "CriticalTimelock", "Guardian 2"]
     }
   ],
-  "height": 47319839
+  "height": 48233577
 }
