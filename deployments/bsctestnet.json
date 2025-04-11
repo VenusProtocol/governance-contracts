@@ -2260,7 +2260,7 @@
       ]
     },
     "GovernorBravoDelegate": {
-      "address": "0x4baF88AbA7f86f6540728BEF454b224C5d2215e7",
+      "address": "0x1789237eF2Db11D7fA8F91ff7FbdCAB40581C3F6",
       "abi": [
         {
           "anonymous": false,
@@ -2492,6 +2492,86 @@
           "anonymous": false,
           "inputs": [
             {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "votingPeriod",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "votingDelay",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "proposalThreshold",
+              "type": "uint256"
+            }
+          ],
+          "name": "SetProposalConfigs",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "oldMinVotingPeriod",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "newMinVotingPeriod",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "oldmaxVotingPeriod",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "newmaxVotingPeriod",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "oldminVotingDelay",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "newminVotingDelay",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "oldmaxVotingDelay",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "newmaxVotingDelay",
+              "type": "uint256"
+            }
+          ],
+          "name": "SetValidationParams",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
               "indexed": true,
               "internalType": "address",
               "name": "voter",
@@ -2611,67 +2691,7 @@
         {
           "constant": true,
           "inputs": [],
-          "name": "MAX_VOTING_DELAY",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "payable": false,
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "constant": true,
-          "inputs": [],
-          "name": "MAX_VOTING_PERIOD",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "payable": false,
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "constant": true,
-          "inputs": [],
           "name": "MIN_PROPOSAL_THRESHOLD",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "payable": false,
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "constant": true,
-          "inputs": [],
-          "name": "MIN_VOTING_DELAY",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "payable": false,
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "constant": true,
-          "inputs": [],
-          "name": "MIN_VOTING_PERIOD",
           "outputs": [
             {
               "internalType": "uint256",
@@ -3013,6 +3033,33 @@
               "components": [
                 {
                   "internalType": "uint256",
+                  "name": "minVotingPeriod",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "maxVotingPeriod",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "minVotingDelay",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "maxVotingDelay",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct GovernorBravoDelegateStorageV3.ValidationParams",
+              "name": "validationParams_",
+              "type": "tuple"
+            },
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
                   "name": "votingDelay",
                   "type": "uint256"
                 },
@@ -3344,6 +3391,75 @@
           "type": "function"
         },
         {
+          "constant": false,
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "votingDelay",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "votingPeriod",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "proposalThreshold",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct GovernorBravoDelegateStorageV2.ProposalConfig[]",
+              "name": "proposalConfigs_",
+              "type": "tuple[]"
+            }
+          ],
+          "name": "setProposalConfigs",
+          "outputs": [],
+          "payable": false,
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "constant": false,
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "minVotingPeriod",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "maxVotingPeriod",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "minVotingDelay",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "maxVotingDelay",
+                  "type": "uint256"
+                }
+              ],
+              "internalType": "struct GovernorBravoDelegateStorageV3.ValidationParams",
+              "name": "newValidationParams",
+              "type": "tuple"
+            }
+          ],
+          "name": "setValidationParams",
+          "outputs": [],
+          "payable": false,
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
           "constant": true,
           "inputs": [
             {
@@ -3373,6 +3489,36 @@
               "internalType": "contract TimelockInterface",
               "name": "",
               "type": "address"
+            }
+          ],
+          "payable": false,
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "constant": true,
+          "inputs": [],
+          "name": "validationParams",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "minVotingPeriod",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxVotingPeriod",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "minVotingDelay",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "maxVotingDelay",
+              "type": "uint256"
             }
           ],
           "payable": false,
