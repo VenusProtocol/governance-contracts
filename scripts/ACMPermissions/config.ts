@@ -128,9 +128,9 @@ export const addressMap: Record<SUPPORTED_NETWORKS, Record<string, string>> = {
     "0x79a36dc9a43D05Db4747c59c02F48ed500e47dF1": "XVSBridgeDest",
   },
   basemainnet: {
-    "0x939bD8d64c0A9583A7Dcea9933f7b21697ab6396": "NormalTimelock",
-    "0x555ba73dB1b006F3f2C7dB7126d6e4343aDBce02": "FastTrackTimelock",
-    "0x213c446ec11e45b15a6E29C1C1b402B8897f606d": "CriticalTimelock",
+    "0x21c12f2946a1a66cBFf7eb997022a37167eCf517": "NormalTimelock",
+    "0x209F73Ee2Fa9A72aF3Fa6aF1933A3B58ed3De5D7": "FastTrackTimelock",
+    "0x47F65466392ff2aE825d7a170889F7b5b9D8e60D": "CriticalTimelock",
     "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C": "Guardian",
     "0xeef902918DdeCD773D4B422aa1C6e1673EB9136F": "PoolRegistry",
     "0x3dd92fb51a5d381ae78e023dfb5dd1d45d2426cd": "XVSBridgeDest",
@@ -159,4 +159,5 @@ export const addressMap: Record<SUPPORTED_NETWORKS, Record<string, string>> = {
     "0x9027cF782515F3184bbF7A6cD7a33052dc52E439": "PoolRegistry",
     "0xCAF833318a6663bb23aa7f218e597c2F7970b4D2": "XVSBridgeDest",
   },
+  berachainbartio: {},
 };
