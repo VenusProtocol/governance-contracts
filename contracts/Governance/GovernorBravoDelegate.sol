@@ -138,7 +138,10 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
     function setValidationParams(ValidationParams memory newValidationParams) public {
         require(msg.sender == admin, "GovernorBravo::setValidationParams: admin only");
         require(
-            newValidationParams.minVotingPeriod > 0 && newValidationParams.minVotingDelay > 0,
+            newValidationParams.minVotingPeriod > 0 &&
+                newValidationParams.minVotingDelay > 0 &&
+                newValidationParams.minVotingDelay < newValidationParams.maxVotingDelay &&
+                newValidationParams.minVotingPeriod < newValidationParams.maxVotingPeriod,
             "GovernorBravo::setValidationParams: invalid params"
         );
         emit SetValidationParams(
@@ -156,7 +159,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
 
     /**
      ** @notice Sets the configuration for different proposal types
-     ** @dev Requires validationParams to be configured before
+     ** @dev Requires validationParams to be configured before also it will set proposal config for all proposal types
      ** @param proposalConfigs_ Array of proposal configuration structs to update
      */
     function setProposalConfigs(ProposalConfig[] memory proposalConfigs_) public {
@@ -169,6 +172,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
             "GovernorBravo::setProposalConfigs: validation params not configured yet"
         );
         uint256 arrLength = proposalConfigs_.length;
+        require(arrLength == 3, "GovernorBravo::setProposalConfigs: invalid proposal config length");
         for (uint256 i; i < arrLength; ++i) {
             require(
                 proposalConfigs_[i].votingPeriod >= validationParams.minVotingPeriod,
