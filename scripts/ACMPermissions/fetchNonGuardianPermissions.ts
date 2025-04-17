@@ -13,20 +13,18 @@ import { Permission } from "./types";
  */
 function isTimelockAndNotGuardian(addresses: string[], guardianAddress: string, network: SUPPORTED_NETWORKS): boolean {
   const TIMELOCK = ["NormalTimelock", "FastTrackTimelock", "CriticalTimelock"];
+  const BSCGUARDIANS = ["Guardian 1", "Guardian 2", "Guardian 3"];
   let hasTimelock = false;
   let hasGuardian = false;
 
   for (const address of addresses) {
     const resolvedName = addressMap[network][address];
-
-    if (TIMELOCK.includes(resolvedName)) {
-      hasTimelock = true;
+    if (!hasTimelock) {
+      hasTimelock = TIMELOCK.includes(resolvedName);
     }
-
-    if (address === guardianAddress) {
-      hasGuardian = true;
+    if (!hasGuardian) {
+      hasGuardian = network === "bscmainnet" ? BSCGUARDIANS.includes(resolvedName) : address === guardianAddress;
     }
-
     if (hasTimelock && hasGuardian) break;
   }
 

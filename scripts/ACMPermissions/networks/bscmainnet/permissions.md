@@ -766,6 +766,7 @@
   - `NormalTimelock`
   - `FastTrackTimelock`
   - `CriticalTimelock`
+  - `Guardian 3`
 
 ## Contract Address: 0x8455EFA4D7Ff63b8BFD96AdD889483Ea7d39B70a
 
@@ -774,6 +775,7 @@
   - `NormalTimelock`
   - `FastTrackTimelock`
   - `CriticalTimelock`
+  - `Guardian 3`
 
 ## Contract Address: 0x004065D34C6b18cE4370ced1CeBDE94865DbFAFE
 
@@ -1244,6 +1246,8 @@
 - **Function Signature**: `setTreasuryPercent(uint256)`
 - **Addresses**:
   - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
 
 ## Contract Address: 0x0870793286aada55d39ce7f82fb2766e8004cf43
 

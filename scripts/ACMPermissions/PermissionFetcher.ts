@@ -72,6 +72,7 @@ export class PermissionFetcher {
         this.permissionsMap[hash] = {
           contractAddress: event.contractAddress,
           functionSignature: event.functionSignature,
+          role: hash,
           addresses: [],
         };
       }
@@ -168,8 +169,7 @@ export class PermissionFetcher {
       for (const address of contract.address) {
         for (const funcSig of contract.functions) {
           const role = this.getHash(address, funcSig);
-          const roleHash = ethers.utils.keccak256(role);
-          hashTable[roleHash] = {
+          hashTable[role] = {
             contractAddress: address,
             functionSignature: funcSig,
           };
