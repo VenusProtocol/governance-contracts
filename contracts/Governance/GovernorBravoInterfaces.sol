@@ -194,7 +194,7 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
 
 /**
  * @title GovernorBravoDelegateStorageV2
- * @dev For future upgrades, do not change GovernorBravoDelegateStorageV1. Create a new
+ * @dev For future upgrades, do not change GovernorBravoDelegateStorageV2. Create a new
  * contract which implements GovernorBravoDelegateStorageV2 and following the naming convention
  * GovernorBravoDelegateStorageVX.
  */
@@ -221,6 +221,12 @@ contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
     mapping(uint => TimelockInterface) public proposalTimelocks;
 }
 
+/**
+ * @title GovernorBravoDelegateStorageV3
+ * @dev For future upgrades, do not change GovernorBravoDelegateStorageV3. Create a new
+ * contract which implements GovernorBravoDelegateStorageV3 and following the naming convention
+ * GovernorBravoDelegateStorageVX.
+ */
 contract GovernorBravoDelegateStorageV3 is GovernorBravoDelegateStorageV2 {
     struct ValidationParams {
         uint256 minVotingPeriod;
