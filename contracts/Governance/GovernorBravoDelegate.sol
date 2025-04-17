@@ -108,11 +108,11 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
         require(xvsVault_ != address(0), "GovernorBravo::initialize: invalid xvs vault address");
         require(guardian_ != address(0), "GovernorBravo::initialize: invalid guardian");
         require(
-            timelocks.length == uint8(ProposalType.CRITICAL) + 1,
+            timelocks.length == getGovernanceRouteCount(),
             "GovernorBravo::initialize:number of timelocks should match number of governance routes"
         );
         require(
-            proposalConfigs_.length == uint8(ProposalType.CRITICAL) + 1,
+            proposalConfigs_.length == getGovernanceRouteCount(),
             "GovernorBravo::initialize:number of proposal configs should match number of governance routes"
         );
 
@@ -172,7 +172,10 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
             "GovernorBravo::setProposalConfigs: validation params not configured yet"
         );
         uint256 arrLength = proposalConfigs_.length;
-        require(arrLength == 3, "GovernorBravo::setProposalConfigs: invalid proposal config length");
+        require(
+            arrLength == getGovernanceRouteCount(),
+            "GovernorBravo::setProposalConfigs: invalid proposal config length"
+        );
         for (uint256 i; i < arrLength; ++i) {
             require(
                 proposalConfigs_[i].votingPeriod >= validationParams.minVotingPeriod,
@@ -543,7 +546,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
         require(initialProposalId == 0, "GovernorBravo::_initiate: can only initiate once");
         proposalCount = GovernorAlphaInterface(governorAlpha).proposalCount();
         initialProposalId = proposalCount;
-        for (uint256 i; i < uint8(ProposalType.CRITICAL) + 1; ++i) {
+        for (uint256 i; i < getGovernanceRouteCount(); ++i) {
             proposalTimelocks[i].acceptAdmin();
         }
     }
@@ -622,5 +625,9 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
             chainId := chainid()
         }
         return chainId;
+    }
+
+    function getGovernanceRouteCount() internal pure returns (uint8) {
+        return uint8(ProposalType.CRITICAL) + 1;
     }
 }
