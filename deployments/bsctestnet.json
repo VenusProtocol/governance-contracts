@@ -2260,7 +2260,7 @@
       ]
     },
     "GovernorBravoDelegate": {
-      "address": "0xbF178741fe3053F2b7aBFf15Bcc5146A2c598b77",
+      "address": "0xB30b0b051132930e8E4A77f990CFdf78895f9E1A",
       "abi": [
         {
           "anonymous": false,
