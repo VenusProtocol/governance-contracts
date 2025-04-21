@@ -19,7 +19,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: "yarn"
@@ -40,7 +40,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: "yarn"
@@ -85,7 +85,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 16
           cache: "yarn"
@@ -110,7 +110,7 @@ jobs:
           token: ${{ secrets.VENUS_TOOLS_TOKEN }}
 
       - name: Setup Node.js environment
-        uses: actions/setup-node@v2
+        uses: actions/setup-node@v3
         with:
           node-version: 18
           cache: "yarn"
@@ -121,7 +121,7 @@ jobs:
 
       - name: Export deployments
         run: |
-          for NETWORK in bsctestnet bscmainnet ethereum sepolia opbnbtestnet opbnbmainnet arbitrumsepolia arbitrumone opsepolia opmainnet basesepolia basemainnet unichainsepolia unichainmainnet; do
+          for NETWORK in bsctestnet bscmainnet ethereum sepolia opbnbtestnet opbnbmainnet arbitrumsepolia arbitrumone opsepolia opmainnet basesepolia basemainnet unichainsepolia unichainmainnet berachainbartio; do
             EXPORT=true yarn hardhat export --network ${NETWORK} --export ./deployments/${NETWORK}.json
             jq -M '{name, chainId, addresses: .contracts | map_values(.address)}' ./deployments/${NETWORK}.json > ./deployments/${NETWORK}_addresses.json
           done
