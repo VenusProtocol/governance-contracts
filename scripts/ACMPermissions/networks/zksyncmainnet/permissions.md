@@ -408,21 +408,6 @@
 
 ## Contract Address: 0x0000000000000000000000000000000000000000
 
-- **Function Signature**: `addPool(string,address,uint256,uint256,uint256)`
-- **Addresses**:
-
-## Contract Address: 0x0000000000000000000000000000000000000000
-
-- **Function Signature**: `setPoolName(address,string)`
-- **Addresses**:
-
-## Contract Address: 0x0000000000000000000000000000000000000000
-
-- **Function Signature**: `updatePoolMetadata(address,VenusPoolMetaData)`
-- **Addresses**:
-
-## Contract Address: 0x0000000000000000000000000000000000000000
-
 - **Function Signature**: `setProtocolSeizeShare(uint256)`
 - **Addresses**:
   - `NormalTimelock`
@@ -771,21 +756,6 @@
   - `NormalTimelock`
   - `CriticalTimelock`
   - `FastTrackTimelock`
-
-## Contract Address: 0x0000000000000000000000000000000000000000
-
-- **Function Signature**: `setLastRewardingBlock(address[],uint32[],uint32[])`
-- **Addresses**:
-
-## Contract Address: 0x0000000000000000000000000000000000000000
-
-- **Function Signature**: `setLastRewardingBlocks(address[],uint32[],uint32[])`
-- **Addresses**:
-
-## Contract Address: 0x0000000000000000000000000000000000000000
-
-- **Function Signature**: `addMarket(AddMarketInput)`
-- **Addresses**:
 
 ## Contract Address: 0x183dE3C349fCf546aAe925E1c7F364EA6FB4033c
 
