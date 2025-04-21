@@ -1,3 +1,34 @@
+## [2.11.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.10.0...v2.11.0) (2025-04-21)
+
+
+### Features
+
+* add json files ([932617c](https://github.com/VenusProtocol/governance-contracts/commit/932617c61914e73b2c0a99c6ec0beab613a2769e))
+* add md files and handle missing role ([a28b4ad](https://github.com/VenusProtocol/governance-contracts/commit/a28b4ad070036e9e414a278828d8b682abd65163))
+* add missing role information ([a48b2c9](https://github.com/VenusProtocol/governance-contracts/commit/a48b2c9b2038de287a1f80710ae498f52dc3a1bd))
+* add new networks ([a7440c1](https://github.com/VenusProtocol/governance-contracts/commit/a7440c1250a8de15c36dc747875eead119e06b20))
+* added a script to fetch non guardian permissions ([c76fe1b](https://github.com/VenusProtocol/governance-contracts/commit/c76fe1bc000087cacc750506013fd13dc04bc09e))
+* append missing role file ([9de5af3](https://github.com/VenusProtocol/governance-contracts/commit/9de5af3b21f7877d97a03db073be1abb7c501951))
+* deployed aggregator ([fef53f7](https://github.com/VenusProtocol/governance-contracts/commit/fef53f7172f41669bd8e98981d5553fb2f5b8775))
+* deployed contracts ([3f87841](https://github.com/VenusProtocol/governance-contracts/commit/3f87841dc65880415cfb5ec0a944caf6dcffe5fe))
+* map addresses ([f6357c2](https://github.com/VenusProtocol/governance-contracts/commit/f6357c27c78be8948962cddbf5ede5cd7f5bfd5e))
+* redeployed contracts ([37b5f47](https://github.com/VenusProtocol/governance-contracts/commit/37b5f472e4bec4efac7ff09480de4e7a91654f0a))
+* refactor fetchNonGuardianPermission script for BSC mainnet ([5473e57](https://github.com/VenusProtocol/governance-contracts/commit/5473e57d8101b8efe517680ebafe740c02326e23))
+* update permissions granted ([7f7f1b6](https://github.com/VenusProtocol/governance-contracts/commit/7f7f1b67063f6f8f598d4e194d0974dc4f646536))
+* updating deployment files ([cae8655](https://github.com/VenusProtocol/governance-contracts/commit/cae8655c3631ce555b2f01892cd160a9484a42cc))
+
+
+### Bug Fixes
+
+* compilation and removed unneccessary function ([4d5bf96](https://github.com/VenusProtocol/governance-contracts/commit/4d5bf96471835a3081a77e18eb2cf938b48cb779))
+* linting ([db664a0](https://github.com/VenusProtocol/governance-contracts/commit/db664a02ae25cedb37e4297c1fac09e2e657bf39))
+* minor issue with last stored block ([9c8d3ce](https://github.com/VenusProtocol/governance-contracts/commit/9c8d3ce57428be2caacc1042bfc27c4a9212eda9))
+* remove permissions with empty addresses ([5d35234](https://github.com/VenusProtocol/governance-contracts/commit/5d3523444a8efe55876c9b0adf306f3925386c0e))
+* revert timelock change ([14935f0](https://github.com/VenusProtocol/governance-contracts/commit/14935f0463c0cb2d7906cd4480d1b3427c30e393))
+* typo & update bnb permissions ([801c58f](https://github.com/VenusProtocol/governance-contracts/commit/801c58fe673ca7ad0d5287fcdcecadf773f32bcb))
+* use timelock instead of guardian ([0c4e14a](https://github.com/VenusProtocol/governance-contracts/commit/0c4e14ab74573ec925fc472b3990f2327b799667))
+* yarn.lock ([e0fb338](https://github.com/VenusProtocol/governance-contracts/commit/e0fb338d09c75110153b5094c1a0599b530297b7))
+
 ## [2.11.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.11.0-dev.1...v2.11.0-dev.2) (2025-04-21)
 
 
