@@ -1,3 +1,10 @@
+## [2.11.1-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.11.0...v2.11.1-dev.1) (2025-04-22)
+
+
+### Bug Fixes
+
+* update yarn ([192ee6a](https://github.com/VenusProtocol/governance-contracts/commit/192ee6ace9961f71719f7499c2ef5a90fa168b3b))
+
 ## [2.11.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.10.0...v2.11.0) (2025-04-21)
 
 
