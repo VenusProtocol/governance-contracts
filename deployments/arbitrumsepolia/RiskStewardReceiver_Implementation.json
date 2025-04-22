@@ -1,0 +1,997 @@
+{
+  "address": "0x44A47AfC1A9467Dfe1D5E967cA78432C699a13d9",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "riskOracle_",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "constructor"
+    },
+    {
+      "inputs": [],
+      "name": "ConfigAlreadyProcessed",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ConfigNotActive",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InvalidDebounce",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "sender",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "calledContract",
+          "type": "address"
+        },
+        {
+          "internalType": "string",
+          "name": "methodSignature",
+          "type": "string"
+        }
+      ],
+      "name": "Unauthorized",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "UnsupportedUpdateType",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "UpdateIsExpired",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "UpdateTooFrequent",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroAddressNotAllowed",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint8",
+          "name": "version",
+          "type": "uint8"
+        }
+      ],
+      "name": "Initialized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "oldAccessControlManager",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "newAccessControlManager",
+          "type": "address"
+        }
+      ],
+      "name": "NewAccessControlManager",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferStarted",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "Paused",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "updateType",
+          "type": "string"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousRiskSteward",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "riskSteward",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "previousDebounce",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "debounce",
+          "type": "uint256"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "previousActive",
+          "type": "bool"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "active",
+          "type": "bool"
+        }
+      ],
+      "name": "RiskParameterConfigSet",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "uint256",
+          "name": "updateId",
+          "type": "uint256"
+        }
+      ],
+      "name": "RiskParameterUpdated",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "string",
+          "name": "updateType",
+          "type": "string"
+        },
+        {
+          "indexed": false,
+          "internalType": "bool",
+          "name": "active",
+          "type": "bool"
+        }
+      ],
+      "name": "ToggleConfigActive",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "Unpaused",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "RISK_ORACLE",
+      "outputs": [
+        {
+          "internalType": "contract IRiskOracle",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "UPDATE_EXPIRATION_TIME",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "acceptOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "accessControlManager",
+      "outputs": [
+        {
+          "internalType": "contract IAccessControlManagerV8",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "accessControlManager_",
+          "type": "address"
+        }
+      ],
+      "name": "initialize",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "bytes",
+          "name": "marketUpdateType",
+          "type": "bytes"
+        }
+      ],
+      "name": "lastProcessedTime",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pause",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "paused",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "pendingOwner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "updateId",
+          "type": "uint256"
+        }
+      ],
+      "name": "processUpdateById",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "updateType",
+          "type": "string"
+        },
+        {
+          "internalType": "address",
+          "name": "market",
+          "type": "address"
+        }
+      ],
+      "name": "processUpdateByParameterAndMarket",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "updateId",
+          "type": "uint256"
+        }
+      ],
+      "name": "processedUpdates",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "",
+          "type": "bool"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "updateType",
+          "type": "string"
+        }
+      ],
+      "name": "riskParameterConfigs",
+      "outputs": [
+        {
+          "internalType": "bool",
+          "name": "active",
+          "type": "bool"
+        },
+        {
+          "internalType": "uint256",
+          "name": "debounce",
+          "type": "uint256"
+        },
+        {
+          "internalType": "address",
+          "name": "riskSteward",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "accessControlManager_",
+          "type": "address"
+        }
+      ],
+      "name": "setAccessControlManager",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "updateType",
+          "type": "string"
+        },
+        {
+          "internalType": "address",
+          "name": "riskSteward",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "debounce",
+          "type": "uint256"
+        }
+      ],
+      "name": "setRiskParameterConfig",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "string",
+          "name": "updateType",
+          "type": "string"
+        }
+      ],
+      "name": "toggleConfigActive",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "unpause",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xfb1909f699046d8f3d48bd74ddc5d752d738ba9bb48b275d734c36a8acaa5bcb",
+  "receipt": {
+    "to": null,
+    "from": "0x464779C41C5f1Be598853C1F87bCC7087Ea75f28",
+    "contractAddress": "0x44A47AfC1A9467Dfe1D5E967cA78432C699a13d9",
+    "transactionIndex": 1,
+    "gasUsed": "1903984",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000008000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000080000000000000000000000000000000000000000000000400000000000000000000000000000000000000000000000000000000000000040000000000000000000020000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x8ac63946eee0bf479cff5bddea5e4b57c2c2de7a77d3cb41e5fcc8f13e25ec7b",
+    "transactionHash": "0xfb1909f699046d8f3d48bd74ddc5d752d738ba9bb48b275d734c36a8acaa5bcb",
+    "logs": [
+      {
+        "transactionIndex": 1,
+        "blockNumber": 138700931,
+        "transactionHash": "0xfb1909f699046d8f3d48bd74ddc5d752d738ba9bb48b275d734c36a8acaa5bcb",
+        "address": "0x44A47AfC1A9467Dfe1D5E967cA78432C699a13d9",
+        "topics": ["0x7f26b83ff96e1f2b6a682f133852f6798a09c465da95921460cefb3847402498"],
+        "data": "0x00000000000000000000000000000000000000000000000000000000000000ff",
+        "logIndex": 0,
+        "blockHash": "0x8ac63946eee0bf479cff5bddea5e4b57c2c2de7a77d3cb41e5fcc8f13e25ec7b"
+      }
+    ],
+    "blockNumber": 138700931,
+    "cumulativeGasUsed": "1903984",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": ["0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F"],
+  "numDeployments": 1,
+  "solcInputHash": "34ad2ac9bd0914b716cd67ba66054da9",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.25+commit.b61c2a91\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"address\",\"name\":\"riskOracle_\",\"type\":\"address\"}],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"ConfigAlreadyProcessed\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ConfigNotActive\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InvalidDebounce\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"sender\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"calledContract\",\"type\":\"address\"},{\"internalType\":\"string\",\"name\":\"methodSignature\",\"type\":\"string\"}],\"name\":\"Unauthorized\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"UnsupportedUpdateType\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"UpdateIsExpired\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"UpdateTooFrequent\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ZeroAddressNotAllowed\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint8\",\"name\":\"version\",\"type\":\"uint8\"}],\"name\":\"Initialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"oldAccessControlManager\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"newAccessControlManager\",\"type\":\"address\"}],\"name\":\"NewAccessControlManager\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferStarted\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"Paused\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"updateType\",\"type\":\"string\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousRiskSteward\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"riskSteward\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"previousDebounce\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"debounce\",\"type\":\"uint256\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"previousActive\",\"type\":\"bool\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"active\",\"type\":\"bool\"}],\"name\":\"RiskParameterConfigSet\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"uint256\",\"name\":\"updateId\",\"type\":\"uint256\"}],\"name\":\"RiskParameterUpdated\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"string\",\"name\":\"updateType\",\"type\":\"string\"},{\"indexed\":false,\"internalType\":\"bool\",\"name\":\"active\",\"type\":\"bool\"}],\"name\":\"ToggleConfigActive\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"Unpaused\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"RISK_ORACLE\",\"outputs\":[{\"internalType\":\"contract IRiskOracle\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"UPDATE_EXPIRATION_TIME\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"acceptOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"accessControlManager\",\"outputs\":[{\"internalType\":\"contract IAccessControlManagerV8\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"accessControlManager_\",\"type\":\"address\"}],\"name\":\"initialize\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"bytes\",\"name\":\"marketUpdateType\",\"type\":\"bytes\"}],\"name\":\"lastProcessedTime\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pause\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"paused\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"pendingOwner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"updateId\",\"type\":\"uint256\"}],\"name\":\"processUpdateById\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"updateType\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"market\",\"type\":\"address\"}],\"name\":\"processUpdateByParameterAndMarket\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"updateId\",\"type\":\"uint256\"}],\"name\":\"processedUpdates\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"\",\"type\":\"bool\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"updateType\",\"type\":\"string\"}],\"name\":\"riskParameterConfigs\",\"outputs\":[{\"internalType\":\"bool\",\"name\":\"active\",\"type\":\"bool\"},{\"internalType\":\"uint256\",\"name\":\"debounce\",\"type\":\"uint256\"},{\"internalType\":\"address\",\"name\":\"riskSteward\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"accessControlManager_\",\"type\":\"address\"}],\"name\":\"setAccessControlManager\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"updateType\",\"type\":\"string\"},{\"internalType\":\"address\",\"name\":\"riskSteward\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"debounce\",\"type\":\"uint256\"}],\"name\":\"setRiskParameterConfig\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"string\",\"name\":\"updateType\",\"type\":\"string\"}],\"name\":\"toggleConfigActive\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"unpause\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"author\":\"Venus\",\"custom:security-contact\":\"https://github.com/VenusProtocol/governance-contracts#discussion\",\"events\":{\"Initialized(uint8)\":{\"details\":\"Triggered when the contract has been initialized or reinitialized.\"},\"Paused(address)\":{\"details\":\"Emitted when the pause is triggered by `account`.\"},\"Unpaused(address)\":{\"details\":\"Emitted when the pause is lifted by `account`.\"}},\"kind\":\"dev\",\"methods\":{\"acceptOwnership()\":{\"details\":\"The new owner accepts the ownership transfer.\"},\"constructor\":{\"custom:error\":\"Throws ZeroAddressNotAllowed if the risk oracle address is zero\",\"custom:oz-upgrades-unsafe-allow\":\"constructor\",\"details\":\"Sets the immutable risk oracle address and disables initializers\"},\"initialize(address)\":{\"params\":{\"accessControlManager_\":\"The address of the access control manager\"}},\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"pause()\":{\"custom:access\":\"Controlled by AccessControlManager\"},\"paused()\":{\"details\":\"Returns true if the contract is paused, and false otherwise.\"},\"pendingOwner()\":{\"details\":\"Returns the address of the pending owner.\"},\"processUpdateById(uint256)\":{\"custom:error\":\"Throws ConfigNotActive if the config is not activeThrows UpdateIsExpired if the update is expiredThrows ConfigAlreadyProcessed if the update has already been processedThrows UpdateTooFrequent if the update is too frequent\",\"custom:event\":\"Emits RiskParameterUpdated with the update ID\",\"params\":{\"updateId\":\"The ID of the update to process\"}},\"processUpdateByParameterAndMarket(string,address)\":{\"custom:error\":\"Throws ConfigNotActive if the config is not activeThrows UpdateIsExpired if the update is expiredThrows ConfigAlreadyProcessed if the update has already been processedThrows UpdateTooFrequent if the update is too frequent\",\"custom:event\":\"Emits RiskParameterUpdated with the update ID\",\"params\":{\"market\":\"The market to process the update for\",\"updateType\":\"The type of update to process\"}},\"renounceOwnership()\":{\"details\":\"Disabling renounceOwnership function.\"},\"setAccessControlManager(address)\":{\"custom:access\":\"Only Governance\",\"custom:event\":\"Emits NewAccessControlManager event\",\"details\":\"Admin function to set address of AccessControlManager\",\"params\":{\"accessControlManager_\":\"The new address of the AccessControlManager\"}},\"setRiskParameterConfig(string,address,uint256)\":{\"custom:access\":\"Controlled by AccessControlManager\",\"custom:error\":\"Throws UnsupportedUpdateType if the update type is an empty stringThrows InvalidDebounce if the debounce is 0Throws ZeroAddressNotAllowed if the risk steward address is zero\",\"custom:event\":\"Emits RiskParameterConfigSet with the update type, previous risk steward, new risk steward, previous debounce, new debounce, previous active status, and new active status\",\"params\":{\"debounce\":\"The debounce period for the update\",\"riskSteward\":\"The address for the risk steward contract responsible for processing the update\",\"updateType\":\"The type of update to configure\"}},\"toggleConfigActive(string)\":{\"custom:access\":\"Controlled by AccessControlManager\",\"custom:error\":\"Throws UnsupportedUpdateType if the update type is not supported\",\"custom:event\":\"Emits ToggleConfigActive with the update type and the new active status\",\"params\":{\"updateType\":\"The type of update to toggle on or off\"}},\"transferOwnership(address)\":{\"details\":\"Starts the ownership transfer of the contract to a new account. Replaces the pending transfer if there is one. Can only be called by the current owner.\"},\"unpause()\":{\"custom:access\":\"Controlled by AccessControlManager\"}},\"stateVariables\":{\"__gap\":{\"details\":\"This empty reserved space is put in place to allow future versions to add new variables without shifting down storage in the inheritance chain. See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps\"}},\"title\":\"RiskStewardReceiver\",\"version\":1},\"userdoc\":{\"errors\":{\"ConfigAlreadyProcessed()\":[{\"notice\":\"Thrown when an update has already been processed\"}],\"ConfigNotActive()\":[{\"notice\":\"Thrown if a submitted update is not active and therefor cannot be processed\"}],\"InvalidDebounce()\":[{\"notice\":\"Thrown when a debounce value of 0 is set\"}],\"Unauthorized(address,address,string)\":[{\"notice\":\"Thrown when the action is prohibited by AccessControlManager\"}],\"UnsupportedUpdateType()\":[{\"notice\":\"Thrown when an update type that is not supported is operated on\"}],\"UpdateIsExpired()\":[{\"notice\":\"Thrown when an update was not applied within the required time frame\"}],\"UpdateTooFrequent()\":[{\"notice\":\"Thrown when the debounce period hasn't passed for applying an update to a specific market / update type\"}],\"ZeroAddressNotAllowed()\":[{\"notice\":\"Thrown if the supplied address is a zero address where it is not allowed\"}]},\"events\":{\"NewAccessControlManager(address,address)\":{\"notice\":\"Emitted when access control manager contract address is changed\"},\"RiskParameterConfigSet(string,address,address,uint256,uint256,bool,bool)\":{\"notice\":\"Event emitted when a risk parameter config is set\"},\"RiskParameterUpdated(uint256)\":{\"notice\":\"Event emitted when an update is successfully processed\"},\"ToggleConfigActive(string,bool)\":{\"notice\":\"Event emitted when a risk parameter config is toggled on or off\"}},\"kind\":\"user\",\"methods\":{\"RISK_ORACLE()\":{\"notice\":\"Whitelisted oracle address to receive updates from\"},\"UPDATE_EXPIRATION_TIME()\":{\"notice\":\"Time before a submitted update is considered stale\"},\"accessControlManager()\":{\"notice\":\"Returns the address of the access control manager contract\"},\"initialize(address)\":{\"notice\":\"Initializes the contract as ownable, pausable, and access controlled\"},\"lastProcessedTime(bytes)\":{\"notice\":\"Mapping of market and update type to last update timestamp. Used for debouncing updates.\"},\"pause()\":{\"notice\":\"Pauses processing of updates\"},\"processUpdateById(uint256)\":{\"notice\":\"Processes an update by its ID. Will validate that the update configuration is active, is not expired, unprocessed, and that the debounce period has passed. Validated updates will be processed by the associated risk steward contract which will perform update specific validations and apply validated updates.\"},\"processUpdateByParameterAndMarket(string,address)\":{\"notice\":\"Processes the latest update for a given parameter and market. Will validate that the update configuration is active, is not expired, unprocessed, and that the debounce period has passed. Validated updates will be processed by the associated risk steward contract which will perform update specific validations and apply validated updates.\"},\"processedUpdates(uint256)\":{\"notice\":\"Mapping of processed updates. Used to prevent re-execution\"},\"riskParameterConfigs(string)\":{\"notice\":\"Mapping of supported risk configurations and their validation parameters\"},\"setAccessControlManager(address)\":{\"notice\":\"Sets the address of AccessControlManager\"},\"setRiskParameterConfig(string,address,uint256)\":{\"notice\":\"Sets the risk parameter config for a given update type\"},\"toggleConfigActive(string)\":{\"notice\":\"Toggles the active status of a risk parameter config\"},\"unpause()\":{\"notice\":\"Unpauses processing of updates\"}},\"notice\":\"Contract that can read updates from the Chaos Labs Risk Oracle, validate them, and push them to the correct RiskSteward.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/RiskSteward/RiskStewardReceiver.sol\":\"RiskStewardReceiver\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":10000},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.9.0) (access/Ownable2Step.sol)\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"./OwnableUpgradeable.sol\\\";\\nimport {Initializable} from \\\"../proxy/utils/Initializable.sol\\\";\\n\\n/**\\n * @dev Contract module which provides access control mechanism, where\\n * there is an account (an owner) that can be granted exclusive access to\\n * specific functions.\\n *\\n * By default, the owner account will be the one that deploys the contract. This\\n * can later be changed with {transferOwnership} and {acceptOwnership}.\\n *\\n * This module is used through inheritance. It will make available all functions\\n * from parent (Ownable).\\n */\\nabstract contract Ownable2StepUpgradeable is Initializable, OwnableUpgradeable {\\n    address private _pendingOwner;\\n\\n    event OwnershipTransferStarted(address indexed previousOwner, address indexed newOwner);\\n\\n    function __Ownable2Step_init() internal onlyInitializing {\\n        __Ownable_init_unchained();\\n    }\\n\\n    function __Ownable2Step_init_unchained() internal onlyInitializing {\\n    }\\n    /**\\n     * @dev Returns the address of the pending owner.\\n     */\\n    function pendingOwner() public view virtual returns (address) {\\n        return _pendingOwner;\\n    }\\n\\n    /**\\n     * @dev Starts the ownership transfer of the contract to a new account. Replaces the pending transfer if there is one.\\n     * Can only be called by the current owner.\\n     */\\n    function transferOwnership(address newOwner) public virtual override onlyOwner {\\n        _pendingOwner = newOwner;\\n        emit OwnershipTransferStarted(owner(), newOwner);\\n    }\\n\\n    /**\\n     * @dev Transfers ownership of the contract to a new account (`newOwner`) and deletes any pending owner.\\n     * Internal function without access restriction.\\n     */\\n    function _transferOwnership(address newOwner) internal virtual override {\\n        delete _pendingOwner;\\n        super._transferOwnership(newOwner);\\n    }\\n\\n    /**\\n     * @dev The new owner accepts the ownership transfer.\\n     */\\n    function acceptOwnership() public virtual {\\n        address sender = _msgSender();\\n        require(pendingOwner() == sender, \\\"Ownable2Step: caller is not the new owner\\\");\\n        _transferOwnership(sender);\\n    }\\n\\n    /**\\n     * @dev This empty reserved space is put in place to allow future versions to add new\\n     * variables without shifting down storage in the inheritance chain.\\n     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps\\n     */\\n    uint256[49] private __gap;\\n}\\n\",\"keccak256\":\"0x9140dabc466abab21b48b72dbda26736b1183a310d0e677d3719d201df026510\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.9.0) (access/Ownable.sol)\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"../utils/ContextUpgradeable.sol\\\";\\nimport {Initializable} from \\\"../proxy/utils/Initializable.sol\\\";\\n\\n/**\\n * @dev Contract module which provides a basic access control mechanism, where\\n * there is an account (an owner) that can be granted exclusive access to\\n * specific functions.\\n *\\n * By default, the owner account will be the one that deploys the contract. This\\n * can later be changed with {transferOwnership}.\\n *\\n * This module is used through inheritance. It will make available the modifier\\n * `onlyOwner`, which can be applied to your functions to restrict their use to\\n * the owner.\\n */\\nabstract contract OwnableUpgradeable is Initializable, ContextUpgradeable {\\n    address private _owner;\\n\\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\\n\\n    /**\\n     * @dev Initializes the contract setting the deployer as the initial owner.\\n     */\\n    function __Ownable_init() internal onlyInitializing {\\n        __Ownable_init_unchained();\\n    }\\n\\n    function __Ownable_init_unchained() internal onlyInitializing {\\n        _transferOwnership(_msgSender());\\n    }\\n\\n    /**\\n     * @dev Throws if called by any account other than the owner.\\n     */\\n    modifier onlyOwner() {\\n        _checkOwner();\\n        _;\\n    }\\n\\n    /**\\n     * @dev Returns the address of the current owner.\\n     */\\n    function owner() public view virtual returns (address) {\\n        return _owner;\\n    }\\n\\n    /**\\n     * @dev Throws if the sender is not the owner.\\n     */\\n    function _checkOwner() internal view virtual {\\n        require(owner() == _msgSender(), \\\"Ownable: caller is not the owner\\\");\\n    }\\n\\n    /**\\n     * @dev Leaves the contract without owner. It will not be possible to call\\n     * `onlyOwner` functions. Can only be called by the current owner.\\n     *\\n     * NOTE: Renouncing ownership will leave the contract without an owner,\\n     * thereby disabling any functionality that is only available to the owner.\\n     */\\n    function renounceOwnership() public virtual onlyOwner {\\n        _transferOwnership(address(0));\\n    }\\n\\n    /**\\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\\n     * Can only be called by the current owner.\\n     */\\n    function transferOwnership(address newOwner) public virtual onlyOwner {\\n        require(newOwner != address(0), \\\"Ownable: new owner is the zero address\\\");\\n        _transferOwnership(newOwner);\\n    }\\n\\n    /**\\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\\n     * Internal function without access restriction.\\n     */\\n    function _transferOwnership(address newOwner) internal virtual {\\n        address oldOwner = _owner;\\n        _owner = newOwner;\\n        emit OwnershipTransferred(oldOwner, newOwner);\\n    }\\n\\n    /**\\n     * @dev This empty reserved space is put in place to allow future versions to add new\\n     * variables without shifting down storage in the inheritance chain.\\n     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps\\n     */\\n    uint256[49] private __gap;\\n}\\n\",\"keccak256\":\"0x359a1ab89b46b9aba7bcad3fb651924baf4893d15153049b9976b0fc9be1358e\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.9.0) (proxy/utils/Initializable.sol)\\n\\npragma solidity ^0.8.2;\\n\\nimport \\\"../../utils/AddressUpgradeable.sol\\\";\\n\\n/**\\n * @dev This is a base contract to aid in writing upgradeable contracts, or any kind of contract that will be deployed\\n * behind a proxy. Since proxied contracts do not make use of a constructor, it's common to move constructor logic to an\\n * external initializer function, usually called `initialize`. It then becomes necessary to protect this initializer\\n * function so it can only be called once. The {initializer} modifier provided by this contract will have this effect.\\n *\\n * The initialization functions use a version number. Once a version number is used, it is consumed and cannot be\\n * reused. This mechanism prevents re-execution of each \\\"step\\\" but allows the creation of new initialization steps in\\n * case an upgrade adds a module that needs to be initialized.\\n *\\n * For example:\\n *\\n * [.hljs-theme-light.nopadding]\\n * ```solidity\\n * contract MyToken is ERC20Upgradeable {\\n *     function initialize() initializer public {\\n *         __ERC20_init(\\\"MyToken\\\", \\\"MTK\\\");\\n *     }\\n * }\\n *\\n * contract MyTokenV2 is MyToken, ERC20PermitUpgradeable {\\n *     function initializeV2() reinitializer(2) public {\\n *         __ERC20Permit_init(\\\"MyToken\\\");\\n *     }\\n * }\\n * ```\\n *\\n * TIP: To avoid leaving the proxy in an uninitialized state, the initializer function should be called as early as\\n * possible by providing the encoded function call as the `_data` argument to {ERC1967Proxy-constructor}.\\n *\\n * CAUTION: When used with inheritance, manual care must be taken to not invoke a parent initializer twice, or to ensure\\n * that all initializers are idempotent. This is not verified automatically as constructors are by Solidity.\\n *\\n * [CAUTION]\\n * ====\\n * Avoid leaving a contract uninitialized.\\n *\\n * An uninitialized contract can be taken over by an attacker. This applies to both a proxy and its implementation\\n * contract, which may impact the proxy. To prevent the implementation contract from being used, you should invoke\\n * the {_disableInitializers} function in the constructor to automatically lock it when it is deployed:\\n *\\n * [.hljs-theme-light.nopadding]\\n * ```\\n * /// @custom:oz-upgrades-unsafe-allow constructor\\n * constructor() {\\n *     _disableInitializers();\\n * }\\n * ```\\n * ====\\n */\\nabstract contract Initializable {\\n    /**\\n     * @dev Indicates that the contract has been initialized.\\n     * @custom:oz-retyped-from bool\\n     */\\n    uint8 private _initialized;\\n\\n    /**\\n     * @dev Indicates that the contract is in the process of being initialized.\\n     */\\n    bool private _initializing;\\n\\n    /**\\n     * @dev Triggered when the contract has been initialized or reinitialized.\\n     */\\n    event Initialized(uint8 version);\\n\\n    /**\\n     * @dev A modifier that defines a protected initializer function that can be invoked at most once. In its scope,\\n     * `onlyInitializing` functions can be used to initialize parent contracts.\\n     *\\n     * Similar to `reinitializer(1)`, except that functions marked with `initializer` can be nested in the context of a\\n     * constructor.\\n     *\\n     * Emits an {Initialized} event.\\n     */\\n    modifier initializer() {\\n        bool isTopLevelCall = !_initializing;\\n        require(\\n            (isTopLevelCall && _initialized < 1) || (!AddressUpgradeable.isContract(address(this)) && _initialized == 1),\\n            \\\"Initializable: contract is already initialized\\\"\\n        );\\n        _initialized = 1;\\n        if (isTopLevelCall) {\\n            _initializing = true;\\n        }\\n        _;\\n        if (isTopLevelCall) {\\n            _initializing = false;\\n            emit Initialized(1);\\n        }\\n    }\\n\\n    /**\\n     * @dev A modifier that defines a protected reinitializer function that can be invoked at most once, and only if the\\n     * contract hasn't been initialized to a greater version before. In its scope, `onlyInitializing` functions can be\\n     * used to initialize parent contracts.\\n     *\\n     * A reinitializer may be used after the original initialization step. This is essential to configure modules that\\n     * are added through upgrades and that require initialization.\\n     *\\n     * When `version` is 1, this modifier is similar to `initializer`, except that functions marked with `reinitializer`\\n     * cannot be nested. If one is invoked in the context of another, execution will revert.\\n     *\\n     * Note that versions can jump in increments greater than 1; this implies that if multiple reinitializers coexist in\\n     * a contract, executing them in the right order is up to the developer or operator.\\n     *\\n     * WARNING: setting the version to 255 will prevent any future reinitialization.\\n     *\\n     * Emits an {Initialized} event.\\n     */\\n    modifier reinitializer(uint8 version) {\\n        require(!_initializing && _initialized < version, \\\"Initializable: contract is already initialized\\\");\\n        _initialized = version;\\n        _initializing = true;\\n        _;\\n        _initializing = false;\\n        emit Initialized(version);\\n    }\\n\\n    /**\\n     * @dev Modifier to protect an initialization function so that it can only be invoked by functions with the\\n     * {initializer} and {reinitializer} modifiers, directly or indirectly.\\n     */\\n    modifier onlyInitializing() {\\n        require(_initializing, \\\"Initializable: contract is not initializing\\\");\\n        _;\\n    }\\n\\n    /**\\n     * @dev Locks the contract, preventing any future reinitialization. This cannot be part of an initializer call.\\n     * Calling this in the constructor of a contract will prevent that contract from being initialized or reinitialized\\n     * to any version. It is recommended to use this to lock implementation contracts that are designed to be called\\n     * through proxies.\\n     *\\n     * Emits an {Initialized} event the first time it is successfully executed.\\n     */\\n    function _disableInitializers() internal virtual {\\n        require(!_initializing, \\\"Initializable: contract is initializing\\\");\\n        if (_initialized != type(uint8).max) {\\n            _initialized = type(uint8).max;\\n            emit Initialized(type(uint8).max);\\n        }\\n    }\\n\\n    /**\\n     * @dev Returns the highest version that has been initialized. See {reinitializer}.\\n     */\\n    function _getInitializedVersion() internal view returns (uint8) {\\n        return _initialized;\\n    }\\n\\n    /**\\n     * @dev Returns `true` if the contract is currently initializing. See {onlyInitializing}.\\n     */\\n    function _isInitializing() internal view returns (bool) {\\n        return _initializing;\\n    }\\n}\\n\",\"keccak256\":\"0x89be10e757d242e9b18d5a32c9fbe2019f6d63052bbe46397a430a1d60d7f794\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.7.0) (security/Pausable.sol)\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"../utils/ContextUpgradeable.sol\\\";\\nimport {Initializable} from \\\"../proxy/utils/Initializable.sol\\\";\\n\\n/**\\n * @dev Contract module which allows children to implement an emergency stop\\n * mechanism that can be triggered by an authorized account.\\n *\\n * This module is used through inheritance. It will make available the\\n * modifiers `whenNotPaused` and `whenPaused`, which can be applied to\\n * the functions of your contract. Note that they will not be pausable by\\n * simply including this module, only once the modifiers are put in place.\\n */\\nabstract contract PausableUpgradeable is Initializable, ContextUpgradeable {\\n    /**\\n     * @dev Emitted when the pause is triggered by `account`.\\n     */\\n    event Paused(address account);\\n\\n    /**\\n     * @dev Emitted when the pause is lifted by `account`.\\n     */\\n    event Unpaused(address account);\\n\\n    bool private _paused;\\n\\n    /**\\n     * @dev Initializes the contract in unpaused state.\\n     */\\n    function __Pausable_init() internal onlyInitializing {\\n        __Pausable_init_unchained();\\n    }\\n\\n    function __Pausable_init_unchained() internal onlyInitializing {\\n        _paused = false;\\n    }\\n\\n    /**\\n     * @dev Modifier to make a function callable only when the contract is not paused.\\n     *\\n     * Requirements:\\n     *\\n     * - The contract must not be paused.\\n     */\\n    modifier whenNotPaused() {\\n        _requireNotPaused();\\n        _;\\n    }\\n\\n    /**\\n     * @dev Modifier to make a function callable only when the contract is paused.\\n     *\\n     * Requirements:\\n     *\\n     * - The contract must be paused.\\n     */\\n    modifier whenPaused() {\\n        _requirePaused();\\n        _;\\n    }\\n\\n    /**\\n     * @dev Returns true if the contract is paused, and false otherwise.\\n     */\\n    function paused() public view virtual returns (bool) {\\n        return _paused;\\n    }\\n\\n    /**\\n     * @dev Throws if the contract is paused.\\n     */\\n    function _requireNotPaused() internal view virtual {\\n        require(!paused(), \\\"Pausable: paused\\\");\\n    }\\n\\n    /**\\n     * @dev Throws if the contract is not paused.\\n     */\\n    function _requirePaused() internal view virtual {\\n        require(paused(), \\\"Pausable: not paused\\\");\\n    }\\n\\n    /**\\n     * @dev Triggers stopped state.\\n     *\\n     * Requirements:\\n     *\\n     * - The contract must not be paused.\\n     */\\n    function _pause() internal virtual whenNotPaused {\\n        _paused = true;\\n        emit Paused(_msgSender());\\n    }\\n\\n    /**\\n     * @dev Returns to normal state.\\n     *\\n     * Requirements:\\n     *\\n     * - The contract must be paused.\\n     */\\n    function _unpause() internal virtual whenPaused {\\n        _paused = false;\\n        emit Unpaused(_msgSender());\\n    }\\n\\n    /**\\n     * @dev This empty reserved space is put in place to allow future versions to add new\\n     * variables without shifting down storage in the inheritance chain.\\n     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps\\n     */\\n    uint256[49] private __gap;\\n}\\n\",\"keccak256\":\"0xad32f6821f860555f9530902a65b54203a4f5db2117f4384ae47a124958078db\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/utils/AddressUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.9.0) (utils/Address.sol)\\n\\npragma solidity ^0.8.1;\\n\\n/**\\n * @dev Collection of functions related to the address type\\n */\\nlibrary AddressUpgradeable {\\n    /**\\n     * @dev Returns true if `account` is a contract.\\n     *\\n     * [IMPORTANT]\\n     * ====\\n     * It is unsafe to assume that an address for which this function returns\\n     * false is an externally-owned account (EOA) and not a contract.\\n     *\\n     * Among others, `isContract` will return false for the following\\n     * types of addresses:\\n     *\\n     *  - an externally-owned account\\n     *  - a contract in construction\\n     *  - an address where a contract will be created\\n     *  - an address where a contract lived, but was destroyed\\n     *\\n     * Furthermore, `isContract` will also return true if the target contract within\\n     * the same transaction is already scheduled for destruction by `SELFDESTRUCT`,\\n     * which only has an effect at the end of a transaction.\\n     * ====\\n     *\\n     * [IMPORTANT]\\n     * ====\\n     * You shouldn't rely on `isContract` to protect against flash loan attacks!\\n     *\\n     * Preventing calls from contracts is highly discouraged. It breaks composability, breaks support for smart wallets\\n     * like Gnosis Safe, and does not provide security since it can be circumvented by calling from a contract\\n     * constructor.\\n     * ====\\n     */\\n    function isContract(address account) internal view returns (bool) {\\n        // This method relies on extcodesize/address.code.length, which returns 0\\n        // for contracts in construction, since the code is only stored at the end\\n        // of the constructor execution.\\n\\n        return account.code.length > 0;\\n    }\\n\\n    /**\\n     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to\\n     * `recipient`, forwarding all available gas and reverting on errors.\\n     *\\n     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost\\n     * of certain opcodes, possibly making contracts go over the 2300 gas limit\\n     * imposed by `transfer`, making them unable to receive funds via\\n     * `transfer`. {sendValue} removes this limitation.\\n     *\\n     * https://consensys.net/diligence/blog/2019/09/stop-using-soliditys-transfer-now/[Learn more].\\n     *\\n     * IMPORTANT: because control is transferred to `recipient`, care must be\\n     * taken to not create reentrancy vulnerabilities. Consider using\\n     * {ReentrancyGuard} or the\\n     * https://solidity.readthedocs.io/en/v0.8.0/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].\\n     */\\n    function sendValue(address payable recipient, uint256 amount) internal {\\n        require(address(this).balance >= amount, \\\"Address: insufficient balance\\\");\\n\\n        (bool success, ) = recipient.call{value: amount}(\\\"\\\");\\n        require(success, \\\"Address: unable to send value, recipient may have reverted\\\");\\n    }\\n\\n    /**\\n     * @dev Performs a Solidity function call using a low level `call`. A\\n     * plain `call` is an unsafe replacement for a function call: use this\\n     * function instead.\\n     *\\n     * If `target` reverts with a revert reason, it is bubbled up by this\\n     * function (like regular Solidity function calls).\\n     *\\n     * Returns the raw returned data. To convert to the expected return value,\\n     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].\\n     *\\n     * Requirements:\\n     *\\n     * - `target` must be a contract.\\n     * - calling `target` with `data` must not revert.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCall(address target, bytes memory data) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, 0, \\\"Address: low-level call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`], but with\\n     * `errorMessage` as a fallback revert reason when `target` reverts.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCall(\\n        address target,\\n        bytes memory data,\\n        string memory errorMessage\\n    ) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, 0, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but also transferring `value` wei to `target`.\\n     *\\n     * Requirements:\\n     *\\n     * - the calling contract must have an ETH balance of at least `value`.\\n     * - the called Solidity function must be `payable`.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCallWithValue(address target, bytes memory data, uint256 value) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, value, \\\"Address: low-level call with value failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCallWithValue-address-bytes-uint256-}[`functionCallWithValue`], but\\n     * with `errorMessage` as a fallback revert reason when `target` reverts.\\n     *\\n     * _Available since v3.1._\\n     */\\n    function functionCallWithValue(\\n        address target,\\n        bytes memory data,\\n        uint256 value,\\n        string memory errorMessage\\n    ) internal returns (bytes memory) {\\n        require(address(this).balance >= value, \\\"Address: insufficient balance for call\\\");\\n        (bool success, bytes memory returndata) = target.call{value: value}(data);\\n        return verifyCallResultFromTarget(target, success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a static call.\\n     *\\n     * _Available since v3.3._\\n     */\\n    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {\\n        return functionStaticCall(target, data, \\\"Address: low-level static call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],\\n     * but performing a static call.\\n     *\\n     * _Available since v3.3._\\n     */\\n    function functionStaticCall(\\n        address target,\\n        bytes memory data,\\n        string memory errorMessage\\n    ) internal view returns (bytes memory) {\\n        (bool success, bytes memory returndata) = target.staticcall(data);\\n        return verifyCallResultFromTarget(target, success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a delegate call.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {\\n        return functionDelegateCall(target, data, \\\"Address: low-level delegate call failed\\\");\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-string-}[`functionCall`],\\n     * but performing a delegate call.\\n     *\\n     * _Available since v3.4._\\n     */\\n    function functionDelegateCall(\\n        address target,\\n        bytes memory data,\\n        string memory errorMessage\\n    ) internal returns (bytes memory) {\\n        (bool success, bytes memory returndata) = target.delegatecall(data);\\n        return verifyCallResultFromTarget(target, success, returndata, errorMessage);\\n    }\\n\\n    /**\\n     * @dev Tool to verify that a low level call to smart-contract was successful, and revert (either by bubbling\\n     * the revert reason or using the provided one) in case of unsuccessful call or if target was not a contract.\\n     *\\n     * _Available since v4.8._\\n     */\\n    function verifyCallResultFromTarget(\\n        address target,\\n        bool success,\\n        bytes memory returndata,\\n        string memory errorMessage\\n    ) internal view returns (bytes memory) {\\n        if (success) {\\n            if (returndata.length == 0) {\\n                // only check isContract if the call was successful and the return data is empty\\n                // otherwise we already know that it was a contract\\n                require(isContract(target), \\\"Address: call to non-contract\\\");\\n            }\\n            return returndata;\\n        } else {\\n            _revert(returndata, errorMessage);\\n        }\\n    }\\n\\n    /**\\n     * @dev Tool to verify that a low level call was successful, and revert if it wasn't, either by bubbling the\\n     * revert reason or using the provided one.\\n     *\\n     * _Available since v4.3._\\n     */\\n    function verifyCallResult(\\n        bool success,\\n        bytes memory returndata,\\n        string memory errorMessage\\n    ) internal pure returns (bytes memory) {\\n        if (success) {\\n            return returndata;\\n        } else {\\n            _revert(returndata, errorMessage);\\n        }\\n    }\\n\\n    function _revert(bytes memory returndata, string memory errorMessage) private pure {\\n        // Look for revert reason and bubble it up if present\\n        if (returndata.length > 0) {\\n            // The easiest way to bubble the revert reason is using memory via assembly\\n            /// @solidity memory-safe-assembly\\n            assembly {\\n                let returndata_size := mload(returndata)\\n                revert(add(32, returndata), returndata_size)\\n            }\\n        } else {\\n            revert(errorMessage);\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x9c80f545915582e63fe206c6ce27cbe85a86fc10b9cd2a0e8c9488fb7c2ee422\",\"license\":\"MIT\"},\"@openzeppelin/contracts-upgradeable/utils/ContextUpgradeable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.9.4) (utils/Context.sol)\\n\\npragma solidity ^0.8.0;\\nimport {Initializable} from \\\"../proxy/utils/Initializable.sol\\\";\\n\\n/**\\n * @dev Provides information about the current execution context, including the\\n * sender of the transaction and its data. While these are generally available\\n * via msg.sender and msg.data, they should not be accessed in such a direct\\n * manner, since when dealing with meta-transactions the account sending and\\n * paying for execution may not be the actual sender (as far as an application\\n * is concerned).\\n *\\n * This contract is only required for intermediate, library-like contracts.\\n */\\nabstract contract ContextUpgradeable is Initializable {\\n    function __Context_init() internal onlyInitializing {\\n    }\\n\\n    function __Context_init_unchained() internal onlyInitializing {\\n    }\\n    function _msgSender() internal view virtual returns (address) {\\n        return msg.sender;\\n    }\\n\\n    function _msgData() internal view virtual returns (bytes calldata) {\\n        return msg.data;\\n    }\\n\\n    function _contextSuffixLength() internal view virtual returns (uint256) {\\n        return 0;\\n    }\\n\\n    /**\\n     * @dev This empty reserved space is put in place to allow future versions to add new\\n     * variables without shifting down storage in the inheritance chain.\\n     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps\\n     */\\n    uint256[50] private __gap;\\n}\\n\",\"keccak256\":\"0x75097e35253e7fb282ee4d7f27a80eaacfa759923185bf17302a89cbc059c5ef\",\"license\":\"MIT\"},\"@openzeppelin/contracts/access/IAccessControl.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts v4.4.1 (access/IAccessControl.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev External interface of AccessControl declared to support ERC165 detection.\\n */\\ninterface IAccessControl {\\n    /**\\n     * @dev Emitted when `newAdminRole` is set as ``role``'s admin role, replacing `previousAdminRole`\\n     *\\n     * `DEFAULT_ADMIN_ROLE` is the starting admin for all roles, despite\\n     * {RoleAdminChanged} not being emitted signaling this.\\n     *\\n     * _Available since v3.1._\\n     */\\n    event RoleAdminChanged(bytes32 indexed role, bytes32 indexed previousAdminRole, bytes32 indexed newAdminRole);\\n\\n    /**\\n     * @dev Emitted when `account` is granted `role`.\\n     *\\n     * `sender` is the account that originated the contract call, an admin role\\n     * bearer except when using {AccessControl-_setupRole}.\\n     */\\n    event RoleGranted(bytes32 indexed role, address indexed account, address indexed sender);\\n\\n    /**\\n     * @dev Emitted when `account` is revoked `role`.\\n     *\\n     * `sender` is the account that originated the contract call:\\n     *   - if using `revokeRole`, it is the admin role bearer\\n     *   - if using `renounceRole`, it is the role bearer (i.e. `account`)\\n     */\\n    event RoleRevoked(bytes32 indexed role, address indexed account, address indexed sender);\\n\\n    /**\\n     * @dev Returns `true` if `account` has been granted `role`.\\n     */\\n    function hasRole(bytes32 role, address account) external view returns (bool);\\n\\n    /**\\n     * @dev Returns the admin role that controls `role`. See {grantRole} and\\n     * {revokeRole}.\\n     *\\n     * To change a role's admin, use {AccessControl-_setRoleAdmin}.\\n     */\\n    function getRoleAdmin(bytes32 role) external view returns (bytes32);\\n\\n    /**\\n     * @dev Grants `role` to `account`.\\n     *\\n     * If `account` had not been already granted `role`, emits a {RoleGranted}\\n     * event.\\n     *\\n     * Requirements:\\n     *\\n     * - the caller must have ``role``'s admin role.\\n     */\\n    function grantRole(bytes32 role, address account) external;\\n\\n    /**\\n     * @dev Revokes `role` from `account`.\\n     *\\n     * If `account` had been granted `role`, emits a {RoleRevoked} event.\\n     *\\n     * Requirements:\\n     *\\n     * - the caller must have ``role``'s admin role.\\n     */\\n    function revokeRole(bytes32 role, address account) external;\\n\\n    /**\\n     * @dev Revokes `role` from the calling account.\\n     *\\n     * Roles are often managed via {grantRole} and {revokeRole}: this function's\\n     * purpose is to provide a mechanism for accounts to lose their privileges\\n     * if they are compromised (such as when a trusted device is misplaced).\\n     *\\n     * If the calling account had been granted `role`, emits a {RoleRevoked}\\n     * event.\\n     *\\n     * Requirements:\\n     *\\n     * - the caller must be `account`.\\n     */\\n    function renounceRole(bytes32 role, address account) external;\\n}\\n\",\"keccak256\":\"0x59ce320a585d7e1f163cd70390a0ef2ff9cec832e2aa544293a00692465a7a57\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Strings.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.9.0) (utils/Strings.sol)\\n\\npragma solidity ^0.8.0;\\n\\nimport \\\"./math/Math.sol\\\";\\nimport \\\"./math/SignedMath.sol\\\";\\n\\n/**\\n * @dev String operations.\\n */\\nlibrary Strings {\\n    bytes16 private constant _SYMBOLS = \\\"0123456789abcdef\\\";\\n    uint8 private constant _ADDRESS_LENGTH = 20;\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` decimal representation.\\n     */\\n    function toString(uint256 value) internal pure returns (string memory) {\\n        unchecked {\\n            uint256 length = Math.log10(value) + 1;\\n            string memory buffer = new string(length);\\n            uint256 ptr;\\n            /// @solidity memory-safe-assembly\\n            assembly {\\n                ptr := add(buffer, add(32, length))\\n            }\\n            while (true) {\\n                ptr--;\\n                /// @solidity memory-safe-assembly\\n                assembly {\\n                    mstore8(ptr, byte(mod(value, 10), _SYMBOLS))\\n                }\\n                value /= 10;\\n                if (value == 0) break;\\n            }\\n            return buffer;\\n        }\\n    }\\n\\n    /**\\n     * @dev Converts a `int256` to its ASCII `string` decimal representation.\\n     */\\n    function toString(int256 value) internal pure returns (string memory) {\\n        return string(abi.encodePacked(value < 0 ? \\\"-\\\" : \\\"\\\", toString(SignedMath.abs(value))));\\n    }\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation.\\n     */\\n    function toHexString(uint256 value) internal pure returns (string memory) {\\n        unchecked {\\n            return toHexString(value, Math.log256(value) + 1);\\n        }\\n    }\\n\\n    /**\\n     * @dev Converts a `uint256` to its ASCII `string` hexadecimal representation with fixed length.\\n     */\\n    function toHexString(uint256 value, uint256 length) internal pure returns (string memory) {\\n        bytes memory buffer = new bytes(2 * length + 2);\\n        buffer[0] = \\\"0\\\";\\n        buffer[1] = \\\"x\\\";\\n        for (uint256 i = 2 * length + 1; i > 1; --i) {\\n            buffer[i] = _SYMBOLS[value & 0xf];\\n            value >>= 4;\\n        }\\n        require(value == 0, \\\"Strings: hex length insufficient\\\");\\n        return string(buffer);\\n    }\\n\\n    /**\\n     * @dev Converts an `address` with fixed length of 20 bytes to its not checksummed ASCII `string` hexadecimal representation.\\n     */\\n    function toHexString(address addr) internal pure returns (string memory) {\\n        return toHexString(uint256(uint160(addr)), _ADDRESS_LENGTH);\\n    }\\n\\n    /**\\n     * @dev Returns true if the two strings are equal.\\n     */\\n    function equal(string memory a, string memory b) internal pure returns (bool) {\\n        return keccak256(bytes(a)) == keccak256(bytes(b));\\n    }\\n}\\n\",\"keccak256\":\"0x3088eb2868e8d13d89d16670b5f8612c4ab9ff8956272837d8e90106c59c14a0\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/math/Math.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.9.0) (utils/math/Math.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Standard math utilities missing in the Solidity language.\\n */\\nlibrary Math {\\n    enum Rounding {\\n        Down, // Toward negative infinity\\n        Up, // Toward infinity\\n        Zero // Toward zero\\n    }\\n\\n    /**\\n     * @dev Returns the largest of two numbers.\\n     */\\n    function max(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a > b ? a : b;\\n    }\\n\\n    /**\\n     * @dev Returns the smallest of two numbers.\\n     */\\n    function min(uint256 a, uint256 b) internal pure returns (uint256) {\\n        return a < b ? a : b;\\n    }\\n\\n    /**\\n     * @dev Returns the average of two numbers. The result is rounded towards\\n     * zero.\\n     */\\n    function average(uint256 a, uint256 b) internal pure returns (uint256) {\\n        // (a + b) / 2 can overflow.\\n        return (a & b) + (a ^ b) / 2;\\n    }\\n\\n    /**\\n     * @dev Returns the ceiling of the division of two numbers.\\n     *\\n     * This differs from standard division with `/` in that it rounds up instead\\n     * of rounding down.\\n     */\\n    function ceilDiv(uint256 a, uint256 b) internal pure returns (uint256) {\\n        // (a + b - 1) / b can overflow on addition, so we distribute.\\n        return a == 0 ? 0 : (a - 1) / b + 1;\\n    }\\n\\n    /**\\n     * @notice Calculates floor(x * y / denominator) with full precision. Throws if result overflows a uint256 or denominator == 0\\n     * @dev Original credit to Remco Bloemen under MIT license (https://xn--2-umb.com/21/muldiv)\\n     * with further edits by Uniswap Labs also under MIT license.\\n     */\\n    function mulDiv(uint256 x, uint256 y, uint256 denominator) internal pure returns (uint256 result) {\\n        unchecked {\\n            // 512-bit multiply [prod1 prod0] = x * y. Compute the product mod 2^256 and mod 2^256 - 1, then use\\n            // use the Chinese Remainder Theorem to reconstruct the 512 bit result. The result is stored in two 256\\n            // variables such that product = prod1 * 2^256 + prod0.\\n            uint256 prod0; // Least significant 256 bits of the product\\n            uint256 prod1; // Most significant 256 bits of the product\\n            assembly {\\n                let mm := mulmod(x, y, not(0))\\n                prod0 := mul(x, y)\\n                prod1 := sub(sub(mm, prod0), lt(mm, prod0))\\n            }\\n\\n            // Handle non-overflow cases, 256 by 256 division.\\n            if (prod1 == 0) {\\n                // Solidity will revert if denominator == 0, unlike the div opcode on its own.\\n                // The surrounding unchecked block does not change this fact.\\n                // See https://docs.soliditylang.org/en/latest/control-structures.html#checked-or-unchecked-arithmetic.\\n                return prod0 / denominator;\\n            }\\n\\n            // Make sure the result is less than 2^256. Also prevents denominator == 0.\\n            require(denominator > prod1, \\\"Math: mulDiv overflow\\\");\\n\\n            ///////////////////////////////////////////////\\n            // 512 by 256 division.\\n            ///////////////////////////////////////////////\\n\\n            // Make division exact by subtracting the remainder from [prod1 prod0].\\n            uint256 remainder;\\n            assembly {\\n                // Compute remainder using mulmod.\\n                remainder := mulmod(x, y, denominator)\\n\\n                // Subtract 256 bit number from 512 bit number.\\n                prod1 := sub(prod1, gt(remainder, prod0))\\n                prod0 := sub(prod0, remainder)\\n            }\\n\\n            // Factor powers of two out of denominator and compute largest power of two divisor of denominator. Always >= 1.\\n            // See https://cs.stackexchange.com/q/138556/92363.\\n\\n            // Does not overflow because the denominator cannot be zero at this stage in the function.\\n            uint256 twos = denominator & (~denominator + 1);\\n            assembly {\\n                // Divide denominator by twos.\\n                denominator := div(denominator, twos)\\n\\n                // Divide [prod1 prod0] by twos.\\n                prod0 := div(prod0, twos)\\n\\n                // Flip twos such that it is 2^256 / twos. If twos is zero, then it becomes one.\\n                twos := add(div(sub(0, twos), twos), 1)\\n            }\\n\\n            // Shift in bits from prod1 into prod0.\\n            prod0 |= prod1 * twos;\\n\\n            // Invert denominator mod 2^256. Now that denominator is an odd number, it has an inverse modulo 2^256 such\\n            // that denominator * inv = 1 mod 2^256. Compute the inverse by starting with a seed that is correct for\\n            // four bits. That is, denominator * inv = 1 mod 2^4.\\n            uint256 inverse = (3 * denominator) ^ 2;\\n\\n            // Use the Newton-Raphson iteration to improve the precision. Thanks to Hensel's lifting lemma, this also works\\n            // in modular arithmetic, doubling the correct bits in each step.\\n            inverse *= 2 - denominator * inverse; // inverse mod 2^8\\n            inverse *= 2 - denominator * inverse; // inverse mod 2^16\\n            inverse *= 2 - denominator * inverse; // inverse mod 2^32\\n            inverse *= 2 - denominator * inverse; // inverse mod 2^64\\n            inverse *= 2 - denominator * inverse; // inverse mod 2^128\\n            inverse *= 2 - denominator * inverse; // inverse mod 2^256\\n\\n            // Because the division is now exact we can divide by multiplying with the modular inverse of denominator.\\n            // This will give us the correct result modulo 2^256. Since the preconditions guarantee that the outcome is\\n            // less than 2^256, this is the final result. We don't need to compute the high bits of the result and prod1\\n            // is no longer required.\\n            result = prod0 * inverse;\\n            return result;\\n        }\\n    }\\n\\n    /**\\n     * @notice Calculates x * y / denominator with full precision, following the selected rounding direction.\\n     */\\n    function mulDiv(uint256 x, uint256 y, uint256 denominator, Rounding rounding) internal pure returns (uint256) {\\n        uint256 result = mulDiv(x, y, denominator);\\n        if (rounding == Rounding.Up && mulmod(x, y, denominator) > 0) {\\n            result += 1;\\n        }\\n        return result;\\n    }\\n\\n    /**\\n     * @dev Returns the square root of a number. If the number is not a perfect square, the value is rounded down.\\n     *\\n     * Inspired by Henry S. Warren, Jr.'s \\\"Hacker's Delight\\\" (Chapter 11).\\n     */\\n    function sqrt(uint256 a) internal pure returns (uint256) {\\n        if (a == 0) {\\n            return 0;\\n        }\\n\\n        // For our first guess, we get the biggest power of 2 which is smaller than the square root of the target.\\n        //\\n        // We know that the \\\"msb\\\" (most significant bit) of our target number `a` is a power of 2 such that we have\\n        // `msb(a) <= a < 2*msb(a)`. This value can be written `msb(a)=2**k` with `k=log2(a)`.\\n        //\\n        // This can be rewritten `2**log2(a) <= a < 2**(log2(a) + 1)`\\n        // \\u2192 `sqrt(2**k) <= sqrt(a) < sqrt(2**(k+1))`\\n        // \\u2192 `2**(k/2) <= sqrt(a) < 2**((k+1)/2) <= 2**(k/2 + 1)`\\n        //\\n        // Consequently, `2**(log2(a) / 2)` is a good first approximation of `sqrt(a)` with at least 1 correct bit.\\n        uint256 result = 1 << (log2(a) >> 1);\\n\\n        // At this point `result` is an estimation with one bit of precision. We know the true value is a uint128,\\n        // since it is the square root of a uint256. Newton's method converges quadratically (precision doubles at\\n        // every iteration). We thus need at most 7 iteration to turn our partial result with one bit of precision\\n        // into the expected uint128 result.\\n        unchecked {\\n            result = (result + a / result) >> 1;\\n            result = (result + a / result) >> 1;\\n            result = (result + a / result) >> 1;\\n            result = (result + a / result) >> 1;\\n            result = (result + a / result) >> 1;\\n            result = (result + a / result) >> 1;\\n            result = (result + a / result) >> 1;\\n            return min(result, a / result);\\n        }\\n    }\\n\\n    /**\\n     * @notice Calculates sqrt(a), following the selected rounding direction.\\n     */\\n    function sqrt(uint256 a, Rounding rounding) internal pure returns (uint256) {\\n        unchecked {\\n            uint256 result = sqrt(a);\\n            return result + (rounding == Rounding.Up && result * result < a ? 1 : 0);\\n        }\\n    }\\n\\n    /**\\n     * @dev Return the log in base 2, rounded down, of a positive value.\\n     * Returns 0 if given 0.\\n     */\\n    function log2(uint256 value) internal pure returns (uint256) {\\n        uint256 result = 0;\\n        unchecked {\\n            if (value >> 128 > 0) {\\n                value >>= 128;\\n                result += 128;\\n            }\\n            if (value >> 64 > 0) {\\n                value >>= 64;\\n                result += 64;\\n            }\\n            if (value >> 32 > 0) {\\n                value >>= 32;\\n                result += 32;\\n            }\\n            if (value >> 16 > 0) {\\n                value >>= 16;\\n                result += 16;\\n            }\\n            if (value >> 8 > 0) {\\n                value >>= 8;\\n                result += 8;\\n            }\\n            if (value >> 4 > 0) {\\n                value >>= 4;\\n                result += 4;\\n            }\\n            if (value >> 2 > 0) {\\n                value >>= 2;\\n                result += 2;\\n            }\\n            if (value >> 1 > 0) {\\n                result += 1;\\n            }\\n        }\\n        return result;\\n    }\\n\\n    /**\\n     * @dev Return the log in base 2, following the selected rounding direction, of a positive value.\\n     * Returns 0 if given 0.\\n     */\\n    function log2(uint256 value, Rounding rounding) internal pure returns (uint256) {\\n        unchecked {\\n            uint256 result = log2(value);\\n            return result + (rounding == Rounding.Up && 1 << result < value ? 1 : 0);\\n        }\\n    }\\n\\n    /**\\n     * @dev Return the log in base 10, rounded down, of a positive value.\\n     * Returns 0 if given 0.\\n     */\\n    function log10(uint256 value) internal pure returns (uint256) {\\n        uint256 result = 0;\\n        unchecked {\\n            if (value >= 10 ** 64) {\\n                value /= 10 ** 64;\\n                result += 64;\\n            }\\n            if (value >= 10 ** 32) {\\n                value /= 10 ** 32;\\n                result += 32;\\n            }\\n            if (value >= 10 ** 16) {\\n                value /= 10 ** 16;\\n                result += 16;\\n            }\\n            if (value >= 10 ** 8) {\\n                value /= 10 ** 8;\\n                result += 8;\\n            }\\n            if (value >= 10 ** 4) {\\n                value /= 10 ** 4;\\n                result += 4;\\n            }\\n            if (value >= 10 ** 2) {\\n                value /= 10 ** 2;\\n                result += 2;\\n            }\\n            if (value >= 10 ** 1) {\\n                result += 1;\\n            }\\n        }\\n        return result;\\n    }\\n\\n    /**\\n     * @dev Return the log in base 10, following the selected rounding direction, of a positive value.\\n     * Returns 0 if given 0.\\n     */\\n    function log10(uint256 value, Rounding rounding) internal pure returns (uint256) {\\n        unchecked {\\n            uint256 result = log10(value);\\n            return result + (rounding == Rounding.Up && 10 ** result < value ? 1 : 0);\\n        }\\n    }\\n\\n    /**\\n     * @dev Return the log in base 256, rounded down, of a positive value.\\n     * Returns 0 if given 0.\\n     *\\n     * Adding one to the result gives the number of pairs of hex symbols needed to represent `value` as a hex string.\\n     */\\n    function log256(uint256 value) internal pure returns (uint256) {\\n        uint256 result = 0;\\n        unchecked {\\n            if (value >> 128 > 0) {\\n                value >>= 128;\\n                result += 16;\\n            }\\n            if (value >> 64 > 0) {\\n                value >>= 64;\\n                result += 8;\\n            }\\n            if (value >> 32 > 0) {\\n                value >>= 32;\\n                result += 4;\\n            }\\n            if (value >> 16 > 0) {\\n                value >>= 16;\\n                result += 2;\\n            }\\n            if (value >> 8 > 0) {\\n                result += 1;\\n            }\\n        }\\n        return result;\\n    }\\n\\n    /**\\n     * @dev Return the log in base 256, following the selected rounding direction, of a positive value.\\n     * Returns 0 if given 0.\\n     */\\n    function log256(uint256 value, Rounding rounding) internal pure returns (uint256) {\\n        unchecked {\\n            uint256 result = log256(value);\\n            return result + (rounding == Rounding.Up && 1 << (result << 3) < value ? 1 : 0);\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xe4455ac1eb7fc497bb7402579e7b4d64d928b846fce7d2b6fde06d366f21c2b3\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/math/SignedMath.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v4.8.0) (utils/math/SignedMath.sol)\\n\\npragma solidity ^0.8.0;\\n\\n/**\\n * @dev Standard signed math utilities missing in the Solidity language.\\n */\\nlibrary SignedMath {\\n    /**\\n     * @dev Returns the largest of two signed numbers.\\n     */\\n    function max(int256 a, int256 b) internal pure returns (int256) {\\n        return a > b ? a : b;\\n    }\\n\\n    /**\\n     * @dev Returns the smallest of two signed numbers.\\n     */\\n    function min(int256 a, int256 b) internal pure returns (int256) {\\n        return a < b ? a : b;\\n    }\\n\\n    /**\\n     * @dev Returns the average of two signed numbers without overflow.\\n     * The result is rounded towards zero.\\n     */\\n    function average(int256 a, int256 b) internal pure returns (int256) {\\n        // Formula from the book \\\"Hacker's Delight\\\"\\n        int256 x = (a & b) + ((a ^ b) >> 1);\\n        return x + (int256(uint256(x) >> 255) & (a ^ b));\\n    }\\n\\n    /**\\n     * @dev Returns the absolute unsigned value of a signed value.\\n     */\\n    function abs(int256 n) internal pure returns (uint256) {\\n        unchecked {\\n            // must be unchecked in order to support `n = type(int256).min`\\n            return uint256(n >= 0 ? n : -n);\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xf92515413956f529d95977adc9b0567d583c6203fc31ab1c23824c35187e3ddc\",\"license\":\"MIT\"},\"@venusprotocol/solidity-utilities/contracts/validators.sol\":{\"content\":\"// SPDX-License-Identifier: BSD-3-Clause\\npragma solidity 0.8.25;\\n\\n/// @notice Thrown if the supplied address is a zero address where it is not allowed\\nerror ZeroAddressNotAllowed();\\n\\n/// @notice Thrown if the supplied value is 0 where it is not allowed\\nerror ZeroValueNotAllowed();\\n\\n/// @notice Checks if the provided address is nonzero, reverts otherwise\\n/// @param address_ Address to check\\n/// @custom:error ZeroAddressNotAllowed is thrown if the provided address is a zero address\\nfunction ensureNonzeroAddress(address address_) pure {\\n    if (address_ == address(0)) {\\n        revert ZeroAddressNotAllowed();\\n    }\\n}\\n\\n/// @notice Checks if the provided value is nonzero, reverts otherwise\\n/// @param value_ Value to check\\n/// @custom:error ZeroValueNotAllowed is thrown if the provided value is 0\\nfunction ensureNonzeroValue(uint256 value_) pure {\\n    if (value_ == 0) {\\n        revert ZeroValueNotAllowed();\\n    }\\n}\\n\",\"keccak256\":\"0xdb88e14d50dd21889ca3329d755673d022c47e8da005b6a545c7f69c2c4b7b86\",\"license\":\"BSD-3-Clause\"},\"contracts/Governance/AccessControlledV8.sol\":{\"content\":\"// SPDX-License-Identifier: BSD-3-Clause\\npragma solidity 0.8.25;\\n\\nimport \\\"@openzeppelin/contracts-upgradeable/proxy/utils/Initializable.sol\\\";\\nimport \\\"@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol\\\";\\n\\nimport \\\"./IAccessControlManagerV8.sol\\\";\\n\\n/**\\n * @title AccessControlledV8\\n * @author Venus\\n * @notice This contract is helper between access control manager and actual contract. This contract further inherited by other contract (using solidity 0.8.13)\\n * to integrate access controlled mechanism. It provides initialise methods and verifying access methods.\\n */\\nabstract contract AccessControlledV8 is Initializable, Ownable2StepUpgradeable {\\n    /// @notice Access control manager contract\\n    IAccessControlManagerV8 private _accessControlManager;\\n\\n    /**\\n     * @dev This empty reserved space is put in place to allow future versions to add new\\n     * variables without shifting down storage in the inheritance chain.\\n     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps\\n     */\\n    uint256[49] private __gap;\\n\\n    /// @notice Emitted when access control manager contract address is changed\\n    event NewAccessControlManager(address oldAccessControlManager, address newAccessControlManager);\\n\\n    /// @notice Thrown when the action is prohibited by AccessControlManager\\n    error Unauthorized(address sender, address calledContract, string methodSignature);\\n\\n    function __AccessControlled_init(address accessControlManager_) internal onlyInitializing {\\n        __Ownable2Step_init();\\n        __AccessControlled_init_unchained(accessControlManager_);\\n    }\\n\\n    function __AccessControlled_init_unchained(address accessControlManager_) internal onlyInitializing {\\n        _setAccessControlManager(accessControlManager_);\\n    }\\n\\n    /**\\n     * @notice Sets the address of AccessControlManager\\n     * @dev Admin function to set address of AccessControlManager\\n     * @param accessControlManager_ The new address of the AccessControlManager\\n     * @custom:event Emits NewAccessControlManager event\\n     * @custom:access Only Governance\\n     */\\n    function setAccessControlManager(address accessControlManager_) external onlyOwner {\\n        _setAccessControlManager(accessControlManager_);\\n    }\\n\\n    /**\\n     * @notice Returns the address of the access control manager contract\\n     */\\n    function accessControlManager() external view returns (IAccessControlManagerV8) {\\n        return _accessControlManager;\\n    }\\n\\n    /**\\n     * @dev Internal function to set address of AccessControlManager\\n     * @param accessControlManager_ The new address of the AccessControlManager\\n     */\\n    function _setAccessControlManager(address accessControlManager_) internal {\\n        require(address(accessControlManager_) != address(0), \\\"invalid acess control manager address\\\");\\n        address oldAccessControlManager = address(_accessControlManager);\\n        _accessControlManager = IAccessControlManagerV8(accessControlManager_);\\n        emit NewAccessControlManager(oldAccessControlManager, accessControlManager_);\\n    }\\n\\n    /**\\n     * @notice Reverts if the call is not allowed by AccessControlManager\\n     * @param signature Method signature\\n     */\\n    function _checkAccessAllowed(string memory signature) internal view {\\n        bool isAllowedToCall = _accessControlManager.isAllowedToCall(msg.sender, signature);\\n\\n        if (!isAllowedToCall) {\\n            revert Unauthorized(msg.sender, address(this), signature);\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0x0dcf283925f4dddc23ca0ee71d2cb96a9dd6e4cf08061b69fde1697ea39dc514\",\"license\":\"BSD-3-Clause\"},\"contracts/Governance/IAccessControlManagerV8.sol\":{\"content\":\"// SPDX-License-Identifier: BSD-3-Clause\\npragma solidity ^0.8.25;\\n\\nimport \\\"@openzeppelin/contracts/access/IAccessControl.sol\\\";\\n\\n/**\\n * @title IAccessControlManagerV8\\n * @author Venus\\n * @notice Interface implemented by the `AccessControlManagerV8` contract.\\n */\\ninterface IAccessControlManagerV8 is IAccessControl {\\n    function giveCallPermission(address contractAddress, string calldata functionSig, address accountToPermit) external;\\n\\n    function revokeCallPermission(\\n        address contractAddress,\\n        string calldata functionSig,\\n        address accountToRevoke\\n    ) external;\\n\\n    function isAllowedToCall(address account, string calldata functionSig) external view returns (bool);\\n\\n    function hasPermission(\\n        address account,\\n        address contractAddress,\\n        string calldata functionSig\\n    ) external view returns (bool);\\n}\\n\",\"keccak256\":\"0xaa29b098440d0b3a131c5ecdf25ce548790c1b5ac7bf9b5c0264b6af6f7a1e0b\",\"license\":\"BSD-3-Clause\"},\"contracts/RiskSteward/IRiskSteward.sol\":{\"content\":\"// SPDX-License-Identifier: BSD-3-Clause\\npragma solidity 0.8.25;\\n\\nimport { RiskParameterUpdate } from \\\"../interfaces/IRiskOracle.sol\\\";\\nimport { ICorePoolComptroller } from \\\"../interfaces/ICorePoolComptroller.sol\\\";\\n\\ninterface IRiskSteward {\\n    function CORE_POOL_COMPTROLLER() external view returns (ICorePoolComptroller);\\n\\n    function initialize(address accessControlManager_, uint256 maxIncreaseBps_) external;\\n\\n    function processUpdate(RiskParameterUpdate calldata update) external;\\n}\\n\",\"keccak256\":\"0xc161c33f27e993abd0b5e4dc07d3729e70986fb21b6017bd58170efdaea205f6\",\"license\":\"BSD-3-Clause\"},\"contracts/RiskSteward/IRiskStewardReceiver.sol\":{\"content\":\"// SPDX-License-Identifier: BSD-3-Clause\\npragma solidity 0.8.25;\\nimport { IRiskOracle } from \\\"../interfaces/IRiskOracle.sol\\\";\\n\\nstruct RiskParamConfig {\\n    bool active;\\n    uint256 debounce;\\n    address riskSteward;\\n}\\n\\ninterface IRiskStewardReceiver {\\n    function RISK_ORACLE() external view returns (IRiskOracle);\\n\\n    function initialize(address accessControlManager_) external;\\n\\n    function setRiskParameterConfig(string calldata updateType, address riskSteward, uint256 debounce) external;\\n\\n    function toggleConfigActive(string calldata updateType) external;\\n\\n    function processUpdateById(uint256 updateId) external;\\n\\n    function processUpdateByParameterAndMarket(string memory updateType, address market) external;\\n}\\n\",\"keccak256\":\"0xc242e3e0b88a7aa1568cbff74072e4a11348a1ae027873d2b372d70ce440a61a\",\"license\":\"BSD-3-Clause\"},\"contracts/RiskSteward/RiskStewardReceiver.sol\":{\"content\":\"// SPDX-License-Identifier: BSD-3-Clause\\npragma solidity 0.8.25;\\n\\nimport { Strings } from \\\"@openzeppelin/contracts/utils/Strings.sol\\\";\\nimport { IRiskSteward } from \\\"./IRiskSteward.sol\\\";\\nimport { IRiskOracle, RiskParameterUpdate } from \\\"../interfaces/IRiskOracle.sol\\\";\\nimport { ICorePoolComptroller } from \\\"../interfaces/ICorePoolComptroller.sol\\\";\\nimport { IIsolatedPoolsComptroller } from \\\"../interfaces/IIsolatedPoolsComptroller.sol\\\";\\nimport { IRiskStewardReceiver, RiskParamConfig } from \\\"./IRiskStewardReceiver.sol\\\";\\nimport { PausableUpgradeable } from \\\"@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol\\\";\\nimport { AccessControlledV8 } from \\\"../Governance/AccessControlledV8.sol\\\";\\nimport { ensureNonzeroAddress } from \\\"@venusprotocol/solidity-utilities/contracts/validators.sol\\\";\\n\\n/**\\n * @title RiskStewardReceiver\\n * @author Venus\\n * @notice Contract that can read updates from the Chaos Labs Risk Oracle, validate them, and push them to the correct RiskSteward.\\n * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion\\n */\\ncontract RiskStewardReceiver is IRiskStewardReceiver, PausableUpgradeable, AccessControlledV8 {\\n    /**\\n     * @notice Mapping of supported risk configurations and their validation parameters\\n     */\\n    mapping(string updateType => RiskParamConfig) public riskParameterConfigs;\\n\\n    /**\\n     * @notice Whitelisted oracle address to receive updates from\\n     */\\n    IRiskOracle public immutable RISK_ORACLE;\\n\\n    /**\\n     * @notice Mapping of market and update type to last update timestamp. Used for debouncing updates.\\n     */\\n    mapping(bytes marketUpdateType => uint256) public lastProcessedTime;\\n\\n    /**\\n     * @notice Mapping of processed updates. Used to prevent re-execution\\n     */\\n    mapping(uint256 updateId => bool) public processedUpdates;\\n\\n    /**\\n     * @notice Time before a submitted update is considered stale\\n     */\\n    uint256 public constant UPDATE_EXPIRATION_TIME = 1 days;\\n\\n    /**\\n     * @dev This empty reserved space is put in place to allow future versions to add new\\n     * variables without shifting down storage in the inheritance chain.\\n     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps\\n     */\\n    uint256[47] private __gap;\\n\\n    /**\\n     * @notice Event emitted when a risk parameter config is set\\n     */\\n    event RiskParameterConfigSet(\\n        string updateType,\\n        address indexed previousRiskSteward,\\n        address indexed riskSteward,\\n        uint256 previousDebounce,\\n        uint256 debounce,\\n        bool previousActive,\\n        bool active\\n    );\\n\\n    /**\\n     * @notice Event emitted when a risk parameter config is toggled on or off\\n     */\\n    event ToggleConfigActive(string updateType, bool active);\\n\\n    /**\\n     * @notice Event emitted when an update is successfully processed\\n     */\\n    event RiskParameterUpdated(uint256 indexed updateId);\\n\\n    /**\\n     * @notice Thrown if a submitted update is not active and therefor cannot be processed\\n     */\\n    error ConfigNotActive();\\n\\n    /**\\n     * @notice Thrown when an update was not applied within the required time frame\\n     */\\n    error UpdateIsExpired();\\n\\n    /**\\n     * @notice Thrown when an update has already been processed\\n     */\\n    error ConfigAlreadyProcessed();\\n\\n    /**\\n     * @notice Thrown when the debounce period hasn't passed for applying an update to a specific market / update type\\n     */\\n    error UpdateTooFrequent();\\n\\n    /**\\n     * @notice Thrown when an update type that is not supported is operated on\\n     */\\n    error UnsupportedUpdateType();\\n\\n    /**\\n     * @notice Thrown when a debounce value of 0 is set\\n     */\\n    error InvalidDebounce();\\n\\n    /**\\n     * @dev Sets the immutable risk oracle address and disables initializers\\n     * @custom:error Throws ZeroAddressNotAllowed if the risk oracle address is zero\\n     * @custom:oz-upgrades-unsafe-allow constructor\\n     */\\n    constructor(address riskOracle_) {\\n        ensureNonzeroAddress(riskOracle_);\\n        RISK_ORACLE = IRiskOracle(riskOracle_);\\n        _disableInitializers();\\n    }\\n\\n    /**\\n     * @notice Initializes the contract as ownable, pausable, and access controlled\\n     * @param accessControlManager_ The address of the access control manager\\n     */\\n    function initialize(address accessControlManager_) external initializer {\\n        __Pausable_init();\\n        __AccessControlled_init(accessControlManager_);\\n    }\\n\\n    /**\\n     * @notice Pauses processing of updates\\n     * @custom:access Controlled by AccessControlManager\\n     */\\n    function pause() external {\\n        _checkAccessAllowed(\\\"pause()\\\");\\n        _pause();\\n    }\\n\\n    /**\\n     * @notice Unpauses processing of updates\\n     * @custom:access Controlled by AccessControlManager\\n     */\\n    function unpause() external {\\n        _checkAccessAllowed(\\\"unpause()\\\");\\n        _unpause();\\n    }\\n\\n    /**\\n     * @notice Sets the risk parameter config for a given update type\\n     * @param updateType The type of update to configure\\n     * @param riskSteward The address for the risk steward contract responsible for processing the update\\n     * @param debounce The debounce period for the update\\n     * @custom:access Controlled by AccessControlManager\\n     * @custom:event Emits RiskParameterConfigSet with the update type, previous risk steward, new risk steward, previous debounce,\\n     *new debounce, previous active status, and new active status\\n     * @custom:error Throws UnsupportedUpdateType if the update type is an empty string\\n     * @custom:error Throws InvalidDebounce if the debounce is 0\\n     * @custom:error Throws ZeroAddressNotAllowed if the risk steward address is zero\\n     */\\n    function setRiskParameterConfig(string calldata updateType, address riskSteward, uint256 debounce) external {\\n        _checkAccessAllowed(\\\"setRiskParameterConfig(string,address,uint256)\\\");\\n        if (Strings.equal(updateType, \\\"\\\")) {\\n            revert UnsupportedUpdateType();\\n        }\\n        if (debounce == 0 || debounce <= UPDATE_EXPIRATION_TIME) {\\n            revert InvalidDebounce();\\n        }\\n        ensureNonzeroAddress(riskSteward);\\n        RiskParamConfig memory previousConfig = riskParameterConfigs[updateType];\\n        riskParameterConfigs[updateType] = RiskParamConfig({\\n            active: true,\\n            riskSteward: riskSteward,\\n            debounce: debounce\\n        });\\n        emit RiskParameterConfigSet(\\n            updateType,\\n            previousConfig.riskSteward,\\n            riskSteward,\\n            previousConfig.debounce,\\n            debounce,\\n            previousConfig.active,\\n            true\\n        );\\n    }\\n\\n    /**\\n     * @notice Toggles the active status of a risk parameter config\\n     * @param updateType The type of update to toggle on or off\\n     * @custom:access Controlled by AccessControlManager\\n     * @custom:event Emits ToggleConfigActive with the update type and the new active status\\n     * @custom:error Throws UnsupportedUpdateType if the update type is not supported\\n     */\\n    function toggleConfigActive(string calldata updateType) external {\\n        _checkAccessAllowed(\\\"toggleConfigActive(string)\\\");\\n\\n        if (riskParameterConfigs[updateType].riskSteward == address(0)) {\\n            revert UnsupportedUpdateType();\\n        }\\n\\n        riskParameterConfigs[updateType].active = !riskParameterConfigs[updateType].active;\\n        emit ToggleConfigActive(updateType, riskParameterConfigs[updateType].active);\\n    }\\n\\n    /**\\n     * @notice Processes an update by its ID. Will validate that the update configuration is active, is not expired, unprocessed, and that the debounce period has passed.\\n     * Validated updates will be processed by the associated risk steward contract which will perform update specific validations and apply validated updates.\\n     * @param updateId The ID of the update to process\\n     * @custom:event Emits RiskParameterUpdated with the update ID\\n     * @custom:error Throws ConfigNotActive if the config is not active\\n     * @custom:error Throws UpdateIsExpired if the update is expired\\n     * @custom:error Throws ConfigAlreadyProcessed if the update has already been processed\\n     * @custom:error Throws UpdateTooFrequent if the update is too frequent\\n     */\\n    function processUpdateById(uint256 updateId) external whenNotPaused {\\n        RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);\\n        RiskParameterUpdate memory latestForMarketAndType = RISK_ORACLE.getLatestUpdateByParameterAndMarket(\\n            update.updateType,\\n            update.market\\n        );\\n        if (latestForMarketAndType.updateId != updateId) {\\n            revert UpdateIsExpired();\\n        }\\n\\n        bytes memory marketUpdateTypeKey = _getMarketUpdateTypeKey(update.market, update.updateType);\\n        _validateUpdateStatus(update, marketUpdateTypeKey);\\n        _processUpdate(update, marketUpdateTypeKey);\\n    }\\n\\n    /**\\n     * @notice Processes the latest update for a given parameter and market. Will validate that the update configuration is active, is not expired,\\n     * unprocessed, and that the debounce period has passed.\\n     * Validated updates will be processed by the associated risk steward contract which will perform update specific validations and apply validated updates.\\n     * @param updateType The type of update to process\\n     * @param market The market to process the update for\\n     * @custom:event Emits RiskParameterUpdated with the update ID\\n     * @custom:error Throws ConfigNotActive if the config is not active\\n     * @custom:error Throws UpdateIsExpired if the update is expired\\n     * @custom:error Throws ConfigAlreadyProcessed if the update has already been processed\\n     * @custom:error Throws UpdateTooFrequent if the update is too frequent\\n     */\\n    function processUpdateByParameterAndMarket(string memory updateType, address market) external whenNotPaused {\\n        RiskParameterUpdate memory update = RISK_ORACLE.getLatestUpdateByParameterAndMarket(updateType, market);\\n        bytes memory marketUpdateTypeKey = _getMarketUpdateTypeKey(update.market, update.updateType);\\n        _validateUpdateStatus(update, marketUpdateTypeKey);\\n        _processUpdate(update, marketUpdateTypeKey);\\n    }\\n\\n    /**\\n     * @dev Internal function which calls the risk steward to apply the update. If successful, it records the last processed time for the update and\\n     *market and marks the update as processed.\\n     * @custom:event Emits RiskParameterUpdated with the update ID\\n     */\\n    function _processUpdate(RiskParameterUpdate memory update, bytes memory marketUpdateTypeKey) internal {\\n        IRiskSteward(riskParameterConfigs[update.updateType].riskSteward).processUpdate(update);\\n        lastProcessedTime[marketUpdateTypeKey] = block.timestamp;\\n        processedUpdates[update.updateId] = true;\\n        emit RiskParameterUpdated(update.updateId);\\n    }\\n\\n    /**\\n     * @dev Encodes the market and update type into a bytes key to be used with the last processed time mapping\\n     */\\n    function _getMarketUpdateTypeKey(address market, string memory updateType) internal pure returns (bytes memory) {\\n        return abi.encodePacked(market, updateType);\\n    }\\n\\n    /**\\n     * @dev Validates the status of an update. Will validate that the update configuration is active, is not expired, unprocessed, and that the debounce period has passed.\\n     * @custom:error Throws ConfigNotActive if the config is not active\\n     * @custom:error Throws UpdateIsExpired if the update is expired\\n     * @custom:error Throws ConfigAlreadyProcessed if the update has already been processed\\n     * @custom:error Throws UpdateTooFrequent if the update is too frequent\\n     */\\n    function _validateUpdateStatus(RiskParameterUpdate memory update, bytes memory marketUpdateTypeKey) internal view {\\n        RiskParamConfig memory config = riskParameterConfigs[update.updateType];\\n\\n        if (!config.active) {\\n            revert ConfigNotActive();\\n        }\\n\\n        if (update.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp) {\\n            revert UpdateIsExpired();\\n        }\\n\\n        if (processedUpdates[update.updateId]) {\\n            revert ConfigAlreadyProcessed();\\n        }\\n\\n        if (block.timestamp - lastProcessedTime[marketUpdateTypeKey] < config.debounce) {\\n            revert UpdateTooFrequent();\\n        }\\n    }\\n\\n    /**\\n     * @dev Disabling renounceOwnership function.\\n     */\\n    function renounceOwnership() public override {\\n        revert(\\\" renounceOwnership() is not allowed\\\");\\n    }\\n}\\n\",\"keccak256\":\"0x416f22cf001d106a78c14e3430057c8be2ef7649c9b037c942352ee379204974\",\"license\":\"BSD-3-Clause\"},\"contracts/interfaces/ICorePoolComptroller.sol\":{\"content\":\"// SPDX-License-Identifier: BSD-3-Clause\\npragma solidity 0.8.25;\\n\\ninterface ICorePoolComptroller {\\n    function borrowCaps(address) external view returns (uint256);\\n\\n    function supplyCaps(address) external view returns (uint256);\\n\\n    function _setMarketSupplyCaps(address[] calldata, uint256[] calldata) external;\\n\\n    function _setMarketBorrowCaps(address[] calldata, uint256[] calldata) external;\\n}\\n\",\"keccak256\":\"0x8583478e8925818f1e2c6d86de0d0885689a24305f0b088539db0b40897740e6\",\"license\":\"BSD-3-Clause\"},\"contracts/interfaces/IIsolatedPoolsComptroller.sol\":{\"content\":\"// SPDX-License-Identifier: BSD-3-Clause\\npragma solidity 0.8.25;\\n\\ninterface IIsolatedPoolsComptroller {\\n    function borrowCaps(address) external view returns (uint256);\\n\\n    function supplyCaps(address) external view returns (uint256);\\n\\n    function setMarketSupplyCaps(address[] calldata, uint256[] calldata) external;\\n\\n    function setMarketBorrowCaps(address[] calldata, uint256[] calldata) external;\\n}\\n\",\"keccak256\":\"0x4dd3839094d706168e6aa1081e694010505106a84ab3a82195c483e1e159dd45\",\"license\":\"BSD-3-Clause\"},\"contracts/interfaces/IRiskOracle.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\npragma solidity ^0.8.25;\\n\\nstruct RiskParameterUpdate {\\n    uint256 timestamp; // Timestamp of the update\\n    bytes newValue; // Encoded parameters, flexible for various data types\\n    string referenceId; // External reference, potentially linking to a document or off-chain data\\n    bytes previousValue; // Previous value of the parameter for historical comparison\\n    string updateType; // Classification of the update for validation purposes\\n    uint256 updateId; // Unique identifier for this specific update\\n    address market; // Address for market of the parameter update\\n    bytes additionalData; // Additional data for the update\\n}\\n\\ninterface IRiskOracle {\\n    function addAuthorizedSender(address sender) external;\\n\\n    function removeAuthorizedSender(address sender) external;\\n\\n    function addUpdateType(string memory newUpdateType) external;\\n\\n    function publishRiskParameterUpdate(\\n        string memory referenceId,\\n        bytes memory newValue,\\n        string memory updateType,\\n        address market,\\n        bytes memory additionalData\\n    ) external;\\n\\n    function publishBulkRiskParameterUpdates(\\n        string[] memory referenceIds,\\n        bytes[] memory newValues,\\n        string[] memory updateTypes,\\n        address[] memory markets,\\n        bytes[] memory additionalData\\n    ) external;\\n\\n    function getAllUpdateTypes() external view returns (string[] memory);\\n\\n    function getLatestUpdateByParameterAndMarket(\\n        string memory updateType,\\n        address market\\n    ) external view returns (RiskParameterUpdate memory);\\n\\n    function getUpdateById(uint256 updateId) external view returns (RiskParameterUpdate memory);\\n\\n    function isAuthorized(address sender) external view returns (bool);\\n}\\n\",\"keccak256\":\"0x37f0d45c640978793572d80d9010c628424e363d87abbd43349ce6297aa23919\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x60a060405234801561001057600080fd5b506040516122be3803806122be83398101604081905261002f9161013c565b61003881610053565b6001600160a01b03811660805261004d61007d565b5061016c565b6001600160a01b03811661007a576040516342bcdf7f60e11b815260040160405180910390fd5b50565b600054610100900460ff16156100e95760405162461bcd60e51b815260206004820152602760248201527f496e697469616c697a61626c653a20636f6e747261637420697320696e697469604482015266616c697a696e6760c81b606482015260840160405180910390fd5b60005460ff9081161461013a576000805460ff191660ff9081179091556040519081527f7f26b83ff96e1f2b6a682f133852f6798a09c465da95921460cefb38474024989060200160405180910390a15b565b60006020828403121561014e57600080fd5b81516001600160a01b038116811461016557600080fd5b9392505050565b60805161212261019c600039600081816102150152818161046b015281816106a4015261077501526121226000f3fe608060405234801561001057600080fd5b506004361061016c5760003560e01c80638da5cb5b116100cd578063ba866f0911610081578063cdd231d211610066578063cdd231d214610383578063e30c397814610396578063f2fde38b146103b457600080fd5b8063ba866f09146102e9578063c4d66de81461037057600080fd5b8063ada26f60116100b2578063ada26f60146102a5578063b080d71d146102b8578063b4a0bdf3146102cb57600080fd5b80638da5cb5b14610264578063a7faee3c1461028257600080fd5b80636391c14a1161012457806379ba50971161010957806379ba5097146102085780637dd8f522146102105780638456cb591461025c57600080fd5b80636391c14a146101ed578063715018a61461020057600080fd5b80633f4ba83a116101555780633f4ba83a146101a35780635c975abb146101ab5780635f1f8afd146101c257600080fd5b80630e32cb8614610171578063233dd0da14610186575b600080fd5b61018461017f3660046118eb565b6103c7565b005b6101906201518081565b6040519081526020015b60405180910390f35b6101846103db565b60335460ff165b604051901515815260200161019a565b6101906101d03660046119ff565b805160208183018101805160fc8252928201919093012091525481565b6101846101fb366004611a70565b610423565b610184610519565b61018461058c565b6102377f000000000000000000000000000000000000000000000000000000000000000081565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200161019a565b610184610624565b60655473ffffffffffffffffffffffffffffffffffffffff16610237565b6101b2610290366004611ac2565b60fd6020526000908152604090205460ff1681565b6101846102b3366004611ac2565b61066a565b6101846102c6366004611b24565b610856565b60c95473ffffffffffffffffffffffffffffffffffffffff16610237565b61033d6102f7366004611b81565b805160208183018101805160fb8252928201919093012091528054600182015460029092015460ff909116919073ffffffffffffffffffffffffffffffffffffffff1683565b604080519315158452602084019290925273ffffffffffffffffffffffffffffffffffffffff169082015260600161019a565b61018461037e3660046118eb565b610aa3565b610184610391366004611bb6565b610c08565b60975473ffffffffffffffffffffffffffffffffffffffff16610237565b6101846103c23660046118eb565b610d7f565b6103cf610e2f565b6103d881610e96565b50565b6104196040518060400160405280600981526020017f756e706175736528290000000000000000000000000000000000000000000000815250610f9e565b610421611077565b565b61042b6110d6565b6040517f5decfee400000000000000000000000000000000000000000000000000000000815260009073ffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000001690635decfee4906104a29086908690600401611c48565b600060405180830381865afa1580156104bf573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f191682016040526104e79190810190611cd5565b905060006104fd8260c001518360800151611129565b90506105098282611156565b61051382826112f6565b50505050565b60405162461bcd60e51b815260206004820152602360248201527f2072656e6f756e63654f776e6572736869702829206973206e6f7420616c6c6f60448201527f776564000000000000000000000000000000000000000000000000000000000060648201526084015b60405180910390fd5b609754339073ffffffffffffffffffffffffffffffffffffffff16811461061b5760405162461bcd60e51b815260206004820152602960248201527f4f776e61626c6532537465703a2063616c6c6572206973206e6f74207468652060448201527f6e6577206f776e657200000000000000000000000000000000000000000000006064820152608401610583565b6103d88161140b565b6106626040518060400160405280600781526020017f7061757365282900000000000000000000000000000000000000000000000000815250610f9e565b61042161143c565b6106726110d6565b6040517f37759b9a000000000000000000000000000000000000000000000000000000008152600481018290526000907f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff16906337759b9a90602401600060405180830381865afa158015610700573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f191682016040526107289190810190611cd5565b608081015160c08201516040517f5decfee400000000000000000000000000000000000000000000000000000000815292935060009273ffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000001692635decfee4926107a892600401611c48565b600060405180830381865afa1580156107c5573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f191682016040526107ed9190810190611cd5565b9050828160a001511461082c576040517fc2a16f1400000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60006108408360c001518460800151611129565b905061084c8382611156565b61051383826112f6565b6108776040518060600160405280602e81526020016120bf602e9139610f9e565b6108c484848080601f016020809104026020016040519081016040528093929190818152602001838380828437600092018290525060408051602081019091529081529250611479915050565b156108fb576040517f80919d7b00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b80158061090b5750620151808111155b15610942576040517ff6ea4e0600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b61094b8261148f565b600060fb858560405161095f929190611df8565b908152604080516020928190038301812060608083018452815460ff16151583526001808301548685015260029092015473ffffffffffffffffffffffffffffffffffffffff9081168486015284519182018552918152938401869052861683830152905190925060fb906109d79088908890611df8565b90815260408051602092819003830181208451815460ff19169015151781558484015160018083019190915594830151600290910180547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff928316179055918501519285015185518884169594909316937ff0368c8064bba33693ceea1832ed04228e2e9189812b88dbeb685b8fda0e9adf93610a94938c938c9390928b92909190611e33565b60405180910390a35050505050565b600054610100900460ff1615808015610ac35750600054600160ff909116105b80610add5750303b158015610add575060005460ff166001145b610b4f5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201527f647920696e697469616c697a65640000000000000000000000000000000000006064820152608401610583565b6000805460ff191660011790558015610b8f57600080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ff166101001790555b610b976114dc565b610ba082611561565b8015610c0457600080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ff169055604051600181527f7f26b83ff96e1f2b6a682f133852f6798a09c465da95921460cefb3847402498906020015b60405180910390a15b5050565b610c466040518060400160405280601a81526020017f746f67676c65436f6e66696741637469766528737472696e6729000000000000815250610f9e565b600073ffffffffffffffffffffffffffffffffffffffff1660fb8383604051610c70929190611df8565b9081526040519081900360200190206002015473ffffffffffffffffffffffffffffffffffffffff1603610cd0576040517f80919d7b00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60fb8282604051610ce2929190611df8565b9081526040519081900360200181205460ff16159060fb90610d079085908590611df8565b908152604051908190036020018120805492151560ff19909316929092179091557f468664a9fd55ec9cd045b61db100de66def2b77a44f261785dc8a0979c5fdb04908390839060fb90610d5e9084908490611df8565b90815260405190819003602001812054610bfb93929160ff90911690611e6e565b610d87610e2f565b6097805473ffffffffffffffffffffffffffffffffffffffff83167fffffffffffffffffffffffff00000000000000000000000000000000000000009091168117909155610dea60655473ffffffffffffffffffffffffffffffffffffffff1690565b73ffffffffffffffffffffffffffffffffffffffff167f38d16b8cac22d99fc7c124b9cd0de2d3fa1faef420bfe791d8c362d765e2270060405160405180910390a350565b60655473ffffffffffffffffffffffffffffffffffffffff1633146104215760405162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e65726044820152606401610583565b73ffffffffffffffffffffffffffffffffffffffff8116610f1f5760405162461bcd60e51b815260206004820152602560248201527f696e76616c696420616365737320636f6e74726f6c206d616e6167657220616460448201527f64726573730000000000000000000000000000000000000000000000000000006064820152608401610583565b60c9805473ffffffffffffffffffffffffffffffffffffffff8381167fffffffffffffffffffffffff000000000000000000000000000000000000000083168117909355604080519190921680825260208201939093527f66fd58e82f7b31a2a5c30e0888f3093efe4e111b00cd2b0c31fe014601293aa09101610bfb565b60c9546040517f18c5e8ab00000000000000000000000000000000000000000000000000000000815260009173ffffffffffffffffffffffffffffffffffffffff16906318c5e8ab90610ff79033908690600401611e94565b602060405180830381865afa158015611014573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906110389190611ec3565b905080610c04573330836040517f4a3fa29300000000000000000000000000000000000000000000000000000000815260040161058393929190611ee5565b61107f6115ef565b6033805460ff191690557f5db9ee0a495bf2e6ff9c91a7834c1ba4fdd244a5e8aa4e537bd38aeae4b073aa335b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390a1565b60335460ff16156104215760405162461bcd60e51b815260206004820152601060248201527f5061757361626c653a20706175736564000000000000000000000000000000006044820152606401610583565b6060828260405160200161113e929190611f27565b60405160208183030381529060405290505b92915050565b600060fb836080015160405161116c9190611f72565b9081526040805160209281900383018120606082018352805460ff1615158083526001820154948301949094526002015473ffffffffffffffffffffffffffffffffffffffff169181019190915291506111f2576040517fdea2a21200000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b82514290611204906201518090611fbd565b101561123c576040517fc2a16f1400000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60a0830151600090815260fd602052604090205460ff161561128a576040517f0bebf69800000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b806020015160fc8360405161129f9190611f72565b908152602001604051809103902054426112b99190611fd0565b10156112f1576040517f53f7a6ee00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b505050565b60fb826080015160405161130a9190611f72565b908152604051908190036020018120600201547f04a6fcd600000000000000000000000000000000000000000000000000000000825273ffffffffffffffffffffffffffffffffffffffff16906304a6fcd69061136b908590600401611fe3565b600060405180830381600087803b15801561138557600080fd5b505af1158015611399573d6000803e3d6000fd5b505050504260fc826040516113ae9190611f72565b9081526040805191829003602090810183209390935560a085018051600090815260fd909452908320805460ff1916600117905551917fad8b54d3eef2f73d25758a2a5b53a3b97e4b947ca025d60b44adacd7fec450a791a25050565b609780547fffffffffffffffffffffffff00000000000000000000000000000000000000001690556103d881611641565b6114446110d6565b6033805460ff191660011790557f62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a2586110ac3390565b8051602091820120825192909101919091201490565b73ffffffffffffffffffffffffffffffffffffffff81166103d8576040517f8579befe00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600054610100900460ff166115595760405162461bcd60e51b815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610583565b6104216116b8565b600054610100900460ff166115de5760405162461bcd60e51b815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610583565b6115e6611741565b6103d8816117c6565b60335460ff166104215760405162461bcd60e51b815260206004820152601460248201527f5061757361626c653a206e6f74207061757365640000000000000000000000006044820152606401610583565b6065805473ffffffffffffffffffffffffffffffffffffffff8381167fffffffffffffffffffffffff0000000000000000000000000000000000000000831681179093556040519116919082907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e090600090a35050565b600054610100900460ff166117355760405162461bcd60e51b815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610583565b6033805460ff19169055565b600054610100900460ff166117be5760405162461bcd60e51b815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610583565b610421611843565b600054610100900460ff166103cf5760405162461bcd60e51b815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610583565b600054610100900460ff166118c05760405162461bcd60e51b815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610583565b6104213361140b565b73ffffffffffffffffffffffffffffffffffffffff811681146103d857600080fd5b6000602082840312156118fd57600080fd5b8135611908816118c9565b9392505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b604051610100810167ffffffffffffffff811182821017156119625761196261190f565b60405290565b604051601f8201601f1916810167ffffffffffffffff811182821017156119915761199161190f565b604052919050565b600067ffffffffffffffff8211156119b3576119b361190f565b50601f01601f191660200190565b60006119d46119cf84611999565b611968565b90508281528383830111156119e857600080fd5b828260208301376000602084830101529392505050565b600060208284031215611a1157600080fd5b813567ffffffffffffffff811115611a2857600080fd5b8201601f81018413611a3957600080fd5b611a48848235602084016119c1565b949350505050565b600082601f830112611a6157600080fd5b611908838335602085016119c1565b60008060408385031215611a8357600080fd5b823567ffffffffffffffff811115611a9a57600080fd5b611aa685828601611a50565b9250506020830135611ab7816118c9565b809150509250929050565b600060208284031215611ad457600080fd5b5035919050565b60008083601f840112611aed57600080fd5b50813567ffffffffffffffff811115611b0557600080fd5b602083019150836020828501011115611b1d57600080fd5b9250929050565b60008060008060608587031215611b3a57600080fd5b843567ffffffffffffffff811115611b5157600080fd5b611b5d87828801611adb565b9095509350506020850135611b71816118c9565b9396929550929360400135925050565b600060208284031215611b9357600080fd5b813567ffffffffffffffff811115611baa57600080fd5b611a4884828501611a50565b60008060208385031215611bc957600080fd5b823567ffffffffffffffff811115611be057600080fd5b611bec85828601611adb565b90969095509350505050565b60005b83811015611c13578181015183820152602001611bfb565b50506000910152565b60008151808452611c34816020860160208601611bf8565b601f01601f19169290920160200192915050565b604081526000611c5b6040830185611c1c565b905073ffffffffffffffffffffffffffffffffffffffff831660208301529392505050565b600082601f830112611c9157600080fd5b8151611c9f6119cf82611999565b818152846020838601011115611cb457600080fd5b611a48826020830160208701611bf8565b8051611cd0816118c9565b919050565b600060208284031215611ce757600080fd5b815167ffffffffffffffff80821115611cff57600080fd5b908301906101008286031215611d1457600080fd5b611d1c61193e565b82518152602083015182811115611d3257600080fd5b611d3e87828601611c80565b602083015250604083015182811115611d5657600080fd5b611d6287828601611c80565b604083015250606083015182811115611d7a57600080fd5b611d8687828601611c80565b606083015250608083015182811115611d9e57600080fd5b611daa87828601611c80565b60808301525060a083015160a0820152611dc660c08401611cc5565b60c082015260e083015182811115611ddd57600080fd5b611de987828601611c80565b60e08301525095945050505050565b8183823760009101908152919050565b818352818160208501375060006020828401015260006020601f19601f840116840101905092915050565b60a081526000611e4760a08301888a611e08565b60208301969096525060408101939093529015156060830152151560809091015292915050565b604081526000611e82604083018587611e08565b90508215156020830152949350505050565b73ffffffffffffffffffffffffffffffffffffffff83168152604060208201526000611a486040830184611c1c565b600060208284031215611ed557600080fd5b8151801515811461190857600080fd5b600073ffffffffffffffffffffffffffffffffffffffff808616835280851660208401525060606040830152611f1e6060830184611c1c565b95945050505050565b7fffffffffffffffffffffffffffffffffffffffff0000000000000000000000008360601b16815260008251611f64816014850160208701611bf8565b919091016014019392505050565b60008251611f84818460208701611bf8565b9190910192915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b8082018082111561115057611150611f8e565b8181038181111561115057611150611f8e565b60208152815160208201526000602083015161010080604085015261200c610120850183611c1c565b91506040850151601f198086850301606087015261202a8483611c1c565b935060608701519150808685030160808701526120478483611c1c565b935060808701519150808685030160a08701526120648483611c1c565b935060a087015160c087015260c0870151915061209960e087018373ffffffffffffffffffffffffffffffffffffffff169052565b60e08701519150808685030183870152506120b48382611c1c565b969550505050505056fe7365745269736b506172616d65746572436f6e66696728737472696e672c616464726573732c75696e7432353629a2646970667358221220d4abdae517dc47682277dca88ac12e19342f8e3f9e6eaf2cec52f10c1ad4fabd64736f6c63430008190033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061016c5760003560e01c80638da5cb5b116100cd578063ba866f0911610081578063cdd231d211610066578063cdd231d214610383578063e30c397814610396578063f2fde38b146103b457600080fd5b8063ba866f09146102e9578063c4d66de81461037057600080fd5b8063ada26f60116100b2578063ada26f60146102a5578063b080d71d146102b8578063b4a0bdf3146102cb57600080fd5b80638da5cb5b14610264578063a7faee3c1461028257600080fd5b80636391c14a1161012457806379ba50971161010957806379ba5097146102085780637dd8f522146102105780638456cb591461025c57600080fd5b80636391c14a146101ed578063715018a61461020057600080fd5b80633f4ba83a116101555780633f4ba83a146101a35780635c975abb146101ab5780635f1f8afd146101c257600080fd5b80630e32cb8614610171578063233dd0da14610186575b600080fd5b61018461017f3660046118eb565b6103c7565b005b6101906201518081565b6040519081526020015b60405180910390f35b6101846103db565b60335460ff165b604051901515815260200161019a565b6101906101d03660046119ff565b805160208183018101805160fc8252928201919093012091525481565b6101846101fb366004611a70565b610423565b610184610519565b61018461058c565b6102377f000000000000000000000000000000000000000000000000000000000000000081565b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200161019a565b610184610624565b60655473ffffffffffffffffffffffffffffffffffffffff16610237565b6101b2610290366004611ac2565b60fd6020526000908152604090205460ff1681565b6101846102b3366004611ac2565b61066a565b6101846102c6366004611b24565b610856565b60c95473ffffffffffffffffffffffffffffffffffffffff16610237565b61033d6102f7366004611b81565b805160208183018101805160fb8252928201919093012091528054600182015460029092015460ff909116919073ffffffffffffffffffffffffffffffffffffffff1683565b604080519315158452602084019290925273ffffffffffffffffffffffffffffffffffffffff169082015260600161019a565b61018461037e3660046118eb565b610aa3565b610184610391366004611bb6565b610c08565b60975473ffffffffffffffffffffffffffffffffffffffff16610237565b6101846103c23660046118eb565b610d7f565b6103cf610e2f565b6103d881610e96565b50565b6104196040518060400160405280600981526020017f756e706175736528290000000000000000000000000000000000000000000000815250610f9e565b610421611077565b565b61042b6110d6565b6040517f5decfee400000000000000000000000000000000000000000000000000000000815260009073ffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000001690635decfee4906104a29086908690600401611c48565b600060405180830381865afa1580156104bf573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f191682016040526104e79190810190611cd5565b905060006104fd8260c001518360800151611129565b90506105098282611156565b61051382826112f6565b50505050565b60405162461bcd60e51b815260206004820152602360248201527f2072656e6f756e63654f776e6572736869702829206973206e6f7420616c6c6f60448201527f776564000000000000000000000000000000000000000000000000000000000060648201526084015b60405180910390fd5b609754339073ffffffffffffffffffffffffffffffffffffffff16811461061b5760405162461bcd60e51b815260206004820152602960248201527f4f776e61626c6532537465703a2063616c6c6572206973206e6f74207468652060448201527f6e6577206f776e657200000000000000000000000000000000000000000000006064820152608401610583565b6103d88161140b565b6106626040518060400160405280600781526020017f7061757365282900000000000000000000000000000000000000000000000000815250610f9e565b61042161143c565b6106726110d6565b6040517f37759b9a000000000000000000000000000000000000000000000000000000008152600481018290526000907f000000000000000000000000000000000000000000000000000000000000000073ffffffffffffffffffffffffffffffffffffffff16906337759b9a90602401600060405180830381865afa158015610700573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f191682016040526107289190810190611cd5565b608081015160c08201516040517f5decfee400000000000000000000000000000000000000000000000000000000815292935060009273ffffffffffffffffffffffffffffffffffffffff7f00000000000000000000000000000000000000000000000000000000000000001692635decfee4926107a892600401611c48565b600060405180830381865afa1580156107c5573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f191682016040526107ed9190810190611cd5565b9050828160a001511461082c576040517fc2a16f1400000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60006108408360c001518460800151611129565b905061084c8382611156565b61051383826112f6565b6108776040518060600160405280602e81526020016120bf602e9139610f9e565b6108c484848080601f016020809104026020016040519081016040528093929190818152602001838380828437600092018290525060408051602081019091529081529250611479915050565b156108fb576040517f80919d7b00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b80158061090b5750620151808111155b15610942576040517ff6ea4e0600000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b61094b8261148f565b600060fb858560405161095f929190611df8565b908152604080516020928190038301812060608083018452815460ff16151583526001808301548685015260029092015473ffffffffffffffffffffffffffffffffffffffff9081168486015284519182018552918152938401869052861683830152905190925060fb906109d79088908890611df8565b90815260408051602092819003830181208451815460ff19169015151781558484015160018083019190915594830151600290910180547fffffffffffffffffffffffff00000000000000000000000000000000000000001673ffffffffffffffffffffffffffffffffffffffff928316179055918501519285015185518884169594909316937ff0368c8064bba33693ceea1832ed04228e2e9189812b88dbeb685b8fda0e9adf93610a94938c938c9390928b92909190611e33565b60405180910390a35050505050565b600054610100900460ff1615808015610ac35750600054600160ff909116105b80610add5750303b158015610add575060005460ff166001145b610b4f5760405162461bcd60e51b815260206004820152602e60248201527f496e697469616c697a61626c653a20636f6e747261637420697320616c72656160448201527f647920696e697469616c697a65640000000000000000000000000000000000006064820152608401610583565b6000805460ff191660011790558015610b8f57600080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ff166101001790555b610b976114dc565b610ba082611561565b8015610c0457600080547fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff00ff169055604051600181527f7f26b83ff96e1f2b6a682f133852f6798a09c465da95921460cefb3847402498906020015b60405180910390a15b5050565b610c466040518060400160405280601a81526020017f746f67676c65436f6e66696741637469766528737472696e6729000000000000815250610f9e565b600073ffffffffffffffffffffffffffffffffffffffff1660fb8383604051610c70929190611df8565b9081526040519081900360200190206002015473ffffffffffffffffffffffffffffffffffffffff1603610cd0576040517f80919d7b00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60fb8282604051610ce2929190611df8565b9081526040519081900360200181205460ff16159060fb90610d079085908590611df8565b908152604051908190036020018120805492151560ff19909316929092179091557f468664a9fd55ec9cd045b61db100de66def2b77a44f261785dc8a0979c5fdb04908390839060fb90610d5e9084908490611df8565b90815260405190819003602001812054610bfb93929160ff90911690611e6e565b610d87610e2f565b6097805473ffffffffffffffffffffffffffffffffffffffff83167fffffffffffffffffffffffff00000000000000000000000000000000000000009091168117909155610dea60655473ffffffffffffffffffffffffffffffffffffffff1690565b73ffffffffffffffffffffffffffffffffffffffff167f38d16b8cac22d99fc7c124b9cd0de2d3fa1faef420bfe791d8c362d765e2270060405160405180910390a350565b60655473ffffffffffffffffffffffffffffffffffffffff1633146104215760405162461bcd60e51b815260206004820181905260248201527f4f776e61626c653a2063616c6c6572206973206e6f7420746865206f776e65726044820152606401610583565b73ffffffffffffffffffffffffffffffffffffffff8116610f1f5760405162461bcd60e51b815260206004820152602560248201527f696e76616c696420616365737320636f6e74726f6c206d616e6167657220616460448201527f64726573730000000000000000000000000000000000000000000000000000006064820152608401610583565b60c9805473ffffffffffffffffffffffffffffffffffffffff8381167fffffffffffffffffffffffff000000000000000000000000000000000000000083168117909355604080519190921680825260208201939093527f66fd58e82f7b31a2a5c30e0888f3093efe4e111b00cd2b0c31fe014601293aa09101610bfb565b60c9546040517f18c5e8ab00000000000000000000000000000000000000000000000000000000815260009173ffffffffffffffffffffffffffffffffffffffff16906318c5e8ab90610ff79033908690600401611e94565b602060405180830381865afa158015611014573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906110389190611ec3565b905080610c04573330836040517f4a3fa29300000000000000000000000000000000000000000000000000000000815260040161058393929190611ee5565b61107f6115ef565b6033805460ff191690557f5db9ee0a495bf2e6ff9c91a7834c1ba4fdd244a5e8aa4e537bd38aeae4b073aa335b60405173ffffffffffffffffffffffffffffffffffffffff909116815260200160405180910390a1565b60335460ff16156104215760405162461bcd60e51b815260206004820152601060248201527f5061757361626c653a20706175736564000000000000000000000000000000006044820152606401610583565b6060828260405160200161113e929190611f27565b60405160208183030381529060405290505b92915050565b600060fb836080015160405161116c9190611f72565b9081526040805160209281900383018120606082018352805460ff1615158083526001820154948301949094526002015473ffffffffffffffffffffffffffffffffffffffff169181019190915291506111f2576040517fdea2a21200000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b82514290611204906201518090611fbd565b101561123c576040517fc2a16f1400000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b60a0830151600090815260fd602052604090205460ff161561128a576040517f0bebf69800000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b806020015160fc8360405161129f9190611f72565b908152602001604051809103902054426112b99190611fd0565b10156112f1576040517f53f7a6ee00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b505050565b60fb826080015160405161130a9190611f72565b908152604051908190036020018120600201547f04a6fcd600000000000000000000000000000000000000000000000000000000825273ffffffffffffffffffffffffffffffffffffffff16906304a6fcd69061136b908590600401611fe3565b600060405180830381600087803b15801561138557600080fd5b505af1158015611399573d6000803e3d6000fd5b505050504260fc826040516113ae9190611f72565b9081526040805191829003602090810183209390935560a085018051600090815260fd909452908320805460ff1916600117905551917fad8b54d3eef2f73d25758a2a5b53a3b97e4b947ca025d60b44adacd7fec450a791a25050565b609780547fffffffffffffffffffffffff00000000000000000000000000000000000000001690556103d881611641565b6114446110d6565b6033805460ff191660011790557f62e78cea01bee320cd4e420270b5ea74000d11b0c9f74754ebdbfc544b05a2586110ac3390565b8051602091820120825192909101919091201490565b73ffffffffffffffffffffffffffffffffffffffff81166103d8576040517f8579befe00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b600054610100900460ff166115595760405162461bcd60e51b815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610583565b6104216116b8565b600054610100900460ff166115de5760405162461bcd60e51b815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610583565b6115e6611741565b6103d8816117c6565b60335460ff166104215760405162461bcd60e51b815260206004820152601460248201527f5061757361626c653a206e6f74207061757365640000000000000000000000006044820152606401610583565b6065805473ffffffffffffffffffffffffffffffffffffffff8381167fffffffffffffffffffffffff0000000000000000000000000000000000000000831681179093556040519116919082907f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e090600090a35050565b600054610100900460ff166117355760405162461bcd60e51b815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610583565b6033805460ff19169055565b600054610100900460ff166117be5760405162461bcd60e51b815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610583565b610421611843565b600054610100900460ff166103cf5760405162461bcd60e51b815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610583565b600054610100900460ff166118c05760405162461bcd60e51b815260206004820152602b60248201527f496e697469616c697a61626c653a20636f6e7472616374206973206e6f74206960448201527f6e697469616c697a696e670000000000000000000000000000000000000000006064820152608401610583565b6104213361140b565b73ffffffffffffffffffffffffffffffffffffffff811681146103d857600080fd5b6000602082840312156118fd57600080fd5b8135611908816118c9565b9392505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052604160045260246000fd5b604051610100810167ffffffffffffffff811182821017156119625761196261190f565b60405290565b604051601f8201601f1916810167ffffffffffffffff811182821017156119915761199161190f565b604052919050565b600067ffffffffffffffff8211156119b3576119b361190f565b50601f01601f191660200190565b60006119d46119cf84611999565b611968565b90508281528383830111156119e857600080fd5b828260208301376000602084830101529392505050565b600060208284031215611a1157600080fd5b813567ffffffffffffffff811115611a2857600080fd5b8201601f81018413611a3957600080fd5b611a48848235602084016119c1565b949350505050565b600082601f830112611a6157600080fd5b611908838335602085016119c1565b60008060408385031215611a8357600080fd5b823567ffffffffffffffff811115611a9a57600080fd5b611aa685828601611a50565b9250506020830135611ab7816118c9565b809150509250929050565b600060208284031215611ad457600080fd5b5035919050565b60008083601f840112611aed57600080fd5b50813567ffffffffffffffff811115611b0557600080fd5b602083019150836020828501011115611b1d57600080fd5b9250929050565b60008060008060608587031215611b3a57600080fd5b843567ffffffffffffffff811115611b5157600080fd5b611b5d87828801611adb565b9095509350506020850135611b71816118c9565b9396929550929360400135925050565b600060208284031215611b9357600080fd5b813567ffffffffffffffff811115611baa57600080fd5b611a4884828501611a50565b60008060208385031215611bc957600080fd5b823567ffffffffffffffff811115611be057600080fd5b611bec85828601611adb565b90969095509350505050565b60005b83811015611c13578181015183820152602001611bfb565b50506000910152565b60008151808452611c34816020860160208601611bf8565b601f01601f19169290920160200192915050565b604081526000611c5b6040830185611c1c565b905073ffffffffffffffffffffffffffffffffffffffff831660208301529392505050565b600082601f830112611c9157600080fd5b8151611c9f6119cf82611999565b818152846020838601011115611cb457600080fd5b611a48826020830160208701611bf8565b8051611cd0816118c9565b919050565b600060208284031215611ce757600080fd5b815167ffffffffffffffff80821115611cff57600080fd5b908301906101008286031215611d1457600080fd5b611d1c61193e565b82518152602083015182811115611d3257600080fd5b611d3e87828601611c80565b602083015250604083015182811115611d5657600080fd5b611d6287828601611c80565b604083015250606083015182811115611d7a57600080fd5b611d8687828601611c80565b606083015250608083015182811115611d9e57600080fd5b611daa87828601611c80565b60808301525060a083015160a0820152611dc660c08401611cc5565b60c082015260e083015182811115611ddd57600080fd5b611de987828601611c80565b60e08301525095945050505050565b8183823760009101908152919050565b818352818160208501375060006020828401015260006020601f19601f840116840101905092915050565b60a081526000611e4760a08301888a611e08565b60208301969096525060408101939093529015156060830152151560809091015292915050565b604081526000611e82604083018587611e08565b90508215156020830152949350505050565b73ffffffffffffffffffffffffffffffffffffffff83168152604060208201526000611a486040830184611c1c565b600060208284031215611ed557600080fd5b8151801515811461190857600080fd5b600073ffffffffffffffffffffffffffffffffffffffff808616835280851660208401525060606040830152611f1e6060830184611c1c565b95945050505050565b7fffffffffffffffffffffffffffffffffffffffff0000000000000000000000008360601b16815260008251611f64816014850160208701611bf8565b919091016014019392505050565b60008251611f84818460208701611bf8565b9190910192915050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052601160045260246000fd5b8082018082111561115057611150611f8e565b8181038181111561115057611150611f8e565b60208152815160208201526000602083015161010080604085015261200c610120850183611c1c565b91506040850151601f198086850301606087015261202a8483611c1c565b935060608701519150808685030160808701526120478483611c1c565b935060808701519150808685030160a08701526120648483611c1c565b935060a087015160c087015260c0870151915061209960e087018373ffffffffffffffffffffffffffffffffffffffff169052565b60e08701519150808685030183870152506120b48382611c1c565b969550505050505056fe7365745269736b506172616d65746572436f6e66696728737472696e672c616464726573732c75696e7432353629a2646970667358221220d4abdae517dc47682277dca88ac12e19342f8e3f9e6eaf2cec52f10c1ad4fabd64736f6c63430008190033",
+  "devdoc": {
+    "author": "Venus",
+    "custom:security-contact": "https://github.com/VenusProtocol/governance-contracts#discussion",
+    "events": {
+      "Initialized(uint8)": {
+        "details": "Triggered when the contract has been initialized or reinitialized."
+      },
+      "Paused(address)": {
+        "details": "Emitted when the pause is triggered by `account`."
+      },
+      "Unpaused(address)": {
+        "details": "Emitted when the pause is lifted by `account`."
+      }
+    },
+    "kind": "dev",
+    "methods": {
+      "acceptOwnership()": {
+        "details": "The new owner accepts the ownership transfer."
+      },
+      "constructor": {
+        "custom:error": "Throws ZeroAddressNotAllowed if the risk oracle address is zero",
+        "custom:oz-upgrades-unsafe-allow": "constructor",
+        "details": "Sets the immutable risk oracle address and disables initializers"
+      },
+      "initialize(address)": {
+        "params": {
+          "accessControlManager_": "The address of the access control manager"
+        }
+      },
+      "owner()": {
+        "details": "Returns the address of the current owner."
+      },
+      "pause()": {
+        "custom:access": "Controlled by AccessControlManager"
+      },
+      "paused()": {
+        "details": "Returns true if the contract is paused, and false otherwise."
+      },
+      "pendingOwner()": {
+        "details": "Returns the address of the pending owner."
+      },
+      "processUpdateById(uint256)": {
+        "custom:error": "Throws ConfigNotActive if the config is not activeThrows UpdateIsExpired if the update is expiredThrows ConfigAlreadyProcessed if the update has already been processedThrows UpdateTooFrequent if the update is too frequent",
+        "custom:event": "Emits RiskParameterUpdated with the update ID",
+        "params": {
+          "updateId": "The ID of the update to process"
+        }
+      },
+      "processUpdateByParameterAndMarket(string,address)": {
+        "custom:error": "Throws ConfigNotActive if the config is not activeThrows UpdateIsExpired if the update is expiredThrows ConfigAlreadyProcessed if the update has already been processedThrows UpdateTooFrequent if the update is too frequent",
+        "custom:event": "Emits RiskParameterUpdated with the update ID",
+        "params": {
+          "market": "The market to process the update for",
+          "updateType": "The type of update to process"
+        }
+      },
+      "renounceOwnership()": {
+        "details": "Disabling renounceOwnership function."
+      },
+      "setAccessControlManager(address)": {
+        "custom:access": "Only Governance",
+        "custom:event": "Emits NewAccessControlManager event",
+        "details": "Admin function to set address of AccessControlManager",
+        "params": {
+          "accessControlManager_": "The new address of the AccessControlManager"
+        }
+      },
+      "setRiskParameterConfig(string,address,uint256)": {
+        "custom:access": "Controlled by AccessControlManager",
+        "custom:error": "Throws UnsupportedUpdateType if the update type is an empty stringThrows InvalidDebounce if the debounce is 0Throws ZeroAddressNotAllowed if the risk steward address is zero",
+        "custom:event": "Emits RiskParameterConfigSet with the update type, previous risk steward, new risk steward, previous debounce, new debounce, previous active status, and new active status",
+        "params": {
+          "debounce": "The debounce period for the update",
+          "riskSteward": "The address for the risk steward contract responsible for processing the update",
+          "updateType": "The type of update to configure"
+        }
+      },
+      "toggleConfigActive(string)": {
+        "custom:access": "Controlled by AccessControlManager",
+        "custom:error": "Throws UnsupportedUpdateType if the update type is not supported",
+        "custom:event": "Emits ToggleConfigActive with the update type and the new active status",
+        "params": {
+          "updateType": "The type of update to toggle on or off"
+        }
+      },
+      "transferOwnership(address)": {
+        "details": "Starts the ownership transfer of the contract to a new account. Replaces the pending transfer if there is one. Can only be called by the current owner."
+      },
+      "unpause()": {
+        "custom:access": "Controlled by AccessControlManager"
+      }
+    },
+    "stateVariables": {
+      "__gap": {
+        "details": "This empty reserved space is put in place to allow future versions to add new variables without shifting down storage in the inheritance chain. See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps"
+      }
+    },
+    "title": "RiskStewardReceiver",
+    "version": 1
+  },
+  "userdoc": {
+    "errors": {
+      "ConfigAlreadyProcessed()": [
+        {
+          "notice": "Thrown when an update has already been processed"
+        }
+      ],
+      "ConfigNotActive()": [
+        {
+          "notice": "Thrown if a submitted update is not active and therefor cannot be processed"
+        }
+      ],
+      "InvalidDebounce()": [
+        {
+          "notice": "Thrown when a debounce value of 0 is set"
+        }
+      ],
+      "Unauthorized(address,address,string)": [
+        {
+          "notice": "Thrown when the action is prohibited by AccessControlManager"
+        }
+      ],
+      "UnsupportedUpdateType()": [
+        {
+          "notice": "Thrown when an update type that is not supported is operated on"
+        }
+      ],
+      "UpdateIsExpired()": [
+        {
+          "notice": "Thrown when an update was not applied within the required time frame"
+        }
+      ],
+      "UpdateTooFrequent()": [
+        {
+          "notice": "Thrown when the debounce period hasn't passed for applying an update to a specific market / update type"
+        }
+      ],
+      "ZeroAddressNotAllowed()": [
+        {
+          "notice": "Thrown if the supplied address is a zero address where it is not allowed"
+        }
+      ]
+    },
+    "events": {
+      "NewAccessControlManager(address,address)": {
+        "notice": "Emitted when access control manager contract address is changed"
+      },
+      "RiskParameterConfigSet(string,address,address,uint256,uint256,bool,bool)": {
+        "notice": "Event emitted when a risk parameter config is set"
+      },
+      "RiskParameterUpdated(uint256)": {
+        "notice": "Event emitted when an update is successfully processed"
+      },
+      "ToggleConfigActive(string,bool)": {
+        "notice": "Event emitted when a risk parameter config is toggled on or off"
+      }
+    },
+    "kind": "user",
+    "methods": {
+      "RISK_ORACLE()": {
+        "notice": "Whitelisted oracle address to receive updates from"
+      },
+      "UPDATE_EXPIRATION_TIME()": {
+        "notice": "Time before a submitted update is considered stale"
+      },
+      "accessControlManager()": {
+        "notice": "Returns the address of the access control manager contract"
+      },
+      "initialize(address)": {
+        "notice": "Initializes the contract as ownable, pausable, and access controlled"
+      },
+      "lastProcessedTime(bytes)": {
+        "notice": "Mapping of market and update type to last update timestamp. Used for debouncing updates."
+      },
+      "pause()": {
+        "notice": "Pauses processing of updates"
+      },
+      "processUpdateById(uint256)": {
+        "notice": "Processes an update by its ID. Will validate that the update configuration is active, is not expired, unprocessed, and that the debounce period has passed. Validated updates will be processed by the associated risk steward contract which will perform update specific validations and apply validated updates."
+      },
+      "processUpdateByParameterAndMarket(string,address)": {
+        "notice": "Processes the latest update for a given parameter and market. Will validate that the update configuration is active, is not expired, unprocessed, and that the debounce period has passed. Validated updates will be processed by the associated risk steward contract which will perform update specific validations and apply validated updates."
+      },
+      "processedUpdates(uint256)": {
+        "notice": "Mapping of processed updates. Used to prevent re-execution"
+      },
+      "riskParameterConfigs(string)": {
+        "notice": "Mapping of supported risk configurations and their validation parameters"
+      },
+      "setAccessControlManager(address)": {
+        "notice": "Sets the address of AccessControlManager"
+      },
+      "setRiskParameterConfig(string,address,uint256)": {
+        "notice": "Sets the risk parameter config for a given update type"
+      },
+      "toggleConfigActive(string)": {
+        "notice": "Toggles the active status of a risk parameter config"
+      },
+      "unpause()": {
+        "notice": "Unpauses processing of updates"
+      }
+    },
+    "notice": "Contract that can read updates from the Chaos Labs Risk Oracle, validate them, and push them to the correct RiskSteward.",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 3192,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "_initialized",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_uint8"
+      },
+      {
+        "astId": 3195,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "_initializing",
+        "offset": 1,
+        "slot": "0",
+        "type": "t_bool"
+      },
+      {
+        "astId": 3862,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_array(t_uint256)50_storage"
+      },
+      {
+        "astId": 3376,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "_paused",
+        "offset": 0,
+        "slot": "51",
+        "type": "t_bool"
+      },
+      {
+        "astId": 3481,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "52",
+        "type": "t_array(t_uint256)49_storage"
+      },
+      {
+        "astId": 3064,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "_owner",
+        "offset": 0,
+        "slot": "101",
+        "type": "t_address"
+      },
+      {
+        "astId": 3184,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "102",
+        "type": "t_array(t_uint256)49_storage"
+      },
+      {
+        "astId": 2957,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "_pendingOwner",
+        "offset": 0,
+        "slot": "151",
+        "type": "t_address"
+      },
+      {
+        "astId": 3051,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "152",
+        "type": "t_array(t_uint256)49_storage"
+      },
+      {
+        "astId": 8569,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "_accessControlManager",
+        "offset": 0,
+        "slot": "201",
+        "type": "t_contract(IAccessControlManagerV8)8754"
+      },
+      {
+        "astId": 8574,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "202",
+        "type": "t_array(t_uint256)49_storage"
+      },
+      {
+        "astId": 10000,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "riskParameterConfigs",
+        "offset": 0,
+        "slot": "251",
+        "type": "t_mapping(t_string_memory_ptr,t_struct(RiskParamConfig)9334_storage)"
+      },
+      {
+        "astId": 10009,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "lastProcessedTime",
+        "offset": 0,
+        "slot": "252",
+        "type": "t_mapping(t_bytes_memory_ptr,t_uint256)"
+      },
+      {
+        "astId": 10014,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "processedUpdates",
+        "offset": 0,
+        "slot": "253",
+        "type": "t_mapping(t_uint256,t_bool)"
+      },
+      {
+        "astId": 10023,
+        "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+        "label": "__gap",
+        "offset": 0,
+        "slot": "254",
+        "type": "t_array(t_uint256)47_storage"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_uint256)47_storage": {
+        "base": "t_uint256",
+        "encoding": "inplace",
+        "label": "uint256[47]",
+        "numberOfBytes": "1504"
+      },
+      "t_array(t_uint256)49_storage": {
+        "base": "t_uint256",
+        "encoding": "inplace",
+        "label": "uint256[49]",
+        "numberOfBytes": "1568"
+      },
+      "t_array(t_uint256)50_storage": {
+        "base": "t_uint256",
+        "encoding": "inplace",
+        "label": "uint256[50]",
+        "numberOfBytes": "1600"
+      },
+      "t_bool": {
+        "encoding": "inplace",
+        "label": "bool",
+        "numberOfBytes": "1"
+      },
+      "t_bytes_memory_ptr": {
+        "encoding": "bytes",
+        "label": "bytes",
+        "numberOfBytes": "32"
+      },
+      "t_contract(IAccessControlManagerV8)8754": {
+        "encoding": "inplace",
+        "label": "contract IAccessControlManagerV8",
+        "numberOfBytes": "20"
+      },
+      "t_mapping(t_bytes_memory_ptr,t_uint256)": {
+        "encoding": "mapping",
+        "key": "t_bytes_memory_ptr",
+        "label": "mapping(bytes => uint256)",
+        "numberOfBytes": "32",
+        "value": "t_uint256"
+      },
+      "t_mapping(t_string_memory_ptr,t_struct(RiskParamConfig)9334_storage)": {
+        "encoding": "mapping",
+        "key": "t_string_memory_ptr",
+        "label": "mapping(string => struct RiskParamConfig)",
+        "numberOfBytes": "32",
+        "value": "t_struct(RiskParamConfig)9334_storage"
+      },
+      "t_mapping(t_uint256,t_bool)": {
+        "encoding": "mapping",
+        "key": "t_uint256",
+        "label": "mapping(uint256 => bool)",
+        "numberOfBytes": "32",
+        "value": "t_bool"
+      },
+      "t_string_memory_ptr": {
+        "encoding": "bytes",
+        "label": "string",
+        "numberOfBytes": "32"
+      },
+      "t_struct(RiskParamConfig)9334_storage": {
+        "encoding": "inplace",
+        "label": "struct RiskParamConfig",
+        "members": [
+          {
+            "astId": 9329,
+            "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+            "label": "active",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_bool"
+          },
+          {
+            "astId": 9331,
+            "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+            "label": "debounce",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_uint256"
+          },
+          {
+            "astId": 9333,
+            "contract": "contracts/RiskSteward/RiskStewardReceiver.sol:RiskStewardReceiver",
+            "label": "riskSteward",
+            "offset": 0,
+            "slot": "2",
+            "type": "t_address"
+          }
+        ],
+        "numberOfBytes": "96"
+      },
+      "t_uint256": {
+        "encoding": "inplace",
+        "label": "uint256",
+        "numberOfBytes": "32"
+      },
+      "t_uint8": {
+        "encoding": "inplace",
+        "label": "uint8",
+        "numberOfBytes": "1"
+      }
+    }
+  }
+}

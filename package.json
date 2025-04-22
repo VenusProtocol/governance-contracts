@@ -63,10 +63,9 @@
     "@nomicfoundation/hardhat-chai-matchers": "^1.0.4",
     "@nomicfoundation/hardhat-network-helpers": "^1.0.6",
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
-    "@nomicfoundation/hardhat-verify": "^2.0.8",
+    "@nomicfoundation/hardhat-verify": "^2.0.13",
     "@nomiclabs/hardhat-ethers": "^2.2.1",
-    "@nomiclabs/hardhat-etherscan": "^3.1.2",
-    "@openzeppelin/contracts": "^4.8.2",
+    "@openzeppelin/contracts": "^4.9.6",
     "@openzeppelin/contracts-upgradeable": "^4.8.2",
     "@openzeppelin/hardhat-upgrades": "^1.22.1",
     "@semantic-release/changelog": "^6.0.2",
@@ -83,7 +82,7 @@
     "@types/node": "^18.16.3",
     "@typescript-eslint/eslint-plugin": "^5.44.0",
     "@typescript-eslint/parser": "^5.44.0",
-    "@venusprotocol/venus-protocol": "8.0.0",
+    "@venusprotocol/venus-protocol": "^9.4.0",
     "bignumber.js": "^9.1.1",
     "chai": "^4.3.7",
     "commitizen": "^4.2.5",
@@ -122,5 +121,8 @@
   },
   "_moduleAliases": {
     "@nomiclabs/hardhat-ethers": "node_modules/hardhat-deploy-ethers"
+  },
+  "resolutions": {
+    "@venusprotocol/governance-contracts": "workspace:."
   }
 }

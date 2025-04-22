@@ -1,7 +1,7 @@
 import "module-alias/register";
 
 import "@nomicfoundation/hardhat-chai-matchers";
-import "@nomiclabs/hardhat-etherscan";
+import "@nomicfoundation/hardhat-verify";
 import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
 import "hardhat-dependency-compiler";
@@ -20,8 +20,14 @@ extendConfig((config: HardhatConfig) => {
     config.external = {
       ...config.external,
       deployments: {
-        bsctestnet: ["node_modules/@venusprotocol/governance-contracts/deployments/bsctestnet"],
-        bscmainnet: ["node_modules/@venusprotocol/governance-contracts/deployments/bscmainnet"],
+        bsctestnet: [
+          "node_modules/@venusprotocol/governance-contracts/deployments/bsctestnet",
+          "node_modules/@venusprotocol/venus-protocol/deployments/bsctestnet",
+        ],
+        bscmainnet: [
+          "node_modules/@venusprotocol/governance-contracts/deployments/bscmainnet",
+          "node_modules/@venusprotocol/venus-protocol/deployments/bscmainnet",
+        ],
         sepolia: ["node_modules/@venusprotocol/governance-contracts/deployments/sepolia"],
         ethereum: ["node_modules/@venusprotocol/governance-contracts/deployments/ethereum"],
       },
@@ -77,9 +83,7 @@ const config: HardhatUserConfig = {
     bsctestnet: {
       url: process.env.ARCHIVE_NODE_bsctestnet || "https://data-seed-prebsc-1-s1.binance.org:8545",
       chainId: 97,
-      accounts: {
-        mnemonic: process.env.MNEMONIC || "",
-      },
+      accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
       gasPrice: 10000000000, // 10 gwei
       gasMultiplier: 10,
       timeout: 12000000,
@@ -92,7 +96,7 @@ const config: HardhatUserConfig = {
       url: process.env.ARCHIVE_NODE_sepolia || "https://ethereum-sepolia.blockpi.network/v1/rpc/public",
       chainId: 11155111,
       live: true,
-      gasPrice: 20000000000, // 20 gwei
+      gasPrice: 25000000000, // 25 gwei
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
     ethereum: {
