@@ -227,11 +227,6 @@
 - **Addresses**:
   - `NormalTimelock`
 
-## Contract Address: 0x0000000000000000000000000000000000000000
-
-- **Function Signature**: `setLastRewardingBlock(address[],uint32[],uint32[])`
-- **Addresses**:
-
 ## Contract Address: 0x9027cF782515F3184bbF7A6cD7a33052dc52E439
 
 - **Function Signature**: `addMarket(AddMarketInput)`
@@ -605,11 +600,6 @@
   - `NormalTimelock`
   - `CriticalTimelock`
   - `FastTrackTimelock`
-
-## Contract Address: 0x0000000000000000000000000000000000000000
-
-- **Function Signature**: `setLastRewardingBlocks(address[],uint32[],uint32[])`
-- **Addresses**:
 
 ## Contract Address: 0x0000000000000000000000000000000000000000
 

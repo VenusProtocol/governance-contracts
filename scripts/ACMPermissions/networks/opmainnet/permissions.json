@@ -775,17 +775,7 @@
         "0xB82479bc345CAA7326D7d21306972033226fC185",
         "0x508bD9C31E8d6760De04c70fe6c2b24B3cDea7E7"
       ]
-    },
-    {
-      "contractAddress": "0x0000000000000000000000000000000000000000",
-      "functionSignature": "setLastRewardingBlock(address[],uint32[],uint32[])",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0x0000000000000000000000000000000000000000",
-      "functionSignature": "setLastRewardingBlocks(address[],uint32[],uint32[])",
-      "addresses": []
     }
   ],
-  "height": 133010539
+  "height": 134556860
 }
