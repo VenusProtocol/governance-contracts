@@ -478,6 +478,18 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV2, GovernorBravoE
     }
 
     /**
+     * @notice Update address of XVS vault
+     * @dev Admin only. Update XVS Vault address
+     * @param xvsVault_ Address of XVS vault
+     */
+    function _setXvsVault(address xvsVault_) external {
+        require(msg.sender == admin, "GovernorBravo::_setXvsVault: admin only");
+        require(xvsVault_ != address(0), "GovernorBravo::setXvsVault: invalid xvs address");
+        emit SetXvsVault(address(xvsVault), xvsVault_);
+        xvsVault = XvsVaultInterface(xvsVault_);
+    }
+
+    /**
      * @notice Sets the new governance guardian
      * @param newGuardian the address of the new guardian
      */
