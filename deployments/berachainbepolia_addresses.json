@@ -2,6 +2,7 @@
   "name": "berachainbepolia",
   "chainId": "80069",
   "addresses": {
+    "ACMCommandsAggregator": "0x1EAA596ad8101bb321a5999e509A61747893078B",
     "AccessControlManager": "0x243313C1cC198FF80756ed2ef14D9dcd94Ee762b",
     "CriticalTimelock": "0x2aae1073B2219729Ff8e5952887905A8da498062",
     "DefaultProxyAdmin": "0x09f0Cf4eD50ed01994900CE9ee1ae85BFECd5c66",
