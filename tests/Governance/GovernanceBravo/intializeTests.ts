@@ -69,7 +69,7 @@ describe("Governor Bravo Initializing Test", () => {
       ).to.be.revertedWith("GovernorBravo::initialize: admin only");
     });
 
-    it("should revert if invalid xvs address", async () => {
+    it("should revert if invalid xvs vault address", async () => {
       await expect(
         governorBravoDelegate.initialize(
           ethers.constants.AddressZero,
