@@ -13,7 +13,7 @@ export const testnetNetworks = [
   "opsepolia",
   "basesepolia",
   "unichainsepolia",
-  "berachainbartio",
+  "berachainbepolia",
   "hardhat",
 ];
 const mainnetNetworks = [
@@ -59,8 +59,8 @@ export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => 
     return "0x9831D3A641E8c7F082EEA75b8249c99be9D09a34"; // UNICHAIN SEPOLIA MULTISIG
   } else if (network === "unichainmainnet") {
     return "0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"; // UNICHAIN MAINNET MULTISIG
-  } else if (network === "berachainbartio") {
-    return "0xdf3b635d2b535f906BB02abb22AED71346E36a00"; // BERACHAIN bArtio MULTISIG
+  } else if (network === "berachainbepolia") {
+    return "0xdf3b635d2b535f906BB02abb22AED71346E36a00"; // BERACHAIN bepolia MULTISIG
   }
   return deployer;
 };
@@ -96,7 +96,7 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
     basemainnet: "0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7",
     unichainsepolia: "0x012f6eaE2A0Bf5916f48b5F37C62Bcfb7C1ffdA1",
     unichainmainnet: "0xb6319cC6c8c27A8F5dAF0dD3DF91EA35C4720dd7",
-    berachainbartio: "0x83c73Da98cf733B03315aFa8758834b36a195b87",
+    berachainbepolia: "0x83c73Da98cf733B03315aFa8758834b36a195b87",
     hardhat: lzEndpointMock?.address || "",
   }[networkName];
 };
