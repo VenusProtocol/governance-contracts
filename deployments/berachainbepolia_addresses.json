@@ -1,0 +1,15 @@
+{
+  "name": "berachainbepolia",
+  "chainId": "80069",
+  "addresses": {
+    "AccessControlManager": "0x243313C1cC198FF80756ed2ef14D9dcd94Ee762b",
+    "CriticalTimelock": "0x2aae1073B2219729Ff8e5952887905A8da498062",
+    "DefaultProxyAdmin": "0x09f0Cf4eD50ed01994900CE9ee1ae85BFECd5c66",
+    "FastTrackTimelock": "0x08Cf9d51df988F1E69174D22b7f93f97e1aAEbeE",
+    "NormalTimelock": "0xAb3DBA18664B96AD54459D06Ca8BD18C9146d5CE",
+    "OmnichainExecutorOwner": "0x61ed025c4EB50604F367316B8E18dB7eb7283D49",
+    "OmnichainExecutorOwner_Implementation": "0xd934a7c03D6fA022321565f2042EC37bD26Baf3c",
+    "OmnichainExecutorOwner_Proxy": "0x61ed025c4EB50604F367316B8E18dB7eb7283D49",
+    "OmnichainGovernanceExecutor": "0xc80E4112940efF40c8626bAc0D8E79cB7dAbe289"
+  }
+}
