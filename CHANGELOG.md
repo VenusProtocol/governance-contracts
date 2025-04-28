@@ -1,3 +1,35 @@
+## [2.12.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.11.1-dev.2...v2.12.0-dev.1) (2025-04-28)
+
+
+### Features
+
+* add deployment script for bravo delegate ([bab311e](https://github.com/VenusProtocol/governance-contracts/commit/bab311e6d9706c798fb8cbd1a088decd426a9af3))
+* add governor bravo v2 in legacy ([b0698fd](https://github.com/VenusProtocol/governance-contracts/commit/b0698fd37edbf011f79c2acc6f541b1efa9f05c1))
+* deployed new impl on BNB mainnet ([9854901](https://github.com/VenusProtocol/governance-contracts/commit/98549012d5217a0dc4cc3c653a5081c95208352b))
+* updating deployment files ([bfe4a50](https://github.com/VenusProtocol/governance-contracts/commit/bfe4a50129ba5d9bab96519c2f6c1925ba679cf4))
+* updating deployment files ([a035533](https://github.com/VenusProtocol/governance-contracts/commit/a03553347aaa713b18f174880554d1046e03b06b))
+* updating deployment files ([b57463c](https://github.com/VenusProtocol/governance-contracts/commit/b57463ce9f84358991d837f254bcc9eee2c61d32))
+* updating deployment files ([851faec](https://github.com/VenusProtocol/governance-contracts/commit/851faecda4287738f68a416cea7fbc63c0006909))
+* upgrade bravo w.r.t new block rate ([cab0d5c](https://github.com/VenusProtocol/governance-contracts/commit/cab0d5c901db970e139d127f484990c7bc601da3))
+
+
+### Bug Fixes
+
+* bravo impl deployment script and skip for hardhat ([b043f6f](https://github.com/VenusProtocol/governance-contracts/commit/b043f6f7d61f0dc2e95d4b92b55fbf36fce413aa))
+* initialise issue and add tests ([ddb87f8](https://github.com/VenusProtocol/governance-contracts/commit/ddb87f80d28af173150db53d4abdbe428114832e))
+* lint issues ([a7e7537](https://github.com/VenusProtocol/governance-contracts/commit/a7e75376ce257b6a4fa2c4522ea227e9af6cc377))
+* typo ([8d2c93f](https://github.com/VenusProtocol/governance-contracts/commit/8d2c93f343cf2023958d5db67f39983f62c04fbb))
+* VBB-01 | Missing Input Validation ([2b5f243](https://github.com/VenusProtocol/governance-contracts/commit/2b5f2439eb003fb129816f78b06026bf4f6254c3))
+
+## [2.11.1-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.11.1-dev.1...v2.11.1-dev.2) (2025-04-28)
+
+## [2.11.1-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.11.0...v2.11.1-dev.1) (2025-04-22)
+
+
+### Bug Fixes
+
+* update yarn ([192ee6a](https://github.com/VenusProtocol/governance-contracts/commit/192ee6ace9961f71719f7499c2ef5a90fa168b3b))
+
 ## [2.11.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.10.0...v2.11.0) (2025-04-21)
 
 

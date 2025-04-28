@@ -1,12 +1,15 @@
 pragma solidity ^0.5.16;
 pragma experimental ABIEncoderV2;
 
+import { XvsVaultInterface, TimelockInterface, GovernorAlphaInterface } from "../Governance/GovernorBravoInterfaces.sol";
+
 /**
  * @title GovernorBravoEvents
  * @author Venus
- * @notice Set of events emitted by the GovernorBravo contracts.
+ * @notice Set of events emitted by the second GovernorBravo implementation contract.
+ * @dev This contract is included for archival and testing purposes.
  */
-contract GovernorBravoEvents {
+contract GovernorBravoEventsV2 {
     /// @notice An event emitted when a new proposal is created
     event ProposalCreated(
         uint id,
@@ -61,21 +64,6 @@ contract GovernorBravoEvents {
 
     /// @notice Emitted when the maximum number of operations in one proposal is updated
     event ProposalMaxOperationsUpdated(uint oldMaxOperations, uint newMaxOperations);
-
-    /// @notice Emitted when the new validation params are set
-    event SetValidationParams(
-        uint256 oldMinVotingPeriod,
-        uint256 newMinVotingPeriod,
-        uint256 oldmaxVotingPeriod,
-        uint256 newmaxVotingPeriod,
-        uint256 oldminVotingDelay,
-        uint256 newminVotingDelay,
-        uint256 oldmaxVotingDelay,
-        uint256 newmaxVotingDelay
-    );
-
-    /// @notice Emitted when new Proposal configs added
-    event SetProposalConfigs(uint256 votingPeriod, uint256 votingDelay, uint256 proposalThreshold);
 }
 
 /**
@@ -96,9 +84,7 @@ contract GovernorBravoDelegatorStorage {
 
 /**
  * @title GovernorBravoDelegateStorageV1
- * @dev For future upgrades, do not change GovernorBravoDelegateStorageV1. Create a new
- * contract which implements GovernorBravoDelegateStorageV1 and following the naming convention
- * GovernorBravoDelegateStorageVX.
+ * @dev This contract is included for archival and testing purposes.
  */
 contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
     /// @notice DEPRECATED The delay before voting on a proposal may take place, once proposed, in blocks
@@ -219,69 +205,4 @@ contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
 
     /// @notice mapping containing Timelock addresses for each proposal type
     mapping(uint => TimelockInterface) public proposalTimelocks;
-}
-
-/**
- * @title GovernorBravoDelegateStorageV3
- * @dev For future upgrades, do not change GovernorBravoDelegateStorageV3. Create a new
- * contract which implements GovernorBravoDelegateStorageV3 and following the naming convention
- * GovernorBravoDelegateStorageVX.
- */
-contract GovernorBravoDelegateStorageV3 is GovernorBravoDelegateStorageV2 {
-    struct ValidationParams {
-        uint256 minVotingPeriod;
-        uint256 maxVotingPeriod;
-        uint256 minVotingDelay;
-        uint256 maxVotingDelay;
-    }
-    /// @notice Stores the current minimum and maximum values of voting delay and voting period
-    ValidationParams public validationParams;
-}
-
-/**
- * @title TimelockInterface
- * @author Venus
- * @notice Interface implemented by the Timelock contract.
- */
-interface TimelockInterface {
-    function delay() external view returns (uint);
-
-    function GRACE_PERIOD() external view returns (uint);
-
-    function acceptAdmin() external;
-
-    function queuedTransactions(bytes32 hash) external view returns (bool);
-
-    function queueTransaction(
-        address target,
-        uint value,
-        string calldata signature,
-        bytes calldata data,
-        uint eta
-    ) external returns (bytes32);
-
-    function cancelTransaction(
-        address target,
-        uint value,
-        string calldata signature,
-        bytes calldata data,
-        uint eta
-    ) external;
-
-    function executeTransaction(
-        address target,
-        uint value,
-        string calldata signature,
-        bytes calldata data,
-        uint eta
-    ) external payable returns (bytes memory);
-}
-
-interface XvsVaultInterface {
-    function getPriorVotes(address account, uint blockNumber) external view returns (uint96);
-}
-
-interface GovernorAlphaInterface {
-    /// @notice The total number of proposals
-    function proposalCount() external returns (uint);
 }
