@@ -1,76 +1,14 @@
 pragma solidity ^0.5.16;
 pragma experimental ABIEncoderV2;
 
-import "./GovernorBravoInterfaces.sol";
+import "./GovernorBravoInterfacesV2.sol";
 
 /**
- * @title GovernorBravoDelegate
- * @notice Venus Governance latest on chain governance includes several new features including variable proposal routes and fine grained pause control.
- * Variable routes for proposals allows for governance paramaters such as voting threshold and timelocks to be customized based on the risk level and
- * impact of the proposal. Added granularity to the pause control mechanism allows governance to pause individual actions on specific markets,
- * which reduces impact on the protocol as a whole. This is particularly useful when applied to isolated pools.
- *
- * The goal of **Governance** is to increase governance efficiency, while mitigating and eliminating malicious or erroneous proposals.
- *
- * ## Details
- *
- * Governance has **3 main contracts**: **GovernanceBravoDelegate, XVSVault, XVS** token.
- *
- * - XVS token is the protocol token used for protocol users to cast their vote on submitted proposals.
- * - XVSVault is the main staking contract for XVS. Users first stake their XVS in the vault and receive voting power proportional to their staked
- * tokens that they can use to vote on proposals. Users also can choose to delegate their voting power to other users.
- *
- * # Governor Bravo
- *
- * `GovernanceBravoDelegate` is main Venus Governance contract. Users interact with it to:
- * - Submit new proposal
- * - Vote on a proposal
- * - Cancel a proposal
- * - Queue a proposal for execution with a timelock executor contract.
- * `GovernanceBravoDelegate` uses the XVSVault to get restrict certain actions based on a user's voting power. The governance rules it inforces are:
- * - A user's voting power must be greater than the `proposalThreshold` to submit a proposal
- * - If a user's voting power drops below certain amount, anyone can cancel the the proposal. The governance guardian and proposal creator can also
- * cancel a proposal at anytime before it is queued for execution.
- *
- * ## Venus Improvement Proposal
- *
- * Venus Governance allows for Venus Improvement Proposals (VIPs) to be categorized based on their impact and risk levels. This allows for optimizing proposals
- * execution to allow for things such as expediting interest rate changes and quickly updating risk parameters, while moving slower on other types of proposals
- * that can prevent a larger risk to the protocol and are not urgent. There are three different types of VIPs with different proposal paramters:
- *
- * - `NORMAL`
- * - `FASTTRACK`
- * - `CRITICAL`
- *
- * When initializing the `GovernorBravo` contract, the parameters for the three routes are set. The parameters are:
- *
- * - `votingDelay`: The delay in blocks between submitting a proposal and when voting begins
- * - `votingPeriod`: The number of blocks where voting will be open
- * - `proposalThreshold`: The number of votes required in order submit a proposal
- *
- * There is also a separate timelock executor contract for each route, which is used to dispatch the VIP for execution, giving even more control over the
- * flow of each type of VIP.
- *
- * ## Voting
- *
- * After a VIP is proposed, voting is opened after the `votingDelay` has passed. For example, if `votingDelay = 0`, then voting will begin in the next block
- * after the proposal has been submitted. After the delay, the proposal state is `ACTIVE` and users can cast their vote `for`, `against`, or `abstain`,
- * weighted by their total voting power (tokens + delegated voting power). Abstaining from a voting allows for a vote to be cast and optionally include a
- * comment, without the incrementing for or against vote count. The total voting power for the user is obtained by calling XVSVault's `getPriorVotes`.
- *
- * `GovernorBravoDelegate` also accepts [EIP-712](https://eips.ethereum.org/EIPS/eip-712) signatures for voting on proposals via the external function
- * `castVoteBySig`.
- *
- * ## Delegating
- *
- * A users voting power includes the amount of staked XVS the have staked as well as the votes delegate to them. Delegating is the process of a user loaning
- * their voting power to another, so that the latter has the combined voting power of both users. This is an important feature because it allows for a user
- * to let another user who they trust propose or vote in their place.
- *
- * The delegation of votes happens through the `XVSVault` contract by calling the `delegate` or `delegateBySig` functions. These same functions can revert
- * vote delegation by calling the same function with a value of `0`.
+ * @title GovernorBravoDelegateV2
+ * @dev This contract is the second deployed implementation GovernorBravo.
+ * It is included here for testing purposes because it is not completely compatible with new block rate of BSC.
  */
-contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoEvents {
+contract GovernorBravoDelegateV2 is GovernorBravoDelegateStorageV2, GovernorBravoEventsV2 {
     /// @notice The name of this contract
     string public constant name = "Venus Governor Bravo";
 
@@ -79,6 +17,18 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
 
     /// @notice The maximum setable proposal threshold
     uint public constant MAX_PROPOSAL_THRESHOLD = 300000e18; //300,000 Xvs
+
+    /// @notice The minimum setable voting period
+    uint public constant MIN_VOTING_PERIOD = 20 * 60 * 3; // About 3 hours, 3 secs per block
+
+    /// @notice The max setable voting period
+    uint public constant MAX_VOTING_PERIOD = 20 * 60 * 24 * 14; // About 2 weeks, 3 secs per block
+
+    /// @notice The min setable voting delay
+    uint public constant MIN_VOTING_DELAY = 1;
+
+    /// @notice The max setable voting delay
+    uint public constant MAX_VOTING_DELAY = 20 * 60 * 24 * 7; // About 1 week, 3 secs per block
 
     /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
     uint public constant quorumVotes = 600000e18; // 600,000 = 2% of Xvs
@@ -98,21 +48,20 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
      */
     function initialize(
         address xvsVault_,
-        ValidationParams memory validationParams_,
         ProposalConfig[] memory proposalConfigs_,
         TimelockInterface[] memory timelocks,
         address guardian_
     ) public {
         require(address(proposalTimelocks[0]) == address(0), "GovernorBravo::initialize: cannot initialize twice");
         require(msg.sender == admin, "GovernorBravo::initialize: admin only");
-        require(xvsVault_ != address(0), "GovernorBravo::initialize: invalid xvs vault address");
+        require(xvsVault_ != address(0), "GovernorBravo::initialize: invalid xvs address");
         require(guardian_ != address(0), "GovernorBravo::initialize: invalid guardian");
         require(
-            timelocks.length == getGovernanceRouteCount(),
+            timelocks.length == uint8(ProposalType.CRITICAL) + 1,
             "GovernorBravo::initialize:number of timelocks should match number of governance routes"
         );
         require(
-            proposalConfigs_.length == getGovernanceRouteCount(),
+            proposalConfigs_.length == uint8(ProposalType.CRITICAL) + 1,
             "GovernorBravo::initialize:number of proposal configs should match number of governance routes"
         );
 
@@ -120,94 +69,37 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
         proposalMaxOperations = 10;
         guardian = guardian_;
 
-        // Set parameters for each Governance Route
-        setValidationParams(validationParams_);
-        setProposalConfigs(proposalConfigs_);
-
-        uint256 arrLength = timelocks.length;
-        for (uint256 i; i < arrLength; ++i) {
-            require(address(timelocks[i]) != address(0), "GovernorBravo::initialize:invalid timelock address");
-            proposalTimelocks[i] = timelocks[i];
-        }
-    }
-
-    /**
-     ** @notice Sets the validation parameters for voting delay and voting period
-     ** @param newValidationParams Struct containing new minimum and maximum voting period and delay
-     */
-    function setValidationParams(ValidationParams memory newValidationParams) public {
-        require(msg.sender == admin, "GovernorBravo::setValidationParams: admin only");
-        require(
-            newValidationParams.minVotingPeriod > 0 &&
-                newValidationParams.minVotingDelay > 0 &&
-                newValidationParams.minVotingDelay < newValidationParams.maxVotingDelay &&
-                newValidationParams.minVotingPeriod < newValidationParams.maxVotingPeriod,
-            "GovernorBravo::setValidationParams: invalid params"
-        );
-        emit SetValidationParams(
-            validationParams.minVotingPeriod,
-            newValidationParams.minVotingPeriod,
-            validationParams.maxVotingPeriod,
-            newValidationParams.maxVotingPeriod,
-            validationParams.minVotingDelay,
-            newValidationParams.minVotingDelay,
-            validationParams.maxVotingDelay,
-            newValidationParams.maxVotingDelay
-        );
-        validationParams = newValidationParams;
-    }
-
-    /**
-     ** @notice Sets the configuration for different proposal types
-     ** @dev Requires validationParams to be configured before also it will set proposal config for all proposal types
-     ** @param proposalConfigs_ Array of proposal configuration structs to update
-     */
-    function setProposalConfigs(ProposalConfig[] memory proposalConfigs_) public {
-        require(msg.sender == admin, "GovernorBravo::setProposalConfigs: admin only");
-        require(
-            validationParams.minVotingPeriod > 0 &&
-                validationParams.maxVotingPeriod > 0 &&
-                validationParams.minVotingDelay > 0 &&
-                validationParams.maxVotingDelay > 0,
-            "GovernorBravo::setProposalConfigs: validation params not configured yet"
-        );
+        //Set parameters for each Governance Route
         uint256 arrLength = proposalConfigs_.length;
-        require(
-            arrLength == getGovernanceRouteCount(),
-            "GovernorBravo::setProposalConfigs: invalid proposal config length"
-        );
         for (uint256 i; i < arrLength; ++i) {
             require(
-                proposalConfigs_[i].votingPeriod >= validationParams.minVotingPeriod,
-                "GovernorBravo::setProposalConfigs: invalid min voting period"
+                proposalConfigs_[i].votingPeriod >= MIN_VOTING_PERIOD,
+                "GovernorBravo::initialize: invalid min voting period"
             );
             require(
-                proposalConfigs_[i].votingPeriod <= validationParams.maxVotingPeriod,
-                "GovernorBravo::setProposalConfigs: invalid max voting period"
+                proposalConfigs_[i].votingPeriod <= MAX_VOTING_PERIOD,
+                "GovernorBravo::initialize: invalid max voting period"
             );
             require(
-                proposalConfigs_[i].votingDelay >= validationParams.minVotingDelay,
-                "GovernorBravo::setProposalConfigs: invalid min voting delay"
+                proposalConfigs_[i].votingDelay >= MIN_VOTING_DELAY,
+                "GovernorBravo::initialize: invalid min voting delay"
             );
             require(
-                proposalConfigs_[i].votingDelay <= validationParams.maxVotingDelay,
-                "GovernorBravo::setProposalConfigs: invalid max voting delay"
+                proposalConfigs_[i].votingDelay <= MAX_VOTING_DELAY,
+                "GovernorBravo::initialize: invalid max voting delay"
             );
             require(
                 proposalConfigs_[i].proposalThreshold >= MIN_PROPOSAL_THRESHOLD,
-                "GovernorBravo::setProposalConfigs: invalid min proposal threshold"
+                "GovernorBravo::initialize: invalid min proposal threshold"
             );
             require(
                 proposalConfigs_[i].proposalThreshold <= MAX_PROPOSAL_THRESHOLD,
-                "GovernorBravo::setProposalConfigs: invalid max proposal threshold"
+                "GovernorBravo::initialize: invalid max proposal threshold"
             );
+            require(address(timelocks[i]) != address(0), "GovernorBravo::initialize:invalid timelock address");
 
             proposalConfigs[i] = proposalConfigs_[i];
-            emit SetProposalConfigs(
-                proposalConfigs_[i].votingPeriod,
-                proposalConfigs_[i].votingDelay,
-                proposalConfigs_[i].proposalThreshold
-            );
+            proposalTimelocks[i] = timelocks[i];
         }
     }
 
@@ -546,7 +438,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
         require(initialProposalId == 0, "GovernorBravo::_initiate: can only initiate once");
         proposalCount = GovernorAlphaInterface(governorAlpha).proposalCount();
         initialProposalId = proposalCount;
-        for (uint256 i; i < getGovernanceRouteCount(); ++i) {
+        for (uint256 i; i < uint8(ProposalType.CRITICAL) + 1; ++i) {
             proposalTimelocks[i].acceptAdmin();
         }
     }
@@ -625,9 +517,5 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
             chainId := chainid()
         }
         return chainId;
-    }
-
-    function getGovernanceRouteCount() internal pure returns (uint8) {
-        return uint8(ProposalType.CRITICAL) + 1;
     }
 }
