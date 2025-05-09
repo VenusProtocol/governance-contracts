@@ -1,3 +1,17 @@
+## [2.13.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.12.0...v2.13.0-dev.1) (2025-05-09)
+
+
+### Features
+
+* deployed on bepolia ([1e63179](https://github.com/VenusProtocol/governance-contracts/commit/1e631799966aeb926377bf99d2b18528d55f05c3))
+* updating deployment files ([52d208d](https://github.com/VenusProtocol/governance-contracts/commit/52d208d36c60d4fb5c2732c0c092502311137ed5))
+* updating deployment files ([026907e](https://github.com/VenusProtocol/governance-contracts/commit/026907ed3e227b8159ca9f2fcd2c7d5fed5ba427))
+
+
+### Bug Fixes
+
+* deployed acm aggregator ([1a75783](https://github.com/VenusProtocol/governance-contracts/commit/1a757831b920b4dcaf89812959017f4526f823b4))
+
 ## [2.12.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.11.0...v2.12.0) (2025-04-28)
 
 
