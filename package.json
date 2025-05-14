@@ -42,6 +42,9 @@
     "clean": "hardhat clean && hardhat clean --config hardhat.config.zksync.ts"
   },
   "dependencies": {
+    "@layerzerolabs/lz-evm-protocol-v2": "^3.0.38",
+    "@layerzerolabs/lz-v2-utilities": "^3.0.73",
+    "@layerzerolabs/oapp-evm": "^0.3.0",
     "@venusprotocol/solidity-utilities": "2.0.0",
     "hardhat-deploy-ethers": "^0.3.0-beta.13",
     "module-alias": "^2.2.2"
@@ -66,7 +69,7 @@
     "@nomicfoundation/hardhat-verify": "^2.0.8",
     "@nomiclabs/hardhat-ethers": "^2.2.1",
     "@nomiclabs/hardhat-etherscan": "^3.1.2",
-    "@openzeppelin/contracts": "^4.8.2",
+    "@openzeppelin/contracts": "^4.9.6",
     "@openzeppelin/contracts-upgradeable": "^4.8.2",
     "@openzeppelin/hardhat-upgrades": "^1.22.1",
     "@semantic-release/changelog": "^6.0.2",
