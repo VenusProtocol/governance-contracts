@@ -2,8 +2,8 @@
 pragma solidity 0.8.25;
 
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import { IRiskSteward } from "./IRiskSteward.sol";
-import { IRiskStewardReceiver, RiskParamConfig } from "./IRiskStewardReceiver.sol";
+import { IRiskSteward } from "../interfaces/IRiskSteward.sol";
+import { IRiskStewardReceiver, RiskParamConfig } from "../interfaces/IRiskStewardReceiver.sol";
 import { Pausable } from "@openzeppelin/contracts/security/Pausable.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
@@ -37,8 +37,6 @@ abstract contract RiskStewardReceiverBase is IRiskStewardReceiver, Pausable, Own
         string updateType,
         address indexed previousRiskSteward,
         address indexed riskSteward,
-        uint256 previousDebounce,
-        uint256 debounce,
         bool previousActive,
         bool active
     );
@@ -60,7 +58,7 @@ abstract contract RiskStewardReceiverBase is IRiskStewardReceiver, Pausable, Own
 
     /**
      * @notice Pauses processing of updates
-     * @custom:access Controlled by AccessControlManager
+     * @custom:access Only owner
      */
     function pause() external onlyOwner {
         _pause();
@@ -68,7 +66,7 @@ abstract contract RiskStewardReceiverBase is IRiskStewardReceiver, Pausable, Own
 
     /**
      * @notice Unpauses processing of updates
-     * @custom:access Controlled by AccessControlManager
+     * @custom:access Only owner
      */
     function unpause() external onlyOwner {
         _unpause();
@@ -78,38 +76,25 @@ abstract contract RiskStewardReceiverBase is IRiskStewardReceiver, Pausable, Own
      * @notice Sets the risk parameter config for a given update type
      * @param updateType The type of update to configure
      * @param riskSteward The address for the risk steward contract responsible for processing the update
-     * @param debounce The debounce period for the update
-     * @custom:access Controlled by AccessControlManager
-     * @custom:event Emits RiskParameterConfigSet with the update type, previous risk steward, new risk steward, previous debounce,
-     *new debounce, previous active status, and new active status
+     * @custom:access Only owner
+     * @custom:event Emits RiskParameterConfigSet with the update type, previous risk steward, new risk steward,
+     * previous active status, and new active status
      * @custom:error Throws UnsupportedUpdateType if the update type is an empty string
      * @custom:error Throws InvalidDebounce if the debounce is 0
      * @custom:error Throws ZeroAddressNotAllowed if the risk steward address is zero
      */
-    function setRiskParameterConfig(
-        string calldata updateType,
-        address riskSteward,
-        uint256 debounce
-    ) external onlyOwner {
+    function setRiskParameterConfig(string calldata updateType, address riskSteward) external onlyOwner {
         if (Strings.equal(updateType, "")) {
             revert UnsupportedUpdateType();
         }
-        if (debounce == 0 || debounce <= UPDATE_EXPIRATION_TIME) {
-            revert InvalidDebounce();
-        }
+
         ensureNonzeroAddress(riskSteward);
         RiskParamConfig memory previousConfig = riskParameterConfigs[updateType];
-        riskParameterConfigs[updateType] = RiskParamConfig({
-            active: true,
-            riskSteward: IRiskSteward(riskSteward),
-            debounce: debounce
-        });
+        riskParameterConfigs[updateType] = RiskParamConfig({ active: true, riskSteward: IRiskSteward(riskSteward) });
         emit RiskParameterConfigSet(
             updateType,
             address(previousConfig.riskSteward),
             riskSteward,
-            previousConfig.debounce,
-            debounce,
             previousConfig.active,
             true
         );
@@ -118,7 +103,7 @@ abstract contract RiskStewardReceiverBase is IRiskStewardReceiver, Pausable, Own
     /**
      * @notice Toggles the active status of a risk parameter config
      * @param updateType The type of update to toggle on or off
-     * @custom:access Controlled by AccessControlManager
+     * @custom:access Only owner
      * @custom:event Emits ToggleConfigActive with the update type and the new active status
      * @custom:error Throws InvalidUpdateType if the update type is not supported
      */

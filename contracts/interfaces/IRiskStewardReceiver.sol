@@ -4,14 +4,13 @@ import { IRiskSteward } from "./IRiskSteward.sol";
 
 struct RiskParamConfig {
     bool active;
-    uint256 debounce;
     IRiskSteward riskSteward;
 }
 
 interface IRiskStewardReceiver {
     function UPDATE_EXPIRATION_TIME() external returns (uint256);
 
-    function setRiskParameterConfig(string calldata updateType, address riskSteward, uint256 debounce) external;
+    function setRiskParameterConfig(string calldata updateType, address riskSteward) external;
 
     function toggleConfigActive(string calldata updateType) external;
 }

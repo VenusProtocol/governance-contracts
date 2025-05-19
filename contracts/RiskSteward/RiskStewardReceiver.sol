@@ -2,9 +2,9 @@
 pragma solidity 0.8.25;
 
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
-import { IRiskSteward } from "./IRiskSteward.sol";
+import { IRiskSteward } from "../interfaces/IRiskSteward.sol";
 import { IRiskOracle, RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
-import { RiskParamConfig } from "./IRiskStewardReceiver.sol";
+import { RiskParamConfig } from "../interfaces/IRiskStewardReceiver.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { RiskStewardReceiverBase } from "./RiskStewardReceiverBase.sol";
 import { OApp, MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
@@ -22,9 +22,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         SEND_TO_DESTINATION_CHAIN,
         CONFIG_NOT_ACTIVE,
         EXPIRED,
-        UPDATE_TOO_FREQUENT,
-        FAILED,
-        INVALID_DESTINATION_CHAIN
+        FAILED
     }
     /**
      * @notice Whitelisted oracle address to receive updates from
@@ -95,7 +93,6 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @custom:error Throws ConfigNotActive if the config is not active
      * @custom:error Throws UpdateIsExpired if the update is expired
      * @custom:error Throws ConfigAlreadyProcessed if the update has already been processed
-     * @custom:error Throws UpdateTooFrequent if the update is too frequent
      */
     function processUpdateById(
         uint256 updateId,
@@ -128,7 +125,6 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @custom:error Throws ConfigNotActive if the config is not active
      * @custom:error Throws UpdateIsExpired if the update is expired
      * @custom:error Throws ConfigAlreadyProcessed if the update has already been processed
-     * @custom:error Throws UpdateTooFrequent if the update is too frequent
      */
     function processUpdateByParameterAndMarket(
         string memory updateType,
@@ -153,12 +149,11 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @param options LayerZero message options
      * @param ZROTokens Amount of ZRO tokens used for the message fee
      * @custom:event Emits RiskParameterUpdated with the update ID
-     @custom:event Emits RiskParameterUpdateProposed with the update IDs
+     * @custom:event Emits RiskParameterUpdateProposed with the update IDs
      * @custom:event Emits UpdateFailed with the update ID and the error if validation fails for an update
      * @custom:error Throws ConfigNotActive if the config is not active
      * @custom:error Throws UpdateIsExpired if the update is expired
      * @custom:error Throws ConfigAlreadyProcessed if the update has already been processed
-     * @custom:error Throws UpdateTooFrequent if the update is too frequent
      * @custom:error Throws UpdateNotInRange if the update is not in range
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
      */
@@ -256,7 +251,9 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         bytes calldata options,
         uint256 ZROTokens
     ) internal {
-        require(isSupplyOrBorrowCapUpdate(update.updateType), "Invalid updateType");
+        if (!isSupplyOrBorrowCapUpdate(update.updateType)) {
+            revert UnsupportedUpdateType();
+        }
         IRiskSteward riskSteward = riskParameterConfigs[update.updateType].riskSteward;
         (, uint16 destChainId) = riskSteward.decodeAdditionalData(update.additionalData);
 

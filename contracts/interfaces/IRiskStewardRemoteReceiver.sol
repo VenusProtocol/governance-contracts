@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
-import { IRiskSteward } from "./IRiskSteward.sol";
+import { IRiskSteward } from "../interfaces/IRiskSteward.sol";
 
 struct RiskParamConfig {
     bool active;

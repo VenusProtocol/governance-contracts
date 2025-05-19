@@ -4,9 +4,9 @@ pragma solidity 0.8.25;
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { IVToken } from "../interfaces/IVToken.sol";
 import { IUnifiedComptroller } from "../interfaces/IUnifiedComptroller.sol";
-import { IRiskStewardReceiver } from "./IRiskStewardReceiver.sol";
+import { IRiskStewardReceiver } from "../interfaces/IRiskStewardReceiver.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
-import { IRiskSteward } from "./IRiskSteward.sol";
+import { IRiskSteward } from "../interfaces/IRiskSteward.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
 /**
