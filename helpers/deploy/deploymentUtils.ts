@@ -101,6 +101,30 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
   }[networkName];
 };
 
+export const getRiskOracle = async (networkName: SUPPORTED_NETWORKS) => {
+  const mockRiskOracle = await ethers.getContractOrNull("MockRiskOracle");
+  return {
+    bscmainnet: "",
+    bsctestnet: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
+    hardhat: mockRiskOracle?.address || "",
+    sepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
+    ethereum: "",
+    opbnbtestnet: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
+    opbnbmainnet: "",
+    arbitrumsepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
+    arbitrumone: "",
+    opsepolia: "0x66A8cb6c4230B044378aC3676D47Ed4fE18e3cFB",
+    opmainnet: "",
+    basesepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
+    basemainnet: "",
+    unichainsepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
+    unichainmainnet: "",
+    zksyncsepolia: "0x1f7474B549840158464Eca63735429815867b40e", // Mock
+    zksyncmainnet: "",
+    berachainbartio: "",
+  }[networkName];
+};
+
 export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {
   if (testnetNetworks.includes(network as string)) {
     return LZ_CHAINID.bsctestnet;
@@ -112,6 +136,10 @@ export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {
 
 export const onlyHardhat = () => async (hre: HardhatRuntimeEnvironment) => {
   return hre.network.name !== "hardhat";
+};
+
+export const skipRemoteNetworks = () => async (hre: HardhatRuntimeEnvironment) => {
+  return hre.network.name !== "bscmainnet" && hre.network.name !== "bsctestnet" && hre.network.name !== "hardhat";
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
