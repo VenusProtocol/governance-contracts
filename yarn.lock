@@ -1242,6 +1242,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@layerzerolabs/lz-evm-protocol-v2@npm:^3.0.38":
+  version: 3.0.94
+  resolution: "@layerzerolabs/lz-evm-protocol-v2@npm:3.0.94"
+  peerDependencies:
+    "@openzeppelin/contracts": ^4.8.1 || ^5.0.0
+    "@openzeppelin/contracts-upgradeable": ^4.8.1 || ^5.0.0
+    hardhat-deploy: ^0.12.4
+    solidity-bytes-utils: ^0.8.0
+  checksum: f5f593a1ff9cc89b05f7eda22e5995b5a96e85c9ab37a413536cb8824af1384c40eb4f5b9b570aff3118b146f8f56da730ae6f22f9756f682dc8f721f6c00b76
+  languageName: node
+  linkType: hard
+
 "@layerzerolabs/lz-evm-sdk-v1-0.7@npm:^1.5.14":
   version: 1.5.16
   resolution: "@layerzerolabs/lz-evm-sdk-v1-0.7@npm:1.5.16"
@@ -1300,6 +1312,16 @@ __metadata:
     hardhat-deploy-ethers: ^0.3.0-beta.13
     hardhat-gas-reporter: ^1.0.6
   checksum: f7603710b18bdda227024b161059b5f725499529d25ea2c6dc7a16c664f2b25bd2be2761e81e870a08b05013c425bf7b5258e7a667ac9390cf598c043b216407
+  languageName: node
+  linkType: hard
+
+"@layerzerolabs/test-devtools-evm-hardhat@npm:^0.5.2":
+  version: 0.5.2
+  resolution: "@layerzerolabs/test-devtools-evm-hardhat@npm:0.5.2"
+  peerDependencies:
+    hardhat: ^2.22.10
+    solidity-bytes-utils: ^0.8.2
+  checksum: b36c14dee73f118742cb27650db5f6432cc60101db9e7e8326647cbdbedc137bceb68b8b20037fecade1383660a14c3cf186e2f52afe9da4be15a6298e3bf554
   languageName: node
   linkType: hard
 
@@ -3765,6 +3787,7 @@ __metadata:
     "@layerzerolabs/lz-v2-utilities": ^3.0.73
     "@layerzerolabs/oapp-evm": ^0.3.0
     "@layerzerolabs/solidity-examples": ^1.0.0
+    "@layerzerolabs/test-devtools-evm-hardhat": ^0.5.2
     "@matterlabs/hardhat-zksync": ^0.2.0
     "@matterlabs/hardhat-zksync-deploy": ^0.11.0
     "@matterlabs/hardhat-zksync-solc": ^1.2.1
@@ -4686,6 +4709,13 @@ __metadata:
   dependencies:
     safe-buffer: ^5.0.1
   checksum: 52307739559e81d9980889de2359cb4f816cc0eb9a463028fa3ab239ab913d9044a1b47b4520f98e68453df32a457b8ba58b8d0ee7e757fc3fb971f3fa7a1482
+  languageName: node
+  linkType: hard
+
+"base-x@npm:^4.0.0":
+  version: 4.0.1
+  resolution: "base-x@npm:4.0.1"
+  checksum: c9061e576f7376b2bc6b69eca131254bb16ebe1445b535a3f0d68f27524e724965b6c191dffd255bf80f9bdf5eb9d1c8d0320903e83116f2c3e09f81b5ecb6a2
   languageName: node
   linkType: hard
 

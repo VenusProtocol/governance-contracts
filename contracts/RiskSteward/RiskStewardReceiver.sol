@@ -8,7 +8,6 @@ import { RiskParamConfig } from "../interfaces/IRiskStewardReceiver.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { RiskStewardReceiverBase } from "./RiskStewardReceiverBase.sol";
 import { OApp, MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
-
 /**
  * @title RiskStewardReceiver
  * @author Venus
@@ -37,12 +36,12 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     /**
      * @notice Source chain id
      */
-    uint16 public immutable LAYER_ZERO_CHAIN_ID;
+    uint32 public immutable LAYER_ZERO_CHAIN_ID;
 
     /**
      * @notice Event emitted when an update is send through LZ on dest chain with update id and LZ send receipt
      */
-    event RiskParameterUpdateSend(uint16 destChainId, uint256 indexed updateId);
+    event RiskParameterUpdateSend(uint32 destChainId, uint256 indexed updateId);
 
     /**
      * @notice Emitted when applying an update fails to validate or execute
@@ -54,7 +53,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      */
 
     event RemoteRiskParameterUpdateFailed(
-        uint16 destChainId,
+        uint32 destChainId,
         bytes payload,
         bytes _options,
         MessagingFee fee,
@@ -67,14 +66,9 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      */
     event ClearRiskParameterUpdate(uint256 updateId, bytes hash);
 
-    /**
-     * @notice Thrown if a submitted update is not active and therefore cannot be processed
-     */
-    error ConfigNotActive(uint256 updateId);
-
     constructor(
         address riskOracle_,
-        uint16 layerZeroChainId_,
+        uint32 layerZeroChainId_,
         address endpoint_,
         address owner_
     ) OApp(endpoint_, owner_) {
@@ -84,15 +78,12 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     * @notice Processes an update by its ID. Will validate that the update configuration is active, is not expired, unprocessed, and that the debounce period has passed
+     * @notice Processes an update by its ID. Will validate that the update configuration is active, is not expired, and unprocessed.
      * If the update is to be applied on BNB chain and valid, it will be processed by the associated risk steward contract which will perform update specific validations
      * and apply validated updates.
-     * If the update is to be applied on a remote chain, it will be submitted to governance as a fast track proposal.
+     * If the update is to be applied on a remote chain, it will send as a payload to remote chain using LZ bridge.
      * @param updateId The ID of the update to process
      * @custom:event Emits RiskParameterUpdateProcessed with the update ID
-     * @custom:error Throws ConfigNotActive if the config is not active
-     * @custom:error Throws UpdateIsExpired if the update is expired
-     * @custom:error Throws ConfigAlreadyProcessed if the update has already been processed
      */
     function processUpdateById(
         uint256 updateId,
@@ -102,6 +93,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
 
         (UPDATE_STATUS error, ) = _validateUpdateStatus(update);
+
         if (error == UPDATE_STATUS.NONE) {
             _executeOrSendUpdatePayload(update, options, ZROTokens);
         } else {
@@ -122,9 +114,6 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @param ZROTokens Amount of ZRO tokens used for the message fee
      * @custom:event Emits RiskParameterUpdated with the update ID
      * @custom:event Emits RiskParameterUpdateProposed with the the update ID
-     * @custom:error Throws ConfigNotActive if the config is not active
-     * @custom:error Throws UpdateIsExpired if the update is expired
-     * @custom:error Throws ConfigAlreadyProcessed if the update has already been processed
      */
     function processUpdateByParameterAndMarket(
         string memory updateType,
@@ -149,12 +138,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @param options LayerZero message options
      * @param ZROTokens Amount of ZRO tokens used for the message fee
      * @custom:event Emits RiskParameterUpdated with the update ID
-     * @custom:event Emits RiskParameterUpdateProposed with the update IDs
      * @custom:event Emits UpdateFailed with the update ID and the error if validation fails for an update
-     * @custom:error Throws ConfigNotActive if the config is not active
-     * @custom:error Throws UpdateIsExpired if the update is expired
-     * @custom:error Throws ConfigAlreadyProcessed if the update has already been processed
-     * @custom:error Throws UpdateNotInRange if the update is not in range
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
      */
     function processUpdatesByIds(
@@ -175,13 +159,14 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      */
 
     function lzSend(
-        uint16 destChainId,
+        uint32 destChainId,
         bytes calldata payload,
         bytes calldata options,
-        MessagingFee calldata fee
-    ) external {
-        require(msg.sender == address(this));
-        _lzSend(destChainId, payload, options, fee, payable(msg.sender));
+        MessagingFee calldata fee,
+        address refundAddress
+    ) external payable {
+        require(msg.sender == address(this), "Invalid caller");
+        _lzSend(destChainId, payload, options, fee, refundAddress);
     }
 
     /**
@@ -251,11 +236,8 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         bytes calldata options,
         uint256 ZROTokens
     ) internal {
-        if (!isSupplyOrBorrowCapUpdate(update.updateType)) {
-            revert UnsupportedUpdateType();
-        }
         IRiskSteward riskSteward = riskParameterConfigs[update.updateType].riskSteward;
-        (, uint16 destChainId) = riskSteward.decodeAdditionalData(update.additionalData);
+        (, uint32 destChainId) = riskSteward.decodeAdditionalData(update.additionalData);
 
         if (LAYER_ZERO_CHAIN_ID == destChainId) {
             try riskSteward.processUpdate(update.updateId, update.newValue, update.updateType, update.market) {
@@ -268,7 +250,15 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         } else {
             bytes memory payload = _createRemotePayload(update);
             // Send layer zero message directly
-            try this.lzSend(destChainId, payload, options, MessagingFee(msg.value, ZROTokens)) {
+            try
+                this.lzSend{ value: msg.value }(
+                    destChainId,
+                    payload,
+                    options,
+                    MessagingFee(msg.value, ZROTokens),
+                    msg.sender
+                )
+            {
                 emit RiskParameterUpdateSend(destChainId, update.updateId);
                 processedUpdates[update.updateId] = UPDATE_STATUS.SEND_TO_DESTINATION_CHAIN;
             } catch (bytes memory reason) {
@@ -311,14 +301,21 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      */
     function _validateUpdateStatus(
         RiskParameterUpdate memory update
-    ) internal view returns (UPDATE_STATUS error, uint16) {
+    ) internal view returns (UPDATE_STATUS error, uint32) {
+        require(update.updateId != 0, "No update found");
+
+        if (!isSupplyOrBorrowCapUpdate(update.updateType)) {
+            revert UnsupportedUpdateType();
+        }
+
         RiskParamConfig memory config = riskParameterConfigs[update.updateType];
 
         RiskParameterUpdate memory latestForMarketAndType = RISK_ORACLE.getLatestUpdateByParameterAndMarket(
             update.updateType,
             update.market
         );
-        (, uint16 destChainId) = config.riskSteward.decodeAdditionalData(update.additionalData);
+
+        (, uint32 destChainId) = config.riskSteward.decodeAdditionalData(update.additionalData);
 
         if (latestForMarketAndType.updateId != update.updateId) {
             return (UPDATE_STATUS.EXPIRED, destChainId);

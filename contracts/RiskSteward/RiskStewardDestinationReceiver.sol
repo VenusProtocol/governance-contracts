@@ -33,17 +33,12 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
      * @notice Required delay before
      */
 
-    uint256 public remoteDelay = 1 hours;
+    uint256 public remoteDelay = 6 hours;
 
     /**
      * @notice Address of guardian, who can cancel the update, if required
      */
     address public guardian;
-
-    /**
-     * @notice Address of Risk oracle
-     */
-    IRiskOracle public RISK_ORACLE;
 
     /**
      * @notice Mapping of processed updates. Used to prevent re-execution
@@ -92,17 +87,8 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
      */
     error Unauthorized();
 
-    constructor(
-        address marketRiskSteward_,
-        address riskOracle_,
-        address endpoint_,
-        address owner_,
-        address guardian_
-    ) OApp(endpoint_, owner_) {
-        ensureNonzeroAddress(riskOracle_);
+    constructor(address endpoint_, address owner_, address guardian_) OApp(endpoint_, owner_) {
         ensureNonzeroAddress(guardian_);
-        ensureNonzeroAddress(marketRiskSteward_);
-        RISK_ORACLE = IRiskOracle(riskOracle_);
         guardian = guardian_;
     }
 
@@ -236,7 +222,13 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
      *      Decodes the payload and forwards the update for processing
      * @param payload The encoded message containing update details
      */
-    function _lzReceive(Origin calldata, bytes32, bytes calldata payload, address, bytes calldata) internal override {
+    function _lzReceive(
+        Origin calldata,
+        bytes32 /*_guid*/,
+        bytes calldata payload,
+        address /*_executor*/,
+        bytes calldata /*_extraData*/
+    ) internal override {
         (
             uint256 updateId,
             bytes memory newValue,
@@ -247,6 +239,7 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
         ) = abi.decode(payload, (uint256, bytes, string, address, bytes, uint256));
 
         processedUpdates[updateId] = UPDATE_STATUS.RECEIVED;
+        remoteUpdateTimestamps[updateId] = block.timestamp;
 
         update[updateId] = RiskParameterUpdate({
             timestamp: timestamp,
