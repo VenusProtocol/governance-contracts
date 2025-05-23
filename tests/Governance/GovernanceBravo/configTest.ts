@@ -4,7 +4,12 @@ import chai from "chai";
 import { Signer } from "ethers";
 import { ethers } from "hardhat";
 
-import { GovernorBravoDelegate, GovernorBravoDelegate__factory, XVSVault } from "../../../typechain";
+import {
+  AccessControlManager__factory,
+  GovernorBravoDelegate,
+  GovernorBravoDelegate__factory,
+  XVSVault,
+} from "../../../typechain";
 
 const { expect } = chai;
 chai.use(smock.matchers);
@@ -81,15 +86,26 @@ describe("Governor Bravo Configuration Setter Test", () => {
     [root, customer, ...accounts] = await ethers.getSigners();
     const contracts = await loadFixture(governorBravoFixture);
     ({ governorBravoDelegate, xvsVault } = contracts);
+    const accessControlManagerFactory = await smock.mock<AccessControlManager__factory>("AccessControlManager");
+
+    const accessControlManager = await accessControlManagerFactory.deploy();
+    accessControlManager.isAllowedToCall.returns(true);
+
     await governorBravoDelegate.setVariable("admin", await root.getAddress());
     const guardianAddress = await accounts[0].getAddress();
-    const timelocks = [accounts[0].getAddress(), accounts[1].getAddress(), accounts[2].getAddress()];
+    const timelocks = [await accounts[0].getAddress(), await accounts[1].getAddress(), await accounts[2].getAddress()];
     await governorBravoDelegate.initialize(
       xvsVault.address,
-      validationParams,
+      [
+        validationParams.minVotingPeriod,
+        validationParams.maxVotingPeriod,
+        validationParams.minVotingDelay,
+        validationParams.maxVotingDelay,
+      ],
       proposalConfigs,
       timelocks,
       guardianAddress,
+      accessControlManager.address,
     );
   });
 

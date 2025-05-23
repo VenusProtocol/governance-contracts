@@ -8,7 +8,7 @@ import "./GovernorBravoInterfacesV3.sol";
  * @dev This contract is the third deployed implementation GovernorBravo with respect to updated block rate of BSC chain.
  * It is included here for testing purposes because it is not completely compatible with new block rate of BSC.
  */
-contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoEvents {
+contract GovernorBravoDelegateV3 is GovernorBravoDelegateStorageV3, GovernorBravoEvents {
     /// @notice The name of this contract
     string public constant name = "Venus Governor Bravo";
 
