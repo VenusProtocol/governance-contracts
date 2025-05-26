@@ -2,7 +2,7 @@
 pragma solidity 0.8.25;
 
 import { IRiskSteward } from "../interfaces/IRiskSteward.sol";
-import { IRiskOracle, RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
+import { RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
 import { RiskParamConfig } from "../interfaces/IRiskStewardReceiver.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { RiskStewardReceiverBase } from "./RiskStewardReceiverBase.sol";

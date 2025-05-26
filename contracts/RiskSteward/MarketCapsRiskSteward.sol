@@ -147,14 +147,18 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     function initialize(
         address accessControlManager_,
         uint256 maxDeltaBps_,
-        uint256 _debouncePeriod
+        uint256 debouncePeriod_
     ) external initializer {
         __AccessControlled_init(accessControlManager_);
         if (maxDeltaBps_ == 0 || maxDeltaBps_ > MAX_BPS) {
             revert InvalidMaxDeltaBps();
         }
         maxDeltaBps = maxDeltaBps_;
-        debouncePeriod = _debouncePeriod;
+
+        if (debouncePeriod_ == 0 || debouncePeriod_ <= RISK_STEWARD_RECEIVER.UPDATE_EXPIRATION_TIME()) {
+            revert InvalidDebouncePeriod();
+        }
+        debouncePeriod = debouncePeriod_;
     }
 
     /**
