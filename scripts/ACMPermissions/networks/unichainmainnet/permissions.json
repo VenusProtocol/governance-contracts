@@ -756,17 +756,7 @@
       "contractAddress": "0x6E78a0d96257F8F2615d72F3ee48cb6fb2c970bd",
       "functionSignature": "unpause()",
       "addresses": ["0x1803Cf1D3495b43cC628aa1d8638A981F8CD341C"]
-    },
-    {
-      "contractAddress": "0x0000000000000000000000000000000000000000",
-      "functionSignature": "setLastRewardingBlock(address[],uint32[],uint32[])",
-      "addresses": []
-    },
-    {
-      "contractAddress": "0x0000000000000000000000000000000000000000",
-      "functionSignature": "setLastRewardingBlocks(address[],uint32[],uint32[])",
-      "addresses": []
     }
   ],
-  "height": 10866528
+  "height": 13964176
 }

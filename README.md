@@ -79,6 +79,20 @@ Deployed contract abis and addresses are exported in the `deployments` directory
 $ yarn hardhat export --network <network-name> --export ./deployments/<network-name>.json
 ```
 
+### Permissions Fetcher Tool
+
+To fetch all permissions, run the following command:
+
+```
+$ npx hardhat run scripts/ACMPermissions/index.ts --network <network-nme>
+```
+
+To fetch only timelock permissions excluding guardian, run:
+
+```
+$ npx hardhat run scripts/ACMPermissions/fetchNonGuardianPermissions.ts --network <network-nme>
+```
+
 ### Discussion
 
 For any concerns with the protocol, open an issue or visit us on [Telegram](https://t.me/venusprotocol) to discuss.
