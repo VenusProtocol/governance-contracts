@@ -1678,7 +1678,7 @@
       ]
     },
     "MarketCapsRiskSteward": {
-      "address": "0xEa687c54321Db5b20CA544f38f08E429a4bfCBc8",
+      "address": "0x49B769d34C7F4E298cbF6CDcB514ffd4F55E06D4",
       "abi": [
         {
           "anonymous": false,
@@ -1792,6 +1792,11 @@
         },
         {
           "inputs": [],
+          "name": "InvalidDebouncePeriod",
+          "type": "error"
+        },
+        {
+          "inputs": [],
           "name": "InvalidMaxDeltaBps",
           "type": "error"
         },
@@ -1822,13 +1827,30 @@
           "type": "error"
         },
         {
-          "inputs": [],
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            }
+          ],
           "name": "UnsupportedUpdateType",
           "type": "error"
         },
         {
-          "inputs": [],
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            }
+          ],
           "name": "UpdateNotInRange",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "UpdateTooFrequent",
           "type": "error"
         },
         {
@@ -1853,6 +1875,25 @@
             }
           ],
           "name": "BorrowCapUpdated",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "oldDebouncePeriod",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "newDebouncePeriod",
+              "type": "uint256"
+            }
+          ],
+          "name": "DebouncePeriodUpdated",
           "type": "event"
         },
         {
@@ -2036,6 +2077,43 @@
           "type": "function"
         },
         {
+          "inputs": [],
+          "name": "debouncePeriod",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes",
+              "name": "additionalData",
+              "type": "bytes"
+            }
+          ],
+          "name": "decodeAdditionalData",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            },
+            {
+              "internalType": "uint32",
+              "name": "",
+              "type": "uint32"
+            }
+          ],
+          "stateMutability": "pure",
+          "type": "function"
+        },
+        {
           "inputs": [
             {
               "internalType": "address",
@@ -2046,11 +2124,35 @@
               "internalType": "uint256",
               "name": "maxDeltaBps_",
               "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "debouncePeriod_",
+              "type": "uint256"
             }
           ],
           "name": "initialize",
           "outputs": [],
           "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes",
+              "name": "marketUpdateType",
+              "type": "bytes"
+            }
+          ],
+          "name": "lastProcessedTime",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
           "type": "function"
         },
         {
@@ -2080,6 +2182,25 @@
           "type": "function"
         },
         {
+          "inputs": [
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "name": "packNewValue",
+          "outputs": [
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            }
+          ],
+          "stateMutability": "pure",
+          "type": "function"
+        },
+        {
           "inputs": [],
           "name": "pendingOwner",
           "outputs": [
@@ -2095,51 +2216,24 @@
         {
           "inputs": [
             {
-              "components": [
-                {
-                  "internalType": "uint256",
-                  "name": "timestamp",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "newValue",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "string",
-                  "name": "referenceId",
-                  "type": "string"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "previousValue",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "string",
-                  "name": "updateType",
-                  "type": "string"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "updateId",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "address",
-                  "name": "market",
-                  "type": "address"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "additionalData",
-                  "type": "bytes"
-                }
-              ],
-              "internalType": "struct RiskParameterUpdate",
-              "name": "update",
-              "type": "tuple"
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "newValue",
+              "type": "bytes"
+            },
+            {
+              "internalType": "string",
+              "name": "updateType",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "market",
+              "type": "address"
             }
           ],
           "name": "processUpdate",
@@ -2148,10 +2242,29 @@
           "type": "function"
         },
         {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            }
+          ],
+          "name": "processedUpdates",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
           "inputs": [],
           "name": "renounceOwnership",
           "outputs": [],
-          "stateMutability": "nonpayable",
+          "stateMutability": "pure",
           "type": "function"
         },
         {
@@ -2163,6 +2276,19 @@
             }
           ],
           "name": "setAccessControlManager",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "debouncePeriod_",
+              "type": "uint256"
+            }
+          ],
+          "name": "setDebouncePeriod",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -2217,23 +2343,28 @@
       ]
     },
     "MarketCapsRiskSteward_Implementation": {
-      "address": "0x3694ad1233FC1f7f71D3aD0b1dad128D8d1333AA",
+      "address": "0xafe8892d372Beb20885e87f2ae49243E370b5DB2",
       "abi": [
         {
           "inputs": [
             {
               "internalType": "address",
-              "name": "corePoolComptroller_",
+              "name": "riskStewardReceiver_",
               "type": "address"
             },
             {
               "internalType": "address",
-              "name": "riskStewardReceiver_",
+              "name": "corePoolComptroller_",
               "type": "address"
             }
           ],
           "stateMutability": "nonpayable",
           "type": "constructor"
+        },
+        {
+          "inputs": [],
+          "name": "InvalidDebouncePeriod",
+          "type": "error"
         },
         {
           "inputs": [],
@@ -2267,13 +2398,30 @@
           "type": "error"
         },
         {
-          "inputs": [],
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            }
+          ],
           "name": "UnsupportedUpdateType",
           "type": "error"
         },
         {
-          "inputs": [],
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            }
+          ],
           "name": "UpdateNotInRange",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "UpdateTooFrequent",
           "type": "error"
         },
         {
@@ -2298,6 +2446,25 @@
             }
           ],
           "name": "BorrowCapUpdated",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "oldDebouncePeriod",
+              "type": "uint256"
+            },
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "newDebouncePeriod",
+              "type": "uint256"
+            }
+          ],
+          "name": "DebouncePeriodUpdated",
           "type": "event"
         },
         {
@@ -2481,6 +2648,43 @@
           "type": "function"
         },
         {
+          "inputs": [],
+          "name": "debouncePeriod",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes",
+              "name": "additionalData",
+              "type": "bytes"
+            }
+          ],
+          "name": "decodeAdditionalData",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            },
+            {
+              "internalType": "uint32",
+              "name": "",
+              "type": "uint32"
+            }
+          ],
+          "stateMutability": "pure",
+          "type": "function"
+        },
+        {
           "inputs": [
             {
               "internalType": "address",
@@ -2491,11 +2695,35 @@
               "internalType": "uint256",
               "name": "maxDeltaBps_",
               "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "debouncePeriod_",
+              "type": "uint256"
             }
           ],
           "name": "initialize",
           "outputs": [],
           "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "bytes",
+              "name": "marketUpdateType",
+              "type": "bytes"
+            }
+          ],
+          "name": "lastProcessedTime",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
           "type": "function"
         },
         {
@@ -2525,6 +2753,25 @@
           "type": "function"
         },
         {
+          "inputs": [
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "name": "packNewValue",
+          "outputs": [
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            }
+          ],
+          "stateMutability": "pure",
+          "type": "function"
+        },
+        {
           "inputs": [],
           "name": "pendingOwner",
           "outputs": [
@@ -2540,51 +2787,24 @@
         {
           "inputs": [
             {
-              "components": [
-                {
-                  "internalType": "uint256",
-                  "name": "timestamp",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "newValue",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "string",
-                  "name": "referenceId",
-                  "type": "string"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "previousValue",
-                  "type": "bytes"
-                },
-                {
-                  "internalType": "string",
-                  "name": "updateType",
-                  "type": "string"
-                },
-                {
-                  "internalType": "uint256",
-                  "name": "updateId",
-                  "type": "uint256"
-                },
-                {
-                  "internalType": "address",
-                  "name": "market",
-                  "type": "address"
-                },
-                {
-                  "internalType": "bytes",
-                  "name": "additionalData",
-                  "type": "bytes"
-                }
-              ],
-              "internalType": "struct RiskParameterUpdate",
-              "name": "update",
-              "type": "tuple"
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "newValue",
+              "type": "bytes"
+            },
+            {
+              "internalType": "string",
+              "name": "updateType",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "market",
+              "type": "address"
             }
           ],
           "name": "processUpdate",
@@ -2593,10 +2813,29 @@
           "type": "function"
         },
         {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            }
+          ],
+          "name": "processedUpdates",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
           "inputs": [],
           "name": "renounceOwnership",
           "outputs": [],
-          "stateMutability": "nonpayable",
+          "stateMutability": "pure",
           "type": "function"
         },
         {
@@ -2608,6 +2847,19 @@
             }
           ],
           "name": "setAccessControlManager",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "debouncePeriod_",
+              "type": "uint256"
+            }
+          ],
+          "name": "setDebouncePeriod",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -2641,7 +2893,7 @@
       ]
     },
     "MarketCapsRiskSteward_Proxy": {
-      "address": "0xEa687c54321Db5b20CA544f38f08E429a4bfCBc8",
+      "address": "0x49B769d34C7F4E298cbF6CDcB514ffd4F55E06D4",
       "abi": [
         {
           "inputs": [
@@ -5349,128 +5601,29 @@
         }
       ]
     },
-    "RiskStewardReceiver": {
-      "address": "0xDF1807d323Dd2E2871e8b394c8F7595E097e1C73",
+    "RiskStewardDestinationReceiver": {
+      "address": "0x02fD9FdafBcCe457530303C80F88E7393311dab3",
       "abi": [
         {
-          "anonymous": false,
           "inputs": [
             {
-              "indexed": false,
               "internalType": "address",
-              "name": "previousAdmin",
+              "name": "endpoint_",
               "type": "address"
             },
             {
-              "indexed": false,
               "internalType": "address",
-              "name": "newAdmin",
-              "type": "address"
-            }
-          ],
-          "name": "AdminChanged",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "beacon",
-              "type": "address"
-            }
-          ],
-          "name": "BeaconUpgraded",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "implementation",
-              "type": "address"
-            }
-          ],
-          "name": "Upgraded",
-          "type": "event"
-        },
-        {
-          "stateMutability": "payable",
-          "type": "fallback"
-        },
-        {
-          "inputs": [],
-          "name": "admin",
-          "outputs": [
-            {
-              "internalType": "address",
-              "name": "admin_",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "implementation",
-          "outputs": [
-            {
-              "internalType": "address",
-              "name": "implementation_",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "newImplementation",
-              "type": "address"
-            }
-          ],
-          "name": "upgradeTo",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "newImplementation",
+              "name": "owner_",
               "type": "address"
             },
             {
-              "internalType": "bytes",
-              "name": "data",
-              "type": "bytes"
+              "internalType": "address",
+              "name": "guardian_",
+              "type": "address"
             }
           ],
-          "name": "upgradeToAndCall",
-          "outputs": [],
-          "stateMutability": "payable",
-          "type": "function"
-        },
-        {
-          "stateMutability": "payable",
-          "type": "receive"
-        },
-        {
-          "inputs": [],
-          "name": "ConfigAlreadyProcessed",
-          "type": "error"
-        },
-        {
-          "inputs": [],
-          "name": "ConfigNotActive",
-          "type": "error"
+          "stateMutability": "nonpayable",
+          "type": "constructor"
         },
         {
           "inputs": [],
@@ -5478,23 +5631,71 @@
           "type": "error"
         },
         {
+          "inputs": [],
+          "name": "InvalidDelegate",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "InvalidEndpointCall",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "LzTokenUnavailable",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint32",
+              "name": "eid",
+              "type": "uint32"
+            }
+          ],
+          "name": "NoPeer",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "msgValue",
+              "type": "uint256"
+            }
+          ],
+          "name": "NotEnoughNative",
+          "type": "error"
+        },
+        {
           "inputs": [
             {
               "internalType": "address",
-              "name": "sender",
+              "name": "addr",
               "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "calledContract",
-              "type": "address"
-            },
-            {
-              "internalType": "string",
-              "name": "methodSignature",
-              "type": "string"
             }
           ],
+          "name": "OnlyEndpoint",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint32",
+              "name": "eid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "sender",
+              "type": "bytes32"
+            }
+          ],
+          "name": "OnlyPeer",
+          "type": "error"
+        },
+        {
+          "inputs": [],
           "name": "Unauthorized",
           "type": "error"
         },
@@ -5504,13 +5705,14 @@
           "type": "error"
         },
         {
-          "inputs": [],
-          "name": "UpdateIsExpired",
-          "type": "error"
-        },
-        {
-          "inputs": [],
-          "name": "UpdateTooFrequent",
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            }
+          ],
+          "name": "UpdateNotReceived",
           "type": "error"
         },
         {
@@ -5522,51 +5724,13 @@
           "anonymous": false,
           "inputs": [
             {
-              "indexed": false,
-              "internalType": "uint8",
-              "name": "version",
-              "type": "uint8"
-            }
-          ],
-          "name": "Initialized",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "oldAccessControlManager",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "newAccessControlManager",
-              "type": "address"
-            }
-          ],
-          "name": "NewAccessControlManager",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
               "indexed": true,
-              "internalType": "address",
-              "name": "previousOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "newOwner",
-              "type": "address"
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
             }
           ],
-          "name": "OwnershipTransferStarted",
+          "name": "CancelUpdate",
           "type": "event"
         },
         {
@@ -5606,6 +5770,25 @@
           "inputs": [
             {
               "indexed": false,
+              "internalType": "uint32",
+              "name": "eid",
+              "type": "uint32"
+            },
+            {
+              "indexed": false,
+              "internalType": "bytes32",
+              "name": "peer",
+              "type": "bytes32"
+            }
+          ],
+          "name": "PeerSet",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
               "internalType": "string",
               "name": "updateType",
               "type": "string"
@@ -5621,18 +5804,6 @@
               "internalType": "address",
               "name": "riskSteward",
               "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "previousDebounce",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "debounce",
-              "type": "uint256"
             },
             {
               "indexed": false,
@@ -5658,9 +5829,66 @@
               "internalType": "uint256",
               "name": "updateId",
               "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "enum RiskStewardDestinationReceiver.UPDATE_STATUS",
+              "name": "error",
+              "type": "uint8"
             }
           ],
-          "name": "RiskParameterUpdated",
+          "name": "RiskParameterUpdateFailed",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            }
+          ],
+          "name": "RiskParameterUpdateProcessed",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "prevGuardian",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "newGuardian",
+              "type": "address"
+            }
+          ],
+          "name": "SetGuardian",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "oldDelay",
+              "type": "uint256"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "newDelay",
+              "type": "uint256"
+            }
+          ],
+          "name": "SetRemoteDelay",
           "type": "event"
         },
         {
@@ -5697,12 +5925,12 @@
         },
         {
           "inputs": [],
-          "name": "RISK_ORACLE",
+          "name": "REMOTE_UPDATE_EXPIRATION_TIME",
           "outputs": [
             {
-              "internalType": "contract IRiskOracle",
+              "internalType": "uint256",
               "name": "",
-              "type": "address"
+              "type": "uint256"
             }
           ],
           "stateMutability": "view",
@@ -5722,20 +5950,36 @@
           "type": "function"
         },
         {
-          "inputs": [],
-          "name": "acceptOwnership",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "accessControlManager",
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "uint32",
+                  "name": "srcEid",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "sender",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "uint64",
+                  "name": "nonce",
+                  "type": "uint64"
+                }
+              ],
+              "internalType": "struct Origin",
+              "name": "origin",
+              "type": "tuple"
+            }
+          ],
+          "name": "allowInitializePath",
           "outputs": [
             {
-              "internalType": "contract IAccessControlManagerV8",
+              "internalType": "bool",
               "name": "",
-              "type": "address"
+              "type": "bool"
             }
           ],
           "stateMutability": "view",
@@ -5744,33 +5988,178 @@
         {
           "inputs": [
             {
-              "internalType": "address",
-              "name": "accessControlManager_",
-              "type": "address"
-            }
-          ],
-          "name": "initialize",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "bytes",
-              "name": "marketUpdateType",
-              "type": "bytes"
-            }
-          ],
-          "name": "lastProcessedTime",
-          "outputs": [
-            {
               "internalType": "uint256",
-              "name": "",
+              "name": "updateId",
               "type": "uint256"
             }
           ],
+          "name": "cancelUpdate",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "endpoint",
+          "outputs": [
+            {
+              "internalType": "contract ILayerZeroEndpointV2",
+              "name": "",
+              "type": "address"
+            }
+          ],
           "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "guardian",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "uint32",
+                  "name": "srcEid",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "sender",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "uint64",
+                  "name": "nonce",
+                  "type": "uint64"
+                }
+              ],
+              "internalType": "struct Origin",
+              "name": "",
+              "type": "tuple"
+            },
+            {
+              "internalType": "bytes",
+              "name": "",
+              "type": "bytes"
+            },
+            {
+              "internalType": "address",
+              "name": "_sender",
+              "type": "address"
+            }
+          ],
+          "name": "isComposeMsgSender",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "uint32",
+                  "name": "srcEid",
+                  "type": "uint32"
+                },
+                {
+                  "internalType": "bytes32",
+                  "name": "sender",
+                  "type": "bytes32"
+                },
+                {
+                  "internalType": "uint64",
+                  "name": "nonce",
+                  "type": "uint64"
+                }
+              ],
+              "internalType": "struct Origin",
+              "name": "_origin",
+              "type": "tuple"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "_guid",
+              "type": "bytes32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "_message",
+              "type": "bytes"
+            },
+            {
+              "internalType": "address",
+              "name": "_executor",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "_extraData",
+              "type": "bytes"
+            }
+          ],
+          "name": "lzReceive",
+          "outputs": [],
+          "stateMutability": "payable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint32",
+              "name": "",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "",
+              "type": "bytes32"
+            }
+          ],
+          "name": "nextNonce",
+          "outputs": [
+            {
+              "internalType": "uint64",
+              "name": "nonce",
+              "type": "uint64"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "oAppVersion",
+          "outputs": [
+            {
+              "internalType": "uint64",
+              "name": "senderVersion",
+              "type": "uint64"
+            },
+            {
+              "internalType": "uint64",
+              "name": "receiverVersion",
+              "type": "uint64"
+            }
+          ],
+          "stateMutability": "pure",
           "type": "function"
         },
         {
@@ -5807,13 +6196,19 @@
           "type": "function"
         },
         {
-          "inputs": [],
-          "name": "pendingOwner",
+          "inputs": [
+            {
+              "internalType": "uint32",
+              "name": "eid",
+              "type": "uint32"
+            }
+          ],
+          "name": "peers",
           "outputs": [
             {
-              "internalType": "address",
-              "name": "",
-              "type": "address"
+              "internalType": "bytes32",
+              "name": "peer",
+              "type": "bytes32"
             }
           ],
           "stateMutability": "view",
@@ -5827,25 +6222,7 @@
               "type": "uint256"
             }
           ],
-          "name": "processUpdateById",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "string",
-              "name": "updateType",
-              "type": "string"
-            },
-            {
-              "internalType": "address",
-              "name": "market",
-              "type": "address"
-            }
-          ],
-          "name": "processUpdateByParameterAndMarket",
+          "name": "processUpdate",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -5861,9 +6238,41 @@
           "name": "processedUpdates",
           "outputs": [
             {
-              "internalType": "bool",
+              "internalType": "enum RiskStewardDestinationReceiver.UPDATE_STATUS",
               "name": "",
-              "type": "bool"
+              "type": "uint8"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "remoteDelay",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            }
+          ],
+          "name": "remoteUpdateTimestamps",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "remoteTimestamp",
+              "type": "uint256"
             }
           ],
           "stateMutability": "view",
@@ -5892,12 +6301,7 @@
               "type": "bool"
             },
             {
-              "internalType": "uint256",
-              "name": "debounce",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
+              "internalType": "contract IRiskSteward",
               "name": "riskSteward",
               "type": "address"
             }
@@ -5909,11 +6313,55 @@
           "inputs": [
             {
               "internalType": "address",
-              "name": "accessControlManager_",
+              "name": "_delegate",
               "type": "address"
             }
           ],
-          "name": "setAccessControlManager",
+          "name": "setDelegate",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newGuardian",
+              "type": "address"
+            }
+          ],
+          "name": "setGuardian",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint32",
+              "name": "_eid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes32",
+              "name": "_peer",
+              "type": "bytes32"
+            }
+          ],
+          "name": "setPeer",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "newDelay",
+              "type": "uint256"
+            }
+          ],
+          "name": "setRemoteDelay",
           "outputs": [],
           "stateMutability": "nonpayable",
           "type": "function"
@@ -5929,11 +6377,6 @@
               "internalType": "address",
               "name": "riskSteward",
               "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "debounce",
-              "type": "uint256"
             }
           ],
           "name": "setRiskParameterConfig",
@@ -5977,687 +6420,56 @@
         {
           "inputs": [
             {
-              "internalType": "address",
-              "name": "_logic",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "admin_",
-              "type": "address"
-            },
-            {
-              "internalType": "bytes",
-              "name": "_data",
-              "type": "bytes"
-            }
-          ],
-          "stateMutability": "payable",
-          "type": "constructor"
-        }
-      ]
-    },
-    "RiskStewardReceiver_Implementation": {
-      "address": "0x345Dfb0554ee638a595eE36F4545192524F8D6D7",
-      "abi": [
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "riskOracle_",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "nonpayable",
-          "type": "constructor"
-        },
-        {
-          "inputs": [],
-          "name": "ConfigAlreadyProcessed",
-          "type": "error"
-        },
-        {
-          "inputs": [],
-          "name": "ConfigNotActive",
-          "type": "error"
-        },
-        {
-          "inputs": [],
-          "name": "InvalidDebounce",
-          "type": "error"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "sender",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "calledContract",
-              "type": "address"
-            },
-            {
-              "internalType": "string",
-              "name": "methodSignature",
-              "type": "string"
-            }
-          ],
-          "name": "Unauthorized",
-          "type": "error"
-        },
-        {
-          "inputs": [],
-          "name": "UnsupportedUpdateType",
-          "type": "error"
-        },
-        {
-          "inputs": [],
-          "name": "UpdateIsExpired",
-          "type": "error"
-        },
-        {
-          "inputs": [],
-          "name": "UpdateTooFrequent",
-          "type": "error"
-        },
-        {
-          "inputs": [],
-          "name": "ZeroAddressNotAllowed",
-          "type": "error"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "uint8",
-              "name": "version",
-              "type": "uint8"
-            }
-          ],
-          "name": "Initialized",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "oldAccessControlManager",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "newAccessControlManager",
-              "type": "address"
-            }
-          ],
-          "name": "NewAccessControlManager",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "previousOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "newOwner",
-              "type": "address"
-            }
-          ],
-          "name": "OwnershipTransferStarted",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "previousOwner",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "newOwner",
-              "type": "address"
-            }
-          ],
-          "name": "OwnershipTransferred",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            }
-          ],
-          "name": "Paused",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "updateType",
-              "type": "string"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "previousRiskSteward",
-              "type": "address"
-            },
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "riskSteward",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "previousDebounce",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "uint256",
-              "name": "debounce",
-              "type": "uint256"
-            },
-            {
-              "indexed": false,
-              "internalType": "bool",
-              "name": "previousActive",
-              "type": "bool"
-            },
-            {
-              "indexed": false,
-              "internalType": "bool",
-              "name": "active",
-              "type": "bool"
-            }
-          ],
-          "name": "RiskParameterConfigSet",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
               "internalType": "uint256",
               "name": "updateId",
               "type": "uint256"
             }
           ],
-          "name": "RiskParameterUpdated",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
+          "name": "update",
+          "outputs": [
             {
-              "indexed": false,
+              "internalType": "uint256",
+              "name": "timestamp",
+              "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "newValue",
+              "type": "bytes"
+            },
+            {
+              "internalType": "string",
+              "name": "referenceId",
+              "type": "string"
+            },
+            {
+              "internalType": "bytes",
+              "name": "previousValue",
+              "type": "bytes"
+            },
+            {
               "internalType": "string",
               "name": "updateType",
               "type": "string"
             },
             {
-              "indexed": false,
-              "internalType": "bool",
-              "name": "active",
-              "type": "bool"
-            }
-          ],
-          "name": "ToggleConfigActive",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "account",
-              "type": "address"
-            }
-          ],
-          "name": "Unpaused",
-          "type": "event"
-        },
-        {
-          "inputs": [],
-          "name": "RISK_ORACLE",
-          "outputs": [
-            {
-              "internalType": "contract IRiskOracle",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "UPDATE_EXPIRATION_TIME",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "acceptOwnership",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "accessControlManager",
-          "outputs": [
-            {
-              "internalType": "contract IAccessControlManagerV8",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "accessControlManager_",
-              "type": "address"
-            }
-          ],
-          "name": "initialize",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "bytes",
-              "name": "marketUpdateType",
-              "type": "bytes"
-            }
-          ],
-          "name": "lastProcessedTime",
-          "outputs": [
-            {
-              "internalType": "uint256",
-              "name": "",
-              "type": "uint256"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "owner",
-          "outputs": [
-            {
-              "internalType": "address",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "pause",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "paused",
-          "outputs": [
-            {
-              "internalType": "bool",
-              "name": "",
-              "type": "bool"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "pendingOwner",
-          "outputs": [
-            {
-              "internalType": "address",
-              "name": "",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
               "internalType": "uint256",
               "name": "updateId",
               "type": "uint256"
-            }
-          ],
-          "name": "processUpdateById",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "string",
-              "name": "updateType",
-              "type": "string"
             },
             {
               "internalType": "address",
               "name": "market",
               "type": "address"
-            }
-          ],
-          "name": "processUpdateByParameterAndMarket",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
+            },
             {
-              "internalType": "uint256",
-              "name": "updateId",
-              "type": "uint256"
-            }
-          ],
-          "name": "processedUpdates",
-          "outputs": [
-            {
-              "internalType": "bool",
-              "name": "",
-              "type": "bool"
+              "internalType": "bytes",
+              "name": "additionalData",
+              "type": "bytes"
             }
           ],
           "stateMutability": "view",
           "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "renounceOwnership",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "string",
-              "name": "updateType",
-              "type": "string"
-            }
-          ],
-          "name": "riskParameterConfigs",
-          "outputs": [
-            {
-              "internalType": "bool",
-              "name": "active",
-              "type": "bool"
-            },
-            {
-              "internalType": "uint256",
-              "name": "debounce",
-              "type": "uint256"
-            },
-            {
-              "internalType": "address",
-              "name": "riskSteward",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "view",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "accessControlManager_",
-              "type": "address"
-            }
-          ],
-          "name": "setAccessControlManager",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "string",
-              "name": "updateType",
-              "type": "string"
-            },
-            {
-              "internalType": "address",
-              "name": "riskSteward",
-              "type": "address"
-            },
-            {
-              "internalType": "uint256",
-              "name": "debounce",
-              "type": "uint256"
-            }
-          ],
-          "name": "setRiskParameterConfig",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "string",
-              "name": "updateType",
-              "type": "string"
-            }
-          ],
-          "name": "toggleConfigActive",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "newOwner",
-              "type": "address"
-            }
-          ],
-          "name": "transferOwnership",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "unpause",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        }
-      ]
-    },
-    "RiskStewardReceiver_Proxy": {
-      "address": "0xDF1807d323Dd2E2871e8b394c8F7595E097e1C73",
-      "abi": [
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "_logic",
-              "type": "address"
-            },
-            {
-              "internalType": "address",
-              "name": "admin_",
-              "type": "address"
-            },
-            {
-              "internalType": "bytes",
-              "name": "_data",
-              "type": "bytes"
-            }
-          ],
-          "stateMutability": "payable",
-          "type": "constructor"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "previousAdmin",
-              "type": "address"
-            },
-            {
-              "indexed": false,
-              "internalType": "address",
-              "name": "newAdmin",
-              "type": "address"
-            }
-          ],
-          "name": "AdminChanged",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "beacon",
-              "type": "address"
-            }
-          ],
-          "name": "BeaconUpgraded",
-          "type": "event"
-        },
-        {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": true,
-              "internalType": "address",
-              "name": "implementation",
-              "type": "address"
-            }
-          ],
-          "name": "Upgraded",
-          "type": "event"
-        },
-        {
-          "stateMutability": "payable",
-          "type": "fallback"
-        },
-        {
-          "inputs": [],
-          "name": "admin",
-          "outputs": [
-            {
-              "internalType": "address",
-              "name": "admin_",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [],
-          "name": "implementation",
-          "outputs": [
-            {
-              "internalType": "address",
-              "name": "implementation_",
-              "type": "address"
-            }
-          ],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "newImplementation",
-              "type": "address"
-            }
-          ],
-          "name": "upgradeTo",
-          "outputs": [],
-          "stateMutability": "nonpayable",
-          "type": "function"
-        },
-        {
-          "inputs": [
-            {
-              "internalType": "address",
-              "name": "newImplementation",
-              "type": "address"
-            },
-            {
-              "internalType": "bytes",
-              "name": "data",
-              "type": "bytes"
-            }
-          ],
-          "name": "upgradeToAndCall",
-          "outputs": [],
-          "stateMutability": "payable",
-          "type": "function"
-        },
-        {
-          "stateMutability": "payable",
-          "type": "receive"
         }
       ]
     }
