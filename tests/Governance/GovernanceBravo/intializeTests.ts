@@ -285,7 +285,7 @@ describe("Governor Bravo Initializing Test", () => {
 
       await governorBravoDelegate.initialize(
         xvsVault.address,
-       validationParams,
+        validationParams,
         proposalConfigs,
         timelocks,
         guardianAddress,
@@ -295,7 +295,7 @@ describe("Governor Bravo Initializing Test", () => {
 
     it("should revert if not called by admin", async () => {
       await expect(governorBravoDelegate.connect(customer)._setGuardian(accounts[0].getAddress())).to.be.rejectedWith(
-        '("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x5FbDB2315678afecb367f032d93F642f64180aa3", "_setGuardian(address)")',
+        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x1fA02b2d6A771842690194Cf62D91bdd92BfE28d", "_setGuardian(address)")',
       );
     });
 
