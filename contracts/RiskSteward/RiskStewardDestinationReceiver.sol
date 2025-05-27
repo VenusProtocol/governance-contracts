@@ -78,6 +78,11 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
     event SetGuardian(address prevGuardian, address newGuardian);
 
     /**
+     * @notice Emitted when update is received from source chain
+     */
+    event UpdateReceived(uint256 indexed updateId);
+
+    /**
      * @notice Thrown when update not received from src chain
      */
     error UpdateNotReceived(uint256 updateId);
@@ -240,6 +245,8 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
 
         processedUpdates[updateId] = UPDATE_STATUS.RECEIVED;
         remoteUpdateTimestamps[updateId] = block.timestamp;
+
+        emit UpdateReceived(updateId);
 
         update[updateId] = RiskParameterUpdate({
             timestamp: timestamp,
