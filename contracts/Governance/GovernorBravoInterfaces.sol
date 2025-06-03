@@ -61,6 +61,21 @@ contract GovernorBravoEvents {
 
     /// @notice Emitted when the maximum number of operations in one proposal is updated
     event ProposalMaxOperationsUpdated(uint oldMaxOperations, uint newMaxOperations);
+
+    /// @notice Emitted when the new validation params are set
+    event SetValidationParams(
+        uint256 oldMinVotingPeriod,
+        uint256 newMinVotingPeriod,
+        uint256 oldmaxVotingPeriod,
+        uint256 newmaxVotingPeriod,
+        uint256 oldminVotingDelay,
+        uint256 newminVotingDelay,
+        uint256 oldmaxVotingDelay,
+        uint256 newmaxVotingDelay
+    );
+
+    /// @notice Emitted when new Proposal configs added
+    event SetProposalConfigs(uint256 votingPeriod, uint256 votingDelay, uint256 proposalThreshold);
 }
 
 /**
@@ -179,7 +194,7 @@ contract GovernorBravoDelegateStorageV1 is GovernorBravoDelegatorStorage {
 
 /**
  * @title GovernorBravoDelegateStorageV2
- * @dev For future upgrades, do not change GovernorBravoDelegateStorageV1. Create a new
+ * @dev For future upgrades, do not change GovernorBravoDelegateStorageV2. Create a new
  * contract which implements GovernorBravoDelegateStorageV2 and following the naming convention
  * GovernorBravoDelegateStorageVX.
  */
@@ -204,6 +219,23 @@ contract GovernorBravoDelegateStorageV2 is GovernorBravoDelegateStorageV1 {
 
     /// @notice mapping containing Timelock addresses for each proposal type
     mapping(uint => TimelockInterface) public proposalTimelocks;
+}
+
+/**
+ * @title GovernorBravoDelegateStorageV3
+ * @dev For future upgrades, do not change GovernorBravoDelegateStorageV3. Create a new
+ * contract which implements GovernorBravoDelegateStorageV3 and following the naming convention
+ * GovernorBravoDelegateStorageVX.
+ */
+contract GovernorBravoDelegateStorageV3 is GovernorBravoDelegateStorageV2 {
+    struct ValidationParams {
+        uint256 minVotingPeriod;
+        uint256 maxVotingPeriod;
+        uint256 minVotingDelay;
+        uint256 maxVotingDelay;
+    }
+    /// @notice Stores the current minimum and maximum values of voting delay and voting period
+    ValidationParams public validationParams;
 }
 
 /**

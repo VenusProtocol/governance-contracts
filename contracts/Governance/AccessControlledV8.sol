@@ -14,7 +14,7 @@ import "./IAccessControlManagerV8.sol";
  */
 abstract contract AccessControlledV8 is Initializable, Ownable2StepUpgradeable {
     /// @notice Access control manager contract
-    IAccessControlManagerV8 private _accessControlManager;
+    IAccessControlManagerV8 internal _accessControlManager;
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new

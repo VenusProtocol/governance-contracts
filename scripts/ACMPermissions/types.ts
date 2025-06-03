@@ -17,6 +17,7 @@ export interface Permission {
   contractAddress: string;
   functionSignature: string;
   addresses: string[];
+  role?: string;
 }
 
 export enum PermissionsEnum {
