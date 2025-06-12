@@ -1,7 +1,7 @@
 import "module-alias/register";
 
 import "@nomicfoundation/hardhat-chai-matchers";
-import "@nomicfoundation/hardhat-verify";
+import "@nomiclabs/hardhat-etherscan";
 import "@openzeppelin/hardhat-upgrades";
 import "@typechain/hardhat";
 import "hardhat-dependency-compiler";
@@ -32,6 +32,17 @@ extendConfig((config: HardhatConfig) => {
         ethereum: ["node_modules/@venusprotocol/governance-contracts/deployments/ethereum"],
       },
     };
+
+    if (process.env.FORKED_NETWORK) {
+      config.external.deployments!.hardhat = [
+        `./deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/oracle/deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/venus-protocol/deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/protocol-reserve/deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/governance-contracts/deployments/${process.env.FORKED_NETWORK}`,
+        `node_modules/@venusprotocol/isolated-pools/deployments/${process.env.FORKED_NETWORK}`,
+      ];
+    }
   }
 });
 
@@ -68,7 +79,7 @@ const config: HardhatUserConfig = {
             enabled: true,
             runs: 10000,
           },
-          evmVersion: "paris",
+          evmVersion: "cancun",
           outputSelection: {
             "*": {
               "*": ["storageLayout"],
@@ -96,7 +107,7 @@ const config: HardhatUserConfig = {
       url: process.env.ARCHIVE_NODE_sepolia || "https://ethereum-sepolia.blockpi.network/v1/rpc/public",
       chainId: 11155111,
       live: true,
-      gasPrice: 25000000000, // 25 gwei
+      gasPrice: 20000000000, // 20 gwei
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
     ethereum: {
@@ -155,9 +166,9 @@ const config: HardhatUserConfig = {
       live: true,
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
-    berachainbepolia: {
-      url: process.env.ARCHIVE_NODE_berachainbepolia || "https://bepolia.rpc.berachain.com",
-      chainId: 80069,
+    berachainbartio: {
+      url: process.env.ARCHIVE_NODE_berachainbartio || "https://bartio.rpc.berachain.com",
+      chainId: 80084,
       live: true,
       accounts: DEPLOYER_PRIVATE_KEY ? [`0x${DEPLOYER_PRIVATE_KEY}`] : [],
     },
@@ -190,7 +201,7 @@ const config: HardhatUserConfig = {
       basemainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
       unichainsepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
       unichainmainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
-      berachainbepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
+      berachainbartio: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
     },
     customChains: [
       {
@@ -306,11 +317,11 @@ const config: HardhatUserConfig = {
         },
       },
       {
-        network: "berachainbepolia",
-        chainId: 80069,
+        network: "berachainbartio",
+        chainId: 80084,
         urls: {
-          apiURL: "https://api.routescan.io/v2/network/testnet/evm/80069/etherscan",
-          browserURL: "https://bepolia.beratrail.io",
+          apiURL: "https://api.routescan.io/v2/network/testnet/evm/80084/etherscan",
+          browserURL: "https://bartio.beratrail.io",
         },
       },
     ],
@@ -350,6 +361,9 @@ const config: HardhatUserConfig = {
       {
         artifacts: "./node_modules/@venusprotocol/venus-protocol/artifacts",
       },
+      {
+        artifacts: "./node_modules/@venusprotocol/isolated-pools/artifacts",
+      },
     ],
     deployments: {},
   },
@@ -361,7 +375,7 @@ const config: HardhatUserConfig = {
 };
 
 function isFork() {
-  return process.env.FORK === "true"
+  return process.env.FORKED_NETWORK
     ? {
         allowUnlimitedContractSize: false,
         loggingEnabled: false,
@@ -374,12 +388,14 @@ function isFork() {
         accounts: {
           accountsBalance: "1000000000000000000",
         },
-        live: false,
+        live: true,
+        saveDeployments: false,
       }
     : {
         allowUnlimitedContractSize: true,
         loggingEnabled: false,
         live: false,
+        saveDeployments: false,
       };
 }
 

@@ -29,6 +29,7 @@
   "scripts": {
     "compile": "hardhat compile && hardhat compile --config hardhat.config.zksync.ts",
     "test": "hardhat test",
+    "test:fork": "hardhat test tests-fork/*",
     "build": "rm -rf dist && hardhat compile && hardhat compile --config hardhat.config.zksync.ts && tsc --declaration",
     "publish:dist": "yarn build && cd dist && yarn publish --access public",
     "lint": "yarn lint:ts && yarn lint:sol && yarn prettier:check",
@@ -39,7 +40,8 @@
     "prettier:check": "prettier --check \"**/*.{js,json,md,ts,yaml,yml,sol}\"",
     "docgen": "hardhat docgen",
     "prepare": "husky install",
-    "clean": "hardhat clean && hardhat clean --config hardhat.config.zksync.ts"
+    "clean": "hardhat clean && hardhat clean --config hardhat.config.zksync.ts",
+    "postinstall": "yarn patch-package"
   },
   "dependencies": {
     "@layerzerolabs/lz-evm-protocol-v2": "^3.0.38",
@@ -53,7 +55,7 @@
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",
     "@commitlint/config-conventional": "^17.4.4",
-    "@defi-wonderland/smock": "2.3.5",
+    "@defi-wonderland/smock": "2.4.0",
     "@ethersproject/abi": "^5.7.0",
     "@ethersproject/abstract-signer": "^5.7.0",
     "@ethersproject/bignumber": "^5.7.0",
@@ -69,6 +71,7 @@
     "@nomicfoundation/hardhat-toolbox": "^2.0.0",
     "@nomicfoundation/hardhat-verify": "^2.0.13",
     "@nomiclabs/hardhat-ethers": "^2.2.1",
+    "@nomiclabs/hardhat-etherscan": "^3.1.2",
     "@openzeppelin/contracts": "^4.9.6",
     "@openzeppelin/contracts-upgradeable": "^4.8.2",
     "@openzeppelin/hardhat-upgrades": "^1.22.1",
@@ -106,6 +109,7 @@
     "lint-staged": "^13.0.4",
     "lodash": "^4.17.21",
     "mocha": "^10.1.0",
+    "patch-package": "^8.0.0",
     "pinst": "^3.0.0",
     "prettier": "^2.8.4",
     "prettier-plugin-solidity": "^1.1.2",
@@ -114,19 +118,22 @@
     "solhint": "^3.4.0",
     "solhint-plugin-prettier": "^0.0.5",
     "solidity-coverage": "^0.8.4",
-    "solidity-docgen": "^0.6.0-beta.34",
+    "solidity-docgen": "0.6.0-beta.34",
     "ts-generator": "^0.1.1",
     "ts-node": "^10.9.1",
     "tsconfig-paths": "^4.1.2",
     "typechain": "^8.1.1",
     "typescript": "^4.9.3",
-    "typescript-retry-decorator": "^2.4.2",
     "zksync-ethers": "^5.9.1"
   },
   "_moduleAliases": {
     "@nomiclabs/hardhat-ethers": "node_modules/hardhat-deploy-ethers"
   },
   "resolutions": {
-    "@venusprotocol/governance-contracts": "workspace:."
+    "@venusprotocol/governance-contracts": "workspace:.",
+    "hardhat": "2.22.18",
+    "@defi-wonderland/smock": "2.4.0",
+    "rxjs": "7.8.2",
+    "semver": "7.7.1"
   }
 }

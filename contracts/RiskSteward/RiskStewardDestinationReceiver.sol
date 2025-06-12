@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
 
+import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { IRiskSteward } from "../interfaces/IRiskSteward.sol";
 import { RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
 import { RiskParamConfig } from "../interfaces/IRiskStewardReceiver.sol";
@@ -142,16 +143,42 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     * @notice Processes an update from the RiskStewardReceiver. First validates that the update has not be processed, the config is active, and is not expired.
+     * @notice Processes a stored update from the RiskStewardReceiver. First validates that the update has not be processed, the config is active, and is not expired.
      * If the update is valid then it is executed, otherwise an update failed error is emitted.
      * @param updateId The ID of the update
      */
-    function processUpdate(uint256 updateId) public whenNotPaused {
+    function processStoredUpdate(uint256 updateId) public whenNotPaused {
         require(block.timestamp > remoteUpdateTimestamps[updateId] + remoteDelay, "Delay has to be surpassed");
         RiskParameterUpdate memory _update = update[updateId];
         UPDATE_STATUS error = _validateUpdateStatus(updateId, _update.updateType, remoteUpdateTimestamps[updateId]);
         if (error == UPDATE_STATUS.NONE) {
             _executeUpdate(updateId, _update.newValue, _update.updateType, _update.market);
+        } else {
+            processedUpdates[updateId] = error;
+            emit RiskParameterUpdateFailed(updateId, error);
+        }
+    }
+
+    /**
+     * @notice Processes an update from the RiskStewardReceiver. First validates that the update has not be processed, the config is active, and is not expired.
+     * If the update is valid then it is executed, otherwise an update failed error is emitted.
+     * @param updateId The ID of the update
+     * @param newValue The new value of the update
+     * @param updateType The type of update
+     * @param market The market of the update
+     * @param timestamp The timestamp of the update
+     * @custom:access This function should only be callable by timelocks that are trusted to receive cross chain messages
+     */
+    function processUpdate(
+        uint256 updateId,
+        bytes calldata newValue,
+        string calldata updateType,
+        address market,
+        uint256 timestamp
+    ) external onlyOwner whenNotPaused {
+        UPDATE_STATUS error = _validateUpdateStatus(updateId, updateType, timestamp);
+        if (error == UPDATE_STATUS.NONE) {
+            _executeUpdate(updateId, newValue, updateType, market);
         } else {
             processedUpdates[updateId] = error;
             emit RiskParameterUpdateFailed(updateId, error);
@@ -184,11 +211,23 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
             return processedUpdates[updateId];
         }
 
-        if (remoteUpdateTimestamps[updateId] == 0) {
+        if (remoteUpdateTimestamps[updateId] == 0 && isSupplyOrBorrowCapUpdate(updateType)) {
             revert UpdateNotReceived(updateId);
         }
 
         return UPDATE_STATUS.NONE;
+    }
+
+    /**
+     * @dev Checks if the update type is a supplyCap or borrowCap update
+     * @param updateType The string name of the update type
+     * @return Whether the update type is supported
+     */
+    function isSupplyOrBorrowCapUpdate(string memory updateType) internal pure returns (bool) {
+        if (Strings.equal(updateType, "supplyCap") || Strings.equal(updateType, "borrowCap")) {
+            return true;
+        }
+        return false;
     }
 
     /**
