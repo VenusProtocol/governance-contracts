@@ -108,25 +108,14 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     error UpdateNotInRange(uint256 updateId);
 
     /**
-     * @notice Thrown when the update is not coming from the RiskStewardReceiver
-     */
-    error OnlyRiskStewardReceiver();
-
-    /**
      * @notice Thrown when the debounce period hasn't passed for applying an update to a specific market/ update type
      */
     error UpdateTooFrequent();
 
-    modifier onlyRiskStewardReceiver() {
-        if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
-            revert OnlyRiskStewardReceiver();
-        }
-        _;
-    }
-
     /**
      * @dev Sets the immutable CorePoolComptroller and RiskStewardReceiver addresses and disables initializers
      * @param riskStewardReceiver_ The address of the RiskStewardReceiver
+     * @param corePoolComptroller_ The address of the corePoolComptroller
      * @custom:error Throws ZeroAddressNotAllowed if the CorePoolComptroller or RiskStewardReceiver addresses are zero
      * @custom:oz-upgrades-unsafe-allow constructor
      */
@@ -142,6 +131,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @dev Initializes the contract as ownable, access controlled, and pausable. Sets the max delta bps initial value.
      * @param accessControlManager_ The address of the access control manager
      * @param maxDeltaBps_ The max detla bps
+     * @param debouncePeriod_ The debounce period
      * @custom:error Throws InvalidMaxDeltaBps if the max delta bps is 0 or greater than MAX_BPS
      */
     function initialize(
@@ -200,18 +190,17 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @param newValue The new supply cap value
      * @param updateType The type of update
      * @param market The market to update the supply cap for
-     * @custom:error OnlyRiskStewardReceiver Thrown if the sender is not the RiskStewardReceiver
      * @custom:error UnsupportedUpdateType Thrown if the update type is not supported
      * @custom:error UpdateNotInRange Thrown if the update is not within the allowed range
      * @custom:event Emits SupplyCapUpdated or BorrowCapUpdated depending on the update with the market and new cap
-     * @custom:access Only callable by the RiskStewardReceiver
+     * @custom:access Controlled by AccessControlManager
      */
-    function processUpdate(
-        uint256 updateId,
-        bytes memory newValue,
-        string memory updateType,
-        address market
-    ) external onlyRiskStewardReceiver {
+    function processUpdate(uint256 updateId, bytes memory newValue, string memory updateType, address market) external {
+        _checkAccessAllowed("processUpdate(uint256,bytes,string,address)");
+        if (processedUpdates[updateId]) {
+            revert("Update already processed");
+        }
+        processedUpdates[updateId] = true;
         if (Strings.equal(updateType, SUPPLY_CAP)) {
             _processSupplyCapUpdate(updateId, newValue, updateType, market);
         } else if (Strings.equal(updateType, BORROW_CAP)) {
@@ -222,27 +211,8 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Decodes the additional data from the SupplyCap and BorrowCap RiskParameterUpdates
-     * @param additionalData The additional data to decode
-     * @return underlying The underlying asset address
-     * @return destChainId The destination chain ID
-     */
-    function decodeAdditionalData(bytes calldata additionalData) external pure returns (address, uint32) {
-        (address underlying, uint32 destChainId) = abi.decode(additionalData, (address, uint32));
-        return (underlying, destChainId);
-    }
-
-    /**
-     * @notice Packs the new value into a bytes memory
-     * @param data The un-padded bytes to decode
-     * @return bytes memory The packed bytes
-     */
-    function packNewValue(bytes memory data) public pure returns (bytes memory) {
-        return abi.encodePacked(new bytes(32 - data.length), data);
-    }
-
-    /**
      * @notice Updates the supply cap for the given market.
+     * @param comptroller The comptroller to update the supply cap for
      * @param market The market to update the supply cap for
      * @param newValue The new supply cap value
      * @custom:event Emits SupplyCapUpdated with the market and new supply cap
@@ -263,6 +233,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
 
     /**
      * @notice Updates the borrow cap for the given market.
+     * @param comptroller The comptroller to update the borrow cap for
      * @param market The market to update the borrow cap for
      * @param newValue The new borrow cap value
      * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
@@ -326,6 +297,26 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
         _validateBorrowCapUpdate(comptroller, market, updateId, newCap);
         _updateBorrowCaps(comptroller, market, newCap);
         lastProcessedTime[_getMarketUpdateTypeKey(market, updateType)] = block.timestamp;
+    }
+
+    /**
+     * @notice Decodes the additional data from the SupplyCap and BorrowCap RiskParameterUpdates
+     * @param additionalData The additional data to decode
+     * @return underlying The underlying asset address
+     * @return destChainId The destination chain ID
+     */
+    function decodeAdditionalData(bytes calldata additionalData) external pure returns (address, uint32) {
+        (address underlying, uint32 destChainId) = abi.decode(additionalData, (address, uint32));
+        return (underlying, destChainId);
+    }
+
+    /**
+     * @notice Packs the new value into a bytes memory
+     * @param data The un-padded bytes to decode
+     * @return bytes memory The packed bytes
+     */
+    function packNewValue(bytes memory data) public pure returns (bytes memory) {
+        return abi.encodePacked(new bytes(32 - data.length), data);
     }
 
     /**

@@ -9,4 +9,8 @@ interface ICorePoolComptroller {
     function _setMarketSupplyCaps(address[] calldata, uint256[] calldata) external;
 
     function _setMarketBorrowCaps(address[] calldata, uint256[] calldata) external;
+
+    function _setCollateralFactor(address, uint256) external;
+
+    function markets(address) external view returns (bool isListed, uint256 collateralFactorMantissa, bool isVenus);
 }

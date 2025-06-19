@@ -4,6 +4,16 @@ pragma solidity 0.8.25;
 import { IVToken } from "../interfaces/IVToken.sol";
 
 contract MockComptroller {
+    /// @notice Represents a market's risk configuration
+    struct Market {
+        bool isListed; // just to match interface
+        uint256 collateralFactorMantissa;
+        uint256 liquidationThresholdMantissa;
+    }
+
+    /// @notice Mapping of vToken address to its market data
+    mapping(address => Market) public markets;
+
     /// @notice Mapping of vToken addresses to their supply caps
     mapping(address => uint256) public supplyCaps;
 
@@ -58,6 +68,23 @@ contract MockComptroller {
             require(vTokenListed[vTokens[i]], "vToken not listed");
             borrowCaps[address(vTokens[i])] = newCaps[i];
         }
+    }
+
+    /**
+     * @notice Sets the collateral factor and liquidation threshold for a vToken
+     * @param vToken The address of the vToken
+     * @param newCollateralFactorMantissa New collateral factor (as a mantissa)
+     * @param newLiquidationThresholdMantissa New liquidation threshold (as a mantissa)
+     */
+    function setCollateralFactor(
+        address vToken,
+        uint256 newCollateralFactorMantissa,
+        uint256 newLiquidationThresholdMantissa
+    ) external {
+        require(vTokenListed[vToken], "vToken not listed");
+
+        markets[vToken].collateralFactorMantissa = newCollateralFactorMantissa;
+        markets[vToken].liquidationThresholdMantissa = newLiquidationThresholdMantissa;
     }
 
     /**

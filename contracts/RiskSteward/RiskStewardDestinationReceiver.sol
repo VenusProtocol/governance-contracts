@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
 
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { IRiskSteward } from "../interfaces/IRiskSteward.sol";
 import { RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
 import { RiskParamConfig } from "../interfaces/IRiskStewardReceiver.sol";
@@ -111,22 +110,6 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     * @notice Cancels a pending risk parameter update
-     * @param updateId The ID of the update to be canceled
-     * @dev Can only be called by the guardian. The update must be in RECEIVED status
-     * @custom:event Emitted CancelUpdate with updateId
-     */
-    function cancelUpdate(uint256 updateId) external {
-        if (msg.sender != guardian) {
-            revert Unauthorized();
-        }
-        require(processedUpdates[updateId] == UPDATE_STATUS.RECEIVED, "Status not compatible");
-        emit CancelUpdate(updateId);
-        processedUpdates[updateId] = UPDATE_STATUS.CANCELLED;
-        delete update[updateId];
-    }
-
-    /**
      * @notice Updates the guardian address responsible for managing certain administrative functions
      * @dev Callable by the current owner or the current guardian New address must be non-zero
      * @param newGuardian The address of the new guardian
@@ -144,10 +127,11 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
 
     /**
      * @notice Processes a stored update from the RiskStewardReceiver. First validates that the update has not be processed, the config is active, and is not expired.
-     * If the update is valid then it is executed, otherwise an update failed error is emitted.
+     *         If the update is valid then it is executed, otherwise an update failed error is emitted.
      * @param updateId The ID of the update
+     * @custom:access This function can be called by anyone
      */
-    function processStoredUpdate(uint256 updateId) public whenNotPaused {
+    function processStoredUpdate(uint256 updateId) external whenNotPaused {
         require(block.timestamp > remoteUpdateTimestamps[updateId] + remoteDelay, "Delay has to be surpassed");
         RiskParameterUpdate memory _update = update[updateId];
         UPDATE_STATUS error = _validateUpdateStatus(updateId, _update.updateType, remoteUpdateTimestamps[updateId]);
@@ -161,7 +145,7 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
 
     /**
      * @notice Processes an update from the RiskStewardReceiver. First validates that the update has not be processed, the config is active, and is not expired.
-     * If the update is valid then it is executed, otherwise an update failed error is emitted.
+     *         If the update is valid then it is executed, otherwise an update failed error is emitted.
      * @param updateId The ID of the update
      * @param newValue The new value of the update
      * @param updateType The type of update
@@ -186,48 +170,19 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     * @notice Validates the status of an update silently. Will validate that the update configuration is active, is not expired and unprocessed.
-     * @param updateId The ID of the update
-     * @param updateType The type of update
-     * @param timestamp Remote timestamp of the update
-     * @return error The UPDATE_STATUS error code if the update is not valid or 0
+     * @notice Cancels a pending risk parameter update
+     * @param updateId The ID of the update to be canceled
+     * @dev Can only be called by the guardian. The update must be in RECEIVED status
+     * @custom:event Emitted CancelUpdate with updateId
      */
-    function _validateUpdateStatus(
-        uint256 updateId,
-        string memory updateType,
-        uint256 timestamp
-    ) internal view returns (UPDATE_STATUS error) {
-        RiskParamConfig memory config = riskParameterConfigs[updateType];
-
-        if (!config.active) {
-            return UPDATE_STATUS.CONFIG_NOT_ACTIVE;
+    function cancelUpdate(uint256 updateId) external {
+        if (msg.sender != guardian) {
+            revert Unauthorized();
         }
-
-        if (timestamp + REMOTE_UPDATE_EXPIRATION_TIME < block.timestamp) {
-            return UPDATE_STATUS.EXPIRED;
-        }
-
-        if (processedUpdates[updateId] == UPDATE_STATUS.PROCESSED) {
-            return processedUpdates[updateId];
-        }
-
-        if (remoteUpdateTimestamps[updateId] == 0 && isSupplyOrBorrowCapUpdate(updateType)) {
-            revert UpdateNotReceived(updateId);
-        }
-
-        return UPDATE_STATUS.NONE;
-    }
-
-    /**
-     * @dev Checks if the update type is a supplyCap or borrowCap update
-     * @param updateType The string name of the update type
-     * @return Whether the update type is supported
-     */
-    function isSupplyOrBorrowCapUpdate(string memory updateType) internal pure returns (bool) {
-        if (Strings.equal(updateType, "supplyCap") || Strings.equal(updateType, "borrowCap")) {
-            return true;
-        }
-        return false;
+        require(processedUpdates[updateId] == UPDATE_STATUS.RECEIVED, "Status not compatible");
+        emit CancelUpdate(updateId);
+        processedUpdates[updateId] = UPDATE_STATUS.CANCELLED;
+        delete update[updateId];
     }
 
     /**
@@ -259,6 +214,38 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
             emit RiskParameterUpdateFailed(updateId, UPDATE_STATUS.FAILED);
             processedUpdates[updateId] = UPDATE_STATUS.FAILED;
         }
+    }
+
+    /**
+     * @notice Validates the status of an update silently. Will validate that the update configuration is active, is not expired and unprocessed.
+     * @param updateId The ID of the update
+     * @param updateType The type of update
+     * @param timestamp Remote timestamp of the update
+     * @return error The UPDATE_STATUS error code if the update is not valid or 0
+     */
+    function _validateUpdateStatus(
+        uint256 updateId,
+        string memory updateType,
+        uint256 timestamp
+    ) internal view returns (UPDATE_STATUS error) {
+        if (timestamp == 0) {
+            revert UpdateNotReceived(updateId);
+        }
+
+        RiskParamConfig memory config = riskParameterConfigs[updateType];
+        if (!config.active) {
+            return UPDATE_STATUS.CONFIG_NOT_ACTIVE;
+        }
+
+        if (timestamp + REMOTE_UPDATE_EXPIRATION_TIME < block.timestamp) {
+            return UPDATE_STATUS.EXPIRED;
+        }
+
+        if (processedUpdates[updateId] == UPDATE_STATUS.PROCESSED) {
+            return processedUpdates[updateId];
+        }
+
+        return UPDATE_STATUS.NONE;
     }
 
     /**

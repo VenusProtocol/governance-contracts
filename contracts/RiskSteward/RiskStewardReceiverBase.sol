@@ -52,11 +52,6 @@ abstract contract RiskStewardReceiverBase is IRiskStewardReceiver, Pausable, Own
     error UnsupportedUpdateType();
 
     /**
-     * @notice Thrown when a debounce value of 0 is set
-     */
-    error InvalidDebounce();
-
-    /**
      * @notice Pauses processing of updates
      * @custom:access Only owner
      */
@@ -80,7 +75,6 @@ abstract contract RiskStewardReceiverBase is IRiskStewardReceiver, Pausable, Own
      * @custom:event Emits RiskParameterConfigSet with the update type, previous risk steward, new risk steward,
      * previous active status, and new active status
      * @custom:error Throws UnsupportedUpdateType if the update type is an empty string
-     * @custom:error Throws InvalidDebounce if the debounce is 0
      * @custom:error Throws ZeroAddressNotAllowed if the risk steward address is zero
      */
     function setRiskParameterConfig(string calldata updateType, address riskSteward) external onlyOwner {

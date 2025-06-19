@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
 
+import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { IVToken } from "../interfaces/IVToken.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
@@ -12,19 +13,19 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
 /**
  * @title CriticalParamsRiskSteward
  * @author Venus
- * @notice Contract that can update reserveFactor and collateralFactor received from RiskStewardReceiver. Requires that the update is within the max delta.
+ * @notice Contract that can update critical Params like reserveFactor and collateralFactor received from RiskStewardReceiver. Requires that the update is within the max delta.
  * Expects the new value to be an encoded uint256 value of un padded bytes.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract CriticalParamsRiskSteward is IRiskSteward, AccessControlledV8 {
     /// @notice Enum representing the kind of Comptroller
     enum ComptrollerType {
-        CoreComptroller,
-        IsolatedComptroller
+        Core,
+        Isolated
     }
 
     /// @notice Metadata for applying a risk parameter update dynamically
-    struct UpdateParameterConfig {
+    struct UpdateSelectorConfig {
         /// @notice Selector for the setter function
         bytes4 setterSelector;
         /// @notice Selector for the getter function
@@ -52,19 +53,14 @@ contract CriticalParamsRiskSteward is IRiskSteward, AccessControlledV8 {
     uint256 public maxDeltaBps;
 
     /**
-     * @notice Source chain id
-     */
-    uint16 public immutable LAYER_ZERO_CHAIN_ID;
-
-    /**
      * @notice The debounce period for updates in seconds
      */
     uint256 public debouncePeriod;
 
     /**
-     * @notice Maps a updateType to its config
+     * @notice Maps a updateType to its selector config
      */
-    mapping(string updateType => mapping(ComptrollerType => UpdateParameterConfig)) public updateParameterConfigs;
+    mapping(string updateType => mapping(ComptrollerType => UpdateSelectorConfig)) public updateSelectorConfigs;
 
     /**
      * @notice Mapping of market and update type to last update timestamp. Used for debouncing updates.
@@ -85,31 +81,24 @@ contract CriticalParamsRiskSteward is IRiskSteward, AccessControlledV8 {
 
     /**
      * @notice Emitted when an update type is registered
-     * @param updateType The string name of the update type (e.g., "reserveFactor")
-     * @param setterSelector The function selector used to set the new value
-     * @param getterSelector The function selector used to get the current value
-     * @param isComptroller Whether the target of the update is a comptroller contract
      */
-    event UpdateTypeRegistered(
+    event UpdateSelectorRegistered(
         string updateType,
         ComptrollerType comptrollerType,
-        bytes4 setterSelector,
-        bytes4 getterSelector,
+        string setterSelector,
+        string getterSelector,
         bool isComptroller
     );
 
     /**
-     * @notice Emitted when a parameter is updated dynamically
-     * @param updateType The string identifier for the update (e.g., "reserveFactor")
-     * @param market The market address associated with the update (0x0 if not applicable)
-     * @param newValue The new value applied
+     * @notice Emitted when a parameter is updated
      */
-    event ParameterUpdated(string updateType, address indexed market, uint256 indexed newValue);
+    event ParameterUpdated(string indexed updateType, address indexed market, uint256 indexed newValue);
 
     /**
      * @notice Emitted when the max delta bps is updated
      */
-    event MaxDeltaBpsUpdated(uint256 oldMaxDeltaBps, uint256 indexed newMaxDeltaBps);
+    event MaxDeltaBpsUpdated(uint256 oldMaxDeltaBps, uint256 newMaxDeltaBps);
 
     /**
      * @notice Emitted when the debounce period is updated
@@ -137,42 +126,32 @@ contract CriticalParamsRiskSteward is IRiskSteward, AccessControlledV8 {
     error UpdateNotInRange(uint256 updateId);
 
     /**
-     * @notice Thrown when the update is not coming from the RiskStewardReceiver
-     */
-    error OnlyRiskStewardReceiver();
-
-    /**
      * @notice Thrown when the debounce period hasn't passed for applying an update to a specific market/ update type
      */
     error UpdateTooFrequent();
 
-    modifier onlyRiskStewardReceiver() {
-        if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
-            revert OnlyRiskStewardReceiver();
-        }
-        _;
-    }
-
     /**
      * @dev Sets the immutable CorePoolComptroller and RiskStewardReceiver addresses and disables initializers
      * @param riskStewardReceiver_ The address of the RiskStewardReceiver
+     * @param corePoolComptroller_ The address of the corePoolComptroller
      * @custom:error Throws ZeroAddressNotAllowed if the CorePoolComptroller or RiskStewardReceiver addresses are zero
      * @custom:oz-upgrades-unsafe-allow constructor
      */
-    constructor(address riskStewardReceiver_, address corePoolComptroller_, uint16 layerZeroChainId) {
+    constructor(address riskStewardReceiver_, address corePoolComptroller_) {
         ensureNonzeroAddress(riskStewardReceiver_);
         ensureNonzeroAddress(corePoolComptroller_);
         RISK_STEWARD_RECEIVER = IRiskStewardReceiver(riskStewardReceiver_);
         CORE_POOL_COMPTROLLER = ICorePoolComptroller(corePoolComptroller_);
-        LAYER_ZERO_CHAIN_ID = layerZeroChainId;
         _disableInitializers();
     }
 
     /**
-     * @dev Initializes the contract as ownable, access controlled, and pausable. Sets the max delta bps initial value.
+     * @dev Initializes the contract as ownable, access controlled, and pausable. Sets the max delta bps and debounce initial value.
      * @param accessControlManager_ The address of the access control manager
      * @param maxDeltaBps_ The max detla bps
+     * @param debouncePeriod_ The debounce period
      * @custom:error Throws InvalidMaxDeltaBps if the max delta bps is 0 or greater than MAX_BPS
+     * @custom:error Throws InvalidDebouncePeriod if the debounce period is 0 or not greater than UPDATE_EXPIRATION_TIME
      */
     function initialize(
         address accessControlManager_,
@@ -223,42 +202,80 @@ contract CriticalParamsRiskSteward is IRiskSteward, AccessControlledV8 {
         debouncePeriod = debouncePeriod_;
     }
 
-    function registerUpdateType(
+    /**
+     * @notice Registers the setter and getter function selectors for a specific update type and comptroller type.
+     * @param updateType A unique string identifier for the update type (e.g., "ReserveFactor").
+     * @param comptrollerType The enum value specifying the comptroller category (e.g., core, isolated).
+     * @param setterSignature The function signature string of the setter (e.g., "setReserveFactor(address,uint256)").
+     * @param getterSignature The function signature string of the getter (e.g., "reserveFactorMantissa()").
+     * @param isComptroller Flag indicating whether the update targets a comptroller or a market.
+     * @custom:access Controlled by AccessControlManager
+     * @custom:event Emits UpdateSelectorRegistered
+     */
+    function registerUpdateSelector(
         string calldata updateType,
         ComptrollerType comptrollerType,
-        bytes4 setterSelector,
-        bytes4 getterSelector,
+        string calldata setterSignature,
+        string calldata getterSignature,
         bool isComptroller
     ) external {
-        _checkAccessAllowed("registerUpdateType(string,bytes4,bytes4,bool)");
+        _checkAccessAllowed("registerUpdateSelector(string,ComptrollerType,string,string,bool)");
 
-        updateParameterConfigs[updateType][comptrollerType] = UpdateParameterConfig({
-            setterSelector: setterSelector,
-            getterSelector: getterSelector,
+        updateSelectorConfigs[updateType][comptrollerType] = UpdateSelectorConfig({
+            setterSelector: bytes4(keccak256(bytes(setterSignature))),
+            getterSelector: bytes4(keccak256(bytes(getterSignature))),
             isComptroller: isComptroller
         });
 
-        emit UpdateTypeRegistered(updateType, comptrollerType, setterSelector, getterSelector, isComptroller);
+        emit UpdateSelectorRegistered(updateType, comptrollerType, setterSignature, getterSignature, isComptroller);
     }
 
-    /// @notice Processes a dynamic risk parameter update
-    /// @param updateId ID of the update (used in validation)
-    /// @param newValue Encoded new value (e.g., abi.encodePacked(uint256))
-    /// @param updateType Name of the update type (e.g., "reserveFactor")
-    /// @param market Address of the vToken market being updated
-    function processUpdate(
+    /**
+     * @notice Processes a critical params update from the RiskStewardReceiver.
+     * Validates that the update is within range and then directly update the riskParameter.
+     * @param updateId The ID of the update
+     * @param newValue The new reserveFactor value
+     * @param updateType The type of update
+     * @param market The market to update the reserveFactor for
+     * @custom:error UpdateNotInRange Thrown if the update is not within the allowed range
+     * @custom:event Emits ParameterUpdated event
+     * @custom:access Controlled by AccessControlManager
+     */
+    function processUpdate(uint256 updateId, bytes memory newValue, string memory updateType, address market) external {
+        _checkAccessAllowed("processUpdate(uint256,bytes,string,address)");
+        if (processedUpdates[updateId]) {
+            revert("Update already processed");
+        }
+        processedUpdates[updateId] = true;
+        if (Strings.equal(updateType, "collateralFactor")) {
+            _processCollateralFactorUpdate(updateId, newValue, updateType, market);
+        } else {
+            _processUpdate(updateId, newValue, updateType, market);
+        }
+    }
+
+    /**
+     * @notice Processes a dynamic risk parameter update
+     * @param updateId The ID of the update
+     * @param newValue TEncoded new value (e.g., abi.encodePacked(uint256))
+     * @param updateType Name of the update type (e.g., "reserveFactor")
+     * @param market Address of the vToken market being updated
+     * @custom:event Emits ParameterUpdated event
+     * @custom:error UpdateNotInRange if the update is not within the allowed range
+     */
+    function _processUpdate(
         uint256 updateId,
         bytes memory newValue,
         string memory updateType,
         address market
-    ) external onlyRiskStewardReceiver {
+    ) internal {
         address comptroller = IVToken(market).comptroller();
-        UpdateParameterConfig memory config;
+        UpdateSelectorConfig memory config;
 
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
-            config = updateParameterConfigs[updateType][ComptrollerType.CoreComptroller];
+            config = updateSelectorConfigs[updateType][ComptrollerType.Core];
         } else {
-            config = updateParameterConfigs[updateType][ComptrollerType.IsolatedComptroller];
+            config = updateSelectorConfigs[updateType][ComptrollerType.Isolated];
         }
 
         require(config.setterSelector != bytes4(0), "Unknown update type");
@@ -274,24 +291,86 @@ contract CriticalParamsRiskSteward is IRiskSteward, AccessControlledV8 {
             uint256 currentValue = abi.decode(result, (uint256));
             _verifyUpdate(market, updateId, updateType, currentValue, decodedValue);
         }
+        _executeUpdate(updateType, config, comptroller, market, decodedValue);
+    }
 
-        // Apply update
-        bytes memory callData;
-
-        if (config.isComptroller) {
-            // For comptroller calls, we assume function takes (address market, uint256 newValue)
-            callData = abi.encodeWithSelector(config.setterSelector, market, decodedValue);
-        } else {
-            // For vToken calls, we assume function takes (uint256 newValue)
-            callData = abi.encodeWithSelector(config.setterSelector, decodedValue);
-        }
+    /**
+     * @notice Executes the update on the target contract using the given setter selector and parameters.
+     * @param updateType The update type name
+     * @param config The UpdateSelectorConfig containing selector and target details
+     * @param comptroller The comptroller of the market
+     * @param market The vToken market
+     * @param newValue The decoded value to be passed to the setter
+     * @custom:event Emits ParameterUpdated event
+     */
+    function _executeUpdate(
+        string memory updateType,
+        UpdateSelectorConfig memory config,
+        address comptroller,
+        address market,
+        uint256 newValue
+    ) internal {
+        address target = config.isComptroller ? comptroller : market;
+        bytes memory callData = config.isComptroller
+            ? abi.encodeWithSelector(config.setterSelector, market, newValue)
+            : abi.encodeWithSelector(config.setterSelector, newValue);
 
         (bool success, ) = target.call(callData);
         require(success, "Setter call failed");
 
         lastProcessedTime[_getMarketUpdateTypeKey(market, updateType)] = block.timestamp;
+        emit ParameterUpdated(updateType, market, newValue);
+    }
 
-        emit ParameterUpdated(updateType, market, decodedValue);
+    /**
+     * @notice Validates the new collateralFactor and if valid, updates the collateralFactor for the given market.
+     * @param updateId The ID of the update
+     * @param newValue The new collateralFactor value
+     * @param updateType The type of update
+     * @param market The market to update the collateralFactor for
+     * @custom:event Emits ParameterUpdated event
+     * @custom:error UpdateNotInRange if the update is not within the allowed range
+     */
+    function _processCollateralFactorUpdate(
+        uint256 updateId,
+        bytes memory newValue,
+        string memory updateType,
+        address market
+    ) internal {
+        uint256 newFactor = _decodeBytesToUint256(newValue);
+        address comptroller = IVToken(market).comptroller();
+        uint256 currentCollateralFactor;
+        if (comptroller == address(CORE_POOL_COMPTROLLER)) {
+            (, currentCollateralFactor, ) = ICorePoolComptroller(comptroller).markets(market);
+        } else {
+            (, currentCollateralFactor, ) = IIsolatedPoolsComptroller(comptroller).markets(market);
+        }
+        _verifyUpdate(market, updateId, updateType, currentCollateralFactor, newFactor);
+        _updateCollateralFactor(updateType, comptroller, market, newFactor);
+    }
+
+    /**
+     * @notice Updates the collateralFactor for the given market.
+     * @param updateType The updateType
+     * @param comptroller The comptroller address
+     * @param market The market to update the collateralFactor for
+     * @param newValue The new collateralFactor value
+     * @custom:event Emits ParameterUpdated with the updateType, market and new collateralFactor
+     */
+    function _updateCollateralFactor(
+        string memory updateType,
+        address comptroller,
+        address market,
+        uint256 newValue
+    ) internal {
+        if (comptroller == address(CORE_POOL_COMPTROLLER)) {
+            ICorePoolComptroller(comptroller)._setCollateralFactor(market, newValue);
+        } else {
+            (, , uint256 iquidationThreshold) = IIsolatedPoolsComptroller(comptroller).markets(market);
+            IIsolatedPoolsComptroller(comptroller).setCollateralFactor(market, newValue, iquidationThreshold);
+        }
+        lastProcessedTime[_getMarketUpdateTypeKey(market, updateType)] = block.timestamp;
+        emit ParameterUpdated(updateType, market, newValue);
     }
 
     /**
