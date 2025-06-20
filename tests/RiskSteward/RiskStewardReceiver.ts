@@ -24,7 +24,7 @@ const DAY_AND_ONE_SECOND = 60 * 60 * 24 + 1;
 
 describe("Risk Steward", async function () {
   let deployer: SignerWithAddress,
-    signer1: SignerWithAddress,
+    unauthorizedSigner: SignerWithAddress,
     mockRiskOracle: MockRiskOracle,
     riskStewardReceiver: RiskStewardReceiver,
     RiskStewardReceiverFactory: ContractFactory,
@@ -38,7 +38,7 @@ describe("Risk Steward", async function () {
 
   const riskStewardFixture = async () => {
     deployer = (await ethers.getSigners())[0];
-    signer1 = (await ethers.getSigners())[1];
+    unauthorizedSigner = (await ethers.getSigners())[1];
     const accessControlManagerFactory = await ethers.getContractFactory("AccessControlManager");
 
     const accessControlManager = await accessControlManagerFactory.deploy();
@@ -118,37 +118,39 @@ describe("Risk Steward", async function () {
   describe("Access Control", async function () {
     it("should revert if access is not granted for setting risk parameter config", async function () {
       await expect(
-        riskStewardReceiver.connect(signer1).setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1),
-      ).to.be.revertedWithCustomError(
-        riskStewardReceiver,
-        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x4631BCAbD6dF18D94796344963cB60d44a4136b6", "setRiskParameterConfig(string,address,uint256)")',
-      );
+        riskStewardReceiver
+          .connect(unauthorizedSigner)
+          .setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address, 1),
+      )
+        .to.be.revertedWithCustomError(riskStewardReceiver, "Unauthorized")
+        .withArgs(
+          unauthorizedSigner.address,
+          riskStewardReceiver.address,
+          "setRiskParameterConfig(string,address,uint256)",
+        );
     });
 
     it("should revert if access is not granted for toggling config active", async function () {
-      await expect(riskStewardReceiver.connect(signer1).toggleConfigActive("supplyCap")).to.be.revertedWithCustomError(
-        riskStewardReceiver,
-        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x4631BCAbD6dF18D94796344963cB60d44a4136b6", "toggleConfigActive(string)")',
-      );
+      await expect(riskStewardReceiver.connect(unauthorizedSigner).toggleConfigActive("supplyCap"))
+        .to.be.revertedWithCustomError(riskStewardReceiver, "Unauthorized")
+        .withArgs(unauthorizedSigner.address, riskStewardReceiver.address, "toggleConfigActive(string)");
     });
 
     it("should revert if access is not granted for pausing", async function () {
-      await expect(riskStewardReceiver.connect(signer1).pause()).to.be.revertedWithCustomError(
-        riskStewardReceiver,
-        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x4631BCAbD6dF18D94796344963cB60d44a4136b6", "pause()")',
-      );
+      await expect(riskStewardReceiver.connect(unauthorizedSigner).pause())
+        .to.be.revertedWithCustomError(riskStewardReceiver, "Unauthorized")
+        .withArgs(unauthorizedSigner.address, riskStewardReceiver.address, "pause()");
     });
 
     it("should revert if access is not granted for unpausing", async function () {
-      await expect(riskStewardReceiver.connect(signer1).unpause()).to.be.revertedWithCustomError(
-        riskStewardReceiver,
-        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0x4631BCAbD6dF18D94796344963cB60d44a4136b6", "unpause()")',
-      );
+      await expect(riskStewardReceiver.connect(unauthorizedSigner).unpause())
+        .to.be.revertedWithCustomError(riskStewardReceiver, "Unauthorized")
+        .withArgs(unauthorizedSigner.address, riskStewardReceiver.address, "unpause()");
     });
 
     it("should revert if access is not granted for processing update", async function () {
       await expect(
-        marketCapsRiskSteward.connect(signer1).processUpdate({
+        marketCapsRiskSteward.connect(unauthorizedSigner).processUpdate({
           timestamp: 100,
           newValue: "0x",
           previousValue: "0x",
@@ -158,14 +160,13 @@ describe("Risk Steward", async function () {
           additionalData: "0x",
           market: mockCoreVToken.address,
         }),
-      ).to.be.revertedWithCustomError(marketCapsRiskSteward, "OnlyRiskStewardReceiver()");
+      ).to.be.revertedWithCustomError(marketCapsRiskSteward, "OnlyRiskStewardReceiver");
     });
 
     it("should revert if access is not granted for setting max increase bps", async function () {
-      await expect(marketCapsRiskSteward.connect(signer1).setMaxDeltaBps(1)).to.be.revertedWithCustomError(
-        marketCapsRiskSteward,
-        'Unauthorized("0x70997970C51812dc3A010C7d01b50e0d17dc79C8", "0xA4899D35897033b927acFCf422bc745916139776", "setMaxDeltaBps(uint256)")',
-      );
+      await expect(marketCapsRiskSteward.connect(unauthorizedSigner).setMaxDeltaBps(1))
+        .to.be.revertedWithCustomError(marketCapsRiskSteward, "Unauthorized")
+        .withArgs(unauthorizedSigner.address, marketCapsRiskSteward.address, "setMaxDeltaBps(uint256)");
     });
   });
 
