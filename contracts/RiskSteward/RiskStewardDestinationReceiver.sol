@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
 
-import { IRiskSteward } from "../interfaces/IRiskSteward.sol";
 import { RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
 import { RiskParamConfig } from "../interfaces/IRiskStewardReceiver.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
@@ -200,14 +199,7 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
         string memory updateType,
         address market
     ) internal {
-        try
-            IRiskSteward(riskParameterConfigs[updateType].riskSteward).processUpdate(
-                updateId,
-                newValue,
-                updateType,
-                market
-            )
-        {
+        try riskParameterConfigs[updateType].riskSteward.processUpdate(updateId, newValue, updateType, market) {
             processedUpdates[updateId] = UPDATE_STATUS.PROCESSED;
             emit RiskParameterUpdateProcessed(updateId);
         } catch {

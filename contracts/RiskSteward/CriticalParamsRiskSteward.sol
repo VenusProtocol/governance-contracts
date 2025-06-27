@@ -13,7 +13,8 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
 /**
  * @title CriticalParamsRiskSteward
  * @author Venus
- * @notice Contract that can update critical Params like reserveFactor and collateralFactor received from RiskStewardReceiver. Requires that the update is within the max delta.
+ * @notice Contract that can update critical Params like reserveFactor and collateralFactor received from RiskStewardReceiver.
+ * Requires that the update is within the max delta.
  * Expects the new value to be an encoded uint256 value of un padded bytes.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */

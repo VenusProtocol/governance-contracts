@@ -28,6 +28,13 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         INVALID_DESTINATION_CHAIN
     }
 
+    struct ProposalActions {
+        address[] targets;
+        uint256[] values;
+        string[] signatures;
+        bytes[] datas;
+    }
+
     struct ProposalParams {
         uint32 destChainId;
         address target;
@@ -211,20 +218,22 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * - For MarketCap updates on remote chains, constructs and sends a payload to the destination chain’s RiskStewardReceiver via the LayerZero bridge.
      * - For critical updates (e.g., reserve factor), creates a governance proposal on the Governor Bravo contract for execution.
      * @param updateId The ID of the update to process
-     * @param options LayerZero call options (e.g., adapterParams) encoded as bytes.
+     * @param options LayerZero call options
      * @param ZROTokens Amount of ZRO tokens approved for fee payment (used in LayerZero).
+     * @param adapterParams Optional adapter parameters for custom gas limits or message execution behavior.
      * @custom:event Emits RiskParameterUpdateFailed if the update is invalid.
      */
     function processUpdateById(
         uint256 updateId,
         bytes calldata options,
-        uint256 ZROTokens
+        uint256 ZROTokens,
+        bytes calldata adapterParams
     ) external payable whenNotPaused {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
         (UPDATE_STATUS error, uint32 destChainId) = _validateUpdateStatus(update);
 
         if (error == UPDATE_STATUS.NONE) {
-            _executeUpdateByType(update, destChainId, options, ZROTokens);
+            _executeUpdateByType(update, destChainId, options, ZROTokens, adapterParams);
         } else {
             processedUpdates[update.updateId] = error;
             emit RiskParameterUpdateFailed(update.updateId, error);
@@ -241,18 +250,20 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @param market The market to process the update for
      * @param options LayerZero message options
      * @param ZROTokens Amount of ZRO tokens used for the message fee
+     * @param adapterParams Optional adapter parameters for custom gas limits or message execution behavior.
      * @custom:event Emits RiskParameterUpdateFailed if the update is invalid.
      */
     function processUpdateByParameterAndMarket(
         string memory updateType,
         address market,
         bytes calldata options,
-        uint256 ZROTokens
+        uint256 ZROTokens,
+        bytes calldata adapterParams
     ) external payable whenNotPaused {
         RiskParameterUpdate memory update = RISK_ORACLE.getLatestUpdateByParameterAndMarket(updateType, market);
         (UPDATE_STATUS error, uint32 destChainId) = _validateUpdateStatus(update);
         if (error == UPDATE_STATUS.NONE) {
-            _executeUpdateByType(update, destChainId, options, ZROTokens);
+            _executeUpdateByType(update, destChainId, options, ZROTokens, adapterParams);
         } else {
             processedUpdates[update.updateId] = error;
             emit RiskParameterUpdateFailed(update.updateId, error);
@@ -265,18 +276,19 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * - All updates on remote chains are grouped and reduced into a single remote proposal for efficiency.
      * - all updateTypes including MarketCap updates are proposed to governance via a fast track proposal.
      * @param updateIds The IDs of the updates to process
+     * @param adapterParams Optional adapter parameters for custom gas limits or message execution behavior.
      * @custom:event Emits RiskParameterUpdated with the update ID
      * @custom:event Emits RiskParameterUpdateProposed with the update IDs
      * @custom:event Emits UpdateFailed with the update ID and the error if validation fails for an update
      * @custom:error Throws UpdateIsExpired if the update is expired
      */
-    function proposeUpdatesByIds(uint256[] memory updateIds) external {
+    function proposeUpdatesByIds(uint256[] memory updateIds, bytes calldata adapterParams) external {
         (
             uint32 destinationChainCount,
             uint256 validProposalCount,
             RiskParameterUpdate[] memory updates
         ) = _validateProposeUpdateAndDestChainIds(updateIds);
-        _sendProposals(destinationChainCount, validProposalCount, updates);
+        _sendProposals(destinationChainCount, validProposalCount, updates, adapterParams);
     }
 
     /**
@@ -326,17 +338,19 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @param destChainId The LayerZero destination chain ID for the proposal
      * @param options Additional options for LayerZero messaging
      * @param ZROTokens The amount of ZRO tokens to be used for message fees
+     * @param adapterParams Optional adapter parameters for custom gas limits or message execution behavior.
      */
     function _executeUpdateByType(
         RiskParameterUpdate memory update,
         uint32 destChainId,
         bytes calldata options,
-        uint256 ZROTokens
+        uint256 ZROTokens,
+        bytes calldata adapterParams
     ) internal {
         if (isSupplyOrBorrowCapUpdate(update.updateType)) {
             _executeOrSendUpdatePayload(update, options, ZROTokens);
         } else {
-            _sendProposal(update, destChainId);
+            _sendProposal(update, destChainId, adapterParams);
         }
     }
 
@@ -391,14 +405,20 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     * @dev Internal function used to propose a single update.
-     * @param update The update to propose a remote proposal for
+     * @notice Proposes a risk parameter update by routing it to the appropriate destination.
+     * @param update The risk parameter update to be proposed.
+     * @param destChainId The LayerZero chain ID of the destination chain for the proposal.
+     * @param adapterParams Optional adapter parameters for custom gas limits or message execution behavior.
      */
-    function _sendProposal(RiskParameterUpdate memory update, uint32 destChainId) internal {
+    function _sendProposal(
+        RiskParameterUpdate memory update,
+        uint32 destChainId,
+        bytes calldata adapterParams
+    ) internal {
         if (LAYER_ZERO_CHAIN_ID == destChainId) {
             _sendBscProposal(update);
         } else {
-            _sendRemoteProposal(update, destChainId);
+            _sendRemoteProposal(update, destChainId, adapterParams);
         }
         processedUpdates[update.updateId] = UPDATE_STATUS.PROPOSED;
         emit RiskParameterUpdateProposed(update.updateId);
@@ -434,32 +454,36 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * Constructs the proposal payload, wraps it with remote execution parameters, and submits it.
      * @param update The risk parameter update to propose on a remote chain
      * @param destChainId The LayerZero chain ID of the target remote chain
+     * @param adapterParams Optional adapter parameters for custom gas limits or message execution behavior.
      * @return proposalId The ID of the newly submitted proposal
      */
     function _sendRemoteProposal(
         RiskParameterUpdate memory update,
-        uint32 destChainId
+        uint32 destChainId,
+        bytes calldata adapterParams
     ) internal returns (uint256 proposalId) {
         proposalId = OMNICHAIN_PROPOSAL_SENDER.proposalCount();
         (address target, uint256 value, string memory signature, bytes memory data) = _generateRemotePayload(
             update,
             destChainId
         );
-        address[] memory targets = new address[](1);
-        uint256[] memory values = new uint256[](1);
-        string[] memory signatures = new string[](1);
-        bytes[] memory datas = new bytes[](1);
-        targets[0] = target;
-        values[0] = value;
-        signatures[0] = signature;
-        datas[0] = data;
+        ProposalActions memory proposal;
+        proposal.targets = new address[](1);
+        proposal.values = new uint256[](1);
+        proposal.signatures = new string[](1);
+        proposal.datas = new bytes[](1);
+        proposal.targets[0] = target;
+        proposal.values[0] = value;
+        proposal.signatures[0] = signature;
+        proposal.datas[0] = data;
         RemoteProposalParams memory remoteProposalParams = _createRemoteProposal(
             destChainId,
             proposalId,
-            targets,
-            values,
-            signatures,
-            datas
+            proposal.targets,
+            proposal.values,
+            proposal.signatures,
+            proposal.datas,
+            adapterParams
         );
         address[] memory remoteProposalTargets = new address[](1);
         remoteProposalTargets[0] = remoteProposalParams.target;
@@ -486,25 +510,28 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @param destinationChainCount Number of unique destination chains involved in the updates
      * @param validProposalCount Number of valid (non-expired, unprocessed) updates to be included
      * @param updates Array of `RiskParameterUpdate` structs representing each proposed parameter change
+     * @param adapterParams Optional adapter parameters for custom gas limits or message execution behavior.
      * @custom:event Emits `RiskParameterUpdateProposed` for every successfully processed update
      */
     function _sendProposals(
         uint32 destinationChainCount,
         uint256 validProposalCount,
-        RiskParameterUpdate[] memory updates
+        RiskParameterUpdate[] memory updates,
+        bytes calldata adapterParams
     ) internal {
         uint32[] memory destChainIds = new uint32[](destinationChainCount);
         address[][] memory remoteTargets = new address[][](destChainIds.length);
         uint256[][] memory remoteValues = new uint256[][](destChainIds.length);
         string[][] memory remoteSignatures = new string[][](destChainIds.length);
         bytes[][] memory remoteDatas = new bytes[][](destChainIds.length);
-        address[] memory targets = new address[](validProposalCount);
-        uint256[] memory values = new uint256[](validProposalCount);
-        string[] memory signatures = new string[](validProposalCount);
-        bytes[] memory datas = new bytes[](validProposalCount);
-        uint256 ind = 0;
+        ProposalActions memory allProposals;
+        allProposals.targets = new address[](validProposalCount);
+        allProposals.values = new uint256[](validProposalCount);
+        allProposals.signatures = new string[](validProposalCount);
+        allProposals.datas = new bytes[](validProposalCount);
+        uint256 ind;
 
-        for (uint256 i = 0; i < updates.length; i++) {
+        for (uint256 i; i < updates.length; ++i) {
             RiskParameterUpdate memory update = updates[i];
             if (Strings.equal(update.updateType, "")) {
                 // Skip indexes of invalid updates
@@ -514,11 +541,11 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
 
             if (processedUpdates[update.updateId] == UPDATE_STATUS.NONE) {
                 if (LAYER_ZERO_CHAIN_ID == p.destChainId) {
-                    targets[ind] = p.target;
-                    values[ind] = p.value;
-                    signatures[ind] = p.signature;
-                    datas[ind] = p.data;
-                    ind++;
+                    allProposals.targets[ind] = p.target;
+                    allProposals.values[ind] = p.value;
+                    allProposals.signatures[ind] = p.signature;
+                    allProposals.datas[ind] = p.data;
+                    ++ind;
                     processedUpdates[update.updateId] = UPDATE_STATUS.PROPOSED;
                     emit RiskParameterUpdateProposed(update.updateId);
                     continue;
@@ -542,26 +569,28 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
             }
         }
 
-        (
-            address[] memory remoteProposalTargets,
-            uint256[] memory remoteProposalValues,
-            string[] memory remoteProposalSignatures,
-            bytes[] memory remoteProposalDatas
-        ) = _createRemoteProposals(destChainIds, remoteTargets, remoteValues, remoteSignatures, remoteDatas);
+        ProposalActions memory remoteProposal = _createRemoteProposals(
+            destChainIds,
+            remoteTargets,
+            remoteValues,
+            remoteSignatures,
+            remoteDatas,
+            adapterParams
+        );
 
-        for (uint256 i = 0; i < destChainIds.length; i++) {
-            targets[ind] = remoteProposalTargets[i];
-            values[ind] = remoteProposalValues[i];
-            signatures[ind] = remoteProposalSignatures[i];
-            datas[ind] = remoteProposalDatas[i];
-            ind++;
+        for (uint256 i; i < destChainIds.length; ++i) {
+            allProposals.targets[ind] = remoteProposal.targets[i];
+            allProposals.values[ind] = remoteProposal.values[i];
+            allProposals.signatures[ind] = remoteProposal.signatures[i];
+            allProposals.datas[ind] = remoteProposal.datas[i];
+            ++ind;
         }
-        _proposeUpdate(targets, values, signatures, datas);
+        _proposeUpdate(allProposals.targets, allProposals.values, allProposals.signatures, allProposals.datas);
     }
 
     /**
      * @notice prepares parameters for a remote proposal or a BSC proposal.
-     * @param update The RiskParameterUpdate to execute if on BSC chain or prepare parameters for if on a remote chain
+     * @param update The RiskParameterUpdate to execute on any chain
      * @custom:event Emits BatchedUpdateFailed with the update ID if the update fails to execute
      * @return ProposalParams proposal parameters
      */
@@ -589,22 +618,16 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @param values The values of the updates
      * @param signatures The signatures of the updates
      * @param datas The data of the updates
+     * @param adapterParams Optional adapter parameters for custom gas limits or message execution behavior.
      */
     function _createRemoteProposals(
         uint32[] memory destChainIds,
         address[][] memory targets,
         uint256[][] memory values,
         string[][] memory signatures,
-        bytes[][] memory datas
-    )
-        internal
-        returns (
-            address[] memory remoteProposalTargets,
-            uint256[] memory remoteProposalValues,
-            string[] memory remoteProposalSignatures,
-            bytes[] memory remoteProposalDatas
-        )
-    {
+        bytes[][] memory datas,
+        bytes calldata adapterParams
+    ) internal returns (ProposalActions memory remoteProposalActions) {
         RemoteProposal memory remoteProposal = RemoteProposal({
             destChainId: 0,
             proposalId: 0,
@@ -615,14 +638,15 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         });
 
         uint256 proposalId = OMNICHAIN_PROPOSAL_SENDER.proposalCount();
-        for (uint256 i = 0; i < destChainIds.length; i++) {
+        for (uint256 i; i < destChainIds.length; ++i) {
             RemoteProposalParams memory remoteProposalParams = _createRemoteProposal(
                 destChainIds[i],
                 proposalId,
                 targets[i],
                 values[i],
                 signatures[i],
-                datas[i]
+                datas[i],
+                adapterParams
             );
 
             remoteProposal.destChainId = remoteProposalParams.destChainId;
@@ -632,7 +656,13 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
             remoteProposal.signatures[i] = remoteProposalParams.signature;
             remoteProposal.datas[i] = remoteProposalParams.data;
         }
-        return (remoteProposal.targets, remoteProposal.values, remoteProposal.signatures, remoteProposal.datas);
+        return
+            ProposalActions(
+                remoteProposal.targets,
+                remoteProposal.values,
+                remoteProposal.signatures,
+                remoteProposal.datas
+            );
     }
 
     /**
@@ -683,7 +713,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         uint32 baseOneIndex = 1;
         validProposalCount = 0;
 
-        for (uint256 i = 0; i < updateIds.length; i++) {
+        for (uint256 i; i < updateIds.length; ++i) {
             RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateIds[i]);
             (UPDATE_STATUS error, uint32 destChainId) = _validateUpdateStatus(update);
 
@@ -752,10 +782,9 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
             riskSteward.packNewValue(update.newValue),
             update.updateType,
             update.market,
-            update.additionalData,
             update.timestamp
         );
-        return (remoteReceiver, 0, "processUpdate(uint256,bytes,string,address,bytes,uint256)", payload);
+        return (remoteReceiver, 0, "processUpdate(uint256,bytes,string,address,uint256)", payload);
     }
 
     /**
@@ -766,6 +795,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @param values The values of the update
      * @param signatures The signatures of the update
      * @param datas The data of the update
+     * @param adapterParams Optional adapter parameters for custom gas limits or message execution behavior.
      * @return remoteProposalParams The remote proposal params
      */
     function _createRemoteProposal(
@@ -774,7 +804,8 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         address[] memory targets,
         uint256[] memory values,
         string[] memory signatures,
-        bytes[] memory datas
+        bytes[] memory datas,
+        bytes calldata adapterParams
     ) internal view returns (RemoteProposalParams memory remoteProposalParams) {
         uint16 lzV1DestChainId = lzV2ToV1ChainId[destChainId];
         require(lzV1DestChainId != 0, "invalid lzV1DestChainId");
@@ -788,7 +819,11 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         );
 
         bytes memory payloadWithId = abi.encode(payload, proposalId);
-        (uint256 fee, bytes memory remoteAdapterParam) = _getRemoteProposalFee(lzV1DestChainId, payloadWithId);
+        bytes memory adapterParams_ = adapterParams.length == 0
+            ? abi.encodePacked(uint16(1), uint256(300000))
+            : adapterParams;
+
+        uint256 fee = _getRemoteProposalFee(lzV1DestChainId, payloadWithId, adapterParams_);
         return
             RemoteProposalParams({
                 destChainId: lzV1DestChainId,
@@ -796,7 +831,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
                 target: address(OMNICHAIN_PROPOSAL_SENDER),
                 value: fee,
                 signature: "execute(uint16,bytes,bytes,address)",
-                data: abi.encode(lzV1DestChainId, payloadWithId, remoteAdapterParam, address(0))
+                data: abi.encode(lzV1DestChainId, payload, adapterParams_, address(0))
             });
     }
 
@@ -804,22 +839,21 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @notice Estimates the fee needed to receive and execute a proposal on a remote chain
      * @param destChainId The destination chain ID of the update
      * @param payloadWithId The payload with the proposal ID
+     * @param adapterParams adapter parameters for custom gas limits or message execution behavior.
      * @return estimatedFee The estimated fee
      */
     function _getRemoteProposalFee(
         uint32 destChainId,
-        bytes memory payloadWithId
-    ) internal view returns (uint256 estimatedFee, bytes memory adapterParams) {
-        uint16 version = 1;
-        uint256 requiredGas = 300000;
-        bytes memory adapterParams_ = abi.encodePacked(version, requiredGas);
+        bytes memory payloadWithId,
+        bytes memory adapterParams
+    ) internal view returns (uint256) {
         (uint256 fee, ) = OMNICHAIN_PROPOSAL_SENDER.estimateFees(
             uint16(destChainId),
             payloadWithId,
             false,
-            adapterParams_
+            adapterParams
         );
-        return (fee, adapterParams_);
+        return fee;
     }
 
     /**
