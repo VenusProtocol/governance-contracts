@@ -12,8 +12,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const networkName = hre.network.name as SUPPORTED_NETWORKS;
 
   const accessControlManager = await hre.ethers.getContract("AccessControlManager");
-  const corePoolComptroller =
-    (await hre.ethers.getContractOrNull("Unitroller"))?.address || "0x0000000000000000000000000000000000000001";
+  const corePoolComptroller = (await hre.ethers.getContract("Unitroller"))?.address;
 
   const maxDeltaBps = 5000; // 50%
   const debouncePeriod = 2 * 24 * 60 * 60 + 1; // 2 days + 1 seconds
@@ -33,6 +32,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       normalTimelockAddress,
       await guardian(networkName as SUPPORTED_NETWORKS),
     ],
+    skipIfAlreadyDeployed: true,
   });
 
   const riskStewardDestinationReceiver = await hre.ethers.getContract("RiskStewardDestinationReceiver");
@@ -53,11 +53,36 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         artifact: defaultProxyAdmin,
       },
     },
+    skipIfAlreadyDeployed: true,
+  });
+
+  await deploy("CriticalParamsRiskSteward", {
+    from: deployer,
+    log: true,
+    args: [riskStewardDestinationReceiver.address, corePoolComptroller],
+    proxy: {
+      owner: networkName === "hardhat" ? deployer : normalTimelockAddress,
+      proxyContract: "OptimizedTransparentUpgradeableProxy",
+      execute: {
+        methodName: "initialize",
+        args: [accessControlManager.address, maxDeltaBps, debouncePeriod],
+      },
+      viaAdminContract: {
+        name: "DefaultProxyAdmin",
+        artifact: defaultProxyAdmin,
+      },
+    },
+    skipIfAlreadyDeployed: true,
   });
 
   const marketCapsRiskSteward = await hre.ethers.getContract("MarketCapsRiskSteward");
   if ((await marketCapsRiskSteward.owner()) === deployer) {
     await marketCapsRiskSteward.transferOwnership(normalTimelockAddress);
+  }
+
+  const criticalParamsRiskSteward = await hre.ethers.getContract("CriticalParamsRiskSteward");
+  if ((await criticalParamsRiskSteward.owner()) === deployer) {
+    await criticalParamsRiskSteward.transferOwnership(normalTimelockAddress);
   }
 };
 

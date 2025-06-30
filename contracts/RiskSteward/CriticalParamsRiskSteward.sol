@@ -32,7 +32,7 @@ contract CriticalParamsRiskSteward is IRiskSteward, AccessControlledV8 {
         /// @notice Selector for the getter function
         bytes4 getterSelector;
         /// @notice True if the update applies to the comptroller; false for vToken
-        bool isComptroller;
+        bool isComptrollerUpdate;
     }
 
     /// @dev Max basis points i.e., 100%
@@ -88,7 +88,7 @@ contract CriticalParamsRiskSteward is IRiskSteward, AccessControlledV8 {
         ComptrollerType comptrollerType,
         string setterSelector,
         string getterSelector,
-        bool isComptroller
+        bool isComptrollerUpdate
     );
 
     /**
@@ -209,7 +209,7 @@ contract CriticalParamsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @param comptrollerType The enum value specifying the comptroller category (e.g., core, isolated).
      * @param setterSignature The function signature string of the setter (e.g., "setReserveFactor(address,uint256)").
      * @param getterSignature The function signature string of the getter (e.g., "reserveFactorMantissa()").
-     * @param isComptroller Flag indicating whether the update targets a comptroller or a market.
+     * @param isComptrollerUpdate Flag indicating whether the update targets a comptroller or a market.
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits UpdateSelectorRegistered
      */
@@ -218,17 +218,23 @@ contract CriticalParamsRiskSteward is IRiskSteward, AccessControlledV8 {
         ComptrollerType comptrollerType,
         string calldata setterSignature,
         string calldata getterSignature,
-        bool isComptroller
+        bool isComptrollerUpdate
     ) external {
         _checkAccessAllowed("registerUpdateSelector(string,ComptrollerType,string,string,bool)");
 
         updateSelectorConfigs[updateType][comptrollerType] = UpdateSelectorConfig({
             setterSelector: bytes4(keccak256(bytes(setterSignature))),
             getterSelector: bytes4(keccak256(bytes(getterSignature))),
-            isComptroller: isComptroller
+            isComptrollerUpdate: isComptrollerUpdate
         });
 
-        emit UpdateSelectorRegistered(updateType, comptrollerType, setterSignature, getterSignature, isComptroller);
+        emit UpdateSelectorRegistered(
+            updateType,
+            comptrollerType,
+            setterSignature,
+            getterSignature,
+            isComptrollerUpdate
+        );
     }
 
     /**
@@ -281,7 +287,7 @@ contract CriticalParamsRiskSteward is IRiskSteward, AccessControlledV8 {
 
         require(config.setterSelector != bytes4(0), "Unknown update type");
 
-        address target = config.isComptroller ? comptroller : market;
+        address target = config.isComptrollerUpdate ? comptroller : market;
         uint256 decodedValue = _decodeBytesToUint256(newValue);
 
         // Read current value and validate
@@ -311,8 +317,8 @@ contract CriticalParamsRiskSteward is IRiskSteward, AccessControlledV8 {
         address market,
         uint256 newValue
     ) internal {
-        address target = config.isComptroller ? comptroller : market;
-        bytes memory callData = config.isComptroller
+        address target = config.isComptrollerUpdate ? comptroller : market;
+        bytes memory callData = config.isComptrollerUpdate
             ? abi.encodeWithSelector(config.setterSelector, market, newValue)
             : abi.encodeWithSelector(config.setterSelector, newValue);
 

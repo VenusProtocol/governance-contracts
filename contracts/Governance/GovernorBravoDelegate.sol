@@ -278,6 +278,15 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV4, GovernorBravoE
     }
 
     /**
+     * @notice Initialize the address of Access Control Manager (ACM)
+     * @param accessControlManager_ The new address of the Access Control Manager
+     * @custom:access Only Admin
+     */
+    function initAccessControlManager(address accessControlManager_) external onlyAdmin initializer {
+        __AccessControlled_init(accessControlManager_);
+    }
+
+    /**
      * @notice Initiate the GovernorBravo contract
      * @dev Admin only. Sets initial proposal id which initiates the contract, ensuring a continuous proposal id count
      * @param governorAlpha The address for the Governor to continue the proposal id count from

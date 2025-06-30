@@ -145,6 +145,7 @@ export const getRiskOracle = async (networkName: SUPPORTED_NETWORKS) => {
     zksyncsepolia: "0x1f7474B549840158464Eca63735429815867b40e", // Mock
     zksyncmainnet: "",
     berachainbartio: "",
+    berachainbepolia: "",
   }[networkName];
 };
 

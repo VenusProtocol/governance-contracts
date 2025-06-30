@@ -12,14 +12,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const networkName = hre.network.name as SUPPORTED_NETWORKS;
 
   const accessControlManager = await hre.ethers.getContract("AccessControlManager");
-  const corePoolComptroller = (await hre.ethers.getContractOrNull("Unitroller")) || {
-    address: "0x0000000000000000000000000000000000000001",
-  };
+  const corePoolComptroller = await hre.ethers.getContract("Unitroller");
   const chainId = hre.network.name == "bscmainnet" ? 30102 : 40102;
 
   const maxDeltaBps = 5000; // 50%
   const debouncePeriod = 2 * 24 * 60 * 60 + 1; // 2 days + 1 seconds
-
   // Explicitly mentioning Default Proxy Admin contract path to fetch it from hardhat-deploy instead of OpenZeppelin
   // as zksync doesnot compile OpenZeppelin contracts using zksolc. It is backward compatible for all networks as well.
   const defaultProxyAdmin = await hre.artifacts.readArtifact(
@@ -27,6 +24,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   );
 
   const normalTimelockAddress = (await hre.ethers.getContract("NormalTimelock")).address;
+  const governorBravo = (await hre.ethers.getContract("GovernorBravoDelegator")).address;
+  const omnichainProposalSender = (await hre.ethers.getContract("OmnichainProposalSender")).address;
+
   await deploy("RiskStewardReceiver", {
     from: deployer,
     log: true,
@@ -35,7 +35,10 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       chainId,
       await getLzV2Endpoint(hre.network.name as SUPPORTED_NETWORKS),
       normalTimelockAddress,
+      governorBravo,
+      omnichainProposalSender,
     ],
+    skipIfAlreadyDeployed: true,
   });
 
   const riskStewardReceiver = await hre.ethers.getContract("RiskStewardReceiver");
@@ -56,11 +59,36 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
         artifact: defaultProxyAdmin,
       },
     },
+    skipIfAlreadyDeployed: true,
+  });
+
+  await deploy("CriticalParamsRiskSteward", {
+    from: deployer,
+    log: true,
+    args: [riskStewardReceiver.address, corePoolComptroller.address],
+    proxy: {
+      owner: networkName === "hardhat" ? deployer : normalTimelockAddress,
+      proxyContract: "OptimizedTransparentUpgradeableProxy",
+      execute: {
+        methodName: "initialize",
+        args: [accessControlManager.address, maxDeltaBps, debouncePeriod],
+      },
+      viaAdminContract: {
+        name: "DefaultProxyAdmin",
+        artifact: defaultProxyAdmin,
+      },
+    },
+    skipIfAlreadyDeployed: true,
   });
 
   const marketCapsRiskSteward = await hre.ethers.getContract("MarketCapsRiskSteward");
   if ((await marketCapsRiskSteward.owner()) === deployer) {
     await marketCapsRiskSteward.transferOwnership(normalTimelockAddress);
+  }
+
+  const criticalParamsRiskSteward = await hre.ethers.getContract("CriticalParamsRiskSteward");
+  if ((await criticalParamsRiskSteward.owner()) === deployer) {
+    await criticalParamsRiskSteward.transferOwnership(normalTimelockAddress);
   }
 };
 
