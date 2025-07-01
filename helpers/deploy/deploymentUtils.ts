@@ -108,7 +108,7 @@ export const getRiskOracle = async (networkName: SUPPORTED_NETWORKS) => {
     bsctestnet: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
     hardhat: mockRiskOracle?.address || "",
     sepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
-    ethereum: "",
+    ethereum: "0x91429ddc50B38bAF3Ba9CB5eB0275507Ac65CBF4",
     opbnbtestnet: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
     opbnbmainnet: "",
     arbitrumsepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
@@ -122,6 +122,7 @@ export const getRiskOracle = async (networkName: SUPPORTED_NETWORKS) => {
     zksyncsepolia: "0x1f7474B549840158464Eca63735429815867b40e", // Mock
     zksyncmainnet: "",
     berachainbartio: "",
+    berachainbepolia: "",
   }[networkName];
 };
 

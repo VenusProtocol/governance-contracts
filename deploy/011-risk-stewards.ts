@@ -44,7 +44,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const riskStewardReceiver = await hre.ethers.getContract("RiskStewardReceiver");
 
   if ((await riskStewardReceiver.owner()) === deployer) {
-    await riskStewardReceiver.transferOwnership(normalTimelockAddress);
+    const tx = await riskStewardReceiver.transferOwnership(normalTimelockAddress);
+    await tx.wait();
+    console.log(`Transferred ownership of RiskStewardReceiver to ${normalTimelockAddress}`);
   }
 
   await deploy("MarketCapsRiskSteward", {
@@ -67,7 +69,9 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const marketCapsRiskSteward = await hre.ethers.getContract("MarketCapsRiskSteward");
   if ((await marketCapsRiskSteward.owner()) === deployer) {
-    await marketCapsRiskSteward.transferOwnership(normalTimelockAddress);
+    const tx = await marketCapsRiskSteward.transferOwnership(normalTimelockAddress);
+    await tx.wait();
+    console.log(`Transferred ownership of MarketCapsRiskSteward to ${normalTimelockAddress}`);
   }
 };
 
