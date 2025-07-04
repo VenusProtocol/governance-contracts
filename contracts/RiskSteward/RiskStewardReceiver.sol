@@ -6,10 +6,11 @@ import { IRiskSteward } from "../interfaces/IRiskSteward.sol";
 import { IRiskOracle, RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
 import { RiskParamConfig } from "../interfaces/IRiskStewardReceiver.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
-import { IGovernorBravoDelegate, GovernorBravoDelegateStorageV2 } from "../Governance/IGovernorBravoV8.sol";
+import { IGovernorBravoDelegate, GovernorBravoDelegateStorageV4, GovernorBravoDelegateStorageV1 } from "../Governance/IGovernorBravoV8.sol";
 import { IOmnichainProposalSender } from "../Cross-chain/interfaces/IOmnichainProposalSender.sol";
 import { RiskStewardReceiverBase } from "./RiskStewardReceiverBase.sol";
 import { OApp, MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oapp/OApp.sol";
+import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
 /**
  * @title RiskStewardReceiver
  * @author Venus
@@ -17,6 +18,7 @@ import { OApp, MessagingFee, Origin } from "@layerzerolabs/oapp-evm/contracts/oa
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
+    using OptionsBuilder for bytes;
     enum UPDATE_STATUS {
         NONE,
         PROCESSED,
@@ -25,7 +27,8 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         EXPIRED,
         FAILED,
         PROPOSED,
-        INVALID_DESTINATION_CHAIN
+        INVALID_DESTINATION_CHAIN,
+        HAS_ACTIVE_PROPOSAL
     }
 
     struct ProposalActions {
@@ -34,7 +37,6 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         string[] signatures;
         bytes[] datas;
     }
-
     struct ProposalParams {
         uint32 destChainId;
         address target;
@@ -50,7 +52,6 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         string signature;
         bytes data;
     }
-
     struct RemoteProposal {
         uint32 destChainId;
         uint256 proposalId;
@@ -83,6 +84,16 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @notice Address of the OmnichainProposalSender used to propose VIPs
      */
     IOmnichainProposalSender public immutable OMNICHAIN_PROPOSAL_SENDER;
+
+    /**
+     * @notice The proposal type used when submitting governance proposals
+     * @dev Stored as a uint8 to ensure compatibility with GovernorBravo's ProposalType enum
+     * Example values:
+     * 0 = NORMAL
+     * 1 = FASTTRACK
+     * 2 = CRITICAL
+     */
+    GovernorBravoDelegateStorageV4.ProposalType public proposalType;
 
     /**
      * @notice Mapping from LayerZero V2 chain ID to V1 chain ID
@@ -138,6 +149,19 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         bytes reason
     );
 
+    /**
+     * @notice Emitted when the proposal type is updated
+     */
+    event ProposalTypeUpdated(
+        GovernorBravoDelegateStorageV4.ProposalType indexed previousProposalType,
+        GovernorBravoDelegateStorageV4.ProposalType indexed newProposalType
+    );
+
+    /**
+     * @notice Thrown when already has an active or pending governance proposal.
+     */
+    error HasActiveProposal();
+
     constructor(
         address riskOracle_,
         uint32 layerZeroChainId_,
@@ -182,6 +206,17 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
+     * @notice Sets the proposal type for future governance proposals
+     * Emits a ProposalTypeUpdated event on success
+     * @param _proposalType The new proposal type to set
+     * @custom:access OnlyOwner
+     */
+    function setProposalType(GovernorBravoDelegateStorageV4.ProposalType _proposalType) external onlyOwner {
+        emit ProposalTypeUpdated(proposalType, _proposalType);
+        proposalType = _proposalType;
+    }
+
+    /**
      * @notice Sets or deletes multiple V2 → V1 chain ID mappings in a single transaction.
      * @dev If an element of `v1ChainIds` is 0, the corresponding mapping is deleted.
      * @param v2ChainIds Array of LayerZero V2 chain IDs to set.
@@ -212,10 +247,20 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
+     * @notice Validates the status of an update by its ID. Checks if the update is active, not expired, and unprocessed.
+     * @param updateId The ID of the update to validate
+     * @return error The UPDATE_STATUS error code if the update is not valid, or NONE if valid
+     */
+    function validateUpdateStatus(uint256 updateId) public view returns (UPDATE_STATUS error) {
+        RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
+        (error, ) = _validateUpdateStatus(update);
+    }
+
+    /**
      * @notice Processes an update by its ID. Validates that the update configuration is active, not expired, and unprocessed.
      * @dev Handles updates based on their type and destination chain:
      * - For MarketCap updates on the BNB chain, directly invokes the associated RiskSteward contract.
-     * - For MarketCap updates on remote chains, constructs and sends a payload to the destination chain’s RiskStewardReceiver via the LayerZero bridge.
+     * - For MarketCap updates on remote chains, constructs and sends a payload to the destination chain's RiskStewardReceiver via the LayerZero bridge.
      * - For critical updates (e.g., reserve factor), creates a governance proposal on the Governor Bravo contract for execution.
      * @param updateId The ID of the update to process
      * @param options LayerZero call options
@@ -244,7 +289,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @notice Processes the latest update for a given parameter and market. Validates that the update configuration is active, not expired, and unprocessed.
      * @dev Handles updates based on their type and destination chain:
      * - For MarketCap updates on the BNB chain, directly invokes the associated RiskSteward contract.
-     * - For MarketCap updates on remote chains, constructs and sends a payload to the destination chain’s RiskStewardReceiver via the LayerZero bridge.
+     * - For MarketCap updates on remote chains, constructs and sends a payload to the destination chain's RiskStewardReceiver via the LayerZero bridge.
      * - For critical updates (e.g., reserve factor), creates a governance proposal on the Governor Bravo contract for execution.
      * @param updateType The type of update to process
      * @param market The market to process the update for
@@ -307,7 +352,10 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         address refundAddress
     ) external payable {
         require(msg.sender == address(this), "Invalid caller");
-        _lzSend(destChainId, payload, options, fee, refundAddress);
+        bytes memory options_ = options.length == 0
+            ? OptionsBuilder.newOptions().addExecutorLzReceiveOption(1_000_000, 0)
+            : options;
+        _lzSend(destChainId, payload, options_, fee, refundAddress);
     }
 
     /**
@@ -366,7 +414,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         uint256 ZROTokens
     ) internal {
         IRiskSteward riskSteward = riskParameterConfigs[update.updateType].riskSteward;
-        (, uint32 destChainId) = riskSteward.decodeAdditionalData(update.additionalData);
+        (, uint32 destChainId) = _decodeAdditionalData(update.additionalData);
 
         if (LAYER_ZERO_CHAIN_ID == destChainId) {
             try riskSteward.processUpdate(update.updateId, update.newValue, update.updateType, update.market) {
@@ -595,8 +643,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @return ProposalParams proposal parameters
      */
     function _prepareProposalParams(RiskParameterUpdate memory update) internal view returns (ProposalParams memory) {
-        IRiskSteward riskSteward = riskParameterConfigs[update.updateType].riskSteward;
-        (, uint32 destChainId_) = riskSteward.decodeAdditionalData(update.additionalData);
+        (, uint32 destChainId_) = _decodeAdditionalData(update.additionalData);
         if (LAYER_ZERO_CHAIN_ID == destChainId_) {
             (address target_, uint256 value_, string memory signature_, bytes memory payload) = _createBscProposal(
                 update
@@ -681,14 +728,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         string[] memory signatures,
         bytes[] memory datas
     ) internal returns (uint256 proposalId) {
-        proposalId = GOVERNANCE_BRAVO.propose(
-            targets,
-            values,
-            signatures,
-            datas,
-            "",
-            GovernorBravoDelegateStorageV2.ProposalType.FASTTRACK
-        );
+        proposalId = GOVERNANCE_BRAVO.propose(targets, values, signatures, datas, "", proposalType);
         return proposalId;
     }
 
@@ -709,6 +749,9 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         internal
         returns (uint32 destinationChainCount, uint256 validProposalCount, RiskParameterUpdate[] memory updates)
     {
+        if (_hasActiveProposal(address(this))) {
+            revert HasActiveProposal();
+        }
         updates = new RiskParameterUpdate[](updateIds.length);
         uint32 baseOneIndex = 1;
         validProposalCount = 0;
@@ -810,17 +853,11 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         uint16 lzV1DestChainId = lzV2ToV1ChainId[destChainId];
         require(lzV1DestChainId != 0, "invalid lzV1DestChainId");
 
-        bytes memory payload = abi.encode(
-            targets,
-            values,
-            signatures,
-            datas,
-            GovernorBravoDelegateStorageV2.ProposalType.FASTTRACK
-        );
+        bytes memory payload = abi.encode(targets, values, signatures, datas, proposalType);
 
         bytes memory payloadWithId = abi.encode(payload, proposalId);
         bytes memory adapterParams_ = adapterParams.length == 0
-            ? abi.encodePacked(uint16(1), uint256(300000))
+            ? abi.encodePacked(uint16(1), uint256(1_000_000))
             : adapterParams;
 
         uint256 fee = _getRemoteProposalFee(lzV1DestChainId, payloadWithId, adapterParams_);
@@ -878,6 +915,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
 
     /**
      * @dev Validates the status of an update silently. Will validate that the update configuration is active, is not expired, and unprocessed
+     * @param update The risk parameter update to validate.
      * @return error The UPDATE_STATUS error code if the update is not valid or 0 and destination chain id
      */
     function _validateUpdateStatus(
@@ -892,7 +930,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
             update.market
         );
 
-        (, uint32 destChainId) = config.riskSteward.decodeAdditionalData(update.additionalData);
+        (, uint32 destChainId) = _decodeAdditionalData(update.additionalData);
 
         if (latestForMarketAndType.updateId != update.updateId) {
             return (UPDATE_STATUS.EXPIRED, destChainId);
@@ -915,15 +953,32 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         }
 
         address remoteReceiver = remoteRiskStewardReceiver[destChainId];
-        if (
-            !isSupplyOrBorrowCapUpdate(update.updateType) &&
-            remoteReceiver == address(0) &&
-            destChainId != LAYER_ZERO_CHAIN_ID
-        ) {
-            return (UPDATE_STATUS.INVALID_DESTINATION_CHAIN, destChainId);
+        if (!isSupplyOrBorrowCapUpdate(update.updateType)) {
+            if (remoteReceiver == address(0) && destChainId != LAYER_ZERO_CHAIN_ID) {
+                return (UPDATE_STATUS.INVALID_DESTINATION_CHAIN, destChainId);
+            }
+            if (_hasActiveProposal(address(this))) {
+                return (UPDATE_STATUS.HAS_ACTIVE_PROPOSAL, destChainId);
+            }
+        }
+        return (UPDATE_STATUS.NONE, destChainId);
+    }
+
+    /**
+     * @dev Checks if the given proposer has any active or pending governance proposals.
+     * @param proposer The address of the proposer to check.
+     * @return hasLiveProposal True if the proposer has an active or pending proposal, false otherwise.
+     */
+    function _hasActiveProposal(address proposer) internal view returns (bool) {
+        uint256 latestProposalId = GOVERNANCE_BRAVO.latestProposalIds(proposer);
+        if (latestProposalId == 0) {
+            return false;
         }
 
-        return (UPDATE_STATUS.NONE, destChainId);
+        GovernorBravoDelegateStorageV1.ProposalState proposalState = GOVERNANCE_BRAVO.state(latestProposalId);
+
+        return (proposalState == GovernorBravoDelegateStorageV1.ProposalState.Active ||
+            proposalState == GovernorBravoDelegateStorageV1.ProposalState.Pending);
     }
 
     /**
@@ -987,5 +1042,16 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         assembly ("memory-safe") {
             value := tload(slotKey)
         }
+    }
+
+    /**
+     * @notice Decodes the additional data from the SupplyCap and BorrowCap RiskParameterUpdates
+     * @param additionalData The additional data to decode
+     * @return underlying The underlying asset address
+     * @return destChainId The destination chain ID
+     */
+    function _decodeAdditionalData(bytes memory additionalData) internal pure returns (address, uint32) {
+        (address underlying, uint32 destChainId) = abi.decode(additionalData, (address, uint32));
+        return (underlying, destChainId);
     }
 }

@@ -359,6 +359,8 @@ interface IGovernorBravoDelegate {
         address voter
     ) external view returns (GovernorBravoDelegateStorageV2.Receipt memory);
 
+    function latestProposalIds(address) external view returns (uint256);
+
     function state(uint256 proposalId) external view returns (GovernorBravoDelegateStorageV2.ProposalState);
 
     function castVote(uint256 proposalId, uint8 support) external;

@@ -44,13 +44,15 @@
     "postinstall": "yarn patch-package"
   },
   "dependencies": {
+    "@layerzerolabs/lz-evm-messagelib-v2": "^3.0.109",
     "@layerzerolabs/lz-evm-protocol-v2": "^3.0.38",
     "@layerzerolabs/lz-v2-utilities": "^3.0.73",
     "@layerzerolabs/oapp-evm": "^0.3.0",
     "@layerzerolabs/test-devtools-evm-hardhat": "^0.5.2",
     "@venusprotocol/solidity-utilities": "2.0.0",
     "hardhat-deploy-ethers": "^0.3.0-beta.13",
-    "module-alias": "^2.2.2"
+    "module-alias": "^2.2.2",
+    "solidity-bytes-utils": "^0.8.4"
   },
   "devDependencies": {
     "@commitlint/cli": "^17.4.4",

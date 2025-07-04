@@ -3,7 +3,7 @@ import { Options } from "@layerzerolabs/lz-v2-utilities";
 import { loadFixture, mine } from "@nomicfoundation/hardhat-network-helpers";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
-import { BigNumber, ContractFactory } from "ethers";
+import { BigNumber } from "ethers";
 import fs from "fs";
 import { ethers, upgrades } from "hardhat";
 import { SignerWithAddress } from "hardhat-deploy-ethers/signers";
@@ -13,7 +13,7 @@ import { LZ_CHAINID } from "../../helpers/deploy/constants";
 import { convertToUnit } from "../../helpers/utils";
 import {
   AccessControlManager,
-  CriticalParamsRiskSteward,
+  CollateralFactorRiskSteward,
   GovernorBravoDelegate,
   GovernorBravoDelegate__factory,
   MarketCapsRiskSteward,
@@ -25,6 +25,7 @@ import {
   OmnichainExecutorOwner,
   OmnichainGovernanceExecutor,
   OmnichainProposalSender,
+  ReserveFactorRiskSteward,
   RiskStewardDestinationReceiver,
   RiskStewardOwner,
   RiskStewardReceiver,
@@ -93,7 +94,6 @@ describe("Risk Steward", async function () {
     signer1: SignerWithAddress,
     mockRiskOracle: MockRiskOracle,
     riskStewardReceiver: RiskStewardReceiver,
-    MarketCapsRiskStewardFactory: ContractFactory,
     mockCoreVToken: MockCoreVToken,
     mockVToken: MockVToken,
     mockEthereumVToken: MockVToken,
@@ -103,17 +103,18 @@ describe("Risk Steward", async function () {
     mockEthereumComptroller: MockComptroller,
     mockArbitrumComptroller: MockComptroller,
     marketCapsRiskSteward: MarketCapsRiskSteward,
-    criticalParamsRiskSteward: CriticalParamsRiskSteward,
+    collateralFactorRiskSteward: CollateralFactorRiskSteward,
+    reserveFactorRiskSteward: ReserveFactorRiskSteward,
     governorBravoDelegate: MockContract<GovernorBravoDelegate>,
     omnichainProposalSender: OmnichainProposalSender,
     ethereumOmnichainExecutorOwner: OmnichainExecutorOwner,
     arbitrumOmnichainExecutorOwner: OmnichainExecutorOwner,
     riskStewardDestReceiver: RiskStewardDestinationReceiver,
     marketCapsDestRiskSteward: MarketCapsRiskSteward,
-    criticalParamsDestRiskSteward: CriticalParamsRiskSteward,
+    collateralFactorDestRiskSteward: CollateralFactorRiskSteward,
+    reserveFactorDestRiskSteward: ReserveFactorRiskSteward,
     stewardOwner: RiskStewardOwner,
     destStewardOwner: RiskStewardOwner,
-    CriticalParamsRiskStewardFactory: ContractFactory,
     xvsVault: XVSVault,
     fastrackTimelock: TimelockV8,
     EthereumNormalTimelock: TimelockV8,
@@ -317,8 +318,9 @@ describe("Risk Steward", async function () {
     const MockRiskOracleFactory = await ethers.getContractFactory("MockRiskOracle");
     const RiskStewardReceiverFactory = await ethers.getContractFactory("RiskStewardReceiver");
     const RiskStewardDestinationFactory = await ethers.getContractFactory("RiskStewardDestinationReceiver");
-    MarketCapsRiskStewardFactory = await ethers.getContractFactory("MarketCapsRiskSteward");
-    CriticalParamsRiskStewardFactory = await ethers.getContractFactory("CriticalParamsRiskSteward");
+    const MarketCapsRiskStewardFactory = await ethers.getContractFactory("MarketCapsRiskSteward");
+    const CollateralFactorRiskStewardFactory = await ethers.getContractFactory("CollateralFactorRiskSteward");
+    const ReserveFactorRiskStewardFactory = await ethers.getContractFactory("ReserveFactorRiskSteward");
 
     mockRiskOracle = await MockRiskOracleFactory.deploy(
       "MockRiskOracle",
@@ -363,8 +365,18 @@ describe("Risk Steward", async function () {
       },
     );
 
-    criticalParamsRiskSteward = await upgrades.deployProxy(
-      CriticalParamsRiskStewardFactory,
+    collateralFactorRiskSteward = await upgrades.deployProxy(
+      CollateralFactorRiskStewardFactory,
+      [accessControlManager.address, 5000, DAY_AND_ONE_SECOND],
+      {
+        constructorArgs: [riskStewardReceiver.address, mockCoreComptroller.address],
+        initializer: "initialize",
+        unsafeAllow: ["state-variable-immutable"],
+      },
+    );
+
+    reserveFactorRiskSteward = await upgrades.deployProxy(
+      ReserveFactorRiskStewardFactory,
       [accessControlManager.address, 5000, DAY_AND_ONE_SECOND],
       {
         constructorArgs: [riskStewardReceiver.address, mockCoreComptroller.address],
@@ -384,8 +396,8 @@ describe("Risk Steward", async function () {
       },
     );
 
-    criticalParamsDestRiskSteward = await upgrades.deployProxy(
-      CriticalParamsRiskStewardFactory,
+    collateralFactorDestRiskSteward = await upgrades.deployProxy(
+      CollateralFactorRiskStewardFactory,
       [accessControlManager.address, 5000, DAY_AND_ONE_SECOND],
       {
         constructorArgs: [riskStewardReceiver.address, mockCoreComptroller.address],
@@ -394,10 +406,21 @@ describe("Risk Steward", async function () {
       },
     );
 
+    reserveFactorDestRiskSteward = await upgrades.deployProxy(
+      ReserveFactorRiskStewardFactory,
+      [accessControlManager.address, 5000, DAY_AND_ONE_SECOND],
+      {
+        constructorArgs: [riskStewardReceiver.address, mockCoreComptroller.address],
+        initializer: "initialize",
+        unsafeAllow: ["state-variable-immutable"],
+      },
+    );
+
+    await riskStewardReceiver.setProposalType(1);
     await riskStewardReceiver.setRiskParameterConfig("supplyCap", marketCapsRiskSteward.address);
     await riskStewardReceiver.setRiskParameterConfig("borrowCap", marketCapsRiskSteward.address);
-    await riskStewardReceiver.setRiskParameterConfig("collateralFactor", criticalParamsRiskSteward.address);
-    await riskStewardReceiver.setRiskParameterConfig("reserveFactor", criticalParamsRiskSteward.address);
+    await riskStewardReceiver.setRiskParameterConfig("collateralFactor", collateralFactorRiskSteward.address);
+    await riskStewardReceiver.setRiskParameterConfig("reserveFactor", reserveFactorRiskSteward.address);
     await riskStewardReceiver.setDestChainIdMappings(
       [BSC_LZV2_CHAIN_ID, ETHEREUM_LZV2_CHAIN_ID, ARBITRUM_LZV2_CHAIN_ID],
       [LZ_CHAINID.bscmainnet, LZ_CHAINID.ethereum, LZ_CHAINID.arbitrumone],
@@ -405,8 +428,8 @@ describe("Risk Steward", async function () {
 
     await riskStewardDestReceiver.setRiskParameterConfig("supplyCap", marketCapsDestRiskSteward.address);
     await riskStewardDestReceiver.setRiskParameterConfig("borrowCap", marketCapsDestRiskSteward.address);
-    await riskStewardDestReceiver.setRiskParameterConfig("collateralFactor", criticalParamsDestRiskSteward.address);
-    await riskStewardDestReceiver.setRiskParameterConfig("reserveFactor", criticalParamsDestRiskSteward.address);
+    await riskStewardDestReceiver.setRiskParameterConfig("collateralFactor", collateralFactorDestRiskSteward.address);
+    await riskStewardDestReceiver.setRiskParameterConfig("reserveFactor", reserveFactorDestRiskSteward.address);
 
     await localEndpointV2.setDestLzEndpoint(riskStewardDestReceiver.address, remoteEndpointV2.address);
     await remoteEndpointV2.setDestLzEndpoint(riskStewardReceiver.address, localEndpointV2.address);
@@ -424,42 +447,6 @@ describe("Risk Steward", async function () {
       deployer.address,
     );
     await governorBravoDelegate.whitelistProposer(riskStewardReceiver.address, 1);
-
-    // registerUpdateSelector on criticalParamsRiskSteward
-    await accessControlManager.giveCallPermission(
-      AddressZero,
-      "registerUpdateSelector(string,ComptrollerType,string,string,bool)",
-      deployer.address,
-    );
-    await criticalParamsRiskSteward.registerUpdateSelector(
-      "reserveFactor",
-      1,
-      "setReserveFactor(uint256)",
-      "reserveFactorMantissa()",
-      false,
-    );
-    await criticalParamsRiskSteward.registerUpdateSelector(
-      "reserveFactor",
-      0,
-      "_setReserveFactor(uint256)",
-      "reserveFactorMantissa()",
-      false,
-    );
-
-    await criticalParamsDestRiskSteward.registerUpdateSelector(
-      "reserveFactor",
-      1,
-      "setReserveFactor(uint256)",
-      "reserveFactorMantissa()",
-      false,
-    );
-    await criticalParamsDestRiskSteward.registerUpdateSelector(
-      "reserveFactor",
-      0,
-      "_setReserveFactor(uint256)",
-      "reserveFactorMantissa()",
-      false,
-    );
 
     const RiskStewardOwner = await ethers.getContractFactory("RiskStewardOwner");
     stewardOwner = await upgrades.deployProxy(RiskStewardOwner, [accessControlManager.address], {
@@ -509,27 +496,9 @@ describe("Risk Steward", async function () {
     await accessControlManager.giveCallPermission(AddressZero, "setRemoteDelay(uint256)", deployer.address);
     await accessControlManager.giveCallPermission(AddressZero, "setGuardian(address)", deployer.address);
 
-    await accessControlManager.giveCallPermission(
-      marketCapsRiskSteward.address,
-      "setMaxDeltaBps(uint256)",
-      deployer.address,
-    );
-    await accessControlManager.giveCallPermission(
-      marketCapsRiskSteward.address,
-      "setDebouncePeriod(uint256)",
-      deployer.address,
-    );
+    await accessControlManager.giveCallPermission(AddressZero, "setMaxDeltaBps(uint256)", deployer.address);
+    await accessControlManager.giveCallPermission(AddressZero, "setDebouncePeriod(uint256)", deployer.address);
 
-    await accessControlManager.giveCallPermission(
-      criticalParamsRiskSteward.address,
-      "setMaxDeltaBps(uint256)",
-      deployer.address,
-    );
-    await accessControlManager.giveCallPermission(
-      criticalParamsRiskSteward.address,
-      "setDebouncePeriod(uint256)",
-      deployer.address,
-    );
     await accessControlManager.giveCallPermission(
       AddressZero,
       "processUpdate(uint256,bytes,string,address)",
@@ -541,7 +510,7 @@ describe("Risk Steward", async function () {
       riskStewardReceiver.address,
     );
     await accessControlManager.giveCallPermission(
-      marketCapsDestRiskSteward.address,
+      AddressZero,
       "processUpdate(uint256,bytes,string,address)",
       riskStewardDestReceiver.address,
     );
@@ -560,11 +529,6 @@ describe("Risk Steward", async function () {
       destStewardOwner.address,
       "processUpdate(uint256,bytes,string,address,uint256)",
       deployer.address,
-    );
-    await accessControlManager.giveCallPermission(
-      criticalParamsDestRiskSteward.address,
-      "processUpdate(uint256,bytes,string,address)",
-      riskStewardDestReceiver.address,
     );
 
     // fund timelock
@@ -1676,7 +1640,9 @@ describe("Risk Steward", async function () {
             destinationChainId: ETHEREUM_LZV2_CHAIN_ID,
           },
         ]);
-        await expect(riskStewardReceiver.processUpdateById(1, "0x", 0, "0x"))
+
+        const adapterParams = ethers.utils.solidityPack(["uint16", "uint256"], [1, 2000000]);
+        await expect(riskStewardReceiver.processUpdateById(1, "0x", 0, adapterParams))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
           .withArgs(1);
 
@@ -1706,8 +1672,8 @@ describe("Risk Steward", async function () {
           .withArgs(proposalId)
           .to.emit(riskStewardDestReceiver, "RiskParameterUpdateProcessed")
           .withArgs(proposalId)
-          .to.emit(criticalParamsDestRiskSteward, "ParameterUpdated")
-          .withArgs("collateralFactor", mockVToken.address, parseUnits("0.75", 18));
+          .to.emit(collateralFactorDestRiskSteward, "CollateralFactorUpdated")
+          .withArgs(mockVToken.address, parseUnits("0.75", 18));
         expect(await ethereumOmnichainGovernanceExecutor.state(proposalId)).equals(2);
         expect(await ethereumOmnichainGovernanceExecutor.queued(proposalId)).equals(false);
         market = await mockComptroller.markets(mockVToken.address);
@@ -1800,10 +1766,10 @@ describe("Risk Steward", async function () {
           .to.emit(omnichainProposalSender, "ExecuteRemoteProposal")
           .to.emit(ethereumOmnichainGovernanceExecutor, "ProposalReceived", "ProposalQueued")
           .to.emit(arbitrumOmnichainGovernanceExecutor, "ProposalReceived", "ProposalQueued")
-          .to.emit(criticalParamsRiskSteward, "ParameterUpdated")
-          .withArgs("collateralFactor", mockVToken.address, parseUnits("0.5", 18))
-          .to.emit(criticalParamsRiskSteward, "ParameterUpdated")
-          .withArgs("reserveFactor", mockVToken.address, parseUnits("0.3", 18));
+          .to.emit(collateralFactorRiskSteward, "CollateralFactorUpdated")
+          .withArgs(mockVToken.address, parseUnits("0.5", 18))
+          .to.emit(reserveFactorRiskSteward, "ReserveFactorUpdated")
+          .withArgs(mockVToken.address, parseUnits("0.3", 18));
         expect(await omnichainProposalSender.proposalCount()).to.equals(2); // check proposal counts
 
         const ethereumProposalId = await ethereumOmnichainGovernanceExecutor.lastProposalReceived();
@@ -1820,14 +1786,14 @@ describe("Risk Steward", async function () {
           .withArgs(ethereumProposalId)
           .to.emit(marketCapsDestRiskSteward, "BorrowCapUpdated")
           .withArgs(mockEthereumVToken.address, parseUnits("8", 18))
-          .to.emit(criticalParamsDestRiskSteward, "ParameterUpdated")
-          .withArgs("reserveFactor", mockEthereumVToken.address, parseUnits("0.24", 18));
+          .to.emit(reserveFactorDestRiskSteward, "ReserveFactorUpdated")
+          .withArgs(mockEthereumVToken.address, parseUnits("0.24", 18));
 
         await expect(arbitrumOmnichainGovernanceExecutor.execute(arbitrumProposalId))
-          .to.emit(criticalParamsDestRiskSteward, "ParameterUpdated")
-          .withArgs("collateralFactor", mockArbitrumVToken.address, parseUnits("0.6", 18))
-          .to.emit(criticalParamsDestRiskSteward, "ParameterUpdated")
-          .withArgs("reserveFactor", mockArbitrumVToken.address, parseUnits("0.3", 18));
+          .to.emit(collateralFactorDestRiskSteward, "CollateralFactorUpdated")
+          .withArgs(mockArbitrumVToken.address, parseUnits("0.6", 18))
+          .to.emit(reserveFactorDestRiskSteward, "ReserveFactorUpdated")
+          .withArgs(mockArbitrumVToken.address, parseUnits("0.3", 18));
 
         expect(await ethereumOmnichainGovernanceExecutor.state(ethereumProposalId)).equals(2);
         expect(await ethereumOmnichainGovernanceExecutor.queued(ethereumProposalId)).equals(false);
@@ -1924,10 +1890,10 @@ describe("Risk Steward", async function () {
           .to.emit(fastrackTimelock, "ExecuteTransaction")
           .to.emit(omnichainProposalSender, "ExecuteRemoteProposal")
           .to.emit(ethereumOmnichainGovernanceExecutor, "ProposalReceived", "ProposalQueued")
-          .to.emit(criticalParamsRiskSteward, "ParameterUpdated")
-          .withArgs("collateralFactor", mockVToken.address, parseUnits("0.75", 18))
-          .to.emit(criticalParamsRiskSteward, "ParameterUpdated")
-          .withArgs("reserveFactor", mockVToken.address, parseUnits("0.32", 18));
+          .to.emit(collateralFactorRiskSteward, "CollateralFactorUpdated")
+          .withArgs(mockVToken.address, parseUnits("0.75", 18))
+          .to.emit(reserveFactorRiskSteward, "ReserveFactorUpdated")
+          .withArgs(mockVToken.address, parseUnits("0.32", 18));
 
         const proposalId = await ethereumOmnichainGovernanceExecutor.lastProposalReceived();
         expect(proposalId).to.equals(lastProposalReceived.add(1)); // check pId
@@ -1940,10 +1906,10 @@ describe("Risk Steward", async function () {
           .withArgs(proposalId)
           .to.emit(marketCapsDestRiskSteward, "SupplyCapUpdated")
           .withArgs(mockEthereumVToken.address, parseUnits("10", 18))
-          .to.emit(criticalParamsDestRiskSteward, "ParameterUpdated")
-          .withArgs("collateralFactor", mockEthereumVToken.address, parseUnits("0.65", 18))
-          .to.emit(criticalParamsDestRiskSteward, "ParameterUpdated")
-          .withArgs("reserveFactor", mockEthereumVToken.address, parseUnits("0.28", 18));
+          .to.emit(collateralFactorDestRiskSteward, "CollateralFactorUpdated")
+          .withArgs(mockEthereumVToken.address, parseUnits("0.65", 18))
+          .to.emit(reserveFactorDestRiskSteward, "ReserveFactorUpdated")
+          .withArgs(mockEthereumVToken.address, parseUnits("0.28", 18));
 
         expect(await ethereumOmnichainGovernanceExecutor.state(proposalId)).equals(2);
         expect(await ethereumOmnichainGovernanceExecutor.queued(proposalId)).equals(false);
@@ -1995,46 +1961,6 @@ describe("Risk Steward", async function () {
 
     it("should not be able to renounce ownership", async function () {
       await expect(marketCapsRiskSteward.renounceOwnership()).to.revertedWith("renounceOwnership() is not allowed");
-    });
-  });
-
-  describe("CriticalParamsRiskSteward", async function () {
-    it("should emit MaxDeltaBpsUpdated when updating maxDeltaBps", async function () {
-      await expect(criticalParamsRiskSteward.setMaxDeltaBps(7500))
-        .to.emit(criticalParamsRiskSteward, "MaxDeltaBpsUpdated")
-        .withArgs(5000, 7500);
-    });
-
-    it("should revert if max delta bps is set to 0", async function () {
-      await expect(criticalParamsRiskSteward.setMaxDeltaBps(0)).to.rejectedWith("InvalidMaxDeltaBps");
-    });
-
-    it("should revert if max delta bps is larger than maxBps", async function () {
-      await expect(criticalParamsRiskSteward.setMaxDeltaBps(10001)).to.rejectedWith("InvalidMaxDeltaBps");
-    });
-
-    it("should emit DebouncePeriodUpdated when updating setDebouncePeriod", async function () {
-      await expect(criticalParamsRiskSteward.setDebouncePeriod(90000))
-        .to.emit(criticalParamsRiskSteward, "DebouncePeriodUpdated")
-        .withArgs(DAY_AND_ONE_SECOND, 90000);
-    });
-
-    it("should revert if debounce period is set to 0", async function () {
-      await expect(criticalParamsRiskSteward.setDebouncePeriod(0)).to.rejectedWith("InvalidDebouncePeriod");
-    });
-
-    it("should revert if debounce period is less than or equal to update expiration time", async function () {
-      await expect(
-        criticalParamsRiskSteward.setDebouncePeriod(await riskStewardReceiver.UPDATE_EXPIRATION_TIME()),
-      ).to.rejectedWith("InvalidDebouncePeriod");
-
-      await expect(
-        criticalParamsRiskSteward.setDebouncePeriod((await riskStewardReceiver.UPDATE_EXPIRATION_TIME()).sub(1)),
-      ).to.rejectedWith("InvalidDebouncePeriod");
-    });
-
-    it("should not be able to renounce ownership", async function () {
-      await expect(criticalParamsRiskSteward.renounceOwnership()).to.revertedWith("renounceOwnership() is not allowed");
     });
   });
 

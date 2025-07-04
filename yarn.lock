@@ -1411,6 +1411,27 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@layerzerolabs/lz-evm-messagelib-v2@npm:^3.0.109":
+  version: 3.0.109
+  resolution: "@layerzerolabs/lz-evm-messagelib-v2@npm:3.0.109"
+  peerDependencies:
+    "@arbitrum/nitro-contracts": ^1.1.0
+    "@axelar-network/axelar-gmp-sdk-solidity": ^5.6.4
+    "@chainlink/contracts-ccip": ^0.7.6
+    "@eth-optimism/contracts": ^0.6.0
+    "@layerzerolabs/lz-evm-protocol-v2": ^3.0.109
+    "@layerzerolabs/lz-evm-v1-0.7": ^3.0.109
+    "@openzeppelin/contracts": ^4.8.1 || ^5.0.0
+    "@openzeppelin/contracts-upgradeable": ^4.8.1 || ^5.0.0
+    hardhat-deploy: ^0.12.4
+    solidity-bytes-utils: ^0.8.0
+  peerDependenciesMeta:
+    "@arbitrum/nitro-contracts":
+      optional: true
+  checksum: c5b9235addc925b73800e2ab07cac4da83bb0fc23a309431ff6c46e5f5b53a831df15ffdb24f11da2cb90303b8f2418f42f53a5a94dc5f0dfc76bae2edda403c
+  languageName: node
+  linkType: hard
+
 "@layerzerolabs/lz-evm-protocol-v2@npm:^3.0.38":
   version: 3.0.102
   resolution: "@layerzerolabs/lz-evm-protocol-v2@npm:3.0.102"
@@ -3568,6 +3589,7 @@ __metadata:
     "@ethersproject/bignumber": ^5.7.0
     "@ethersproject/bytes": ^5.7.0
     "@ethersproject/providers": ^5.7.2
+    "@layerzerolabs/lz-evm-messagelib-v2": ^3.0.109
     "@layerzerolabs/lz-evm-protocol-v2": ^3.0.38
     "@layerzerolabs/lz-v2-utilities": ^3.0.73
     "@layerzerolabs/oapp-evm": ^0.3.0
@@ -3631,6 +3653,7 @@ __metadata:
     shx: ^0.3.4
     solhint: ^3.4.0
     solhint-plugin-prettier: ^0.0.5
+    solidity-bytes-utils: ^0.8.4
     solidity-coverage: ^0.8.4
     solidity-docgen: 0.6.0-beta.34
     ts-generator: ^0.1.1
@@ -12686,6 +12709,13 @@ __metadata:
   version: 0.4.59
   resolution: "solidity-ast@npm:0.4.59"
   checksum: 348657bb98e027c0969d44c3bbcfb3ac4a3ea32db37ce582e291b544fb5361be5bbebf828c562bd6ddaa1ce89d3e241e3b528dbfbadcce0dbc51a655f5088d26
+  languageName: node
+  linkType: hard
+
+"solidity-bytes-utils@npm:^0.8.4":
+  version: 0.8.4
+  resolution: "solidity-bytes-utils@npm:0.8.4"
+  checksum: 3eb3d7628c60727e3c528fd4bf7a3427e2fb145b9793964605ccde81e774a4681f8778552670c7d95671a198387199e8fc1b042173449b044528284a508f9fc5
   languageName: node
   linkType: hard
 
