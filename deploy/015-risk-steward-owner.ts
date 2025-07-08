@@ -19,7 +19,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     "hardhat-deploy/solc_0.8/openzeppelin/proxy/transparent/ProxyAdmin.sol:ProxyAdmin",
   );
 
-  const isBsc = hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet";
+  const isBsc =
+    hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet" || hre.network.name === "hardhat";
   const normalTimelockAddress = (await hre.ethers.getContract("NormalTimelock")).address;
   const riskStewardReceiver = isBsc
     ? await hre.ethers.getContract("RiskStewardReceiver")
@@ -47,7 +48,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const riskStewardOwner = await hre.ethers.getContract("RiskStewardOwner");
 
   if ((await riskStewardReceiver.owner()) === deployer) {
-    await riskStewardReceiver.transferOwnership(riskStewardOwner);
+    await riskStewardReceiver.transferOwnership(riskStewardOwner.address);
   }
 
   const destOwnerFunctionRegistry = [
@@ -63,6 +64,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   const bscOwnerFunctionRegistry = [
     "setRiskParameterConfig(string,address)",
     "toggleConfigActive(string)",
+    "setProposalType(uint8)",
     "pause()",
     "unpause()",
     "setDestChainIdMappings(uint32[],uint16[])",

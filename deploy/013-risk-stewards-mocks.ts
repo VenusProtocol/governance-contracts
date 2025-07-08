@@ -10,7 +10,11 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   await deploy("MockRiskOracle", {
     from: deployer,
-    args: ["Mock Risk Oracle", [deployer], ["supplyCap", "borrowCap"]],
+    args: [
+      "Mock Risk Oracle",
+      [deployer],
+      ["supplyCap", "borrowCap", "collateralFactor", "reserveFactor", "liquidationThreshold"],
+    ],
     log: true,
     autoMine: true,
   });

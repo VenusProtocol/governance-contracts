@@ -101,7 +101,7 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
   }[networkName];
 };
 export const getLzV2Endpoint = async (networkName: SUPPORTED_NETWORKS): Promise<string> => {
-  const lzEndpointMock = await ethers.getContractOrNull("LZEndpointMock");
+  const lzEndpointMock = await ethers.getContractOrNull("EndpointV2Mock");
   return {
     ethereum: "0x1a44076050125825900e736c501f859c50fE728c",
     bscmainnet: "0x1a44076050125825900e736c501f859c50fE728c",

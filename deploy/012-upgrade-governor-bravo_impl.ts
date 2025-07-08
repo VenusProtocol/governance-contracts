@@ -27,6 +27,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
   !(hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet");
 
-func.tags = ["governor-bravo"];
+func.tags = ["governor-bravo-impl"];
 
 export default func;

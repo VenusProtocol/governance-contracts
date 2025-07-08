@@ -251,7 +251,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @param updateId The ID of the update to validate
      * @return error The UPDATE_STATUS error code if the update is not valid, or NONE if valid
      */
-    function validateUpdateStatus(uint256 updateId) public view returns (UPDATE_STATUS error) {
+    function validateUpdatedById(uint256 updateId) public view returns (UPDATE_STATUS error) {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
         (error, ) = _validateUpdateStatus(update);
     }
