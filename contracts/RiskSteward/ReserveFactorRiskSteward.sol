@@ -77,6 +77,41 @@ contract ReserveFactorRiskSteward is CriticalParamRiskStewardBase {
     }
 
     /**
+     * @notice Public view function to validate if a proposed ReserveFactor update is within the allowed range and debounce period has been passed.
+     * @param updateId The ID of the update
+     * @param newValue The new ReserveFactor value
+     * @param market The market to update the ReserveFactor for
+     * @return isValid True if the update would succeed, false if it would revert
+     */
+    function validateUpdate(
+        uint256 updateId,
+        bytes memory newValue,
+        string memory,
+        address market
+    ) external view returns (bool isValid) {
+        uint256 newReserveFactor = _decodeBytesToUint256(newValue);
+
+        try this.validateReserveFactorUpdate(market, updateId, newReserveFactor) {
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * @notice Checks that the new ReserveFactor is within the allowed range of the current ReserveFactor and has passed the debounce period
+     * @param market The market whose ReserveFactor is being updated
+     * @param updateId The ID of the update
+     * @param newReserveFactor The new ReserveFactor value to validate
+     * @custom:error UpdateTooFrequent if the update is too frequent
+     * @custom:error UpdateNotInRange if the update is not within the allowed range
+     */
+    function validateReserveFactorUpdate(address market, uint256 updateId, uint256 newReserveFactor) public view {
+        uint256 currentReserveFactor = IVToken(market).reserveFactorMantissa();
+        _verifyUpdate(market, updateId, RESERVE_FACTOR, currentReserveFactor, newReserveFactor);
+    }
+
+    /**
      * @notice Validates the new reserveFactor and if valid, updates it for the given market.
      * @param updateId The ID of the update
      * @param newValue The new reserveFactor value
@@ -93,7 +128,7 @@ contract ReserveFactorRiskSteward is CriticalParamRiskStewardBase {
     ) internal {
         uint256 newReserveFactor = _decodeBytesToUint256(newValue);
         address comptroller = IVToken(market).comptroller();
-        _validateReserveFactorUpdate(market, updateId, newReserveFactor);
+        validateReserveFactorUpdate(market, updateId, newReserveFactor);
         _updateReserveFactor(comptroller, market, newReserveFactor);
         lastProcessedTime[_getMarketUpdateTypeKey(market, updateType)] = block.timestamp;
     }
@@ -112,17 +147,5 @@ contract ReserveFactorRiskSteward is CriticalParamRiskStewardBase {
             ILVToken(market).setReserveFactor(newValue);
         }
         emit ReserveFactorUpdated(market, newValue);
-    }
-
-    /**
-     * @notice Checks that the new ReserveFactor is within the allowed range of the current ReserveFactor.
-     * @param market The market whose supply cap is being updated
-     * @param updateId The ID of the update
-     * @param newReserveFactor The new ReserveFactor value to validate
-     * @custom:error UpdateNotInRange if the update is not within the allowed range
-     */
-    function _validateReserveFactorUpdate(address market, uint256 updateId, uint256 newReserveFactor) internal view {
-        uint256 currentReserveFactor = IVToken(market).reserveFactorMantissa();
-        _verifyUpdate(market, updateId, RESERVE_FACTOR, currentReserveFactor, newReserveFactor);
     }
 }

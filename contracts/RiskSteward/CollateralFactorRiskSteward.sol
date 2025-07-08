@@ -90,6 +90,55 @@ contract CollateralFactorRiskSteward is CriticalParamRiskStewardBase {
     }
 
     /**
+     * @notice Public view function to validate if a proposed collatertalFactor and reserveFactor update is within the allowed range and debounce period has been passed
+     * @param updateId The ID of the update
+     * @param newValue The new value for collateralFactor or LiquidationThreshold
+     * @param updateType The type of update
+     * @param market The market to update the new value for
+     * @return isValid True if the update would succeed, false if it would revert
+     */
+    function validateUpdate(
+        uint256 updateId,
+        bytes memory newValue,
+        string memory updateType,
+        address market
+    ) external view returns (bool isValid) {
+        uint256 newThreshold = _decodeBytesToUint256(newValue);
+        address comptroller = IVToken(market).comptroller();
+
+        try this.validateUpdateByType(comptroller, market, updateId, newThreshold, updateType) {
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * @notice Checks that the new collatertalFactor or liquidationThreshold is within the allowed range of the current values and debounce period has been passed
+     * @param comptroller The comptroller of the market
+     * @param market The market whose new value is being updated
+     * @param updateId The ID of the update
+     * @param newThreshold The new value to validate
+     * @custom:error UpdateTooFrequent if the update is too frequent
+     * @custom:error UpdateNotInRange if the update is not within the allowed range
+     */
+    function validateUpdateByType(
+        address comptroller,
+        address market,
+        uint256 updateId,
+        uint256 newThreshold,
+        string memory updateType
+    ) public view {
+        if (Strings.equal(updateType, COLLATERAL_FACTOR)) {
+            _validateCollateralFactorUpdate(comptroller, market, updateId, newThreshold);
+        } else if (Strings.equal(updateType, LIQUIDATION_THRESHOLD)) {
+            _validateLiquidationThresholdUpdate(comptroller, market, updateId, newThreshold);
+        } else {
+            revert UnsupportedUpdateType(updateId);
+        }
+    }
+
+    /**
      * @notice Validates the new collateralFactor and if valid, updates the collateralFactor for the given market.
      * @param updateId The ID of the update
      * @param newValue The new collateralFactor value

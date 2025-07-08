@@ -8,5 +8,12 @@ interface IRiskSteward {
 
     function processUpdate(uint256 updateId, bytes memory newValue, string memory updateType, address market) external;
 
+    function validateUpdate(
+        uint256 updateId,
+        bytes memory newValue,
+        string memory updateType,
+        address market
+    ) external view returns (bool);
+
     function packNewValue(bytes memory data) external pure returns (bytes memory);
 }

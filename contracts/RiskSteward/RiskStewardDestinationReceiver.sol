@@ -21,7 +21,8 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
         CONFIG_NOT_ACTIVE,
         EXPIRED,
         CANCELLED,
-        FAILED
+        FAILED,
+        NOT_IN_RANGE_OR_TOO_FREQUENT
     }
     /**
      * @notice Time before a submitted update is considered stale
@@ -133,7 +134,13 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
     function processStoredUpdate(uint256 updateId) external whenNotPaused {
         require(block.timestamp > remoteUpdateTimestamps[updateId] + remoteDelay, "Delay has to be surpassed");
         RiskParameterUpdate memory _update = update[updateId];
-        UPDATE_STATUS error = _validateUpdateStatus(updateId, _update.updateType, remoteUpdateTimestamps[updateId]);
+        UPDATE_STATUS error = _validateUpdateStatus(
+            updateId,
+            _update.newValue,
+            _update.updateType,
+            _update.market,
+            remoteUpdateTimestamps[updateId]
+        );
         if (error == UPDATE_STATUS.NONE) {
             _executeUpdate(updateId, _update.newValue, _update.updateType, _update.market);
         } else {
@@ -159,7 +166,7 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
         address market,
         uint256 timestamp
     ) external onlyOwner whenNotPaused {
-        UPDATE_STATUS error = _validateUpdateStatus(updateId, updateType, timestamp);
+        UPDATE_STATUS error = _validateUpdateStatus(updateId, newValue, updateType, market, timestamp);
         if (error == UPDATE_STATUS.NONE) {
             _executeUpdate(updateId, newValue, updateType, market);
         } else {
@@ -182,6 +189,25 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
         emit CancelUpdate(updateId);
         processedUpdates[updateId] = UPDATE_STATUS.CANCELLED;
         delete update[updateId];
+    }
+
+    /**
+     * @notice Checks whether an update can be processed by validating that the new value is within the allowed range and
+     * has passed the debounce period
+     * @param updateId The ID of the update to validate
+     * @param newValue The new value proposed for the update, encoded as bytes
+     * @param updateType The type of risk parameter being updated (eg., "supplyCap", "borrowCap")
+     * @param market The address of the market (vToken) for which the update is intended
+     * @return isValid True if the update is valid and can be processed, false otherwise
+     */
+    function checkUpdateAllowedRange(
+        uint256 updateId,
+        bytes memory newValue,
+        string memory updateType,
+        address market
+    ) public view returns (bool isValid) {
+        RiskParamConfig memory config = riskParameterConfigs[updateType];
+        return config.riskSteward.validateUpdate(updateId, newValue, updateType, market);
     }
 
     /**
@@ -209,7 +235,9 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     * @notice Validates the status of an update silently. Will validate that the update configuration is active, is not expired and unprocessed.
+     * @notice Validates the status of an update silently without reverting. Checks that the update configuration is active,
+     * the update has not expired, has not already been processed, and that the proposed value is within the allowed range
+     * and respects the debounce period.
      * @param updateId The ID of the update
      * @param updateType The type of update
      * @param timestamp Remote timestamp of the update
@@ -217,7 +245,9 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
      */
     function _validateUpdateStatus(
         uint256 updateId,
+        bytes memory newValue,
         string memory updateType,
+        address market,
         uint256 timestamp
     ) internal view returns (UPDATE_STATUS error) {
         if (timestamp == 0) {
@@ -235,6 +265,10 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
 
         if (processedUpdates[updateId] == UPDATE_STATUS.PROCESSED) {
             return processedUpdates[updateId];
+        }
+
+        if (!checkUpdateAllowedRange(updateId, newValue, updateType, market)) {
+            return UPDATE_STATUS.NOT_IN_RANGE_OR_TOO_FREQUENT;
         }
 
         return UPDATE_STATUS.NONE;

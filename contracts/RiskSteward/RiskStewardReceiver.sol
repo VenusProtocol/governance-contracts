@@ -28,7 +28,8 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         FAILED,
         PROPOSED,
         INVALID_DESTINATION_CHAIN,
-        HAS_ACTIVE_PROPOSAL
+        HAS_ACTIVE_PROPOSAL,
+        NOT_IN_RANGE_OR_TOO_FREQUENT
     }
 
     struct ProposalActions {
@@ -920,7 +921,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      */
     function _validateUpdateStatus(
         RiskParameterUpdate memory update
-    ) internal view returns (UPDATE_STATUS error, uint32) {
+    ) internal view returns (UPDATE_STATUS error, uint32 destChainId) {
         require(update.updateId != 0, "No update found");
 
         RiskParamConfig memory config = riskParameterConfigs[update.updateType];
@@ -930,7 +931,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
             update.market
         );
 
-        (, uint32 destChainId) = _decodeAdditionalData(update.additionalData);
+        (, destChainId) = _decodeAdditionalData(update.additionalData);
 
         if (latestForMarketAndType.updateId != update.updateId) {
             return (UPDATE_STATUS.EXPIRED, destChainId);
@@ -961,6 +962,14 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
                 return (UPDATE_STATUS.HAS_ACTIVE_PROPOSAL, destChainId);
             }
         }
+
+        if (
+            destChainId == LAYER_ZERO_CHAIN_ID &&
+            !config.riskSteward.validateUpdate(update.updateId, update.newValue, update.updateType, update.market)
+        ) {
+            return (UPDATE_STATUS.NOT_IN_RANGE_OR_TOO_FREQUENT, destChainId);
+        }
+
         return (UPDATE_STATUS.NONE, destChainId);
     }
 

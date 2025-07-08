@@ -90,6 +90,58 @@ contract MarketCapsRiskSteward is CriticalParamRiskStewardBase {
     }
 
     /**
+     * @notice Public view function to validate if a proposed market cap update is within the allowed range and debounce period has been passed
+     * @param updateId The ID of the update
+     * @param newValue The new market cap value
+     * @param updateType The type of update
+     * @param market The market to update the market cap for
+     * @return isValid True if the update would succeed, false if it would revert
+     */
+    function validateUpdate(
+        uint256 updateId,
+        bytes memory newValue,
+        string memory updateType,
+        address market
+    ) external view returns (bool isValid) {
+        uint256 newCap = _decodeBytesToUint256(newValue);
+        address comptroller = IVToken(market).comptroller();
+
+        try this.validateMarketCapUpdate(comptroller, market, updateId, newCap, updateType) {
+            return true;
+        } catch {
+            return false;
+        }
+    }
+
+    /**
+     * @notice Checks that the new market cap is within the allowed range of the current market cap and debounce period has been passed
+     * @param comptroller The comptroller of the market
+     * @param market The market whose market cap is being updated
+     * @param updateId The ID of the update
+     * @param newCap The new market cap value to validate
+     * @custom:error UpdateTooFrequent if the update is too frequent
+     * @custom:error UpdateNotInRange if the update is not within the allowed range
+     */
+    function validateMarketCapUpdate(
+        address comptroller,
+        address market,
+        uint256 updateId,
+        uint256 newCap,
+        string memory updateType
+    ) public view {
+        uint256 currentCap;
+        if (Strings.equal(updateType, SUPPLY_CAP)) {
+            currentCap = IIsolatedPoolsComptroller(comptroller).supplyCaps(address(market));
+        } else if (Strings.equal(updateType, BORROW_CAP)) {
+            currentCap = IIsolatedPoolsComptroller(comptroller).borrowCaps(address(market));
+        } else {
+            revert UnsupportedUpdateType(updateId);
+        }
+
+        _verifyUpdate(market, updateId, updateType, currentCap, newCap);
+    }
+
+    /**
      * @notice Validates the new supply cap and if valid, updates the supply cap for the given market.
      * @param updateId The ID of the update
      * @param newValue The new supply cap value
@@ -106,11 +158,8 @@ contract MarketCapsRiskSteward is CriticalParamRiskStewardBase {
     ) internal {
         uint256 newCap = _decodeBytesToUint256(newValue);
         address comptroller = IVToken(market).comptroller();
-
-        _validateSupplyCapUpdate(comptroller, market, updateId, newCap);
-
+        validateMarketCapUpdate(comptroller, market, updateId, newCap, updateType);
         _updateSupplyCaps(comptroller, market, newCap);
-
         lastProcessedTime[_getMarketUpdateTypeKey(market, updateType)] = block.timestamp;
     }
 
@@ -131,7 +180,7 @@ contract MarketCapsRiskSteward is CriticalParamRiskStewardBase {
     ) internal {
         uint256 newCap = _decodeBytesToUint256(newValue);
         address comptroller = IVToken(market).comptroller();
-        _validateBorrowCapUpdate(comptroller, market, updateId, newCap);
+        validateMarketCapUpdate(comptroller, market, updateId, newCap, updateType);
         _updateBorrowCaps(comptroller, market, newCap);
         lastProcessedTime[_getMarketUpdateTypeKey(market, updateType)] = block.timestamp;
     }
@@ -176,41 +225,5 @@ contract MarketCapsRiskSteward is CriticalParamRiskStewardBase {
             IIsolatedPoolsComptroller(comptroller).setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
         }
         emit BorrowCapUpdated(market, newBorrowCaps[0]);
-    }
-
-    /**
-     * @notice Checks that the new supply cap is within the allowed range of the current supply cap.
-     * @param comptroller The comptroller of the market
-     * @param market The market whose supply cap is being updated
-     * @param updateId The ID of the update
-     * @param newCap The new market cap value to validate
-     * @custom:error UpdateNotInRange if the update is not within the allowed range
-     */
-    function _validateSupplyCapUpdate(
-        address comptroller,
-        address market,
-        uint256 updateId,
-        uint256 newCap
-    ) internal view {
-        uint256 currentSupplyCap = IIsolatedPoolsComptroller(comptroller).supplyCaps(address(market));
-        _verifyUpdate(market, updateId, SUPPLY_CAP, currentSupplyCap, newCap);
-    }
-
-    /**
-     * @notice Checks that the new borrow cap is within the allowed range of the current borrow cap.
-     * @param comptroller The comptroller of the market
-     * @param market The market whose borrow cap is being updated
-     * @param updateId The ID of the update
-     * @param newCap The new market cap value to validate
-     * @custom:error UpdateNotInRange if the update is not within the allowed range
-     */
-    function _validateBorrowCapUpdate(
-        address comptroller,
-        address market,
-        uint256 updateId,
-        uint256 newCap
-    ) internal view {
-        uint256 currentBorrowCap = IIsolatedPoolsComptroller(comptroller).borrowCaps(address(market));
-        _verifyUpdate(market, updateId, BORROW_CAP, currentBorrowCap, newCap);
     }
 }
