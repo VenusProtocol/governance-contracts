@@ -906,7 +906,7 @@ describe("Risk Steward", async function () {
       });
     });
 
-    describe("check validateUpdateStatus", async function () {
+    describe("check validateUpdatedById", async function () {
       it("should check if update can be processed", async function () {
         await publishRiskParameterUpdate([
           {
@@ -942,15 +942,15 @@ describe("Risk Steward", async function () {
         ]);
 
         // check if it fails
-        expect(await riskStewardReceiver.validateUpdatedById(1)).to.equal(9);
+        expect(await riskStewardReceiver.validateUpdatedById(1)).to.equal(8);
 
         await expect(riskStewardReceiver.processUpdateById(1, "0x", 0, "0x"))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(1, 9);
-        expect(await riskStewardReceiver.validateUpdatedById(2)).to.equal(9);
-        expect(await riskStewardReceiver.validateUpdatedById(3)).to.equal(9);
-        expect(await riskStewardReceiver.validateUpdatedById(4)).to.equal(9);
-        expect(await riskStewardReceiver.validateUpdatedById(5)).to.equal(9);
+          .withArgs(1, 8);
+        expect(await riskStewardReceiver.validateUpdatedById(2)).to.equal(8);
+        expect(await riskStewardReceiver.validateUpdatedById(3)).to.equal(8);
+        expect(await riskStewardReceiver.validateUpdatedById(4)).to.equal(8);
+        expect(await riskStewardReceiver.validateUpdatedById(5)).to.equal(8);
       });
 
       it("should check on destination reciver if update can be processed", async function () {
@@ -1030,7 +1030,7 @@ describe("Risk Steward", async function () {
         });
         await expect(riskStewardReceiver.processUpdateById(1, "0x", 0, "0x"))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(1, 3);
+          .withArgs(1, 5);
 
         callData = riskStewardReceiver.interface.encodeFunctionData("toggleConfigActive", ["borrowCap"]);
 
@@ -1040,7 +1040,7 @@ describe("Risk Steward", async function () {
         });
         await expect(riskStewardReceiver.processUpdateById(2, "0x", 0, "0x"))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(2, 3);
+          .withArgs(2, 5);
       });
 
       it("should error if the update is expired", async function () {
@@ -1068,35 +1068,6 @@ describe("Risk Steward", async function () {
           .withArgs(2, 4);
       });
 
-      // it.only("should error if market is not supported", async function () {
-      //   // Wrong address
-      //   await publishRiskParameterUpdate([
-      //     {
-      //       updateType: "supplyCap",
-      //       market: mockCoreComptroller.address,
-      //       value: 10,
-      //       destinationChainId: BSC_LZV2_CHAIN_ID,
-      //     },
-      //   ]);
-
-      //   await expect(riskStewardReceiver.processUpdateById(1, "0x", 0, "0x"))
-      //     .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-      //     .withArgs(1, 5);
-
-      //   // Wrong address
-      //   await publishRiskParameterUpdate([
-      //     {
-      //       updateType: "borrowCap",
-      //       market: mockCoreComptroller.address,
-      //       value: 10,
-      //       destinationChainId: BSC_LZV2_CHAIN_ID,
-      //     },
-      //   ]);
-      //   await expect(riskStewardReceiver.processUpdateById(2, "0x", 0, "0x"))
-      //     .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-      //     .withArgs(2, 5);
-      // });
-
       it("should error if the update is too frequent", async function () {
         await publishRiskParameterUpdate([
           {
@@ -1119,7 +1090,7 @@ describe("Risk Steward", async function () {
 
         await expect(riskStewardReceiver.processUpdateById(2, "0x", 0, "0x"))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(2, 9);
+          .withArgs(2, 8);
 
         await publishRiskParameterUpdate([
           {
@@ -1140,7 +1111,7 @@ describe("Risk Steward", async function () {
         ]);
         await expect(riskStewardReceiver.processUpdateById(4, "0x", 0, "0x"))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(4, 9);
+          .withArgs(4, 8);
       });
 
       it("should error if update is already proposed", async function () {
@@ -1158,7 +1129,7 @@ describe("Risk Steward", async function () {
 
         await expect(riskStewardReceiver.processUpdateById(1, "0x", 0, "0x"))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(1, 6);
+          .withArgs(1, 2);
       });
 
       it("should revert on invalid update ID", async function () {
@@ -1192,7 +1163,7 @@ describe("Risk Steward", async function () {
         ]);
         await expect(riskStewardReceiver.processUpdateById(1, "0x", 0, "0x"))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(1, 9);
+          .withArgs(1, 8);
 
         // Too high
         await publishRiskParameterUpdate([
@@ -1206,7 +1177,7 @@ describe("Risk Steward", async function () {
 
         await expect(riskStewardReceiver.processUpdateById(2, "0x", 0, "0x"))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(2, 9);
+          .withArgs(2, 8);
 
         // Too low
         await publishRiskParameterUpdate([
@@ -1220,7 +1191,7 @@ describe("Risk Steward", async function () {
 
         await expect(riskStewardReceiver.processUpdateById(3, "0x", 0, "0x"))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(3, 9);
+          .withArgs(3, 8);
       });
 
       it("should revert if the update id is not the latest", async function () {
@@ -1256,11 +1227,11 @@ describe("Risk Steward", async function () {
           },
         ]);
         // check if it fails
-        expect(await riskStewardReceiver.validateUpdatedById(1)).to.equal(7);
+        expect(await riskStewardReceiver.validateUpdatedById(1)).to.equal(6);
 
         await expect(riskStewardReceiver.processUpdateById(1, "0x", 0, "0x"))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(1, 7);
+          .withArgs(1, 6);
       });
 
       it("should error if update is already sent to destination", async () => {
@@ -1324,7 +1295,7 @@ describe("Risk Steward", async function () {
           ),
         )
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(1, 2);
+          .withArgs(1, 3);
       });
 
       it("should error if lzSend fails", async () => {
@@ -1444,7 +1415,7 @@ describe("Risk Steward", async function () {
         // fail on pending proposal
         await expect(riskStewardReceiver.processUpdateById(2, "0x", 0, "0x"))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(2, 8);
+          .withArgs(2, 7);
 
         xvsVault.getPriorVotes.returns(convertToUnit("600001", 18));
         // Move blocks to pass the voting delay
@@ -1454,7 +1425,7 @@ describe("Risk Steward", async function () {
         // fail on active proposal
         await expect(riskStewardReceiver.processUpdateById(2, "0x", 0, "0x"))
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(2, 8);
+          .withArgs(2, 7);
       });
 
       it("should not change ownership on calling renounceOwnership", async function () {
@@ -1952,7 +1923,7 @@ describe("Risk Steward", async function () {
           .to.emit(riskStewardReceiver, "RiskParameterUpdateProposed")
           .withArgs(5)
           .to.emit(riskStewardReceiver, "RiskParameterUpdateFailed")
-          .withArgs(6, 7);
+          .withArgs(6, 6);
 
         await expectProposalCreatedAndQueued(governorBravoDelegate, riskStewardReceiver, xvsVault, 2);
 
@@ -2204,7 +2175,7 @@ describe("Risk Steward", async function () {
         await expect(riskStewardDestReceiver.connect(deployer).cancelUpdate(updateId))
           .to.emit(riskStewardDestReceiver, "CancelUpdate")
           .withArgs(updateId);
-        expect(await riskStewardDestReceiver.processedUpdates(updateId)).to.equal(5); // CANCELLED
+        expect(await riskStewardDestReceiver.processedUpdates(updateId)).to.equal(6); // CANCELLED
       });
       it("Should not cancel update if update is already processed", async function () {
         await time.increase(6 * 3600 + 1); // increase 6 hours and one minute

@@ -20,9 +20,9 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
         PROCESSED,
         CONFIG_NOT_ACTIVE,
         EXPIRED,
+        NOT_IN_RANGE_OR_TOO_FREQUENT,
         CANCELLED,
-        FAILED,
-        NOT_IN_RANGE_OR_TOO_FREQUENT
+        FAILED
     }
     /**
      * @notice Time before a submitted update is considered stale
@@ -235,46 +235,6 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     * @notice Validates the status of an update silently without reverting. Checks that the update configuration is active,
-     * the update has not expired, has not already been processed, and that the proposed value is within the allowed range
-     * and respects the debounce period.
-     * @param updateId The ID of the update
-     * @param updateType The type of update
-     * @param timestamp Remote timestamp of the update
-     * @return error The UPDATE_STATUS error code if the update is not valid or 0
-     */
-    function _validateUpdateStatus(
-        uint256 updateId,
-        bytes memory newValue,
-        string memory updateType,
-        address market,
-        uint256 timestamp
-    ) internal view returns (UPDATE_STATUS error) {
-        if (timestamp == 0) {
-            revert UpdateNotReceived(updateId);
-        }
-
-        RiskParamConfig memory config = riskParameterConfigs[updateType];
-        if (!config.active) {
-            return UPDATE_STATUS.CONFIG_NOT_ACTIVE;
-        }
-
-        if (timestamp + REMOTE_UPDATE_EXPIRATION_TIME < block.timestamp) {
-            return UPDATE_STATUS.EXPIRED;
-        }
-
-        if (processedUpdates[updateId] == UPDATE_STATUS.PROCESSED) {
-            return processedUpdates[updateId];
-        }
-
-        if (!checkUpdateAllowedRange(updateId, newValue, updateType, market)) {
-            return UPDATE_STATUS.NOT_IN_RANGE_OR_TOO_FREQUENT;
-        }
-
-        return UPDATE_STATUS.NONE;
-    }
-
-    /**
      * @dev Handles incoming LayerZero messages containing risk parameter update data
      *      Decodes the payload and forwards the update for processing
      * @param payload The encoded message containing update details
@@ -310,5 +270,45 @@ contract RiskStewardDestinationReceiver is OApp, RiskStewardReceiverBase {
             market: market,
             additionalData: additionalData
         });
+    }
+
+    /**
+     * @notice Validates the status of an update silently without reverting. Checks that the update configuration is active,
+     * the update has not expired, has not already been processed, and that the proposed value is within the allowed range
+     * and respects the debounce period.
+     * @param updateId The ID of the update
+     * @param updateType The type of update
+     * @param timestamp Remote timestamp of the update
+     * @return error The UPDATE_STATUS error code if the update is not valid or 0
+     */
+    function _validateUpdateStatus(
+        uint256 updateId,
+        bytes memory newValue,
+        string memory updateType,
+        address market,
+        uint256 timestamp
+    ) internal view returns (UPDATE_STATUS error) {
+        if (timestamp == 0) {
+            revert UpdateNotReceived(updateId);
+        }
+
+        RiskParamConfig memory config = riskParameterConfigs[updateType];
+        if (!config.active) {
+            return UPDATE_STATUS.CONFIG_NOT_ACTIVE;
+        }
+
+        if (timestamp + REMOTE_UPDATE_EXPIRATION_TIME < block.timestamp) {
+            return UPDATE_STATUS.EXPIRED;
+        }
+
+        if (processedUpdates[updateId] == UPDATE_STATUS.PROCESSED) {
+            return UPDATE_STATUS.PROCESSED;
+        }
+
+        if (!checkUpdateAllowedRange(updateId, newValue, updateType, market)) {
+            return UPDATE_STATUS.NOT_IN_RANGE_OR_TOO_FREQUENT;
+        }
+
+        return UPDATE_STATUS.NONE;
     }
 }

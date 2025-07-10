@@ -117,29 +117,6 @@ abstract contract CriticalParamRiskStewardBase is AccessControlledV8 {
     }
 
     /**
-     * @dev Initializes the contract as ownable, access controlled, and pausable. Sets the max delta bps initial value.
-     * @param accessControlManager_ The address of the access control manager
-     * @param maxDeltaBps_ The max delta bps
-     * @param debouncePeriod_ The debounce period
-     * @custom:error Throws InvalidMaxDeltaBps if the max delta bps is 0 or greater than MAX_BPS
-     */
-    function __CriticalParamRiskStewardBase_init(
-        address accessControlManager_,
-        uint256 maxDeltaBps_,
-        uint256 debouncePeriod_
-    ) internal onlyInitializing {
-        __AccessControlled_init(accessControlManager_);
-        if (maxDeltaBps_ == 0 || maxDeltaBps_ > MAX_BPS) {
-            revert InvalidMaxDeltaBps();
-        }
-        maxDeltaBps = maxDeltaBps_;
-        if (debouncePeriod_ == 0 || debouncePeriod_ <= RISK_STEWARD_RECEIVER.UPDATE_EXPIRATION_TIME()) {
-            revert InvalidDebouncePeriod();
-        }
-        debouncePeriod = debouncePeriod_;
-    }
-
-    /**
      * @notice Sets the max delta bps
      * @param maxDeltaBps_ The new max delta bps
      * @custom:event Emits MaxDeltaBpsUpdated with the old and new max delta bps
@@ -172,12 +149,42 @@ abstract contract CriticalParamRiskStewardBase is AccessControlledV8 {
     }
 
     /**
+     * @dev Disabling renounceOwnership function.
+     */
+    function renounceOwnership() public pure override {
+        revert("renounceOwnership() is not allowed");
+    }
+
+    /**
      * @notice Packs the new value into a bytes memory
      * @param data The un-padded bytes to decode
      * @return bytes memory The packed bytes
      */
     function packNewValue(bytes memory data) public pure returns (bytes memory) {
         return abi.encodePacked(new bytes(32 - data.length), data);
+    }
+
+    /**
+     * @dev Initializes the contract as ownable, access controlled, and pausable. Sets the max delta bps initial value.
+     * @param accessControlManager_ The address of the access control manager
+     * @param maxDeltaBps_ The max delta bps
+     * @param debouncePeriod_ The debounce period
+     * @custom:error Throws InvalidMaxDeltaBps if the max delta bps is 0 or greater than MAX_BPS
+     */
+    function __CriticalParamRiskStewardBase_init(
+        address accessControlManager_,
+        uint256 maxDeltaBps_,
+        uint256 debouncePeriod_
+    ) internal onlyInitializing {
+        __AccessControlled_init(accessControlManager_);
+        if (maxDeltaBps_ == 0 || maxDeltaBps_ > MAX_BPS) {
+            revert InvalidMaxDeltaBps();
+        }
+        maxDeltaBps = maxDeltaBps_;
+        if (debouncePeriod_ == 0 || debouncePeriod_ <= RISK_STEWARD_RECEIVER.UPDATE_EXPIRATION_TIME()) {
+            revert InvalidDebouncePeriod();
+        }
+        debouncePeriod = debouncePeriod_;
     }
 
     /**
@@ -236,12 +243,5 @@ abstract contract CriticalParamRiskStewardBase is AccessControlledV8 {
      */
     function _getMarketUpdateTypeKey(address market, string memory updateType) internal pure returns (bytes memory) {
         return abi.encodePacked(market, updateType);
-    }
-
-    /**
-     * @dev Disabling renounceOwnership function.
-     */
-    function renounceOwnership() public pure override {
-        revert("renounceOwnership() is not allowed");
     }
 }

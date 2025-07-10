@@ -22,14 +22,14 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     enum UPDATE_STATUS {
         NONE,
         PROCESSED,
-        SEND_TO_DESTINATION_CHAIN,
-        CONFIG_NOT_ACTIVE,
-        EXPIRED,
-        FAILED,
         PROPOSED,
+        SEND_TO_DESTINATION_CHAIN,
+        EXPIRED,
+        CONFIG_NOT_ACTIVE,
         INVALID_DESTINATION_CHAIN,
         HAS_ACTIVE_PROPOSAL,
-        NOT_IN_RANGE_OR_TOO_FREQUENT
+        NOT_IN_RANGE_OR_TOO_FREQUENT,
+        FAILED
     }
 
     struct ProposalActions {
@@ -107,11 +107,13 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     mapping(uint256 updateId => UPDATE_STATUS) public processedUpdates;
 
     /**
-     * @notice Mapping of supported risk configurations and their validation parameters
+     * @notice  Mapping of supported LayerZero V2 destination chain IDs to their corresponding RiskStewardDestinationReceiver contracts
      */
     mapping(uint32 destChainId => address) public remoteRiskStewardReceiver;
 
-    /// @notice Emitted when a V2 → V1 chain ID mapping is set or deleted
+    /**
+     * @notice Event emitted when a V2 → V1 chain ID mapping is set or deleted
+     */
     event ChainIdMappingUpdated(uint32 indexed v2ChainId, uint16 v1ChainId);
 
     /**
@@ -125,7 +127,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     event RiskParameterUpdateProposed(uint256 indexed updateId);
 
     /**
-     * @notice Emit when sets the remote receiver for a destination chain
+     * @notice Event emitted when sets the remote receiver for a destination chain
      */
     event RemoteRiskStewardReceiverUpdated(
         uint32 indexed destChainId,
@@ -151,7 +153,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     );
 
     /**
-     * @notice Emitted when the proposal type is updated
+     * @notice Emitted when the proposalType is updated
      */
     event ProposalTypeUpdated(
         GovernorBravoDelegateStorageV4.ProposalType indexed previousProposalType,
@@ -181,7 +183,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     /**
      * @notice Sets the remote receiver for a destination chain
      * @param destChainId The destination chain ID
-     * @param remoteReceiver The address of the remote receiver
+     * @param remoteReceiver The address of the remote receiver (RiskStewardDestinationReceiver)
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits RemoteRiskStewardReceiverUpdated with the destination chain ID and the remote receiver
      * @custom:error Throws ZeroAddressNotAllowed if the remote receiver address is zero
@@ -201,13 +203,12 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      */
     function deleteRemoteRiskStewardReceiver(uint32 destChainId) external onlyOwner {
         ensureNonzeroAddress(remoteRiskStewardReceiver[destChainId]);
-
         emit RemoteRiskStewardReceiverUpdated(destChainId, remoteRiskStewardReceiver[destChainId], address(0));
         remoteRiskStewardReceiver[destChainId] = address(0);
     }
 
     /**
-     * @notice Sets the proposal type for future governance proposals
+     * @notice Sets the default proposalType for future governance proposals
      * Emits a ProposalTypeUpdated event on success
      * @param _proposalType The new proposal type to set
      * @custom:access OnlyOwner
@@ -248,16 +249,6 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     * @notice Validates the status of an update by its ID. Checks if the update is active, not expired, and unprocessed.
-     * @param updateId The ID of the update to validate
-     * @return error The UPDATE_STATUS error code if the update is not valid, or NONE if valid
-     */
-    function validateUpdatedById(uint256 updateId) public view returns (UPDATE_STATUS error) {
-        RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
-        (error, ) = _validateUpdateStatus(update);
-    }
-
-    /**
      * @notice Processes an update by its ID. Validates that the update configuration is active, not expired, and unprocessed.
      * @dev Handles updates based on their type and destination chain:
      * - For MarketCap updates on the BNB chain, directly invokes the associated RiskSteward contract.
@@ -265,7 +256,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * - For critical updates (e.g., reserve factor), creates a governance proposal on the Governor Bravo contract for execution.
      * @param updateId The ID of the update to process
      * @param options LayerZero call options
-     * @param ZROTokens Amount of ZRO tokens approved for fee payment (used in LayerZero).
+     * @param ZROTokens Optional Amount of ZRO tokens approved for fee payment (used in LayerZero).
      * @param adapterParams Optional adapter parameters for custom gas limits or message execution behavior.
      * @custom:event Emits RiskParameterUpdateFailed if the update is invalid.
      */
@@ -360,6 +351,21 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
+     *  @notice Empty implementation of renounce ownership to avoid any mishappening
+     */
+    function renounceOwnership() public override {}
+
+    /**
+     * @notice Validates the status of an update by its ID. Checks if the update is active, not expired, and unprocessed.
+     * @param updateId The ID of the update to validate
+     * @return error The UPDATE_STATUS error code if the update is not valid, or NONE if valid
+     */
+    function validateUpdatedById(uint256 updateId) public view returns (UPDATE_STATUS error) {
+        RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
+        (error, ) = _validateUpdateStatus(update);
+    }
+
+    /**
      * @notice Quotes the gas needed to pay for the full omnichain transaction in native gas or ZRO token.
      * @param dstEid Destination chain's endpoint ID.
      * @param message The message.
@@ -378,9 +384,16 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     *  @notice Empty implementation of renounce ownership to avoid any mishappening
+     * @dev LayerZero message receive hook
      */
-    function renounceOwnership() public override {}
+    function _lzReceive(
+        Origin calldata origin,
+        bytes32 guid,
+        bytes calldata message,
+        address executor,
+        bytes calldata extraData
+    ) internal virtual override {}
+
     /**
      * @notice Executes the update based on its updateType.
      * @param update The risk parameter update to process
@@ -426,7 +439,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
                 processedUpdates[update.updateId] = UPDATE_STATUS.FAILED;
             }
         } else {
-            bytes memory payload = _createRemotePayload(update);
+            bytes memory payload = _buildLzMarketCapPayload(update);
             // Send layer zero message directly
             try
                 this.lzSend{ value: msg.value }(
@@ -475,13 +488,12 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
 
     /**
      * @notice Creates and submits a governance proposal specifically for the BNB Chain (BSC)
-     * @dev Wraps the given update into a standard proposal format.
-     * It constructs the call data and delegates the proposal creation to `_proposeUpdate`.
-     * @param update The risk parameter update to propose as a BSC-specific governance proposal
+     * @dev  It constructs the call data and delegates the proposal creation to `_proposeUpdate`
+     * @param update The risk parameter update to propose
      * @return proposalId The ID of the proposal created through the governance contract
      */
     function _sendBscProposal(RiskParameterUpdate memory update) internal returns (uint256 proposalId) {
-        (address target, uint256 value, string memory signature, bytes memory data) = _createBscProposal(update);
+        (address target, uint256 value, string memory signature, bytes memory data) = _createBscProposalParams(update);
         address[] memory remoteProposalTargets = new address[](1);
         remoteProposalTargets[0] = target;
         uint256[] memory remoteProposalValues = new uint256[](1);
@@ -512,7 +524,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         bytes calldata adapterParams
     ) internal returns (uint256 proposalId) {
         proposalId = OMNICHAIN_PROPOSAL_SENDER.proposalCount();
-        (address target, uint256 value, string memory signature, bytes memory data) = _generateRemotePayload(
+        (address target, uint256 value, string memory signature, bytes memory data) = _createRemoteUpdateParams(
             update,
             destChainId
         );
@@ -525,7 +537,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         proposal.values[0] = value;
         proposal.signatures[0] = signature;
         proposal.datas[0] = data;
-        RemoteProposalParams memory remoteProposalParams = _createRemoteProposal(
+        RemoteProposalParams memory remoteProposalParams = _createRemoteProposalParams(
             destChainId,
             proposalId,
             proposal.targets,
@@ -555,7 +567,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @notice Batches remote and bnb updates into a single proposal.
      * @dev This function handles all valid updates. Updates targeting the BNB chain are added directly.
      * Remote updates are grouped by destination chain and batched into single actions per chain.
-     * All updates—both BNB and remote—are proposed together in one fast-track governance proposal.
+     * All updates—both BNB and remote—are proposed together in one governance proposal.
      * @param destinationChainCount Number of unique destination chains involved in the updates
      * @param validProposalCount Number of valid (non-expired, unprocessed) updates to be included
      * @param updates Array of `RiskParameterUpdate` structs representing each proposed parameter change
@@ -617,8 +629,8 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
                 emit RiskParameterUpdateProposed(update.updateId);
             }
         }
-
-        ProposalActions memory remoteProposal = _createRemoteProposals(
+        // Creates a batch of RemoteProposalParams, grouped by unique destination chain IDs
+        ProposalActions memory remoteProposals = _batchRemoteProposals(
             destChainIds,
             remoteTargets,
             remoteValues,
@@ -628,39 +640,17 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         );
 
         for (uint256 i; i < destChainIds.length; ++i) {
-            allProposals.targets[ind] = remoteProposal.targets[i];
-            allProposals.values[ind] = remoteProposal.values[i];
-            allProposals.signatures[ind] = remoteProposal.signatures[i];
-            allProposals.datas[ind] = remoteProposal.datas[i];
+            allProposals.targets[ind] = remoteProposals.targets[i];
+            allProposals.values[ind] = remoteProposals.values[i];
+            allProposals.signatures[ind] = remoteProposals.signatures[i];
+            allProposals.datas[ind] = remoteProposals.datas[i];
             ++ind;
         }
         _proposeUpdate(allProposals.targets, allProposals.values, allProposals.signatures, allProposals.datas);
     }
 
     /**
-     * @notice prepares parameters for a remote proposal or a BSC proposal.
-     * @param update The RiskParameterUpdate to execute on any chain
-     * @custom:event Emits BatchedUpdateFailed with the update ID if the update fails to execute
-     * @return ProposalParams proposal parameters
-     */
-    function _prepareProposalParams(RiskParameterUpdate memory update) internal view returns (ProposalParams memory) {
-        (, uint32 destChainId_) = _decodeAdditionalData(update.additionalData);
-        if (LAYER_ZERO_CHAIN_ID == destChainId_) {
-            (address target_, uint256 value_, string memory signature_, bytes memory payload) = _createBscProposal(
-                update
-            );
-            return (ProposalParams(destChainId_, target_, value_, signature_, payload));
-        } else {
-            (address target_, uint256 value_, string memory signature_, bytes memory payload) = _generateRemotePayload(
-                update,
-                destChainId_
-            );
-            return (ProposalParams(destChainId_, target_, value_, signature_, payload));
-        }
-    }
-
-    /**
-     * @notice Reduces a collection or remote proposal parameters into a single command for execution on the remote chain
+     * @notice Reduces a collection of remote proposals into a single set of proposal actions for execution on each destination chain.
      * @param destChainIds The destination chain IDs of the updates
      * @param targets The targets of the updates
      * @param values The values of the updates
@@ -668,7 +658,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @param datas The data of the updates
      * @param adapterParams Optional adapter parameters for custom gas limits or message execution behavior.
      */
-    function _createRemoteProposals(
+    function _batchRemoteProposals(
         uint32[] memory destChainIds,
         address[][] memory targets,
         uint256[][] memory values,
@@ -687,7 +677,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
 
         uint256 proposalId = OMNICHAIN_PROPOSAL_SENDER.proposalCount();
         for (uint256 i; i < destChainIds.length; ++i) {
-            RemoteProposalParams memory remoteProposalParams = _createRemoteProposal(
+            RemoteProposalParams memory remoteProposalParams = _createRemoteProposalParams(
                 destChainIds[i],
                 proposalId,
                 targets[i],
@@ -714,8 +704,8 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     * @notice Creates a fast-track governance proposal using the provided call data.
-     * @dev This function wraps multiple on-chain or cross-chain actions into a single fast-track proposal
+     * @notice Creates a governance proposal using the provided call data.
+     * @dev This function wraps multiple on-chain or cross-chain actions into a single proposal
      * submitted to the Governor Bravo contract.
      * @param targets Array of target contract addresses for each call
      * @param values Array of ETH values (in wei) to send with each call
@@ -783,7 +773,119 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     * @notice Creates a governance proposal payload for a market cap update on the BNB chain.
+     * @dev Silently validates a risk parameter update without reverting
+     * Checks that the update:
+     * - is the latest for the market and parameter,
+     * - is not expired,
+     * - is unprocessed,
+     * - has an active configuration,
+     * - has a valid destination (for non-cap updates),
+     * - has no active governance proposal,
+     * - and meets allowed range and debounce rules for local updates
+     *
+     * @param update The risk parameter update to validate.
+     * @return error The UPDATE_STATUS code indicating why the update is invalid, or NONE (0) if valid
+     * @return destChainId The destination chain ID extracted from the update's additional data
+     */
+
+    function _validateUpdateStatus(
+        RiskParameterUpdate memory update
+    ) internal view returns (UPDATE_STATUS error, uint32 destChainId) {
+        (, destChainId) = _decodeAdditionalData(update.additionalData);
+
+        RiskParameterUpdate memory latestUpdate = RISK_ORACLE.getLatestUpdateByParameterAndMarket(
+            update.updateType,
+            update.market
+        );
+
+        if (latestUpdate.updateId != update.updateId || update.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp) {
+            return (UPDATE_STATUS.EXPIRED, destChainId);
+        }
+
+        UPDATE_STATUS processedStatus = processedUpdates[update.updateId];
+        if (
+            processedStatus == UPDATE_STATUS.PROCESSED ||
+            processedStatus == UPDATE_STATUS.SEND_TO_DESTINATION_CHAIN ||
+            processedStatus == UPDATE_STATUS.PROPOSED
+        ) {
+            return (processedStatus, destChainId);
+        }
+
+        RiskParamConfig memory config = riskParameterConfigs[update.updateType];
+        if (!config.active) {
+            return (UPDATE_STATUS.CONFIG_NOT_ACTIVE, destChainId);
+        }
+
+        bool isLocalUpdate = destChainId == LAYER_ZERO_CHAIN_ID;
+        if (!isSupplyOrBorrowCapUpdate(update.updateType)) {
+            if (!isLocalUpdate && remoteRiskStewardReceiver[destChainId] == address(0)) {
+                return (UPDATE_STATUS.INVALID_DESTINATION_CHAIN, destChainId);
+            }
+            if (_hasActiveProposal(address(this))) {
+                return (UPDATE_STATUS.HAS_ACTIVE_PROPOSAL, destChainId);
+            }
+        }
+
+        if (
+            isLocalUpdate &&
+            !config.riskSteward.validateUpdate(update.updateId, update.newValue, update.updateType, update.market)
+        ) {
+            return (UPDATE_STATUS.NOT_IN_RANGE_OR_TOO_FREQUENT, destChainId);
+        }
+
+        return (UPDATE_STATUS.NONE, destChainId);
+    }
+
+    /**
+     * @dev Builds the LayerZero payload for MarketCap updates to be sent via lzSend.
+     * The payload is stored on the destination chain for later execution.
+     * @param update The MarketCap update to create the payload for
+     * @return data The ABI-encoded payload containing the update parameters
+     */
+    function _buildLzMarketCapPayload(RiskParameterUpdate memory update) internal view returns (bytes memory data) {
+        IRiskSteward riskSteward = riskParameterConfigs[update.updateType].riskSteward;
+
+        bytes memory payload = abi.encode(
+            update.updateId,
+            riskSteward.packNewValue(update.newValue),
+            update.updateType,
+            update.market,
+            update.additionalData,
+            update.timestamp
+        );
+
+        return payload;
+    }
+
+    /**
+     * @notice prepares parameters for a remote proposal or a BSC proposal.
+     * @param update The RiskParameterUpdate to execute on any chain
+     * @custom:event Emits BatchedUpdateFailed with the update ID if the update fails to execute
+     * @return ProposalParams proposal parameters
+     */
+    function _prepareProposalParams(RiskParameterUpdate memory update) internal view returns (ProposalParams memory) {
+        (, uint32 destChainId_) = _decodeAdditionalData(update.additionalData);
+        if (LAYER_ZERO_CHAIN_ID == destChainId_) {
+            (
+                address target_,
+                uint256 value_,
+                string memory signature_,
+                bytes memory payload
+            ) = _createBscProposalParams(update);
+            return (ProposalParams(destChainId_, target_, value_, signature_, payload));
+        } else {
+            (
+                address target_,
+                uint256 value_,
+                string memory signature_,
+                bytes memory payload
+            ) = _createRemoteUpdateParams(update, destChainId_);
+            return (ProposalParams(destChainId_, target_, value_, signature_, payload));
+        }
+    }
+
+    /**
+     * @notice Creates a governance proposal payload params for updates on the BNB chain.
      * @dev Constructs the call data for invoking `processUpdate` on the associated RiskSteward contract.
      * The proposal is formed with the target RiskSteward, zero ETH value, the function signature, and encoded arguments.
      * @param update The RiskParameterUpdate object containing update details such as ID, value, type, and market
@@ -792,7 +894,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @return signature The function signature to be called in the proposal ("processUpdate(uint256,bytes,string,address)")
      * @return data The ABI-encoded payload containing updateId, packed new value, update type, and market address
      */
-    function _createBscProposal(
+    function _createBscProposalParams(
         RiskParameterUpdate memory update
     ) internal view returns (address target, uint256 value, string memory signature, bytes memory data) {
         IRiskSteward riskSteward = riskParameterConfigs[update.updateType].riskSteward;
@@ -814,7 +916,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @return signature Hardcoded as "processUpdate(bytes,bytes,string,address,bytes)" since this is the signature for the processUpdate function
      * @return data The data in bytes of the update
      */
-    function _generateRemotePayload(
+    function _createRemoteUpdateParams(
         RiskParameterUpdate memory update,
         uint32 destChainId
     ) internal view returns (address target, uint256 value, string memory signature, bytes memory data) {
@@ -832,7 +934,8 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     * @notice Creates a remote proposal params for updates to be executed on a remote chain.
+     * @notice Prepares the parameters required to create a remote proposal for execution on a destination chain.
+     * These parameters are submitted to Governor Bravo contracts to invoke Omnichain Governance.
      * @param destChainId The destination chain ID of the update
      * @param proposalId The proposal ID of the update
      * @param targets The targets of the update
@@ -842,7 +945,7 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
      * @param adapterParams Optional adapter parameters for custom gas limits or message execution behavior.
      * @return remoteProposalParams The remote proposal params
      */
-    function _createRemoteProposal(
+    function _createRemoteProposalParams(
         uint32 destChainId,
         uint256 proposalId,
         address[] memory targets,
@@ -895,85 +998,6 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
     }
 
     /**
-     * @dev Creates a remote proposal params for a given update.
-     * @param update The update to create a remote proposal for
-     * @return data The data in bytes of the update
-     */
-    function _createRemotePayload(RiskParameterUpdate memory update) internal view returns (bytes memory data) {
-        IRiskSteward riskSteward = riskParameterConfigs[update.updateType].riskSteward;
-
-        bytes memory payload = abi.encode(
-            update.updateId,
-            riskSteward.packNewValue(update.newValue),
-            update.updateType,
-            update.market,
-            update.additionalData,
-            update.timestamp
-        );
-
-        return payload;
-    }
-
-    /**
-     * @dev Validates the status of an update silently. Will validate that the update configuration is active, is not expired, and unprocessed
-     * @param update The risk parameter update to validate.
-     * @return error The UPDATE_STATUS error code if the update is not valid or 0 and destination chain id
-     */
-    function _validateUpdateStatus(
-        RiskParameterUpdate memory update
-    ) internal view returns (UPDATE_STATUS error, uint32 destChainId) {
-        require(update.updateId != 0, "No update found");
-
-        RiskParamConfig memory config = riskParameterConfigs[update.updateType];
-
-        RiskParameterUpdate memory latestForMarketAndType = RISK_ORACLE.getLatestUpdateByParameterAndMarket(
-            update.updateType,
-            update.market
-        );
-
-        (, destChainId) = _decodeAdditionalData(update.additionalData);
-
-        if (latestForMarketAndType.updateId != update.updateId) {
-            return (UPDATE_STATUS.EXPIRED, destChainId);
-        }
-
-        if (!config.active) {
-            return (UPDATE_STATUS.CONFIG_NOT_ACTIVE, destChainId);
-        }
-
-        if (update.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp) {
-            return (UPDATE_STATUS.EXPIRED, destChainId);
-        }
-
-        if (
-            processedUpdates[update.updateId] == UPDATE_STATUS.PROCESSED ||
-            processedUpdates[update.updateId] == UPDATE_STATUS.SEND_TO_DESTINATION_CHAIN ||
-            processedUpdates[update.updateId] == UPDATE_STATUS.PROPOSED
-        ) {
-            return (processedUpdates[update.updateId], destChainId);
-        }
-
-        address remoteReceiver = remoteRiskStewardReceiver[destChainId];
-        if (!isSupplyOrBorrowCapUpdate(update.updateType)) {
-            if (remoteReceiver == address(0) && destChainId != LAYER_ZERO_CHAIN_ID) {
-                return (UPDATE_STATUS.INVALID_DESTINATION_CHAIN, destChainId);
-            }
-            if (_hasActiveProposal(address(this))) {
-                return (UPDATE_STATUS.HAS_ACTIVE_PROPOSAL, destChainId);
-            }
-        }
-
-        if (
-            destChainId == LAYER_ZERO_CHAIN_ID &&
-            !config.riskSteward.validateUpdate(update.updateId, update.newValue, update.updateType, update.market)
-        ) {
-            return (UPDATE_STATUS.NOT_IN_RANGE_OR_TOO_FREQUENT, destChainId);
-        }
-
-        return (UPDATE_STATUS.NONE, destChainId);
-    }
-
-    /**
      * @dev Checks if the given proposer has any active or pending governance proposals.
      * @param proposer The address of the proposer to check.
      * @return hasLiveProposal True if the proposer has an active or pending proposal, false otherwise.
@@ -989,17 +1013,6 @@ contract RiskStewardReceiver is OApp, RiskStewardReceiverBase {
         return (proposalState == GovernorBravoDelegateStorageV1.ProposalState.Active ||
             proposalState == GovernorBravoDelegateStorageV1.ProposalState.Pending);
     }
-
-    /**
-     * @dev LayerZero message receive hook
-     */
-    function _lzReceive(
-        Origin calldata origin,
-        bytes32 guid,
-        bytes calldata message,
-        address executor,
-        bytes calldata extraData
-    ) internal virtual override {}
 
     /**
      * @dev Checks if the update type is a supplyCap or borrowCap update

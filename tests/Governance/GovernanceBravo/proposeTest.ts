@@ -11,6 +11,7 @@ import {
   GovernorBravoDelegate,
   GovernorBravoDelegate__factory,
   TestTimelockV8,
+  TestTimelockV8__factory,
   XVS,
   XVSStore,
   XVSVault,
@@ -30,14 +31,14 @@ let accounts: Signer[];
 let governorBravoDelegate: MockContract<GovernorBravoDelegate>;
 let xvsVault: FakeContract<XVSVault>;
 let xvsToken: FakeContract<XVS>;
-let normalTimelock: FakeContract<TestTimelockV8>;
+let normalTimelock: MockContract<TestTimelockV8>;
 let accessControlManager: MockContract<AccessControlManager>;
 type GovernorBravoDelegateFixture = {
   governorBravoDelegate: MockContract<GovernorBravoDelegate>;
   xvsVault: FakeContract<XVSVault>;
   xvsStore: FakeContract<XVSStore>;
   xvsToken: FakeContract<XVS>;
-  normalTimelock: FakeContract<TestTimelockV8>;
+  normalTimelock: MockContract<TestTimelockV8>;
   accessControlManager: MockContract<AccessControlManager>;
 };
 
@@ -47,7 +48,9 @@ async function governorBravoFixture(): Promise<GovernorBravoDelegateFixture> {
   const xvsVault = await smock.fake<XVSVault>("MockXVSVault");
   const xvsStore = await smock.fake<XVSStore>("XVSStore");
   const xvsToken = await smock.fake<XVS>("XVS");
-  const normalTimelock = await smock.fake<TestTimelockV8>("TestTimelockV8");
+  const normalTimelockFactory = await smock.mock<TestTimelockV8__factory>("TestTimelockV8");
+  const TIMELOCK_DELAY = 3600;
+  const normalTimelock = await normalTimelockFactory.deploy(governorBravoDelegate.address, TIMELOCK_DELAY);
   const accessControlManagerFactory = await smock.mock<AccessControlManager__factory>("AccessControlManager");
   const accessControlManager = await accessControlManagerFactory.deploy();
   return { governorBravoDelegate, xvsVault, xvsStore, xvsToken, normalTimelock, accessControlManager };

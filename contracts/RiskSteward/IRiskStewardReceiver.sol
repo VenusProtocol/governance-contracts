@@ -9,8 +9,6 @@ struct RiskParamConfig {
 }
 
 interface IRiskStewardReceiver {
-    function RISK_ORACLE() external view returns (IRiskOracle);
-
     function initialize(address accessControlManager_) external;
 
     function setRiskParameterConfig(string calldata updateType, address riskSteward, uint256 debounce) external;
@@ -20,4 +18,6 @@ interface IRiskStewardReceiver {
     function processUpdateById(uint256 updateId) external;
 
     function processUpdateByParameterAndMarket(string memory updateType, address market) external;
+
+    function RISK_ORACLE() external view returns (IRiskOracle);
 }
