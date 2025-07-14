@@ -380,9 +380,9 @@ describe("Risk Steward", async function () {
 
     marketCapsRiskSteward = await upgrades.deployProxy(
       MarketCapsRiskStewardFactory,
-      [accessControlManager.address, 5000, DAY_AND_ONE_SECOND],
+      [accessControlManager.address, riskStewardReceiver.address, 5000, DAY_AND_ONE_SECOND],
       {
-        constructorArgs: [riskStewardReceiver.address, mockCoreComptroller.address],
+        constructorArgs: [mockCoreComptroller.address],
         initializer: "initialize",
         unsafeAllow: ["state-variable-immutable"],
       },
@@ -390,9 +390,9 @@ describe("Risk Steward", async function () {
 
     collateralFactorRiskSteward = await upgrades.deployProxy(
       CollateralFactorRiskStewardFactory,
-      [accessControlManager.address, 5000, DAY_AND_ONE_SECOND],
+      [accessControlManager.address, riskStewardReceiver.address, 5000, DAY_AND_ONE_SECOND],
       {
-        constructorArgs: [riskStewardReceiver.address, mockCoreComptroller.address],
+        constructorArgs: [mockCoreComptroller.address],
         initializer: "initialize",
         unsafeAllow: ["state-variable-immutable"],
       },
@@ -400,9 +400,9 @@ describe("Risk Steward", async function () {
 
     reserveFactorRiskSteward = await upgrades.deployProxy(
       ReserveFactorRiskStewardFactory,
-      [accessControlManager.address, 5000, DAY_AND_ONE_SECOND],
+      [accessControlManager.address, riskStewardReceiver.address, 5000, DAY_AND_ONE_SECOND],
       {
-        constructorArgs: [riskStewardReceiver.address, mockCoreComptroller.address],
+        constructorArgs: [mockCoreComptroller.address],
         initializer: "initialize",
         unsafeAllow: ["state-variable-immutable"],
       },
@@ -411,9 +411,9 @@ describe("Risk Steward", async function () {
     //Risk Stewards on destination chain
     marketCapsDestRiskSteward = await upgrades.deployProxy(
       MarketCapsRiskStewardFactory,
-      [accessControlManager.address, 5000, DAY_AND_ONE_SECOND],
+      [accessControlManager.address, riskStewardDestReceiver.address, 5000, DAY_AND_ONE_SECOND],
       {
-        constructorArgs: [riskStewardDestReceiver.address, mockCoreComptroller.address], // using same comptroller at remote as well.
+        constructorArgs: [mockCoreComptroller.address], // using same comptroller at remote as well.
         initializer: "initialize",
         unsafeAllow: ["state-variable-immutable"],
       },
@@ -421,9 +421,9 @@ describe("Risk Steward", async function () {
 
     collateralFactorDestRiskSteward = await upgrades.deployProxy(
       CollateralFactorRiskStewardFactory,
-      [accessControlManager.address, 5000, DAY_AND_ONE_SECOND],
+      [accessControlManager.address, riskStewardReceiver.address, 5000, DAY_AND_ONE_SECOND],
       {
-        constructorArgs: [riskStewardReceiver.address, mockCoreComptroller.address],
+        constructorArgs: [mockCoreComptroller.address],
         initializer: "initialize",
         unsafeAllow: ["state-variable-immutable"],
       },
@@ -431,9 +431,9 @@ describe("Risk Steward", async function () {
 
     reserveFactorDestRiskSteward = await upgrades.deployProxy(
       ReserveFactorRiskStewardFactory,
-      [accessControlManager.address, 5000, DAY_AND_ONE_SECOND],
+      [accessControlManager.address, riskStewardReceiver.address, 5000, DAY_AND_ONE_SECOND],
       {
-        constructorArgs: [riskStewardReceiver.address, mockCoreComptroller.address],
+        constructorArgs: [mockCoreComptroller.address],
         initializer: "initialize",
         unsafeAllow: ["state-variable-immutable"],
       },

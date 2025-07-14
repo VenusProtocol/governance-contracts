@@ -26,29 +26,27 @@ contract ReserveFactorRiskSteward is CriticalParamRiskStewardBase {
 
     /**
      * @dev Sets the immutable CorePoolComptroller and RiskStewardReceiver addresses and disables initializers
-     * @param riskStewardReceiver_ The address of the RiskStewardReceiver
      * @param corePoolComptroller_ The address of the corePoolComptroller
      * @custom:error Throws ZeroAddressNotAllowed if the CorePoolComptroller or RiskStewardReceiver addresses are zero
      * @custom:oz-upgrades-unsafe-allow constructor
      */
-    constructor(
-        address riskStewardReceiver_,
-        address corePoolComptroller_
-    ) CriticalParamRiskStewardBase(riskStewardReceiver_, corePoolComptroller_) {}
+    constructor(address corePoolComptroller_) CriticalParamRiskStewardBase(corePoolComptroller_) {}
 
     /**
      * @dev Initializes the contract as ownable, access controlled, and pausable. Sets the max delta bps initial value.
      * @param accessControlManager_ The address of the access control manager
+     * @param riskStewardReceiver_ The address of the RiskStewardReceiver
      * @param maxDeltaBps_ The max detla bps
      * @param debouncePeriod_ The debounce period
      * @custom:error Throws InvalidMaxDeltaBps if the max delta bps is 0 or greater than MAX_BPS
      */
     function initialize(
         address accessControlManager_,
+        address riskStewardReceiver_,
         uint256 maxDeltaBps_,
         uint256 debouncePeriod_
     ) external initializer {
-        __CriticalParamRiskStewardBase_init(accessControlManager_, maxDeltaBps_, debouncePeriod_);
+        __CriticalParamRiskStewardBase_init(accessControlManager_, riskStewardReceiver_, maxDeltaBps_, debouncePeriod_);
     }
 
     /**

@@ -25,7 +25,7 @@ abstract contract CriticalParamRiskStewardBase is AccessControlledV8 {
     /**
      * @notice Address of the RiskStewardReceiver used to validate incoming updates
      */
-    IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
+    IRiskStewardReceiver public RiskStewardReceiver;
 
     /**
      * @notice The max delta bps for the update relative to the current value
@@ -69,6 +69,13 @@ abstract contract CriticalParamRiskStewardBase is AccessControlledV8 {
     event DebouncePeriodUpdated(uint256 oldDebouncePeriod, uint256 newDebouncePeriod);
 
     /**
+     * @notice Emitted when the RiskStewardReceiver address is updated
+     * @param oldRiskStewardReceiver The previous RiskStewardReceiver address
+     * @param newRiskStewardReceiver The new RiskStewardReceiver address
+     */
+    event RiskStewardReceiverUpdated(address indexed oldRiskStewardReceiver, address indexed newRiskStewardReceiver);
+
+    /**
      * @notice Thrown when a maxDeltaBps value of 0 is set
      */
     error InvalidMaxDeltaBps();
@@ -102,16 +109,13 @@ abstract contract CriticalParamRiskStewardBase is AccessControlledV8 {
     error UpdateAlreadyProcessed(uint256 updateId);
 
     /**
-     * @dev Sets the immutable CorePoolComptroller and RiskStewardReceiver addresses and disables initializers
-     * @param riskStewardReceiver_ The address of the RiskStewardReceiver
+     * @dev Sets the immutable CorePoolComptroller and disables initializers
      * @param corePoolComptroller_ The address of the corePoolComptroller
-     * @custom:error Throws ZeroAddressNotAllowed if the CorePoolComptroller or RiskStewardReceiver addresses are zero
+     * @custom:error Throws ZeroAddressNotAllowed if the CorePoolComptroller address is zero
      * @custom:oz-upgrades-unsafe-allow constructor
      */
-    constructor(address riskStewardReceiver_, address corePoolComptroller_) {
-        ensureNonzeroAddress(riskStewardReceiver_);
+    constructor(address corePoolComptroller_) {
         ensureNonzeroAddress(corePoolComptroller_);
-        RISK_STEWARD_RECEIVER = IRiskStewardReceiver(riskStewardReceiver_);
         CORE_POOL_COMPTROLLER = ICorePoolComptroller(corePoolComptroller_);
         _disableInitializers();
     }
@@ -141,11 +145,22 @@ abstract contract CriticalParamRiskStewardBase is AccessControlledV8 {
      */
     function setDebouncePeriod(uint256 debouncePeriod_) external {
         _checkAccessAllowed("setDebouncePeriod(uint256)");
-        if (debouncePeriod_ == 0 || debouncePeriod_ <= RISK_STEWARD_RECEIVER.UPDATE_EXPIRATION_TIME()) {
+        if (debouncePeriod_ == 0 || debouncePeriod_ <= RiskStewardReceiver.UPDATE_EXPIRATION_TIME()) {
             revert InvalidDebouncePeriod();
         }
         emit DebouncePeriodUpdated(debouncePeriod, debouncePeriod_);
         debouncePeriod = debouncePeriod_;
+    }
+
+    /**
+     * @notice Sets the RiskStewardReceiver address
+     * @param riskStewardReceiver_ The address of the RiskStewardReceiver
+     */
+    function setRiskStewardReceiver(address riskStewardReceiver_) public {
+        _checkAccessAllowed("setRiskStewardReceiver(address)");
+        ensureNonzeroAddress(riskStewardReceiver_);
+        emit RiskStewardReceiverUpdated(address(RiskStewardReceiver), riskStewardReceiver_);
+        RiskStewardReceiver = IRiskStewardReceiver(riskStewardReceiver_);
     }
 
     /**
@@ -173,15 +188,18 @@ abstract contract CriticalParamRiskStewardBase is AccessControlledV8 {
      */
     function __CriticalParamRiskStewardBase_init(
         address accessControlManager_,
+        address riskStewardReceiver_,
         uint256 maxDeltaBps_,
         uint256 debouncePeriod_
     ) internal onlyInitializing {
         __AccessControlled_init(accessControlManager_);
+        ensureNonzeroAddress(riskStewardReceiver_);
+        RiskStewardReceiver = IRiskStewardReceiver(riskStewardReceiver_);
         if (maxDeltaBps_ == 0 || maxDeltaBps_ > MAX_BPS) {
             revert InvalidMaxDeltaBps();
         }
         maxDeltaBps = maxDeltaBps_;
-        if (debouncePeriod_ == 0 || debouncePeriod_ <= RISK_STEWARD_RECEIVER.UPDATE_EXPIRATION_TIME()) {
+        if (debouncePeriod_ == 0 || debouncePeriod_ <= RiskStewardReceiver.UPDATE_EXPIRATION_TIME()) {
             revert InvalidDebouncePeriod();
         }
         debouncePeriod = debouncePeriod_;
