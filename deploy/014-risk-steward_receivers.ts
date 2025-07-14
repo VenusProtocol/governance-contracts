@@ -67,13 +67,13 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     await deploy(name, {
       from: deployer,
       log: true,
-      args: [receiverAddress, corePoolComptroller],
+      args: [corePoolComptroller],
       proxy: {
         owner: networkName === "hardhat" ? deployer : normalTimelockAddress,
         proxyContract: "OptimizedTransparentUpgradeableProxy",
         execute: {
           methodName: "initialize",
-          args: [accessControlManager.address, maxDeltaBps, debouncePeriod],
+          args: [accessControlManager.address, receiverAddress, maxDeltaBps, debouncePeriod],
         },
         viaAdminContract: {
           name: "DefaultProxyAdmin",
