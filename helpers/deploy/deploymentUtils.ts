@@ -104,7 +104,7 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
 export const getRiskOracle = async (networkName: SUPPORTED_NETWORKS) => {
   const mockRiskOracle = await ethers.getContractOrNull("MockRiskOracle");
   return {
-    bscmainnet: "",
+    bscmainnet: "0x66A8cb6c4230B044378aC3676D47Ed4fE18e3cFB",
     bsctestnet: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
     hardhat: mockRiskOracle?.address || "",
     sepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
