@@ -103,27 +103,32 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
 
 export const getRiskOracle = async (networkName: SUPPORTED_NETWORKS) => {
   const mockRiskOracle = await ethers.getContractOrNull("MockRiskOracle");
-  return {
-    bscmainnet: "0x66A8cb6c4230B044378aC3676D47Ed4fE18e3cFB",
-    bsctestnet: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
-    hardhat: mockRiskOracle?.address || "",
-    sepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
-    ethereum: "0x91429ddc50B38bAF3Ba9CB5eB0275507Ac65CBF4",
-    opbnbtestnet: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
-    opbnbmainnet: "",
-    arbitrumsepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
-    arbitrumone: "",
-    opsepolia: "0x66A8cb6c4230B044378aC3676D47Ed4fE18e3cFB",
-    opmainnet: "",
-    basesepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
-    basemainnet: "",
-    unichainsepolia: "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F",
-    unichainmainnet: "",
-    zksyncsepolia: "0x1f7474B549840158464Eca63735429815867b40e", // Mock
-    zksyncmainnet: "",
-    berachainbartio: "",
-    berachainbepolia: "",
-  }[networkName];
+  switch (networkName) {
+    case SUPPORTED_NETWORKS.BSCTESTNET:
+      return "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F";
+    case SUPPORTED_NETWORKS.BSCMAINNET:
+      return "0x66A8cb6c4230B044378aC3676D47Ed4fE18e3cFB";
+    case SUPPORTED_NETWORKS.HARDHAT:
+      return mockRiskOracle?.address || "";
+    case SUPPORTED_NETWORKS.SEPOLIA:
+      return "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F";
+    case SUPPORTED_NETWORKS.ETHERUEM:
+      return "0x91429ddc50B38bAF3Ba9CB5eB0275507Ac65CBF4";
+    case SUPPORTED_NETWORKS.OPBNBTESTNET:
+      return "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F";
+    case SUPPORTED_NETWORKS.ARBITRUM_SEPOLIA:
+      return "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F";
+    case SUPPORTED_NETWORKS.OPSEPOLIA:
+      return "0x66A8cb6c4230B044378aC3676D47Ed4fE18e3cFB";
+    case SUPPORTED_NETWORKS.BASESEPOLIA:
+      return "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F";
+    case SUPPORTED_NETWORKS.UNICHAINSEPOLIA:
+      return "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F";
+    case SUPPORTED_NETWORKS.ZKSYNC_SEPOLIA:
+      return "0x1f7474B549840158464Eca63735429815867b40e";
+    default:
+      throw new Error(`Risk Oracle Unsupported network: ${networkName}`);
+  }
 };
 
 export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {

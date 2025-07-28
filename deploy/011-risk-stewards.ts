@@ -49,6 +49,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     console.log(`Transferred ownership of RiskStewardReceiver to ${normalTimelockAddress}`);
   }
 
+  const maxDeltaBps = 5000;
   await deploy("MarketCapsRiskSteward", {
     from: deployer,
     log: true,
@@ -58,7 +59,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
       proxyContract: "OptimizedTransparentUpgradeableProxy",
       execute: {
         methodName: "initialize",
-        args: [accessControlManager.address, 5000],
+        args: [accessControlManager.address, maxDeltaBps],
       },
       viaAdminContract: {
         name: "DefaultProxyAdmin",
