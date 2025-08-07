@@ -158,6 +158,5 @@ export const addressMap: Record<SUPPORTED_NETWORKS, Record<string, string>> = {
     "0x9831D3A641E8c7F082EEA75b8249c99be9D09a34": "Guardian",
     "0x9027cF782515F3184bbF7A6cD7a33052dc52E439": "PoolRegistry",
     "0xCAF833318a6663bb23aa7f218e597c2F7970b4D2": "XVSBridgeDest",
-  },
-  berachainbepolia: {},
+  }
 };
