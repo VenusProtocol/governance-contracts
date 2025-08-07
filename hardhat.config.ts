@@ -179,7 +179,7 @@ const config: HardhatUserConfig = {
       basesepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
       basemainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
       unichainsepolia: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
-      unichainmainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY"
+      unichainmainnet: process.env.ETHERSCAN_API_KEY || "ETHERSCAN_API_KEY",
     },
     customChains: [
       {
