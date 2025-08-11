@@ -1,3 +1,12 @@
+## [2.13.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.13.0-dev.1...v2.13.0-dev.2) (2025-08-11)
+
+
+### Bug Fixes
+
+* fixed lint ([91d8be3](https://github.com/VenusProtocol/governance-contracts/commit/91d8be3dbc5a9d911bb083008fa07bee3c800f11))
+* fixed yarn lock ([0de320b](https://github.com/VenusProtocol/governance-contracts/commit/0de320b1fef3801f5a3e98a0d7cd29768bb64a3d))
+* removed berachain ([b44c8f2](https://github.com/VenusProtocol/governance-contracts/commit/b44c8f285774984e07a30992c82300e521673cb6))
+
 ## [2.13.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.12.0...v2.13.0-dev.1) (2025-05-09)
 
 
