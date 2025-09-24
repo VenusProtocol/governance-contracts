@@ -190,9 +190,17 @@
     "addresses": [
       "0x939bD8d64c0A9583A7Dcea9933f7b21697ab6396",
       "0x555ba73dB1b006F3f2C7dB7126d6e4343aDBce02",
-      "0x213c446ec11e45b15a6E29C1C1b402B8897f606d"
+      "0x213c446ec11e45b15a6E29C1C1b402B8897f606d",
+      "0x0b086B866A5A91D5882ed355a34d268c62f8BE66",
+      "0xe17aB0c10be44c64d9B41385a2d3C2335f57701B"
     ],
-    "addressNames": ["NormalTimelock", "FastTrackTimelock", "CriticalTimelock"]
+    "addressNames": [
+      "NormalTimelock",
+      "FastTrackTimelock",
+      "CriticalTimelock",
+      "0x0b086B866A5A91D5882ed355a34d268c62f8BE66",
+      "0xe17aB0c10be44c64d9B41385a2d3C2335f57701B"
+    ]
   },
   {
     "contractAddress": "0x0000000000000000000000000000000000000000000000000000000000000000",
@@ -438,9 +446,17 @@
     "addresses": [
       "0x939bD8d64c0A9583A7Dcea9933f7b21697ab6396",
       "0x555ba73dB1b006F3f2C7dB7126d6e4343aDBce02",
-      "0x213c446ec11e45b15a6E29C1C1b402B8897f606d"
+      "0x213c446ec11e45b15a6E29C1C1b402B8897f606d",
+      "0xB3eE9073a1a394ef242d27267C1A5D3b9ed739fA",
+      "0xCD6956823F1Aaa5be19a6827aFC6d32AD1ef8800"
     ],
-    "addressNames": ["NormalTimelock", "FastTrackTimelock", "CriticalTimelock"]
+    "addressNames": [
+      "NormalTimelock",
+      "FastTrackTimelock",
+      "CriticalTimelock",
+      "0xB3eE9073a1a394ef242d27267C1A5D3b9ed739fA",
+      "0xCD6956823F1Aaa5be19a6827aFC6d32AD1ef8800"
+    ]
   },
   {
     "contractAddress": "0x0000000000000000000000000000000000000000000000000000000000000000",
