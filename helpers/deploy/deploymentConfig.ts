@@ -200,12 +200,6 @@ export const config: Config = {
       { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
     ],
   },
-  berachainbartio: {
-    methods: [
-      { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bsctestnet"], 0, 200000] },
-      { method: "setMaxDailyReceiveLimit(uint256)", args: [100] },
-    ],
-  },
   hardhat: {
     methods: [
       { method: "setMinDstGas(uint16,uint16,uint256)", args: [LZ_CHAINID["bsctestnet"], 0, 200000] },
