@@ -1,3 +1,10 @@
+## [2.13.1-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.13.0...v2.13.1-dev.1) (2025-10-09)
+
+
+### Bug Fixes
+
+* revert bnbmainnet permission updates ([34b53a3](https://github.com/VenusProtocol/governance-contracts/commit/34b53a3cb617fd569ffb38a9bc90255e563d3494))
+
 ## [2.13.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.12.0...v2.13.0) (2025-09-29)
 
 
