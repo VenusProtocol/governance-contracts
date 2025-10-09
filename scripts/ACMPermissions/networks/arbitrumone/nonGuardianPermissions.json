@@ -550,5 +550,66 @@
       "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674"
     ],
     "addressNames": ["NormalTimelock", "FastTrackTimelock", "CriticalTimelock"]
+  },
+  {
+    "contractAddress": "0x0000000000000000000000000000000000000000",
+    "functionSignature": "setSnapshot(uint256,uint256)",
+    "role": "0xf853a912a26d879b5c61493e6a3199970bdd40ea632e5b5cd7e84d88a66c0f9a",
+    "addresses": [
+      "0x4b94589Cc23F618687790036726f744D602c4017",
+      "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
+      "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04"
+    ],
+    "addressNames": ["NormalTimelock", "CriticalTimelock", "FastTrackTimelock"]
+  },
+  {
+    "contractAddress": "0x0000000000000000000000000000000000000000",
+    "functionSignature": "setGrowthRate(uint256,uint256)",
+    "role": "0xfe9ab3e1419c9065c1cc1b8c6ae1c3c56be325dd0c433c7de36711caa1544312",
+    "addresses": [
+      "0x4b94589Cc23F618687790036726f744D602c4017",
+      "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
+      "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04"
+    ],
+    "addressNames": ["NormalTimelock", "CriticalTimelock", "FastTrackTimelock"]
+  },
+  {
+    "contractAddress": "0x0000000000000000000000000000000000000000",
+    "functionSignature": "setSnapshotGap(uint256)",
+    "role": "0x3aae27ec12ef7397b1dff22b6eba5cda4baa9e6ebbd7acda6c72736176824a03",
+    "addresses": [
+      "0x4b94589Cc23F618687790036726f744D602c4017",
+      "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
+      "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04"
+    ],
+    "addressNames": ["NormalTimelock", "CriticalTimelock", "FastTrackTimelock"]
+  },
+  {
+    "contractAddress": "0xC1422B928cb6FC9BA52880892078578a93aa5Cc7",
+    "functionSignature": "setRewardRecipient(address)",
+    "role": "0x218f12e528b42ec290c3b765b77ccb9c6c6391f784e16e1ad332d279ac21a281",
+    "addresses": ["0x4b94589Cc23F618687790036726f744D602c4017"],
+    "addressNames": ["NormalTimelock"]
+  },
+  {
+    "contractAddress": "0xC1422B928cb6FC9BA52880892078578a93aa5Cc7",
+    "functionSignature": "setMaxLoopsLimit(uint256)",
+    "role": "0x4d277fb4b0e6d6a90f3528ebed301fe2dd6d651031614d3f5c198e6a77b34754",
+    "addresses": ["0x4b94589Cc23F618687790036726f744D602c4017"],
+    "addressNames": ["NormalTimelock"]
+  },
+  {
+    "contractAddress": "0x0000000000000000000000000000000000000000",
+    "functionSignature": "setRewardRecipient(address)",
+    "role": "0x5f9fd7d853f70b2f47d8ef667549edf18e477b7fac41e2ce84e60dae075e4460",
+    "addresses": ["0x4b94589Cc23F618687790036726f744D602c4017"],
+    "addressNames": ["NormalTimelock"]
+  },
+  {
+    "contractAddress": "0x0000000000000000000000000000000000000000",
+    "functionSignature": "setMaxLoopsLimit(uint256)",
+    "role": "0x8857df0e988df817bf34b6afe50ca8e5cf74175e949d949be44f4d252f62784d",
+    "addresses": ["0x4b94589Cc23F618687790036726f744D602c4017"],
+    "addressNames": ["NormalTimelock"]
   }
 ]
