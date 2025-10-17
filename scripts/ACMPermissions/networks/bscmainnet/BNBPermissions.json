@@ -94,7 +94,18 @@
         "_setProtocolPaused(bool)",
         "_setActionsPaused(address[],uint8[],bool)",
         "_setForcedLiquidation(address,bool)",
-        "_setForcedLiquidationForUser(address,address,bool)"
+        "_setForcedLiquidationForUser(address,address,bool)",
+        "createPool(string)",
+        "addPoolMarkets(uint96[],address[])",
+        "removePoolMarket(uint96,address)",
+        "setPoolActive(uint96,bool)",
+        "setCollateralFactor(address,uint256,uint256)",
+        "setCollateralFactor(uint96,address,uint256,uint256)",
+        "setIsBorrowAllowed(uint96,address,bool)",
+        "setAllowCorePoolFallback(uint96,bool)",
+        "setPoolLabel(uint96,string)",
+        "setLiquidationIncentive(address,uint256)",
+        "setLiquidationIncentive(uint96,address,uint256)"
       ]
     },
     {
@@ -390,6 +401,32 @@
         "pause()",
         "unpause()"
       ]
+    },
+    {
+      "address": ["0x0000000000000000000000000000000000000000000000000000000000000000"],
+      "functions": ["setSnapshot(uint256,uint256)", "setGrowthRate(uint256,uint256)", "setSnapshotGap(uint256)"]
+    },
+    {
+      "address": ["0xC2f7924809830886EB04c6b40725Fd68F1891fA2"],
+      "functions": ["setRewardRecipient(address)", "setMaxLoopsLimit(uint256)"]
+    },
+    {
+      "address": ["0xBa2a43279a228cf9cD94d072777d8d98e7e0a229"],
+      "functions": [
+        "setRiskParameterConfig(string,address,uint256)",
+        "toggleConfigActive(string)",
+        "pause()",
+        "unpause()",
+        "_setActionsPaused(address[],uint8[],bool)"
+      ]
+    },
+    {
+      "address": ["0xE7252dccd79F2A555E314B9cdd440745b697D562"],
+      "functions": ["setMaxDeltaBps(uint256)"]
+    },
+    {
+      "address": ["0x0000000000000000000000000000000000000000000000000000000000000000"],
+      "functions": ["setMarketSupplyCaps(address[],uint256[])", "setMarketBorrowCaps(address[],uint256[])"]
     }
   ]
 }
