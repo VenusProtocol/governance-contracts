@@ -1,3 +1,10 @@
+## [2.13.1-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.13.1-dev.1...v2.13.1-dev.2) (2025-10-20)
+
+
+### Bug Fixes
+
+* use hardhat verify ([d2f1158](https://github.com/VenusProtocol/governance-contracts/commit/d2f11580923ff875fa79a2be2b0a5a01c13424d2))
+
 ## [2.13.1-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.13.0...v2.13.1-dev.1) (2025-10-09)
 
 
