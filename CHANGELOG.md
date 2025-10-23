@@ -1,3 +1,10 @@
+## [2.14.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.13.1-dev.2...v2.14.0-dev.1) (2025-10-23)
+
+
+### Features
+
+* add slim package scripts ([d3d36a5](https://github.com/VenusProtocol/governance-contracts/commit/d3d36a54902a483553500afda1919820d71cd3e4))
+
 ## [2.13.1-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.13.1-dev.1...v2.13.1-dev.2) (2025-10-20)
 
 
