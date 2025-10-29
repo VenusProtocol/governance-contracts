@@ -3140,7 +3140,57 @@
         "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
         "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
       ]
+    },
+    {
+      "contractAddress": "0x94d1820b2D1c7c7452A163983Dc888CEC546b77D",
+      "functionSignature": "setWhiteListFlashLoanAccount(address,bool)",
+      "role": "0x2a96ca925b9e62cc581eb8e40bc88fab3324aff38bc44205f77272c702cad5bf",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setFlashLoanEnabled(bool)",
+      "role": "0x42874274d7b89e3dd85e9a25e5e578915d6f7832ae77543b91d3202a6ab4cd05",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x0000000000000000000000000000000000000000",
+      "functionSignature": "setFlashLoanFeeMantissa(uint256,uint256)",
+      "role": "0x9cc30fe8389d46e8a4f152fa3c04c590a579a096a7f14aad864bb9f7adc476ac",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x188b608544Fa32D313DE3BBB0480a238c0906e2a",
+      "functionSignature": "setDirectPrice(address,uint256)",
+      "role": "0xd39a8dbe81c6240098fa66940d73d8daf0a97568e8941e4d0fb4b04a819f8d38",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
+    },
+    {
+      "contractAddress": "0x188b608544Fa32D313DE3BBB0480a238c0906e2a",
+      "functionSignature": "setTokenConfig(TokenConfig)",
+      "role": "0x647e2a01beae08feaba5b15fb911f071b7a3d47a13133485a148e2a5842e8426",
+      "addresses": [
+        "0xce10739590001705F7FF231611ba4A48B2820327",
+        "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
+        "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D"
+      ]
     }
   ],
-  "height": 66476935
+  "height": 70529272
 }

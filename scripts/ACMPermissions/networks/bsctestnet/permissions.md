@@ -2703,3 +2703,43 @@
   - `NormalTimelock`
   - `FastTrackTimelock`
   - `CriticalTimelock`
+
+## Contract Address: 0x94d1820b2D1c7c7452A163983Dc888CEC546b77D
+
+- **Function Signature**: `setWhiteListFlashLoanAccount(address,bool)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+
+## Contract Address: 0x0000000000000000000000000000000000000000
+
+- **Function Signature**: `setFlashLoanEnabled(bool)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+
+## Contract Address: 0x0000000000000000000000000000000000000000
+
+- **Function Signature**: `setFlashLoanFeeMantissa(uint256,uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+
+## Contract Address: 0x188b608544Fa32D313DE3BBB0480a238c0906e2a
+
+- **Function Signature**: `setDirectPrice(address,uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+
+## Contract Address: 0x188b608544Fa32D313DE3BBB0480a238c0906e2a
+
+- **Function Signature**: `setTokenConfig(TokenConfig)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
