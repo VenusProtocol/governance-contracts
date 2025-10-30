@@ -10,16 +10,7 @@
 
 - **Function Signature**: `_setCollateralFactor(address,uint256)`
 - **Addresses**:
-  - `NormalTimelock`
   - `Guardian 1`
-  - `FastTrackTimelock`
-  - `CriticalTimelock`
-
-## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
-
-- **Function Signature**: `_setLiquidationIncentive(uint256)`
-- **Addresses**:
-  - `NormalTimelock`
 
 ## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
 
@@ -1451,3 +1442,108 @@
   - `NormalTimelock`
   - `CriticalTimelock`
   - `FastTrackTimelock`
+
+## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
+
+- **Function Signature**: `createPool(string)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+
+## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
+
+- **Function Signature**: `addPoolMarkets(uint96[],address[])`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+
+## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
+
+- **Function Signature**: `removePoolMarket(uint96,address)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+
+## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
+
+- **Function Signature**: `setPoolActive(uint96,bool)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+
+## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
+
+- **Function Signature**: `setCollateralFactor(address,uint256,uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+  - `Guardian 1`
+
+## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
+
+- **Function Signature**: `setCollateralFactor(uint96,address,uint256,uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+  - `Guardian 1`
+
+## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
+
+- **Function Signature**: `setIsBorrowAllowed(uint96,address,bool)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+  - `Guardian 2`
+
+## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
+
+- **Function Signature**: `setAllowCorePoolFallback(uint96,bool)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+
+## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
+
+- **Function Signature**: `setPoolLabel(uint96,string)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+
+## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
+
+- **Function Signature**: `setLiquidationIncentive(address,uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+
+## Contract Address: 0xfD36E2c2a6789Db23113685031d7F16329158384
+
+- **Function Signature**: `setLiquidationIncentive(uint96,address,uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+
+## Contract Address: 0x22Dc2BAEa32E95AB07C2F5B8F63336CbF61aB6b8
+
+- **Function Signature**: `setDirectPrice(address,uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+  - `Guardian 3`
+
+## Contract Address: 0x22Dc2BAEa32E95AB07C2F5B8F63336CbF61aB6b8
+
+- **Function Signature**: `setTokenConfig(TokenConfig)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `FastTrackTimelock`
+  - `CriticalTimelock`
+  - `Guardian 3`

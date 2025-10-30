@@ -427,6 +427,10 @@
     {
       "address": ["0x0000000000000000000000000000000000000000000000000000000000000000"],
       "functions": ["setMarketSupplyCaps(address[],uint256[])", "setMarketBorrowCaps(address[],uint256[])"]
+    },
+    {
+      "address": ["0x22Dc2BAEa32E95AB07C2F5B8F63336CbF61aB6b8"],
+      "functions": ["setTokenConfig(TokenConfig)", "setDirectPrice(address,uint256)"]
     }
   ]
 }
