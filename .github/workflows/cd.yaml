@@ -45,4 +45,4 @@ jobs:
       - name: Publish slim package
         run: bash .github/publish_slim_package.sh
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
