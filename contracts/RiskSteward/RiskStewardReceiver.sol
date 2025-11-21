@@ -4,8 +4,6 @@ pragma solidity 0.8.25;
 import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { IRiskSteward } from "./IRiskSteward.sol";
 import { IRiskOracle, RiskParameterUpdate } from "../interfaces/IRiskOracle.sol";
-import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
-import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
 import { IRiskStewardReceiver, RiskParamConfig } from "./IRiskStewardReceiver.sol";
 import { PausableUpgradeable } from "@openzeppelin/contracts-upgradeable/security/PausableUpgradeable.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
