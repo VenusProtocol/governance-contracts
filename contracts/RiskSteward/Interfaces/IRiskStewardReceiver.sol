@@ -3,7 +3,9 @@ pragma solidity 0.8.25;
 
 interface IRiskStewardReceiver {
     // View functions
-    function riskParameterConfigs(bytes32) external view returns (bool active, uint256 debounce, uint256 timelock, address riskSteward);
+    function riskParameterConfigs(
+        bytes32
+    ) external view returns (bool active, uint256 debounce, uint256 timelock, address riskSteward);
 
     function updateTypeLabels(bytes32) external view returns (string memory);
 
@@ -13,14 +15,12 @@ interface IRiskStewardReceiver {
 
     function whitelistedApprovers(address) external view returns (bool);
 
-    // State-changing functions
-    function initialize(address accessControlManager_) external;
-
-    function pause() external;
-
-    function unpause() external;
-
-    function setRiskParameterConfig(string calldata updateType, address riskSteward, uint256 debounce, uint256 timelock) external;
+    function setRiskParameterConfig(
+        string calldata updateType,
+        address riskSteward,
+        uint256 debounce,
+        uint256 timelock
+    ) external;
 
     function setConfigActive(string calldata updateType, bool active) external;
 
@@ -34,13 +34,8 @@ interface IRiskStewardReceiver {
 
     function rejectUpdate(uint256 updateId) external;
 
-    function markUpdateExpired(uint256 updateId) external;
-
-    function getExecutableUpdates() external view returns (uint256[] memory executableUpdates);
-
-    function getExpiredUpdates() external view returns (uint256[] memory expiredUpdates);
-
-    function executeAllExecutableUpdates() external returns (uint256 executedCount);
-
-    function markAllExpiredUpdates() external returns (uint256 markedCount);
+    function getExecutableUpdates(
+        string calldata updateType,
+        address comptroller
+    ) external view returns (uint256[] memory executableUpdates);
 }

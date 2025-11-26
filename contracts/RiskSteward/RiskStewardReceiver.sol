@@ -6,6 +6,8 @@ import { IRiskOracle, RiskParameterUpdate } from "./Interfaces/IRiskOracle.sol";
 import { IRiskStewardReceiver } from "./Interfaces/IRiskStewardReceiver.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
+import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
+import { IVToken } from "../interfaces/IVToken.sol";
 
 /**
  * @title RiskStewardReceiver
@@ -217,6 +219,8 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
      */
     error UpdateNotApproved();
 
+    error RegitredUpdateTypeExist(uint256);
+
     /**
      * @notice Thrown when trying to renounce ownership
      */
@@ -234,7 +238,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
     }
 
     /**
-     * @notice Initializes the contract as ownable, pausable, and access controlled
+     * @notice Initializes the contract with the Access Control Manager.
      * @param accessControlManager_ The address of the access control manager
      */
     function initialize(address accessControlManager_) external initializer {
@@ -359,9 +363,10 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
      */
     function registerUpdate(uint256 updateId) external {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
-        updateTypeKey = keccak256(bytes(update.updateType));
-        RiskParamConfig config = riskParameterConfigs[updateTypeKey];
+        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
+        RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
 
+        _ensureNoActiveUpdate(update);
         _validateRegisterUpdate(update, config);
 
         // Check if update is within safe delta based on risk steward's validation
@@ -380,7 +385,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
             executedAt: 0
         });
 
-        registerdUpdate[updateTypeKey][update.market] = updateId;
+        registeredUpdates[updateTypeKey][update.market] = updateId;
 
         emit UpdateRegistered(updateId, unlockTime, update.updateType, update.market);
     }
@@ -400,11 +405,10 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
     function executeUpdate(uint256 updateId) external {
         RegisteredUpdate storage registeredUpdate = updates[updateId];
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
-        updateTypeKey = keccak256(bytes(update.updateType));
-        RiskParamConfig config = riskParameterConfigs[updateTypeKey];
+        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
+        RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
 
-        _validateExecuteUpdate(update, config);
-
+        _validateExecuteUpdate(registeredUpdate, update, config);
         IRiskSteward(config.riskSteward).processUpdate(update);
 
         registeredUpdate.status = UpdateStatus.Executed;
@@ -412,9 +416,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
         lastProcessedUpdate[updateTypeKey][update.market] = updateId;
 
         emit UpdateExecuted(updateId);
-
-        // Update resolved boundary
-        _updateResolvedBoundary();
     }
 
     /**
@@ -465,92 +466,44 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
 
         registeredUpdate.status = UpdateStatus.Rejected;
         emit UpdateRejected(updateId);
-
-        // Update resolved boundary
-        _updateResolvedBoundary();
     }
 
     /**
-     * @notice Marks an update as expired if it has passed the expiration time
-     * @param updateId The oracle update ID of the update to check and mark as expired
-     * @custom:error Throws UpdateNotFound if the update doesn't exist
-     * @custom:event Emits UpdateExpired if the update was marked as expired
-     */
-    function markUpdateExpired(uint256 updateId) external {
-        RegisteredUpdate storage registeredUpdate = updates[updateId];
-
-        if (!_checkUpdateExpired(registeredUpdate)) {
-            revert UpdateNotExpired();
-        }
-
-        registeredUpdate.status = UpdateStatus.Expired;
-        emit UpdateExpired(updateId);
-
-        // Update resolved boundary
-        _updateResolvedBoundary();
-    }
-
-    /**
-     * @notice Executes all executable registered updates in a batch
-     * @return executedCount The number of updates that were executed
-     * @custom:access Anyone can execute unlocked and approved updates
-     */
-    function executeAllExecutableUpdates() external returns (uint256 executedCount) {
-        uint256[] memory executableUpdates = getExecutableUpdates();
-        for (uint256 i = 0; i < executableUpdates.length; ++i) {
-            uint256 updateId = executableUpdates[i];
-            RegisteredUpdate storage registeredUpdate = updates[updateId];
-            registeredUpdate.status = UpdateStatus.Executed;
-            registeredUpdate.executedAt = block.timestamp;
-
-            RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
-            bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-            lastProcessedUpdate[updateTypeKey][update.market] = updateId;
-
-            RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
-            IRiskSteward(config.riskSteward).processUpdate(update);
-            emit UpdateExecuted(updateId);
-            ++executedCount;
-        }
-        // Update resolved boundary
-        _updateResolvedBoundary();
-    }
-
-    /**
-     * @notice Marks all expired registered updates as expired in a batch
-     * @return markedCount The number of updates that were marked as expired
-     * @custom:access Anyone can mark expired updates
-     */
-    function markAllExpiredUpdates() external returns (uint256 markedCount) {
-        uint256[] memory expiredUpdates = getExpiredUpdates();
-        for (uint256 i = 0; i < expiredUpdates.length; ++i) {
-            RegisteredUpdate storage registeredUpdate = updates[expiredUpdates[i]];
-            registeredUpdate.status = UpdateStatus.Expired;
-            emit UpdateExpired(expiredUpdates[i]);
-            ++markedCount;
-        }
-        // Update resolved boundary
-        _updateResolvedBoundary();
-    }
-
-    /**
-     * @notice Returns an array of update IDs for all executable registered updates
+     * @notice Returns an array of update IDs for executable registered updates for a given update type and comptroller.
+     * @param updateType The human‑readable identifier of the update type to filter by
+     * @param comptroller The address of the Isolated Pools Comptroller that manages the markets
      * @return executableUpdates Array of update IDs that are ready to be executed
      */
-    function getExecutableUpdates() public view returns (uint256[] memory executableUpdates) {
-        uint256 maxUpdateId = RISK_ORACLE.updateCounter();
-        uint256[] memory tempArray = new uint256[](maxUpdateId);
+    function getExecutableUpdates(
+        string calldata updateType,
+        address comptroller
+    ) external view returns (uint256[] memory executableUpdates) {
+        bytes32 updateTypeKey = keccak256(bytes(updateType));
+        // TODO: Update the vToken interface for getAllMarkets
+        IVToken[] memory markets = IIsolatedPoolsComptroller(comptroller).getAllMarkets();
+        uint256 maxUpdates = markets.length;
+        uint256[] memory tempArray = new uint256[](maxUpdates);
         uint256 count = 0;
 
-        // Iterate through all possible update IDs from resolvedBoundary to maxUpdateId
-        for (uint256 i = resolvedBoundary; i <= maxUpdateId; ++i) {
-            if (_checkUpdateExecutable(i)) {
-                tempArray[count] = i;
-                ++count;
-            }
+        for (uint256 i = 0; i < maxUpdates; ++i) {
+            address market = address(markets[i]);
+
+            uint256 registeredUpdateId = registeredUpdates[updateTypeKey][market];
+            if (registeredUpdateId == 0) continue; // skip empty
+
+            RegisteredUpdate storage u = updates[registeredUpdateId];
+            if (u.status != UpdateStatus.Pending) continue;
+
+            RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(registeredUpdateId);
+
+            // validate expiration
+            if (update.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp) continue;
+
+            tempArray[count] = registeredUpdateId;
+            count++;
         }
 
-        // Resize array to actual count
+        // shrink array to real size
         executableUpdates = new uint256[](count);
         for (uint256 i = 0; i < count; ++i) {
             executableUpdates[i] = tempArray[i];
@@ -558,93 +511,47 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
     }
 
     /**
-     * @notice Returns an array of update IDs for all expired registered updates that need to be marked as expired
-     * @return expiredUpdates Array of update IDs that are expired and need to be marked
+     * @notice Ensures there is no other pending registered update of the same type for the same market.
+     *         If a pending update exists and is expired, it is marked as expired; otherwise the call reverts.
+     * @param update The risk parameter update being registered
+     * @custom:error RegitredUpdateTypeExist if there is a non‑expired pending update of the same type for the market
      */
-    function getExpiredUpdates() public view returns (uint256[] memory expiredUpdates) {
-        uint256 maxUpdateId = RISK_ORACLE.updateCounter();
-        uint256[] memory tempArray = new uint256[](maxUpdateId);
-        uint256 count = 0;
+    function _ensureNoActiveUpdate(RiskParameterUpdate memory update) internal {
+        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
+        uint256 registeredUpdateId = registeredUpdates[updateTypeKey][update.market];
+        if (registeredUpdateId == 0) return; // no prior update of this type for this market
 
-        // Iterate through all possible update IDs from 1 to maxUpdateId
-        for (uint256 i = resolvedBoundary; i <= maxUpdateId; ++i) {
-            RegisteredUpdate storage registeredUpdate = updates[i];
+        RegisteredUpdate storage existing = updates[registeredUpdateId];
+        RiskParameterUpdate memory existingUpdate = RISK_ORACLE.getUpdateById(registeredUpdateId);
 
-            if (_checkUpdateExpired(registeredUpdate)) {
-                tempArray[count] = i;
-                ++count;
-            }
+        if (existing.status != UpdateStatus.Pending) return;
+
+        // Check expiration
+        bool expired = existingUpdate.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp;
+
+        if (expired) {
+            existing.status = UpdateStatus.Expired;
+            emit UpdateExpired(registeredUpdateId);
+            return;
         }
 
-        // Resize array to actual count
-        expiredUpdates = new uint256[](count);
-        for (uint256 i = 0; i < count; ++i) {
-            expiredUpdates[i] = tempArray[i];
-        }
+        // If still pending & not expired reject
+        revert RegitredUpdateTypeExist(registeredUpdateId);
     }
 
     /**
-     * @notice Advances the resolved boundary pointer as far as possible where consecutive IDs are resolved
-     * Queries the RiskOracle to get the maximum update ID and checks sequentially
+     * @notice Validates an oracle update before registration.
+     * @param update The risk parameter update to validate
+     * @param config The configuration for this update type
+     * @custom:error UpdateAlreadyResolved if the update was already registered
+     * @custom:error UpdateIsExpired if the update has expired or is not the latest for the given market and type
+     * @custom:error ConfigNotActive if the configuration for the update type is not active
+     * @custom:error UpdateTooFrequent if the debounce period has not passed for the given market and type
      */
-    function _updateResolvedBoundary() internal {
-        uint256 currentBoundary = resolvedBoundary;
-        uint256 newBoundary = currentBoundary;
-
-        // Get the maximum update ID from the oracle
-        uint256 maxUpdateId = RISK_ORACLE.updateCounter();
-
-        // Start checking from boundary + 1
-        for (uint256 i = currentBoundary + 1; i <= maxUpdateId; ++i) {
-            RegisteredUpdate storage update = updates[i];
-            // If update doesn't exist, we've reached the end
-            if (update.updateId == 0) {
-                break;
-            }
-            // Only advance if the update is resolved (Executed, Rejected, or Expired)
-            if (
-                update.status == UpdateStatus.Executed ||
-                update.status == UpdateStatus.Rejected ||
-                update.status == UpdateStatus.Expired
-            ) {
-                newBoundary = i;
-            } else {
-                break;
-            }
-        }
-
-        if (newBoundary > currentBoundary) {
-            resolvedBoundary = newBoundary;
-            emit UpdateResolvedBoundary(newBoundary);
-        }
-    }
-
-    function _validateRegisterUpdate(RiskParameterUpdate update, RiskParamConfig config) internal {
+    function _validateRegisterUpdate(RiskParameterUpdate memory update, RiskParamConfig memory config) internal view {
         // Check if this update was already registered
         if (updates[update.updateId].status != UpdateStatus.None) {
             revert UpdateAlreadyResolved();
-        }
-
-        // In case of exiting registerd update dont alow another of same type 
-        uint256 registeredUpdateId = registerdUpdate[updateTypeKey][update.market];
-        if (
-            updates[registeredUpdateId].status == UpdateStatus.Pending &&
-            (update.timestamp + UPDATE_EXPIRATION_TIME > block.timestamp)
-        ) {
-            revert RegitredUpdateTypeExist(registeredUpdateId);
-        }
-
-        // Check if this is the latest update for this market and type
-        RiskParameterUpdate memory latestForMarketAndType = RISK_ORACLE.getLatestUpdateByParameterAndMarket(
-            update.updateType,
-            update.market
-        );
-        if (latestForMarketAndType.updateId != updateId) {
-            revert UpdateIsExpired();
-        }
-        // Check expiration
-        if (update.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp) {
-            revert UpdateIsExpired();
         }
 
         // Check if config is active
@@ -652,21 +559,47 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
             revert ConfigNotActive();
         }
 
-        updateTypeKey = keccak256(bytes(update.updateType));
-        uint256 lastProcessedId = lastProcessedUpdate[updateTypeKey][market];
+        // Check if this is the latest update for this market and type
+        RiskParameterUpdate memory latestForMarketAndType = RISK_ORACLE.getLatestUpdateByParameterAndMarket(
+            update.updateType,
+            update.market
+        );
+
+        if (latestForMarketAndType.updateId != update.updateId) {
+            revert UpdateIsExpired();
+        }
+
+        // Check expiration
+        if (update.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp) {
+            revert UpdateIsExpired();
+        }
+
+        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
+        uint256 lastProcessedId = lastProcessedUpdate[updateTypeKey][update.market];
         uint256 lastExecutionTime = updates[lastProcessedId].executedAt;
 
         // Check debounce
-        if (lastExecutionTime != 0 && (block.timestamp - lastExecutionTime < debounce)) {
+        if (lastExecutionTime != 0 && (block.timestamp - lastExecutionTime < config.debounce)) {
             revert UpdateTooFrequent();
         }
     }
 
+    /**
+     * @notice Validates a registered update before execution.
+     * @param registeredUpdate The stored registered update metadata
+     * @param update The risk parameter update fetched from the oracle
+     * @param config The configuration for this update type
+     * @custom:error UpdateAlreadyResolved if the update was already executed or rejected
+     * @custom:error UpdateIsExpired if the update has expired
+     * @custom:error ConfigNotActive if the configuration for the update type is not active
+     * @custom:error UpdateNotUnlocked if the unlock time has not passed
+     * @custom:error UpdateNotApproved if the update has not been approved
+     */
     function _validateExecuteUpdate(
-        RegisteredUpdate registeredUpdate,
-        RiskParameterUpdate update,
-        RiskParamConfig config
-    ) inetrnal {
+        RegisteredUpdate memory registeredUpdate,
+        RiskParameterUpdate memory update,
+        RiskParamConfig memory config
+    ) internal view {
         if (registeredUpdate.status != UpdateStatus.Pending) {
             revert UpdateAlreadyResolved();
         }
@@ -686,53 +619,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
         if (registeredUpdate.approver == address(0)) {
             revert UpdateNotApproved();
         }
-    }
-
-    /**
-     * @notice Checks if an update is executable (meets all requirements for execution)
-     * @param updateId The oracle update ID of the update to check
-     * @return True if the update is executable, false otherwise
-     */
-    function _checkUpdateExecutable(uint256 updateId) internal view returns (bool) {
-        RegisteredUpdate storage registeredUpdate = updates[updateId];
-        RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
-        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-        RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
-
-        if (!config.active) {
-            return false;
-        }
-
-        if (registeredUpdate.status != UpdateStatus.Pending) {
-            return false;
-        }
-
-        if (update.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp) {
-            return false;
-        }
-
-        if (block.timestamp < registeredUpdate.unlockTime) {
-            return false;
-        }
-
-        if (registeredUpdate.approver == address(0)) {
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * @notice Checks if an update is expired
-     * @param registeredUpdate The registered update to check
-     * @return True if the update is expired, false otherwise
-     */
-    function _checkUpdateExpired(RegisteredUpdate storage registeredUpdate) internal view returns (bool) {
-        if (registeredUpdate.status != UpdateStatus.Pending) {
-            return false;
-        }
-
-        RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(registeredUpdate.updateId);
-        return update.timestamp + UPDATE_EXPIRATION_TIME <= block.timestamp;
     }
 
     /**
