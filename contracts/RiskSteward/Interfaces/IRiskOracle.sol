@@ -23,6 +23,7 @@ struct RiskParameterUpdate {
     uint256 timestamp;
     address publisher;
     bytes additionalData;
+    uint32 destChainId;
 }
 
 /**
@@ -127,43 +128,47 @@ interface IRiskOracle {
     function setUpdateTypeActive(string memory updateType, bool active) external;
 
     /**
-     * @notice Publishes a new risk parameter update
+     * @notice Publishes a new risk parameter update.
      * @param referenceId An external reference ID associated with the update
      * @param newValue The new value of the risk parameter being updated (encoded as bytes)
      * @param updateType Type of update performed, must be an active update type
      * @param market Address of the market for which the parameter update applies
      * @param additionalData Additional data or metadata for the update
+     * @param dstEid Destination endpoint ID for cross-chain routing
      * @custom:error SenderNotAuthorized Thrown if caller is not an authorized sender
      * @custom:error UnauthorizedUpdateType Thrown if update type is not active
      * @custom:error ZeroAddressNotAllowed Thrown if market is the zero address
-     * @custom:event ParameterUpdated Emitted when update is successfully published
+     * @custom:event UpdatePublished Emitted when the update is successfully published
      */
     function publishRiskParameterUpdate(
         string memory referenceId,
         bytes memory newValue,
         string memory updateType,
         address market,
-        bytes memory additionalData
+        bytes memory additionalData,
+        uint32 dstEid
     ) external;
 
     /**
-     * @notice Publishes multiple risk parameter updates in a single transaction
+     * @notice Publishes multiple risk parameter updates in a single transaction.
      * @param referenceIds Array of external reference IDs, one for each update
      * @param newValues Array of new values for each update (encoded as bytes)
      * @param updateTypes Array of update types, all must be active update types
      * @param markets Array of market addresses for each update
      * @param additionalData Array of additional data for each update
+     * @param dstEid Array of destination endpoint IDs for cross-chain routing
      * @custom:error SenderNotAuthorized Thrown if caller is not an authorized sender
      * @custom:error ArrayLengthMismatch Thrown if all arrays don't have the same length
      * @custom:error UnauthorizedUpdateType Thrown if any update type is not active
      * @custom:error ZeroAddressNotAllowed Thrown if any market is the zero address
-     * @custom:event ParameterUpdated Emitted for each successfully published update
+     * @custom:event UpdatePublished Emitted for each successfully published update
      */
     function publishBulkRiskParameterUpdates(
         string[] memory referenceIds,
         bytes[] memory newValues,
         string[] memory updateTypes,
         address[] memory markets,
-        bytes[] memory additionalData
+        bytes[] memory additionalData,
+        uint32[] memory dstEid
     ) external;
 }

@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
 
+import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
+import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
 import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
 import { IRiskOracle, RiskParameterUpdate } from "./Interfaces/IRiskOracle.sol";
 import { IRiskStewardReceiver } from "./Interfaces/IRiskStewardReceiver.sol";
@@ -8,6 +10,12 @@ import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
 import { IVToken } from "../interfaces/IVToken.sol";
+import {
+    OAppUpgradeable,
+    MessagingFee,
+    Origin
+} from "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppUpgradeable.sol";
+import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
 
 /**
  * @title RiskStewardReceiver
@@ -15,40 +23,18 @@ import { IVToken } from "../interfaces/IVToken.sol";
  * @notice Contract that can read updates from multiple Risk Oracles, validate them with timelock, and push them to the correct RiskSteward.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
-    /**
-     * @notice Status of an update
-     */
-    enum UpdateStatus {
-        None,
-        Pending,
-        Executed,
-        Rejected,
-        Expired
-    }
-
-    struct RiskParamConfig {
-        bool active;
-        uint256 debounce; // delay between updates exicutions
-        uint256 timelock; // Timelock period before update can be executed
-        address riskSteward;
-    }
-
-    /**
-     * @notice Registered update structure with timelock and approval information
-     */
-    struct RegisteredUpdate {
-        uint256 updateId; // Update ID from the oracle
-        uint256 unlockTime; // Timestamp when this update can be executed
-        UpdateStatus status; // Current status of the update
-        address approver; // Address of the approver who approved this update (address(0) if not approved)
-        uint256 executedAt; // Timestamp when this update was executed (0 if not executed yet)
-    }
+contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUpgradeable {
+    using OptionsBuilder for bytes;
 
     /**
      * @notice Time before a submitted update is considered stale
      */
     uint256 public constant UPDATE_EXPIRATION_TIME = 1 days;
+
+    /**
+     * @notice Source chain id
+     */
+    uint32 public immutable LAYER_ZERO_CHAIN_ID;
 
     /**
      * @notice The Risk Oracle contract address (set once in constructor)
@@ -81,11 +67,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
     mapping(bytes32 => mapping(address market => uint256)) public registeredUpdates;
 
     /**
-     * @notice Resolved boundary - all update IDs <= resolvedBoundary are guaranteed resolved
-     */
-    uint256 public resolvedBoundary;
-
-    /**
      * @notice Mapping from approver address to whitelist status
      */
     mapping(address => bool) public whitelistedApprovers;
@@ -98,151 +79,43 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
     uint256[47] private __gap;
 
     /**
-     * @notice Event emitted when a risk parameter config is set
-     */
-    event RiskParameterConfigUpdated(
-        bytes32 indexed updateTypeHash,
-        string updateType,
-        address indexed previousRiskSteward,
-        address indexed riskSteward,
-        uint256 previousDebounce,
-        uint256 debounce,
-        uint256 previousTimelock,
-        uint256 timelock,
-        bool previousActive,
-        bool active
-    );
-
-    /**
-     * @notice Event emitted when a risk parameter config active status is set
-     */
-    event ConfigActiveUpdated(
-        bytes32 indexed updateTypeHash,
-        string updateType,
-        bool previousActive,
-        bool indexed active
-    );
-
-    /**
-     * @notice Event emitted when an update is successfully executed
-     */
-    event UpdateExecuted(uint256 indexed updateId);
-
-    /**
-     * @notice Event emitted when an update is rejected
-     */
-    event UpdateRejected(uint256 indexed updateId);
-
-    /**
-     * @notice Event emitted when an update is marked as expired
-     */
-    event UpdateExpired(uint256 indexed updateId);
-
-    /**
-     * @notice Event emitted when an approver status is set
-     */
-    event ApproverStatusUpdated(address indexed approver, bool previousApproved, bool indexed approved);
-
-    /**
-     * @notice Event emitted when an update is approved
-     */
-    event SetApproved(uint256 indexed updateId, address indexed approver);
-
-    /**
-     * @notice Event emitted when an update is registered
-     */
-    event UpdateRegistered(uint256 indexed updateId, uint256 unlockTime, string updateType, address indexed market);
-
-    /**
-     * @notice Event emitted when resolved boundary is advanced
-     * @param newResolvedBoundary The new resolved boundary value
-     */
-    event UpdateResolvedBoundary(uint256 indexed newResolvedBoundary);
-
-    /**
-     * @notice Thrown if a submitted update is not active and therefore cannot be processed
-     */
-    error ConfigNotActive();
-
-    /**
-     * @notice Thrown when an update was not applied within the required time frame
-     */
-    error UpdateIsExpired();
-
-    /**
-     * @notice Thrown when trying to mark an update as expired but it is not expired
-     */
-    error UpdateNotExpired();
-
-    /**
-     * @notice Thrown when an update has already been processed
-     */
-    error UpdateAlreadyResolved();
-
-    /**
-     * @notice Thrown when the debounce period hasn't passed for applying an update to a specific market / update type
-     */
-    error UpdateTooFrequent();
-
-    /**
-     * @notice Thrown when an update type that is not supported is operated on
-     */
-    error UnsupportedUpdateType();
-
-    /**
-     * @notice Thrown when a debounce value of 0 is set
-     */
-    error InvalidDebounce();
-
-    /**
-     * @notice Thrown when a timelock value of 0 is set
-     */
-    error InvalidTimelock();
-
-    /**
-     * @notice Thrown when update unlock time has not been reached
-     */
-    error UpdateNotUnlocked();
-
-    /**
-     * @notice Thrown when trying to resolve an update that doesn't exist
-     */
-    error UpdateNotFound();
-
-    /**
-     * @notice Thrown when an address is not an approver
-     */
-    error NotAnApprover();
-
-    /**
-     * @notice Thrown when an update has not been approved
-     */
-    error UpdateNotApproved();
-
-    error RegitredUpdateTypeExist(uint256);
-
-    /**
-     * @notice Thrown when trying to renounce ownership
-     */
-    error RenounceOwnershipNotAllowed();
-
-    /**
      * @notice Disables initializers and sets the Risk Oracle
      * @param riskOracle_ The address of the Risk Oracle contract
      * @custom:oz-upgrades-unsafe-allow constructor
      */
-    constructor(address riskOracle_) {
+    constructor(address riskOracle_, address endpoint_, uint32 layerZeroChainId_) OAppUpgradeable(endpoint_) {
         _disableInitializers();
         ensureNonzeroAddress(riskOracle_);
         RISK_ORACLE = IRiskOracle(riskOracle_);
+        LAYER_ZERO_CHAIN_ID = layerZeroChainId_;
     }
 
     /**
      * @notice Initializes the contract with the Access Control Manager.
      * @param accessControlManager_ The address of the access control manager
      */
-    function initialize(address accessControlManager_) external initializer {
+    function initialize(address accessControlManager_, address owner_) external initializer {
         __AccessControlled_init(accessControlManager_);
+        __OApp_init(owner_);
+    }
+
+    // TODO: validate Storage layout
+    /**
+     * @dev Overrides OwnableUpgradeable and Ownable2StepUpgradeable to resolve
+     *      the multiple inheritance ownership transfer conflict.
+     */
+    function transferOwnership(
+        address newOwner
+    ) public override(OwnableUpgradeable, Ownable2StepUpgradeable) onlyOwner {
+        Ownable2StepUpgradeable.transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Internal hook to finalize ownership transfer, resolving the
+     *      OwnableUpgradeable and Ownable2StepUpgradeable inheritance conflict.
+     */
+    function _transferOwnership(address newOwner) internal override(OwnableUpgradeable, Ownable2StepUpgradeable) {
+        Ownable2StepUpgradeable._transferOwnership(newOwner);
     }
 
     /**
@@ -365,6 +238,13 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
         bytes32 updateTypeKey = keccak256(bytes(update.updateType));
         RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
+
+        if (update.destChainId != 0 && update.destChainId != LAYER_ZERO_CHAIN_ID) {
+            // here debounce is only for the bridge to avoid DOS, the main debounce is on the destination.
+            _validateRegisterUpdate(update, config);
+            _sendRemoteUpdate(update);
+            return;
+        }
 
         _ensureNoActiveUpdate(update);
         _validateRegisterUpdate(update, config);
@@ -509,6 +389,76 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8 {
             executableUpdates[i] = tempArray[i];
         }
     }
+
+    /**
+     * @notice Sends a `RiskParameterUpdate` to a destination chain via LayerZero.
+     * @param dstEid Destination chain endpoint ID
+     * @param update The risk parameter update payload to send
+     * @param options LayerZero message options; if empty, a default executor option is used
+     * @param fee Messaging fee structure returned by `quote`
+     * @param refundAddress Address to receive any surplus fee refunds
+     */
+    function lzSend(
+        uint32 dstEid,
+        RiskParameterUpdate memory update,
+        bytes memory options,
+        MessagingFee memory fee,
+        address refundAddress
+    ) public payable {
+        require(msg.sender == address(this), "Invalid caller");
+        bytes memory payload = abi.encode(update);
+        bytes memory options_ = options.length == 0
+            ? OptionsBuilder.newOptions().addExecutorLzReceiveOption(1_000_000, 0)
+            : options;
+        _lzSend(dstEid, payload, options_, fee, refundAddress);
+    }
+
+    /**
+     * @notice Quotes the gas fee needed to pay for the full omnichain transaction in native gas or ZRO token.
+     * @param update The risk parameter update payload to be sent
+     * @param options Message execution options (e.g., for sending gas to the destination)
+     * @param payInLzToken Whether to return the fee in ZRO token instead of native gas
+     * @return fee A `MessagingFee` struct containing the calculated gas fee
+     */
+    function quote(
+        RiskParameterUpdate memory update,
+        bytes memory options,
+        bool payInLzToken
+    ) public view returns (MessagingFee memory fee) {
+        bytes memory payload = abi.encode(update);
+        fee = _quote(update.destChainId, payload, options, payInLzToken);
+    }
+
+    function _sendRemoteUpdate(RiskParameterUpdate memory update) internal {
+        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
+
+        MessagingFee memory fee = quote(update, "0x", false);
+        lzSend(update.destChainId, update, "0x", fee, address(this)); // TODO :transfer fee
+
+        updates[update.updateId] = RegisteredUpdate({
+            updateId: update.updateId,
+            unlockTime: block.timestamp,
+            status: UpdateStatus.SENT_TO_DESTINATION,
+            approver: address(0),
+            executedAt: block.timestamp
+        });
+
+        registeredUpdates[updateTypeKey][update.market] = update.updateId;
+        lastProcessedUpdate[updateTypeKey][update.market] = update.updateId;
+
+        emit UpdateSentToDestination(update.updateId, update.destChainId, update.updateType, update.market);
+    }
+
+    /**
+     * @dev LayerZero message receive hook
+     */
+    function _lzReceive(
+        Origin calldata origin,
+        bytes32 guid,
+        bytes calldata message,
+        address executor,
+        bytes calldata extraData
+    ) internal virtual override {}
 
     /**
      * @notice Ensures there is no other pending registered update of the same type for the same market.

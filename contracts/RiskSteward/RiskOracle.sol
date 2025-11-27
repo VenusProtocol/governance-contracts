@@ -214,9 +214,10 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         bytes memory newValue,
         string memory updateType,
         address market,
-        bytes memory additionalData
+        bytes memory additionalData,
+        uint32 dstEid
     ) external onlyAuthorized {
-        _publishUpdate(referenceId, newValue, updateType, market, additionalData);
+        _publishUpdate(referenceId, newValue, updateType, market, additionalData, dstEid);
     }
 
     /**
@@ -235,7 +236,8 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         bytes[] memory newValues,
         string[] memory updateTypes,
         address[] memory markets,
-        bytes[] memory additionalData
+        bytes[] memory additionalData,
+        uint32[] memory dstEid
     ) external onlyAuthorized {
         uint256 length = referenceIds.length;
         if (
@@ -243,12 +245,13 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
             length != newValues.length ||
             length != updateTypes.length ||
             length != markets.length ||
-            length != additionalData.length
+            length != additionalData.length ||
+            length != dstEid.length
         ) {
             revert ArrayLengthMismatch();
         }
         for (uint256 i = 0; i < length; ++i) {
-            _publishUpdate(referenceIds[i], newValues[i], updateTypes[i], markets[i], additionalData[i]);
+            _publishUpdate(referenceIds[i], newValues[i], updateTypes[i], markets[i], additionalData[i], dstEid[i]);
         }
     }
 
@@ -299,7 +302,8 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         bytes memory newValue,
         string memory updateType,
         address market,
-        bytes memory additionalData
+        bytes memory additionalData,
+        uint32 dstEid
     ) internal {
         ensureNonzeroAddress(market);
         if (!activeUpdateTypes[updateType]) {
@@ -318,7 +322,8 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
             previousValue,
             block.timestamp,
             msg.sender,
-            additionalData
+            additionalData,
+            dstEid
         );
         updatesById[updateCounter] = newUpdate;
 
