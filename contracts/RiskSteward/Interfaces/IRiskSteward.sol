@@ -23,25 +23,6 @@ interface IRiskSteward {
     function RISK_STEWARD_RECEIVER() external view returns (IRiskStewardReceiver);
 
     /**
-     * @notice Returns the canonical update type identifier for supply caps.
-     * @return The `supplyCap` update type string
-     */
-    function SUPPLY_CAP() external view returns (string memory);
-
-    /**
-     * @notice Returns the canonical update type identifier for borrow caps.
-     * @return The `borrowCap` update type string
-     */
-    function BORROW_CAP() external view returns (string memory);
-
-    /**
-     * @notice Initializes the steward with access control and initial safe delta.
-     * @param accessControlManager_ The address of the access control manager
-     * @param safeDeltaBps_ The initial safe delta threshold in basis points
-     */
-    function initialize(address accessControlManager_, uint256 safeDeltaBps_) external;
-
-    /**
      * @notice Updates the safe delta threshold in basis points.
      * @param safeDeltaBps_ The new safe delta threshold in basis points
      */

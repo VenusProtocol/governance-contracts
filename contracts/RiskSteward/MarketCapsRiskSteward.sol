@@ -176,10 +176,12 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
         if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
             revert OnlyRiskStewardReceiver();
         }
+        uint256 newValue = _decodeBytesToUint256(update.newValue);
+
         if (Strings.equal(update.updateType, SUPPLY_CAP)) {
-            _processSupplyCapUpdate(update);
+            _updateSupplyCaps(update.market, newValue);
         } else if (Strings.equal(update.updateType, BORROW_CAP)) {
-            _processBorrowCapUpdate(update);
+            _updateBorrowCaps(update.market, newValue);
         } else {
             revert UnsupportedUpdateType();
         }
@@ -219,28 +221,6 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
         IIsolatedPoolsComptroller(comptroller).setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
 
         emit BorrowCapUpdated(market, newBorrowCaps[0]);
-    }
-
-    /**
-     * @notice Processes the supply cap update and updates the supply cap for the given market.
-     * Delta validation is already performed by RiskStewardReceiver before execution.
-     * @param update RiskParameterUpdate update to process
-     * @custom:event Emits SupplyCapUpdated with the market and new supply cap
-     */
-    function _processSupplyCapUpdate(RiskParameterUpdate memory update) internal {
-        uint256 newValue = _decodeBytesToUint256(update.newValue);
-        _updateSupplyCaps(update.market, newValue);
-    }
-
-    /**
-     * @notice Processes the borrow cap update and updates the borrow cap for the given market.
-     * Delta validation is already performed by RiskStewardReceiver before execution.
-     * @param update RiskParameterUpdate update to process
-     * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
-     */
-    function _processBorrowCapUpdate(RiskParameterUpdate memory update) internal {
-        uint256 newValue = _decodeBytesToUint256(update.newValue);
-        _updateBorrowCaps(update.market, newValue);
     }
 
     /**

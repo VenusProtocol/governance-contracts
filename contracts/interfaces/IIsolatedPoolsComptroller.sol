@@ -13,4 +13,18 @@ interface IIsolatedPoolsComptroller {
     function setMarketBorrowCaps(address[] calldata, uint256[] calldata) external;
 
     function getAllMarkets() external view returns (IVToken[] memory);
+    
+    function liquidationIncentiveMantissa() external view returns (uint256);
+
+    function setCollateralFactor(
+        address vToken,
+        uint256 newCollateralFactorMantissa,
+        uint256 newLiquidationThresholdMantissa
+    ) external;
+
+    function setLiquidationIncentive(uint256 newLiquidationIncentiveMantissa) external returns (uint256);
+
+    function markets(
+        address vToken
+    ) external view returns (bool isListed, uint256 collateralFactorMantissa, uint256 liquidationThresholdMantissa);
 }

@@ -313,18 +313,19 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         uint256 previousUpdateId = latestUpdateIdByMarketAndType[market][updateType];
         bytes memory previousValue = updatesById[previousUpdateId].newValue;
 
-        RiskParameterUpdate memory newUpdate = RiskParameterUpdate(
-            referenceId,
-            updateCounter,
-            market,
-            updateType,
-            newValue,
-            previousValue,
-            block.timestamp,
-            msg.sender,
-            additionalData,
-            dstEid
-        );
+        RiskParameterUpdate memory newUpdate = RiskParameterUpdate({
+            referenceId: referenceId,
+            updateId: updateCounter,
+            market: market,
+            updateType: updateType,
+            newValue: newValue,
+            previousValue: previousValue,
+            timestamp: block.timestamp,
+            publisher: msg.sender,
+            additionalData: additionalData,
+            poolId: 0,
+            destChainId: dstEid
+        });
         updatesById[updateCounter] = newUpdate;
 
         // Update the latest update ID for the market and updateType

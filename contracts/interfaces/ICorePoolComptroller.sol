@@ -9,4 +9,59 @@ interface ICorePoolComptroller {
     function _setMarketSupplyCaps(address[] calldata, uint256[] calldata) external;
 
     function _setMarketBorrowCaps(address[] calldata, uint256[] calldata) external;
+
+    function setCollateralFactor(
+        uint96 poolId,
+        address vToken,
+        uint256 newCollateralFactorMantissa,
+        uint256 newLiquidizationThresholdMantissa
+    ) external returns (uint256);
+
+    function setCollateralFactor(
+        address vToken,
+        uint256 newCollateralFactorMantissa,
+        uint256 newLiquidationThresholdMantissa
+    ) external;
+
+    function setLiquidationIncentive(
+        address vToken,
+        uint256 newLiquidationIncentiveMantissa
+    ) external returns (uint256);
+
+    function setLiquidationIncentive(
+        uint96 poolId,
+        address vToken,
+        uint256 newLiquidationIncentiveMantissa
+    ) external returns (uint256);
+
+    function markets(
+        address
+    )
+        external
+        view
+        returns (
+            bool isListed,
+            uint256 collateralFactorMantissa,
+            bool isVenus,
+            uint256 liquidationThresholdMantissa,
+            uint256 liquidationIncentiveMantissa,
+            uint96 marketPoolId,
+            bool isBorrowAllowed
+        );
+
+    function poolMarkets(
+        uint96 poolId,
+        address vToken
+    )
+        external
+        view
+        returns (
+            bool isListed,
+            uint256 collateralFactorMantissa,
+            bool isVenus,
+            uint256 liquidationThresholdMantissa,
+            uint256 liquidationIncentiveMantissa,
+            uint96 marketPoolId,
+            bool isBorrowAllowed
+        );
 }

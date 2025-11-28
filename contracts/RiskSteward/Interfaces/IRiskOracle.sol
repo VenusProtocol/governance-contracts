@@ -12,6 +12,7 @@ pragma solidity 0.8.25;
  * @param timestamp Block timestamp when the update was published
  * @param publisher Address of the account that published this update
  * @param additionalData Additional metadata or data associated with the update
+ * @param poolId Pool identifier for eMode-style collateral configuration (0 for regular markets)
  */
 struct RiskParameterUpdate {
     string referenceId;
@@ -23,6 +24,7 @@ struct RiskParameterUpdate {
     uint256 timestamp;
     address publisher;
     bytes additionalData;
+    uint96 poolId;
     uint32 destChainId;
 }
 
