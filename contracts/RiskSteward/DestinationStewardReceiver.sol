@@ -115,6 +115,27 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     );
 
     /**
+     * @notice Emitted when a new bridged update arrives but a pending, non‑expired
+     *         update is already registered for the same (updateType, market).
+     */
+    event RegisteredPendingUpdateExist(
+        uint256 indexed updateId,
+        uint256 arrivalTime,
+        string updateType,
+        address indexed market
+    );
+
+    /**
+     * @notice Emitted when a duplicate bridged update (same updateId) is received.
+     */
+    event DuplicateUpdateReceived(
+        uint256 indexed updateId,
+        uint256 arrivalTime,
+        string updateType,
+        address indexed market
+    );
+
+    /**
      * @notice Emitted when a bridged update is executed on the destination
      */
     event RemoteUpdateExecuted(uint256 indexed updateId);
@@ -448,27 +469,31 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      */
     function _lzReceive(Origin calldata, bytes32, bytes calldata payload, address, bytes calldata) internal override {
         RiskParameterUpdate memory update = abi.decode(payload, (RiskParameterUpdate));
-        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-
-        RegisteredUpdate storage reg = registeredUpdates[updateTypeKey][update.market];
         uint256 newId = update.updateId;
-
-        // Always store the update itself
-        updates[newId] = update;
         uint256 arrivalTime = block.timestamp;
+
+        // If this update ID was already stored, treat as a duplicate and do not overwrite
+        if (updates[newId].updateId != 0) {
+            emit DuplicateUpdateReceived(newId, arrivalTime, update.updateType, update.market);
+            return;
+        }
+
+        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
+        RegisteredUpdate storage reg = registeredUpdates[updateTypeKey][update.market];
 
         // Check if there is an existing registered pending & non-expired update
         if (reg.updateId != 0 && reg.status == UpdateStatus.Pending) {
             RiskParameterUpdate storage cur = updates[reg.updateId];
 
-            // If still valid (not expired), do NOT override the registry
+            // If still valid (not expired), do NOT override the registry or store the new update
             if (cur.timestamp + REMOTE_UPDATE_EXPIRATION_TIME >= block.timestamp) {
-                emit RemoteUpdateRegistered(newId, arrivalTime, update.updateType, update.market);
+                emit RegisteredPendingUpdateExist(reg.updateId, arrivalTime, update.updateType, update.market);
                 return;
             }
         }
 
-        // Otherwise, write new pending entry
+        // Otherwise, write new pending entry and store the update
+        updates[newId] = update;
         reg.updateId = newId;
         reg.status = UpdateStatus.Pending;
         reg.arrivalTime = arrivalTime;

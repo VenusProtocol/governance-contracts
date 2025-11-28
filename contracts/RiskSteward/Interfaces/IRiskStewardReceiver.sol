@@ -11,7 +11,8 @@ interface IRiskStewardReceiver {
         Executed,
         Rejected,
         Expired,
-        SENT_TO_DESTINATION
+        SENT_TO_DESTINATION,
+        Executable
     }
 
     struct RiskParamConfig {
@@ -188,4 +189,11 @@ interface IRiskStewardReceiver {
         string calldata updateType,
         address comptroller
     ) external view returns (uint256[] memory executableUpdates);
+
+    /**
+     * @notice Returns the current status of an update, checking expiration and execution conditions.
+     * @param updateId The oracle update ID to query
+     * @return The current `UpdateStatus` for the given update ID (may differ from stored status if expired or executable)
+     */
+    function getUpdateStatus(uint256 updateId) external view returns (UpdateStatus);
 }
