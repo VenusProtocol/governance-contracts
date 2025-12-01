@@ -8,8 +8,7 @@ import { IRiskOracle, RiskParameterUpdate } from "./Interfaces/IRiskOracle.sol";
 import { IRiskStewardReceiver } from "./Interfaces/IRiskStewardReceiver.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
-import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
-import { IVToken } from "../interfaces/IVToken.sol";
+import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import {
     OAppUpgradeable,
     MessagingFee,
@@ -28,17 +27,17 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     using OptionsBuilder for bytes;
 
     /**
-     * @notice Time before a submitted update is considered stale
+     * @notice Period after which a proposed update becomes expired and can no longer be applied
      */
     uint256 public constant UPDATE_EXPIRATION_TIME = 1 days;
 
     /**
-     * @notice Source chain id
+     * @notice Source chain LayerZero endpoint ID
      */
-    uint32 public immutable LAYER_ZERO_CHAIN_ID;
+    uint32 public immutable LAYER_ZERO_EID;
 
     /**
-     * @notice The Risk Oracle contract address (set once in constructor)
+     * @notice The Risk Oracle contract address
      */
     IRiskOracle public immutable RISK_ORACLE;
 
@@ -48,29 +47,24 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     mapping(bytes32 => RiskParamConfig) public riskParameterConfigs;
 
     /**
-     * @notice Mapping from hashed updateType to original human-readable string label
-     */
-    mapping(bytes32 => string) public updateTypeLabels;
-
-    /**
      * @notice Master storage of all updates by update ID
      */
     mapping(uint256 updateId => RegisteredUpdate) public updates;
 
     /**
-     * @notice Track last processed update ID per (updateType, market) (keyed by hashed updateType)
+     * @notice Track last processed update ID per (updateTypeKey, market)
      */
     mapping(bytes32 => mapping(address market => uint256)) public lastProcessedUpdate;
 
     /**
-     * @notice Track the current registerd update per (updateType, market) to avoid registering multiple updates
+     * @notice Track the current registered update per (updateType, market) to avoid registering multiple updates
      */
-    mapping(bytes32 => mapping(address market => uint256)) public registeredUpdates;
+    mapping(bytes32 => mapping(address market => uint256)) public lastRegisteredUpdate;
 
     /**
-     * @notice Mapping from approver address to whitelist status
+     * @notice Mapping from executor address to whitelist status
      */
-    mapping(address => bool) public whitelistedApprovers;
+    mapping(address => bool) public whitelistedExecutors;
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
@@ -84,11 +78,11 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @param riskOracle_ The address of the Risk Oracle contract
      * @custom:oz-upgrades-unsafe-allow constructor
      */
-    constructor(address riskOracle_, address endpoint_, uint32 layerZeroChainId_) OAppUpgradeable(endpoint_) {
+    constructor(address riskOracle_, address endpoint_, uint32 layerZeroLzEid_) OAppUpgradeable(endpoint_) {
         _disableInitializers();
         ensureNonzeroAddress(riskOracle_);
         RISK_ORACLE = IRiskOracle(riskOracle_);
-        LAYER_ZERO_CHAIN_ID = layerZeroChainId_;
+        LAYER_ZERO_EID = layerZeroLzEid_;
     }
 
     /**
@@ -100,7 +94,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         __OApp_init(owner_);
     }
 
-    // TODO: validate Storage layout
     /**
      * @dev Overrides OwnableUpgradeable and Ownable2StepUpgradeable to resolve
      *      the multiple inheritance ownership transfer conflict.
@@ -126,11 +119,9 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @param debounce The debounce period for the update
      * @param timelock The timelock period before the update can be executed
      * @custom:access Controlled by AccessControlManager
-     * @custom:event Emits RiskParameterConfigUpdated with the update type hash, update type, previous risk steward, new risk steward, previous debounce,
-     * new debounce, previous timelock, new timelock, previous active status, and new active status
+     * @custom:event Emits RiskParameterConfigUpdated
      * @custom:error Throws UnsupportedUpdateType if the update type is an empty string
      * @custom:error Throws InvalidDebounce if the debounce is 0
-     * @custom:error Throws InvalidTimelock if the timelock is 0
      * @custom:error Throws ZeroAddressNotAllowed if the risk steward address is zero
      */
     function setRiskParameterConfig(
@@ -151,11 +142,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
         bytes32 key = keccak256(bytes(updateType));
         RiskParamConfig memory previousConfig = riskParameterConfigs[key];
-
-        // Add the label if not already stored
-        if (bytes(updateTypeLabels[key]).length == 0) {
-            updateTypeLabels[key] = updateType;
-        }
 
         riskParameterConfigs[key] = RiskParamConfig({
             active: true,
@@ -204,134 +190,75 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     }
 
     /**
-     * @notice Sets the whitelist status of an approver
-     * @param approver The address of the approver
+     * @notice Sets the whitelist executor
+     * @param executor The address of the executor
      * @param approved The whitelist status to set (true to whitelist, false to remove)
      * @custom:access Controlled by AccessControlManager
-     * @custom:event Emits ApproverStatusUpdated with the approver address, previous approval status, and approval status
-     * @custom:error Throws ZeroAddressNotAllowed if the approver address is zero
+     * @custom:event Emits ExecutorStatusUpdated with the executor address, previous approval status, and approval status
+     * @custom:error Throws ZeroAddressNotAllowed if the executor address is zero
      */
-    function setApprover(address approver, bool approved) external {
-        _checkAccessAllowed("setApprover(address,bool)");
-        ensureNonzeroAddress(approver);
+    function setWhitelistedExecutor(address executor, bool approved) external {
+        _checkAccessAllowed("setWhitelistedExecutor(address,bool)");
+        ensureNonzeroAddress(executor);
 
-        bool previousApproved = whitelistedApprovers[approver];
+        bool previousApproved = whitelistedExecutors[executor];
         if (previousApproved == approved) {
             return;
         }
 
-        whitelistedApprovers[approver] = approved;
-        emit ApproverStatusUpdated(approver, previousApproved, approved);
+        whitelistedExecutors[executor] = approved;
+        emit ExecutorStatusUpdated(executor, previousApproved, approved);
     }
 
     /**
-     * @notice Returns the current status of an update, checking expiration and execution conditions.
-     * @param updateId The oracle update ID to query
-     * @return The current `UpdateStatus` for the given update ID (may differ from stored status if expired or executable)
-     */
-    function getUpdateStatus(uint256 updateId) external view returns (UpdateStatus) {
-        return _getCurrentStatus(updateId);
-    }
-
-    /**
-     * @notice Registers an update from the Risk Oracle with a timelock.
-     * This function should be called when the oracle publishes an update.
-     * The unlock time is calculated from the update type's configured timelock period.
+     * @notice Processes an update from the Risk Oracle. Validates and either executes immediately,
+     * registers with timelock, or forwards cross-chain.
      * @param updateId The update ID from the oracle's perspective
-     * @custom:access Anyone can register updates
-     * @custom:event Emits UpdateRegistered with the oracle update ID, unlock time, update type, and market
-     * @custom:error Throws UpdateAlreadyResolved if the update was already registered
+     * @custom:access Anyone can process updates
+     * @custom:event Emits UpdateRegistered, UpdateExecuted, or UpdateSentToDestination depending on the update type
+     * @custom:error Throws UpdateAlreadyResolved if the update was already processed
      * @custom:error Throws UpdateIsExpired if the update has expired
-     * @custom:error Throws UnsupportedUpdateType if the update type is not configured
+     * @custom:error Throws ConfigNotActive if the config is not active
+     * @custom:error Throws UpdateTooFrequent if the debounce period has not passed
+     * @custom:error Throws RegisteredUpdateTypeExist if there is a non-expired pending update of the same type
      */
-    function registerUpdate(uint256 updateId) external {
+    function processUpdate(uint256 updateId) external {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
-        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-        RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
+        RiskParamConfig memory config = riskParameterConfigs[update.updateTypeKey];
+        _ensureNoActiveUpdate(update);
+        _validateRegisterUpdate(update, config);
 
-        if (update.destChainId != 0 && update.destChainId != LAYER_ZERO_CHAIN_ID) {
-            // Here debounce is only for the bridge to avoid DOS, the main debounce is on the destination.
-            _validateRegisterUpdate(update, config);
+        // Check Remote Update
+        if (update.destLzEid != 0 && update.destLzEid != LAYER_ZERO_EID) {
             _sendRemoteUpdate(update);
             return;
         }
-
-        _ensureNoActiveUpdate(update);
-        _validateRegisterUpdate(update, config);
-        registeredUpdates[updateTypeKey][update.market] = updateId;
-
-        // Check if update is safe for direct execution based on risk steward's validation
-        IRiskSteward riskSteward = IRiskSteward(config.riskSteward);
-        bool safeForDirectExecution = riskSteward.isSafeForDirectExecution(update);
-
-        // If safe for direct execution, execute immediately
-        if (safeForDirectExecution) {
-            _executeImmediateUpdate(updateId, update, riskSteward, updateTypeKey);
-            return;
-        }
-
-        // Otherwise, use the configured timelock period
-        uint256 unlockTime = block.timestamp + config.timelock;
-        updates[updateId] = RegisteredUpdate({
-            updateId: updateId,
-            unlockTime: unlockTime,
-            status: UpdateStatus.Pending,
-            approver: address(0),
-            executedAt: 0
-        });
-
-        emit UpdateRegistered(updateId, unlockTime, update.updateType, update.market);
+        _registerOrExecuteUpdate(update, config);
     }
 
     /**
-     * @notice Executes a registered update after its unlock time has passed and it has been approved
+     * @notice Executes a registered update. Only whitelisted executors can call this function.
+     *         This function can be used for updates that are in Executable status.
      * @param updateId The oracle update ID of the update to execute
-     * @custom:access Anyone can execute unlocked and approved updates
+     * @custom:access Only whitelisted executors can call this function
      * @custom:event Emits UpdateExecuted with the oracle update ID
-     * @custom:error Throws UpdateNotFound if the update doesn't exist
-     * @custom:error Throws UpdateNotUnlocked if the unlock time hasn't passed
-     * @custom:error Throws UpdateNotApproved if the update has not been approved
+     * @custom:error Throws NotAnExecutor if the caller is not a whitelisted executor
      * @custom:error Throws UpdateAlreadyResolved if the update was already executed or rejected
+     * @custom:error Throws UpdateIsExpired if the update has expired
      * @custom:error Throws ConfigNotActive if the config is not active
-     * @custom:error Throws UpdateTooFrequent if the debounce period hasn't passed
+     * @custom:error Throws UpdateNotUnlocked if the unlock time has not passed
      */
-    function executeUpdate(uint256 updateId) external {
+    function executeRegisteredUpdate(uint256 updateId) external {
+        if (!whitelistedExecutors[msg.sender]) {
+            revert NotAnExecutor();
+        }
+
         RegisteredUpdate storage registeredUpdate = updates[updateId];
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
-        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-        RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
+        RiskParamConfig memory config = riskParameterConfigs[update.updateTypeKey];
 
         _validateExecuteUpdate(registeredUpdate, update, config);
-        IRiskSteward(config.riskSteward).processUpdate(update);
-
-        registeredUpdate.status = UpdateStatus.Executed;
-        registeredUpdate.executedAt = block.timestamp;
-        lastProcessedUpdate[updateTypeKey][update.market] = updateId;
-
-        emit UpdateExecuted(updateId);
-    }
-
-    /**
-     * @notice Approves an update for execution. Only updates with Pending status can be approved.
-     * @param updateId The oracle update ID of the update to approve
-     * @custom:access Only whitelisted approvers can approve updates
-     * @custom:event Emits SetApproved with the oracle update ID and approver address
-     * @custom:error Throws NotAnApprover if the caller is not a whitelisted approver
-     * @custom:error Throws UpdateAlreadyResolved if the update status is not Pending (e.g., already executed, rejected, expired, or sent to destination)
-     */
-    function approveUpdate(uint256 updateId) external {
-        if (!whitelistedApprovers[msg.sender]) {
-            revert NotAnApprover();
-        }
-
-        UpdateStatus currentStatus = _getCurrentStatus(updateId);
-        if (currentStatus != UpdateStatus.Pending) {
-            revert UpdateAlreadyResolved();
-        }
-
-        RegisteredUpdate storage registeredUpdate = updates[updateId];
-        registeredUpdate.approver = msg.sender;
-        emit SetApproved(updateId, msg.sender);
+        _executeUpdate(update, IRiskSteward(config.riskSteward));
     }
 
     /**
@@ -339,7 +266,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @param updateId The oracle update ID of the update to reject
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits UpdateRejected with the oracle update ID
-     * @custom:error Throws UpdateNotFound if the update doesn't exist
      * @custom:error Throws UpdateAlreadyResolved if the update was already executed or rejected
      */
     function rejectUpdate(uint256 updateId) external {
@@ -355,6 +281,39 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     }
 
     /**
+     * @notice Resends a remote update to the destination chain. Only whitelisted executors can call this function.
+     *         This function is useful in case of bridge failures.
+     * @dev Duplicate update rejection is handled in the destination contract itself, so resending
+     *      the same update multiple times is safe and will be deduplicated on the destination side.
+     * @param updateId The oracle update ID to resend
+     * @custom:access Only whitelisted executors can call this function
+     * @custom:event Emits UpdateResentToDestination with the update ID, destination chain ID, update type, and market
+     * @custom:error Throws NotAnExecutor if the caller is not a whitelisted executor
+     * @custom:error Throws InvalidUpdateToResend if the update status is not SENT_TO_DESTINATION
+     * @custom:error Throws UpdateIsExpired if the update has expired
+     */
+    function resendRemoteUpdate(uint256 updateId) external {
+        if (!whitelistedExecutors[msg.sender]) {
+            revert NotAnExecutor();
+        }
+
+        RegisteredUpdate storage registeredUpdate = updates[updateId];
+        if (registeredUpdate.status != UpdateStatus.SENT_TO_DESTINATION) {
+            revert InvalidUpdateToResend();
+        }
+
+        RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
+
+        // Check if update is expired
+        if (update.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp) {
+            revert UpdateIsExpired();
+        }
+
+        _sendRemoteUpdate(update);
+        emit UpdateResentToDestination(update.updateId, update.destLzEid, update.updateType, update.market);
+    }
+
+    /**
      * @notice Returns an array of update IDs for executable registered updates for a given update type and comptroller.
      * @param updateType The human‑readable identifier of the update type to filter by
      * @param comptroller The address of the Isolated Pools Comptroller that manages the markets
@@ -365,16 +324,13 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         address comptroller
     ) external view returns (uint256[] memory executableUpdates) {
         bytes32 updateTypeKey = keccak256(bytes(updateType));
-        // TODO: Update the vToken interface for getAllMarkets
-        IVToken[] memory markets = IIsolatedPoolsComptroller(comptroller).getAllMarkets();
+        address[] memory markets = ICorePoolComptroller(comptroller).getAllMarkets();
         uint256 maxUpdates = markets.length;
         uint256[] memory tempArray = new uint256[](maxUpdates);
         uint256 count = 0;
 
         for (uint256 i = 0; i < maxUpdates; ++i) {
-            address market = address(markets[i]);
-            uint256 registeredUpdateId = registeredUpdates[updateTypeKey][market];
-
+            uint256 registeredUpdateId = lastRegisteredUpdate[updateTypeKey][markets[i]];
             if (_getCurrentStatus(registeredUpdateId) != UpdateStatus.Executable) continue;
             tempArray[count] = registeredUpdateId;
             count++;
@@ -388,26 +344,44 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     }
 
     /**
-     * @notice Sends a `RiskParameterUpdate` to a destination chain via LayerZero.
-     * @param dstEid Destination chain endpoint ID
-     * @param update The risk parameter update payload to send
-     * @param options LayerZero message options; if empty, a default executor option is used
-     * @param fee Messaging fee structure returned by `quote`
-     * @param refundAddress Address to receive any surplus fee refunds
+     * @notice Returns the current status of an update, checking expiration and execution conditions.
+     * @param updateId The oracle update ID to query
+     * @return The current `UpdateStatus` for the given update ID (may differ from stored status if expired or executable)
      */
-    function lzSend(
-        uint32 dstEid,
-        RiskParameterUpdate memory update,
-        bytes memory options,
-        MessagingFee memory fee,
-        address refundAddress
-    ) public payable {
-        require(msg.sender == address(this), "Invalid caller");
-        bytes memory payload = abi.encode(update);
-        bytes memory options_ = options.length == 0
-            ? OptionsBuilder.newOptions().addExecutorLzReceiveOption(1_000_000, 0)
-            : options;
-        _lzSend(dstEid, payload, options_, fee, refundAddress);
+    function getUpdateStatus(uint256 updateId) external view returns (UpdateStatus) {
+        return _getCurrentStatus(updateId);
+    }
+
+    /**
+     * @notice Returns the risk parameter configuration for a given update type
+     * @param updateType The human-readable identifier of the update type
+     * @return The risk parameter configuration
+     */
+    function getRiskParameterConfig(string calldata updateType) external view returns (RiskParamConfig memory) {
+        bytes32 key = keccak256(bytes(updateType));
+        return riskParameterConfigs[key];
+    }
+
+    /**
+     * @notice Returns the last processed update ID for a given update type and market
+     * @param updateType The human-readable identifier of the update type
+     * @param market The address of the market
+     * @return The last processed update ID
+     */
+    function getLastProcessedUpdate(string calldata updateType, address market) external view returns (uint256) {
+        bytes32 key = keccak256(bytes(updateType));
+        return lastProcessedUpdate[key][market];
+    }
+
+    /**
+     * @notice Returns the last registered update ID for a given update type and market
+     * @param updateType The human-readable identifier of the update type
+     * @param market The address of the market
+     * @return The last registered update ID
+     */
+    function getLastRegisteredUpdate(string calldata updateType, address market) external view returns (uint256) {
+        bytes32 key = keccak256(bytes(updateType));
+        return lastRegisteredUpdate[key][market];
     }
 
     /**
@@ -423,23 +397,78 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         bool payInLzToken
     ) public view returns (MessagingFee memory fee) {
         bytes memory payload = abi.encode(update);
-        fee = _quote(update.destChainId, payload, options, payInLzToken);
+        fee = _quote(update.destLzEid, payload, options, payInLzToken);
     }
 
     /**
-     * @notice Executes an update immediately without timelock when it's within the safe delta threshold.
-     *         Processes the update via the risk steward, marks it as executed, and updates tracking mappings.
-     * @param updateId The oracle update ID to execute
-     * @param update The risk parameter update to process
-     * @param steward The risk steward contract that will process the update
-     * @param updateTypeKey The hashed update type identifier
+     * @notice Sends a `RiskParameterUpdate` to a destination chain via LayerZero.
+     * @param dstEid Destination chain endpoint ID
+     * @param update The risk parameter update payload to send
+     * @param options LayerZero message options; if empty, a default executor option is used
+     * @param fee Messaging fee structure returned by `quote`
+     * @param refundAddress Address to receive any surplus fee refunds
+     * @custom:error InvalidLzSendCaller if called by any address other than this contract
      */
-    function _executeImmediateUpdate(
-        uint256 updateId,
+    function lzSend(
+        uint32 dstEid,
         RiskParameterUpdate memory update,
-        IRiskSteward steward,
-        bytes32 updateTypeKey
-    ) internal {
+        bytes memory options,
+        MessagingFee memory fee,
+        address refundAddress
+    ) public payable {
+        if (msg.sender != address(this)) {
+            revert InvalidLzSendCaller();
+        }
+
+        bytes memory payload = abi.encode(update);
+        bytes memory options_ = options.length == 0
+            ? OptionsBuilder.newOptions().addExecutorLzReceiveOption(1_000_000, 0)
+            : options;
+        _lzSend(dstEid, payload, options_, fee, refundAddress);
+    }
+
+    /**
+     * @notice Registers an update from the Risk Oracle with a timelock, or executes it immediately if safe.
+     * @param update The risk parameter update from the Risk Oracle to register or execute
+     * @param config The risk parameter configuration for this update type containing timelock and risk steward address
+     * @custom:event Emits UpdateRegistered with the oracle update ID, unlock time (or current timestamp if executed immediately), update type, and market
+     * @custom:event Emits UpdateExecuted if the update is safe for direct execution and is executed immediately
+     */
+    function _registerOrExecuteUpdate(RiskParameterUpdate memory update, RiskParamConfig memory config) internal {
+        uint256 updateId = update.updateId;
+        lastRegisteredUpdate[update.updateTypeKey][update.market] = update.updateId;
+
+        IRiskSteward riskSteward = IRiskSteward(config.riskSteward);
+        bool safeForDirectExecution = riskSteward.isSafeForDirectExecution(update);
+
+        // If safe for direct execution, execute immediately
+        if (safeForDirectExecution) {
+            emit UpdateRegistered(updateId, block.timestamp, update.updateType, update.market);
+            _executeUpdate(update, riskSteward);
+            return;
+        }
+
+        // Otherwise, use the configured timelock period to register the update
+        uint256 unlockTime = block.timestamp + config.timelock;
+        updates[updateId] = RegisteredUpdate({
+            updateId: updateId,
+            unlockTime: unlockTime,
+            status: UpdateStatus.Pending,
+            executor: address(0),
+            executedAt: 0
+        });
+        emit UpdateRegistered(updateId, unlockTime, update.updateType, update.market);
+    }
+
+    /**
+     * @notice Executes a validated update via the risk steward and records its execution metadata.
+     *         Updates the registered update storage, last processed tracking, and emits the execution event.
+     * @param update The risk parameter update to execute
+     * @param steward The risk steward contract that will process the update
+     * @custom:event Emits UpdateExecuted with the oracle update ID
+     */
+    function _executeUpdate(RiskParameterUpdate memory update, IRiskSteward steward) internal {
+        uint256 updateId = update.updateId;
         uint256 timestamp = block.timestamp;
         steward.processUpdate(update);
 
@@ -447,56 +476,56 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
             updateId: updateId,
             unlockTime: timestamp, // executes immediately
             status: UpdateStatus.Executed,
-            approver: address(0),
+            executor: address(msg.sender),
             executedAt: timestamp
         });
 
-        lastProcessedUpdate[updateTypeKey][update.market] = updateId;
+        lastProcessedUpdate[update.updateTypeKey][update.market] = updateId;
         emit UpdateExecuted(updateId);
     }
 
     /**
-     * @notice Sends a risk parameter update to a destination chain via LayerZero.
-     *         Quotes the messaging fee, sends the update, and marks it as SENT_TO_DESTINATION.
+     * @notice Sends a risk parameter update to a destination chain via LayerZero and records it as sent.
+     *         Quotes the messaging fee, sends the encoded update payload, updates tracking mappings, and emits the send event.
      * @param update The risk parameter update to send to the destination chain
+     * @custom:event Emits UpdateSentToDestination with the update ID, destination endpoint ID, update type, and market
      */
     function _sendRemoteUpdate(RiskParameterUpdate memory update) internal {
-        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-
         MessagingFee memory fee = quote(update, "0x", false);
-        lzSend(update.destChainId, update, "0x", fee, address(this)); // TODO :transfer fee
+        lzSend(update.destLzEid, update, "0x", fee, address(this)); // TODO :transfer fee
 
         updates[update.updateId] = RegisteredUpdate({
             updateId: update.updateId,
             unlockTime: block.timestamp,
             status: UpdateStatus.SENT_TO_DESTINATION,
-            approver: address(0),
+            executor: address(msg.sender),
             executedAt: block.timestamp
         });
 
-        registeredUpdates[updateTypeKey][update.market] = update.updateId;
+        bytes32 updateTypeKey = update.updateTypeKey;
+        lastRegisteredUpdate[updateTypeKey][update.market] = update.updateId;
         lastProcessedUpdate[updateTypeKey][update.market] = update.updateId;
 
-        emit UpdateSentToDestination(update.updateId, update.destChainId, update.updateType, update.market);
+        emit UpdateSentToDestination(update.updateId, update.destLzEid, update.updateType, update.market);
     }
 
     /**
      * @notice Ensures there is no other pending registered update of the same type for the same market.
-     *         If a pending update exists and is expired, it is marked as expired; otherwise the call reverts.
+     *         If a pending update exists and is expired, it is marked as expired and a new update can proceed.
+     *         If a pending update exists and is not expired, the call reverts to prevent overlapping updates.
      * @param update The risk parameter update being registered
-     * @custom:error RegitredUpdateTypeExist if there is a non‑expired pending update of the same type for the market
+     * @custom:event Emits UpdateExpired with the ID of the previously pending update if it is found to be expired
+     * @custom:error RegisteredUpdateTypeExist if there is a non‑expired pending update of the same type for the market
      */
     function _ensureNoActiveUpdate(RiskParameterUpdate memory update) internal {
-        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-        uint256 registeredUpdateId = registeredUpdates[updateTypeKey][update.market];
+        uint256 registeredUpdateId = lastRegisteredUpdate[update.updateTypeKey][update.market];
         if (registeredUpdateId == 0) return; // no prior update of this type for this market
 
         RegisteredUpdate storage existing = updates[registeredUpdateId];
-        RiskParameterUpdate memory existingUpdate = RISK_ORACLE.getUpdateById(registeredUpdateId);
-
         if (existing.status != UpdateStatus.Pending) return;
 
         // Check expiration
+        RiskParameterUpdate memory existingUpdate = RISK_ORACLE.getUpdateById(registeredUpdateId);
         bool expired = existingUpdate.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp;
 
         if (expired) {
@@ -505,8 +534,8 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
             return;
         }
 
-        // If still pending & not expired reject
-        revert RegitredUpdateTypeExist(registeredUpdateId);
+        // If still pending & not expired reject new update
+        revert RegisteredUpdateTypeExist(registeredUpdateId);
     }
 
     /**
@@ -514,8 +543,8 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @param update The risk parameter update to validate
      * @param config The configuration for this update type
      * @custom:error UpdateAlreadyResolved if the update was already registered
-     * @custom:error UpdateIsExpired if the update has expired or is not the latest for the given market and type
      * @custom:error ConfigNotActive if the configuration for the update type is not active
+     * @custom:error UpdateIsExpired if the update has expired or is not the latest for the given market and type
      * @custom:error UpdateTooFrequent if the debounce period has not passed for the given market and type
      */
     function _validateRegisterUpdate(RiskParameterUpdate memory update, RiskParamConfig memory config) internal view {
@@ -534,7 +563,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
             update.updateType,
             update.market
         );
-
         if (latestForMarketAndType.updateId != update.updateId) {
             revert UpdateIsExpired();
         }
@@ -544,12 +572,10 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
             revert UpdateIsExpired();
         }
 
-        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-        uint256 lastProcessedId = lastProcessedUpdate[updateTypeKey][update.market];
-        uint256 lastExecutionTime = updates[lastProcessedId].executedAt;
-
         // Check debounce
-        if (lastExecutionTime != 0 && (block.timestamp - lastExecutionTime < config.debounce)) {
+        uint256 lastProcessedId = lastProcessedUpdate[update.updateTypeKey][update.market];
+        uint256 lastExecutionTime = updates[lastProcessedId].executedAt;
+        if (lastExecutionTime != 0 && (lastExecutionTime + config.debounce > block.timestamp)) {
             revert UpdateTooFrequent();
         }
     }
@@ -559,17 +585,20 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @param registeredUpdate The stored registered update metadata
      * @param update The risk parameter update fetched from the oracle
      * @param config The configuration for this update type
+     * @custom:error ConfigNotActive if the configuration for the update type is not active
      * @custom:error UpdateAlreadyResolved if the update was already executed or rejected
      * @custom:error UpdateIsExpired if the update has expired
-     * @custom:error ConfigNotActive if the configuration for the update type is not active
      * @custom:error UpdateNotUnlocked if the unlock time has not passed
-     * @custom:error UpdateNotApproved if the update has not been approved
      */
     function _validateExecuteUpdate(
         RegisteredUpdate memory registeredUpdate,
         RiskParameterUpdate memory update,
         RiskParamConfig memory config
     ) internal view {
+        if (!config.active) {
+            revert ConfigNotActive();
+        }
+
         if (registeredUpdate.status != UpdateStatus.Pending) {
             revert UpdateAlreadyResolved();
         }
@@ -578,16 +607,8 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
             revert UpdateIsExpired();
         }
 
-        if (!config.active) {
-            revert ConfigNotActive();
-        }
-
         if (block.timestamp < registeredUpdate.unlockTime) {
             revert UpdateNotUnlocked();
-        }
-
-        if (registeredUpdate.approver == address(0)) {
-            revert UpdateNotApproved();
         }
     }
 
@@ -600,29 +621,21 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         RegisteredUpdate memory registeredUpdate = updates[updateId];
         UpdateStatus storedStatus = registeredUpdate.status;
 
-        // If update doesn't exist (status is None), return None
-        if (storedStatus == UpdateStatus.None) {
-            return UpdateStatus.None;
-        }
-
-        // For non-pending statuses, return stored status
+        // For non-pending status, return stored status
         if (storedStatus != UpdateStatus.Pending) {
             return storedStatus;
         }
 
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
-        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-        RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
+        RiskParamConfig memory config = riskParameterConfigs[update.updateTypeKey];
 
         // Check if expired
         if (update.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp) {
             return UpdateStatus.Expired;
         }
 
-        // Check all execution conditions
-        if (
-            config.active && block.timestamp >= registeredUpdate.unlockTime && registeredUpdate.approver != address(0)
-        ) {
+        // Check execution conditions
+        if (config.active && block.timestamp >= registeredUpdate.unlockTime) {
             return UpdateStatus.Executable;
         }
 
@@ -644,7 +657,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @notice Disables renounceOwnership function
      * @custom:error Throws RenounceOwnershipNotAllowed
      */
-    function renounceOwnership() public override {
+    function renounceOwnership() public pure override {
         revert RenounceOwnershipNotAllowed();
     }
 }

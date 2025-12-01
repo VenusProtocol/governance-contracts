@@ -10,6 +10,12 @@ interface ICorePoolComptroller {
 
     function _setMarketBorrowCaps(address[] calldata, uint256[] calldata) external;
 
+    function setMarketSupplyCaps(address[] calldata, uint256[] calldata) external;
+
+    function setMarketBorrowCaps(address[] calldata, uint256[] calldata) external;
+
+    function getAllMarkets() external view returns (address[] memory);
+
     function setCollateralFactor(
         uint96 poolId,
         address vToken,

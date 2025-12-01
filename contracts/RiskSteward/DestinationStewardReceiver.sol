@@ -8,7 +8,6 @@ import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
-import { IVToken } from "../interfaces/IVToken.sol";
 import { OAppUpgradeable, Origin } from "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppUpgradeable.sol";
 
 /**
@@ -30,22 +29,31 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
         Rejected
     }
 
+    /**
+     * @notice Configuration for a risk parameter update type on the destination chain.
+     * @param active Whether this update type configuration is currently active
+     * @param debounce Minimum delay between consecutive executions for the same (updateType, market) pair
+     * @param riskSteward Address of the risk steward contract responsible for processing this update type
+     */
     struct RiskParamConfig {
         bool active;
-        uint256 debounce; 
+        uint256 debounce;
         address riskSteward;
     }
 
     /**
-     * @notice Struct tracking the registered update for a given (updateType, market) pair
-     * @dev `arrivalTime` is when the update was received on this chain; unlock time is derived as
-     *      `arrivalTime + REMOTE_DELAY` instead of being stored separately.
+     * @notice Destination-side storage for a bridged risk parameter update.
+     * @param update The full risk parameter update payload received from the source chain
+     * @param status Current local status of the bridged update (Pending, Executed, Rejected)
+     * @param arrivalTime Timestamp when the update was received on this chain
+     * @param executor Address of the executor who executed this update on the destination (address(0) if not executed yet)
+     * @dev Unlock time is derived as `arrivalTime + REMOTE_DELAY` instead of being stored separately.
      */
-    struct RegisteredUpdate {
-        uint256 updateId;
+    struct DestinationUpdate {
+        RiskParameterUpdate update;
         UpdateStatus status;
         uint256 arrivalTime;
-        address approver;
+        address executor;
     }
 
     /**
@@ -59,9 +67,9 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     uint256 public constant REMOTE_DELAY = 6 hours;
 
     /**
-     * @notice Source chain id
+     * @notice Source chain LayerZero endpoint ID
      */
-    uint32 public immutable LAYER_ZERO_CHAIN_ID;
+    uint32 public immutable LAYER_ZERO_EID;
 
     /**
      * @notice Mapping of supported risk configurations per update type (hashed updateType string)
@@ -69,24 +77,26 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     mapping(bytes32 => RiskParamConfig) public riskParameterConfigs;
 
     /**
-     * @notice Mapping from hashed updateType to original human-readable string label
-     */
-    mapping(bytes32 => string) public updateTypeLabels;
-
-    /**
      * @notice Master storage of all bridged updates by update ID
      */
-    mapping(uint256 updateId => RiskParameterUpdate) public updates;
+    mapping(uint256 updateId => DestinationUpdate) public updates;
 
     /**
-     * @notice Mapping from (updateType, market) to currently registered remote update metadata
+     * @notice Mapping from (updateType, market) to currently registered remote update ID
+     * @dev Points to the latest bridged update ID for each (updateType, market) pair.
+     *      All per-update data is stored in the `updates` mapping.
      */
-    mapping(bytes32 => mapping(address market => RegisteredUpdate)) public registeredUpdates;
+    mapping(bytes32 => mapping(address market => uint256)) public lastRegisteredUpdate;
 
     /**
      * @notice Track last executed update timestamp per (updateType, market)
      */
     mapping(bytes32 => mapping(address market => uint256)) public lastExecutedAt;
+
+    /**
+     * @notice Mapping from executor address to whitelist status
+     */
+    mapping(address => bool) public whitelistedExecutors;
 
     /**
      * @notice Emitted when a risk parameter config is updated for an update type
@@ -98,8 +108,6 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
         address indexed riskSteward,
         uint256 previousDebounce,
         uint256 debounce,
-        uint256 previousTimelock,
-        uint256 timelock,
         bool previousActive,
         bool active
     );
@@ -141,14 +149,9 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     event RemoteUpdateExecuted(uint256 indexed updateId);
 
     /**
-     * @notice Emitted when an approver status is set on the destination
+     * @notice Emitted when an executor status is set on the destination
      */
-    event ApproverStatusUpdated(address indexed approver, bool previousApproved, bool indexed approved);
-
-    /**
-     * @notice Emitted when an update is approved on the destination
-     */
-    event SetApproved(uint256 indexed updateId, address indexed approver);
+    event ExecutorStatusUpdated(address indexed executor, bool previousApproved, bool indexed approved);
 
     /**
      * @notice Emitted when an update is rejected on the destination
@@ -189,25 +192,37 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @notice Thrown when the debounce period hasn't passed for applying an update to a specific market / update type
      */
     error UpdateTooFrequent();
+
     /**
-     * @notice Thrown when an address is not an approver
+     * @notice Thrown when an empty update type string is provided
      */
-    error NotAnApprover();
+    error InvalidUpdateType();
+
     /**
-     * @notice Thrown when an update has not been approved
+     * @notice Thrown when a debounce value of 0 is set
      */
-    error UpdateNotApproved();
+    error InvalidDebounce();
+
+    /**
+     * @notice Thrown when a non-zero timelock is provided on the destination (timelock is not used here)
+     */
+    error InvalidTimelock();
+
+    /**
+     * @notice Thrown when an address is not a whitelisted executor
+     */
+    error NotAnExecutor();
 
     /**
      * @notice Disables initializers and sets immutable values.
      * @param endpoint_ Local LayerZero endpoint on this chain
-     * @param layerZeroChainId_ LayerZero endpoint ID for this destination chain
+     * @param layerZeroEid_ LayerZero endpoint ID for this destination chain
      * @custom:oz-upgrades-unsafe-allow constructor
      */
-    constructor(address endpoint_, uint32 layerZeroChainId_) OAppUpgradeable(endpoint_) {
+    constructor(address endpoint_, uint32 layerZeroEid_) OAppUpgradeable(endpoint_) {
         _disableInitializers();
         ensureNonzeroAddress(endpoint_);
-        LAYER_ZERO_CHAIN_ID = layerZeroChainId_;
+        LAYER_ZERO_EID = layerZeroEid_;
         emit RemoteDelaySet(REMOTE_DELAY);
     }
 
@@ -240,44 +255,31 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     }
 
     /**
-     * @notice Sets the risk parameter config for a given update type on the destination chain
+     * @notice Sets the risk parameter config for a given update type on the destination chain.
      * @param updateType The type of update to configure (e.g., "supplyCap", "borrowCap")
      * @param riskSteward The address for the risk steward contract responsible for processing the update
      * @param debounce The debounce period for updates of this type on the destination (anti‑DoS)
-     * @param timelock Unused on destination but kept for struct compatibility
-     * @custom:access Only owner
-     * @custom:event Emits RiskParameterConfigUpdated
+     * @custom:access Controlled by AccessControlManager
+     * @custom:event Emits RiskParameterConfigUpdated (with previousTimelock and timelock always emitted as 0)
+     * @custom:error InvalidUpdateType if the update type string is empty
+     * @custom:error InvalidDebounce if the debounce is 0
      */
-    function setRiskParameterConfig(
-        string calldata updateType,
-        address riskSteward,
-        uint256 debounce,
-        uint256 timelock
-    ) external {
+    function setRiskParameterConfig(string calldata updateType, address riskSteward, uint256 debounce) external {
         _checkAccessAllowed("setRiskParameterConfig(string,address,uint256,uint256)");
         ensureNonzeroAddress(riskSteward);
 
         if (bytes(updateType).length == 0) {
-            revert();
+            revert InvalidUpdateType();
         }
 
         if (debounce == 0) {
-            revert();
+            revert InvalidDebounce();
         }
 
         bytes32 key = keccak256(bytes(updateType));
         RiskParamConfig memory previousConfig = riskParameterConfigs[key];
 
-        // Add the label if not already stored
-        if (bytes(updateTypeLabels[key]).length == 0) {
-            updateTypeLabels[key] = updateType;
-        }
-
-        riskParameterConfigs[key] = RiskParamConfig({
-            active: true,
-            debounce: debounce,
-            riskSteward: riskSteward
-        });
+        riskParameterConfigs[key] = RiskParamConfig({ active: true, debounce: debounce, riskSteward: riskSteward });
 
         emit RiskParameterConfigUpdated(
             key,
@@ -286,64 +288,74 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
             riskSteward,
             previousConfig.debounce,
             debounce,
-            0,
-            timelock,
             previousConfig.active,
             true
         );
     }
 
     /**
-     * @notice Mapping from approver address to whitelist status
-     */
-    mapping(address => bool) public whitelistedApprovers;
-
-    /**
-     * @notice Sets the whitelist status of an approver on the destination chain
-     * @param approver The address of the approver
+     * @notice Sets the whitelist status of an executor on the destination chain.
+     * @param executor The address of the executor
      * @param approved The whitelist status to set (true to whitelist, false to remove)
      * @custom:access Controlled by AccessControlManager
+     * @custom:event Emits ExecutorStatusUpdated with the executor address, previous approval status, and new approval status
      */
-    function setApprover(address approver, bool approved) external {
-        _checkAccessAllowed("setApprover(address,bool)");
-        ensureNonzeroAddress(approver);
-        bool previousApproved = whitelistedApprovers[approver];
+    function setWhitelistedExecutor(address executor, bool approved) external {
+        _checkAccessAllowed("setWhitelistedExecutor(address,bool)");
+        ensureNonzeroAddress(executor);
+        bool previousApproved = whitelistedExecutors[executor];
         if (previousApproved == approved) {
             return;
         }
 
-        whitelistedApprovers[approver] = approved;
-        emit ApproverStatusUpdated(approver, previousApproved, approved);
+        whitelistedExecutors[executor] = approved;
+        emit ExecutorStatusUpdated(executor, previousApproved, approved);
     }
 
     /**
-     * @notice Approves a remote update for execution on the destination chain
-     * @param updateId The oracle update ID of the update to approve
-     * @custom:access Only whitelisted approvers can approve updates
+     * @notice Executes a bridged update after its remote delay has passed.
+     * @param updateId The bridged update ID to execute
+     * @custom:access Only whitelisted executors can execute updates
      */
-    function approveUpdate(uint256 updateId) external {
-        if (!whitelistedApprovers[msg.sender]) {
-            revert NotAnApprover();
+    function executeUpdate(uint256 updateId) external {
+        if (!whitelistedExecutors[msg.sender]) {
+            revert NotAnExecutor();
         }
 
-        RiskParameterUpdate memory update = updates[updateId];
-        if (update.updateId == 0) {
+        DestinationUpdate storage destUpdate = updates[updateId];
+        RiskParameterUpdate memory update = destUpdate.update;
+        bytes32 updateTypeKey = update.updateTypeKey;
+        RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
+
+        if (!config.active) {
+            revert ConfigNotActive();
+        }
+
+        if (destUpdate.status != UpdateStatus.Pending) {
             revert UpdateNotFound();
         }
 
-        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-        RegisteredUpdate storage reg = registeredUpdates[updateTypeKey][update.market];
-
-        if (reg.updateId != updateId || reg.status != UpdateStatus.Pending) {
-            revert UpdateNotFound();
+        if (block.timestamp < destUpdate.arrivalTime + REMOTE_DELAY) {
+            revert UpdateNotUnlocked();
         }
 
         if (update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME < block.timestamp) {
             revert UpdateIsExpired();
         }
 
-        reg.approver = msg.sender;
-        emit SetApproved(updateId, msg.sender);
+        // Destination-side debounce based on last execution for this (updateType, market)
+        uint256 lastExecutionTime = lastExecutedAt[updateTypeKey][update.market];
+        if (lastExecutionTime != 0 && (lastExecutionTime + config.debounce > block.timestamp)) {
+            revert UpdateTooFrequent();
+        }
+
+        IRiskSteward(config.riskSteward).processUpdate(update);
+
+        lastExecutedAt[updateTypeKey][update.market] = block.timestamp;
+        destUpdate.status = UpdateStatus.Executed;
+        destUpdate.executor = msg.sender;
+
+        emit RemoteUpdateExecuted(updateId);
     }
 
     /**
@@ -353,68 +365,14 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      */
     function rejectUpdate(uint256 updateId) external {
         _checkAccessAllowed("rejectUpdate(uint256)");
+        DestinationUpdate storage destUpdate = updates[updateId];
 
-        RiskParameterUpdate memory update = updates[updateId];
-        if (update.updateId == 0) {
+        if (destUpdate.status != UpdateStatus.Pending) {
             revert UpdateNotFound();
         }
 
-        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-        RegisteredUpdate storage reg = registeredUpdates[updateTypeKey][update.market];
-
-        if (reg.updateId != updateId || reg.status != UpdateStatus.Pending) {
-            revert UpdateNotFound();
-        }
-
-        reg.status = UpdateStatus.Rejected;
+        destUpdate.status = UpdateStatus.Rejected;
         emit UpdateRejected(updateId);
-    }
-
-    /**
-     * @notice Executes a bridged update after its remote delay has passed
-     * @param updateId The bridged update ID to execute
-     * @custom:access Anyone can execute unlocked updates
-     */
-    function executeUpdate(uint256 updateId) external {
-        RiskParameterUpdate memory update = updates[updateId];
-        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-        RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
-
-        if (!config.active) {
-            revert ConfigNotActive();
-        }
-
-        // Destination-side debounce based on last execution for this (updateType, market)
-        uint256 lastExecutionTime = lastExecutedAt[updateTypeKey][update.market];
-        if (lastExecutionTime != 0 && (block.timestamp - lastExecutionTime < config.debounce)) {
-            revert UpdateTooFrequent();
-        }
-
-        RegisteredUpdate storage reg = registeredUpdates[updateTypeKey][update.market];
-
-        if (reg.updateId != updateId || reg.status != UpdateStatus.Pending) {
-            revert UpdateNotFound();
-        }
-
-        if (block.timestamp < reg.arrivalTime + REMOTE_DELAY) {
-            revert UpdateNotUnlocked();
-        }
-
-        if (update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME < block.timestamp) {
-            revert UpdateIsExpired();
-        }
-
-        if (reg.approver == address(0)) {
-            revert UpdateNotApproved();
-        }
-
-        IRiskSteward(config.riskSteward).processUpdate(update);
-
-        lastExecutedAt[updateTypeKey][update.market] = block.timestamp;
-
-        reg.status = UpdateStatus.Executed;
-
-        emit RemoteUpdateExecuted(updateId);
     }
 
     /**
@@ -428,29 +386,27 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
         address comptroller
     ) external view returns (uint256[] memory executableUpdates) {
         bytes32 updateTypeKey = keccak256(bytes(updateType));
-        IVToken[] memory markets = IIsolatedPoolsComptroller(comptroller).getAllMarkets();
+        address[] memory markets = IIsolatedPoolsComptroller(comptroller).getAllMarkets();
         uint256 maxUpdates = markets.length;
         uint256[] memory tempArray = new uint256[](maxUpdates);
         uint256 count = 0;
 
         for (uint256 i = 0; i < maxUpdates; ++i) {
-            address market = address(markets[i]);
+            address market = markets[i];
 
-            RegisteredUpdate memory reg = registeredUpdates[updateTypeKey][market];
-            uint256 registeredUpdateId = reg.updateId;
-            if (registeredUpdateId == 0) continue;
-            if (reg.status != UpdateStatus.Pending) continue;
+            uint256 registeredUpdateId = lastRegisteredUpdate[updateTypeKey][market];
+            DestinationUpdate memory destUpdate = updates[registeredUpdateId];
+            if (destUpdate.status != UpdateStatus.Pending) continue;
 
-            RiskParameterUpdate memory update = updates[registeredUpdateId];
+            RiskParameterUpdate memory update = destUpdate.update;
             RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
             if (!config.active) continue;
 
             // Debounce: skip if last execution for this (updateType, market) is too recent
             uint256 lastExecutionTime = lastExecutedAt[updateTypeKey][market];
-            if (lastExecutionTime != 0 && (block.timestamp - lastExecutionTime < config.debounce)) continue;
+            if (lastExecutionTime != 0 && (lastExecutionTime + config.debounce > block.timestamp)) continue;
 
-            if (block.timestamp < reg.arrivalTime + REMOTE_DELAY) continue;
-            if (reg.approver == address(0)) continue;
+            if (block.timestamp < destUpdate.arrivalTime + REMOTE_DELAY) continue;
             if (update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME < block.timestamp) continue;
 
             tempArray[count] = registeredUpdateId;
@@ -464,6 +420,42 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     }
 
     /**
+     * @notice Returns the risk parameter configuration for a given update type
+     * @param updateType The human-readable identifier of the update type
+     * @return The risk parameter configuration
+     */
+    function getRiskParameterConfig(string calldata updateType) external view returns (RiskParamConfig memory) {
+        bytes32 key = keccak256(bytes(updateType));
+        return riskParameterConfigs[key];
+    }
+
+    /**
+     * @notice Returns the registered update for a given update type and market
+     * @param updateType The human-readable identifier of the update type
+     * @param market The address of the market
+     * @return The registered update
+     */
+    function getRegisteredUpdate(
+        string calldata updateType,
+        address market
+    ) external view returns (DestinationUpdate memory) {
+        bytes32 key = keccak256(bytes(updateType));
+        uint256 updateId = lastRegisteredUpdate[key][market];
+        return updates[updateId];
+    }
+
+    /**
+     * @notice Returns the last executed timestamp for a given update type and market
+     * @param updateType The human-readable identifier of the update type
+     * @param market The address of the market
+     * @return The last executed timestamp
+     */
+    function getLastExecutedAt(string calldata updateType, address market) external view returns (uint256) {
+        bytes32 key = keccak256(bytes(updateType));
+        return lastExecutedAt[key][market];
+    }
+
+    /**
      * @dev Handles incoming LayerZero messages containing a full `RiskParameterUpdate`
      *      sent by the source‑chain `RiskStewardReceiver`.
      */
@@ -473,31 +465,36 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
         uint256 arrivalTime = block.timestamp;
 
         // If this update ID was already stored, treat as a duplicate and do not overwrite
-        if (updates[newId].updateId != 0) {
+        if (updates[newId].update.updateId != 0) {
             emit DuplicateUpdateReceived(newId, arrivalTime, update.updateType, update.market);
             return;
         }
 
-        bytes32 updateTypeKey = keccak256(bytes(update.updateType));
-        RegisteredUpdate storage reg = registeredUpdates[updateTypeKey][update.market];
+        uint256 currentRegisteredId = lastRegisteredUpdate[update.updateTypeKey][update.market];
 
         // Check if there is an existing registered pending & non-expired update
-        if (reg.updateId != 0 && reg.status == UpdateStatus.Pending) {
-            RiskParameterUpdate storage cur = updates[reg.updateId];
+            DestinationUpdate storage current = updates[currentRegisteredId];
+            if (current.status == UpdateStatus.Pending) {
+                RiskParameterUpdate storage cur = current.update;
 
-            // If still valid (not expired), do NOT override the registry or store the new update
-            if (cur.timestamp + REMOTE_UPDATE_EXPIRATION_TIME >= block.timestamp) {
-                emit RegisteredPendingUpdateExist(reg.updateId, arrivalTime, update.updateType, update.market);
-                return;
+                // If still valid (not expired), do NOT override the registry or store the new update
+                if (cur.timestamp + REMOTE_UPDATE_EXPIRATION_TIME >= block.timestamp) {
+                    emit RegisteredPendingUpdateExist(
+                        currentRegisteredId,
+                        arrivalTime,
+                        update.updateType,
+                        update.market
+                    );
+                    return;
+                }
             }
-        }
 
         // Otherwise, write new pending entry and store the update
-        updates[newId] = update;
-        reg.updateId = newId;
-        reg.status = UpdateStatus.Pending;
-        reg.arrivalTime = arrivalTime;
-        reg.approver = address(0);
+        DestinationUpdate storage destUpdate = updates[newId];
+        destUpdate.update = update;
+        destUpdate.status = UpdateStatus.Pending;
+        destUpdate.arrivalTime = arrivalTime;
+        lastRegisteredUpdate[update.updateTypeKey][update.market] = newId;
 
         emit RemoteUpdateRegistered(newId, arrivalTime, update.updateType, update.market);
     }

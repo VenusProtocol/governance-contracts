@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
 
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { RiskParameterUpdate } from "./Interfaces/IRiskOracle.sol";
 import { IVToken } from "../interfaces/IVToken.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
@@ -45,9 +44,19 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     string public constant COLLATERAL_FACTORS = "collateralFactors";
 
     /**
+     * @notice The update type key for collateral factors (keccak256 hash of COLLATERAL_FACTORS)
+     */
+    bytes32 public constant COLLATERAL_FACTORS_KEY = keccak256(bytes(COLLATERAL_FACTORS));
+
+    /**
      * @notice The update type for liquidation incentive.
      */
     string public constant LIQUIDATION_INCENTIVE = "liquidationIncentive";
+
+    /**
+     * @notice The update type key for liquidation incentive (keccak256 hash of LIQUIDATION_INCENTIVE)
+     */
+    bytes32 public constant LIQUIDATION_INCENTIVE_KEY = keccak256(bytes(LIQUIDATION_INCENTIVE));
 
     /**
      * @dev Storage gap for upgradeability.
@@ -93,6 +102,16 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Thrown when trying to renounce ownership.
      */
     error RenounceOwnershipNotAllowed();
+
+    /**
+     * @notice Thrown when the uint256 data length is invalid
+     */
+    error InvalidUintLength();
+
+    /**
+     * @notice Thrown when the two uint256 data length is invalid
+     */
+    error InvalidTwoUintLength();
 
     /**
      * @notice Sets the immutable `CORE_POOL_COMPTROLLER` and `RISK_STEWARD_RECEIVER` addresses and disables initializers.
@@ -153,13 +172,11 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
 
         address comptroller = IVToken(update.market).comptroller();
 
-        string memory uType = update.updateType;
-
-        if (Strings.equal(uType, COLLATERAL_FACTORS)) {
+        if (update.updateTypeKey == COLLATERAL_FACTORS_KEY) {
             return _checkCFWithinSafeDelta(update, comptroller);
         }
 
-        if (Strings.equal(uType, LIQUIDATION_INCENTIVE)) {
+        if (update.updateTypeKey == LIQUIDATION_INCENTIVE_KEY) {
             return _checkLIWithinSafeDelta(update, comptroller);
         }
 
@@ -183,9 +200,9 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         address comptroller = IVToken(update.market).comptroller();
         uint96 poolId = update.poolId;
 
-        if (Strings.equal(update.updateType, COLLATERAL_FACTORS)) {
+        if (update.updateTypeKey == COLLATERAL_FACTORS_KEY) {
             _updateCollateralFactors(comptroller, update.market, poolId, update.newValue);
-        } else if (Strings.equal(update.updateType, LIQUIDATION_INCENTIVE)) {
+        } else if (update.updateTypeKey == LIQUIDATION_INCENTIVE_KEY) {
             _updateLiquidationIncentive(comptroller, update.market, poolId, update.newValue);
         } else {
             revert UnsupportedUpdateType();
@@ -218,7 +235,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
             );
         } else {
             if (poolId != 0) revert UnsupportedUpdateType();
-            
+
             IIsolatedPoolsComptroller(comptroller).setCollateralFactor(
                 market,
                 newCollateralFactor,
@@ -243,7 +260,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         uint96 poolId,
         bytes memory newValue
     ) internal {
-        (uint256 newLiquidationIncentive) = abi.decode(newValue, (uint256));
+        uint256 newLiquidationIncentive = abi.decode(newValue, (uint256));
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
             ICorePoolComptroller(comptroller).setLiquidationIncentive(poolId, market, newLiquidationIncentive);
         } else {
@@ -302,7 +319,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         RiskParameterUpdate calldata update,
         address comptroller
     ) internal view returns (bool) {
-        (uint256 newCF, uint256 newLT) = abi.decode(update.newValue, (uint256, uint256));
+        (uint256 newCF, uint256 newLT) = _decodeAbiEncodedTwoUint256(update.newValue);
 
         (uint256 currCF, uint256 currLT) = _getCurrentCollateralFactors(comptroller, update.market);
 
@@ -312,8 +329,11 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         return _isWithinSafeDelta(newCF, currCF) && _isWithinSafeDelta(newLT, currLT);
     }
 
-    function _checkLIWithinSafeDelta(RiskParameterUpdate calldata update, address comptroller) internal view returns (bool) {
-        uint256 newLI = abi.decode(update.newValue, (uint256));
+    function _checkLIWithinSafeDelta(
+        RiskParameterUpdate calldata update,
+        address comptroller
+    ) internal view returns (bool) {
+        uint256 newLI = _decodeAbiEncodedUint256(update.newValue);
         uint256 currLI = _getCurrentLiquidationIncentive(comptroller, update.market);
 
         // If current values are zero, update always requires timelock
@@ -332,6 +352,35 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         uint256 diff = newValue > currentValue ? newValue - currentValue : currentValue - newValue;
         uint256 maxDiff = (safeDeltaBps * currentValue) / MAX_BPS;
         return diff <= maxDiff;
+    }
+
+    /**
+     * @notice Decodes ABI-encoded bytes into a uint256.
+     * @dev Expects exactly 32 bytes as produced by abi.encode(uint256).
+     * @param data ABI-encoded uint256 payload (32 bytes)
+     * @return value Decoded uint256
+     */
+    function _decodeAbiEncodedUint256(bytes memory data) internal pure returns (uint256 value) {
+        if (data.length != 32) {
+            revert InvalidUintLength();
+        }
+
+        value = abi.decode(data, (uint256));
+    }
+
+    /**
+     * @notice Decodes ABI-encoded bytes into two uint256 values.
+     * @dev Expects exactly 64 bytes as produced by abi.encode(uint256,uint256).
+     * @param data ABI-encoded (uint256, uint256) payload
+     * @return a First uint256
+     * @return b Second uint256
+     */
+    function _decodeAbiEncodedTwoUint256(bytes memory data) internal pure returns (uint256 a, uint256 b) {
+        if (data.length != 64) {
+            revert InvalidTwoUintLength();
+        }
+
+        (a, b) = abi.decode(data, (uint256, uint256));
     }
 
     /**

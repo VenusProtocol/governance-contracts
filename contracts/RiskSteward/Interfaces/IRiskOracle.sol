@@ -6,26 +6,29 @@ pragma solidity 0.8.25;
  * @param referenceId External reference ID, potentially linking to a document or off-chain data
  * @param updateId Unique identifier for this specific update
  * @param market Address of the market for which the parameter update applies
- * @param updateType Classification of the update type for validation purposes
+ * @param updateType Classification of the update type for validation purposes (human-readable)
+ * @param updateTypeKey Keccak256 hash of updateType for efficient comparisons
  * @param newValue Encoded new value of the risk parameter, flexible for various data types
  * @param previousValue Previous value of the parameter for historical comparison
  * @param timestamp Block timestamp when the update was published
  * @param publisher Address of the account that published this update
  * @param additionalData Additional metadata or data associated with the update
  * @param poolId Pool identifier for eMode-style collateral configuration (0 for regular markets)
+ * @param destLzEid LayerZero endpoint ID of the destination chain (0 for local execution)
  */
 struct RiskParameterUpdate {
     string referenceId;
     uint256 updateId;
     address market;
     string updateType;
+    bytes32 updateTypeKey;
     bytes newValue;
     bytes previousValue;
     uint256 timestamp;
     address publisher;
     bytes additionalData;
     uint96 poolId;
-    uint32 destChainId;
+    uint32 destLzEid;
 }
 
 /**

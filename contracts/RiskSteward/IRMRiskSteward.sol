@@ -1,14 +1,11 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
 
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { RiskParameterUpdate } from "./Interfaces/IRiskOracle.sol";
 import { IVToken } from "../interfaces/IVToken.sol";
 import { IVToken as IILVToken } from "../interfaces/IILVToken.sol";
 import { InterestRateModel } from "@venusprotocol/isolated-pools/contracts/InterestRateModel.sol";
-import {
-    InterestRateModelV8
-} from "@venusprotocol/venus-protocol/contracts/InterestRateModels/InterestRateModelV8.sol";
+import { InterestRateModelV8 } from "@venusprotocol/venus-protocol/contracts/InterestRateModels/InterestRateModelV8.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IRiskStewardReceiver } from "./Interfaces/IRiskStewardReceiver.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
@@ -30,6 +27,11 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice The update type for interest rate model
      */
     string public constant INTEREST_RATE_MODEL = "interestRateModel";
+
+    /**
+     * @notice The update type key for interest rate model (keccak256 hash of INTEREST_RATE_MODEL)
+     */
+    bytes32 public constant INTEREST_RATE_MODEL_KEY = keccak256(bytes(INTEREST_RATE_MODEL));
 
     /**
      * @notice Address of the Core Pool Comptroller used to distinguish between core and isolated pools.
@@ -56,15 +58,11 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
 
     /**
      * @notice Emitted when an interest rate model is updated
-     * @param market The market address
-     * @param newInterestRateModel The new interest rate model address
      */
     event InterestRateModelUpdated(address indexed market, address indexed newInterestRateModel);
 
     /**
      * @notice Emitted when the safe delta bps is updated
-     * @param oldSafeDeltaBps The old safe delta bps
-     * @param newSafeDeltaBps The new safe delta bps
      */
     event SafeDeltaBpsUpdated(uint256 indexed oldSafeDeltaBps, uint256 indexed newSafeDeltaBps);
 
@@ -136,11 +134,6 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Processes an interest rate model update from the RiskStewardReceiver.
      * Directly updates the market interest rate model on the vToken.
      * Delta validation is already performed by RiskStewardReceiver before execution.
-     * RiskParameterUpdate shape is as follows:
-     *  * newValue - encoded address of the InterestRateModel contract
-     *  * previousValue - encoded address of the previous InterestRateModel contract
-     *  * updateType - interestRateModel
-     *  * additionalData - encoded bytes of (address underlying, uint16 destChainId)
      * @param update RiskParameterUpdate update to process
      * @custom:error Throws OnlyRiskStewardReceiver if the sender is not the RiskStewardReceiver
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
@@ -152,8 +145,8 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
             revert OnlyRiskStewardReceiver();
         }
 
-        if (Strings.equal(update.updateType, INTEREST_RATE_MODEL)) {
-            address newIRM = _decodeBytesToAddress(update.newValue);
+        if (update.updateTypeKey == INTEREST_RATE_MODEL_KEY) {
+            address newIRM = _decodeAbiEncodedAddress(update.newValue);
             _updateIRM(update.market, newIRM);
         } else {
             revert UnsupportedUpdateType();
@@ -167,8 +160,8 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
      * @dev For IRM updates, always returns false as we cannot compare IRM values
      */
-    function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
-        if (!Strings.equal(update.updateType, INTEREST_RATE_MODEL)) {
+    function isSafeForDirectExecution(RiskParameterUpdate calldata update) external pure returns (bool) {
+        if (update.updateTypeKey != INTEREST_RATE_MODEL_KEY) {
             revert UnsupportedUpdateType();
         }
 
@@ -195,25 +188,22 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Decodes bytes to an address
-     * @param data The bytes to decode (should be 20 bytes for an address)
-     * @return addr The decoded address
-     * @custom:error Throws InvalidAddressLength if data length is not 20 bytes
+     * @notice Decodes ABI-encoded bytes into an address.
+     * @dev Expects exactly 32 bytes as produced by abi.encode(address).
+     * @param data ABI-encoded address payload (32 bytes)
+     * @return The decoded address
+     * @custom:error Throws InvalidAddressLength if data length is not 32 bytes
      */
-    function _decodeBytesToAddress(bytes memory data) internal pure returns (address addr) {
-        if (data.length != 20) {
-            revert InvalidAddressLength();
-        }
-        assembly {
-            addr := mload(add(data, 20))
-        }
+    function _decodeAbiEncodedAddress(bytes memory data) internal pure returns (address) {
+        if (data.length != 32) revert InvalidAddressLength();
+        return abi.decode(data, (address));
     }
 
     /**
      * @notice Disables renounceOwnership function
      * @custom:error Throws RenounceOwnershipNotAllowed
      */
-    function renounceOwnership() public override {
+    function renounceOwnership() public pure override {
         revert RenounceOwnershipNotAllowed();
     }
 }

@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
 
-import { Strings } from "@openzeppelin/contracts/utils/Strings.sol";
 import { RiskParameterUpdate } from "./Interfaces/IRiskOracle.sol";
 import { IVToken } from "../interfaces/IVToken.sol";
-import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
+import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IRiskStewardReceiver } from "./Interfaces/IRiskStewardReceiver.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
@@ -38,9 +37,19 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     string public constant SUPPLY_CAP = "supplyCap";
 
     /**
+     * @notice The update type key for supply caps (keccak256 hash of SUPPLY_CAP)
+     */
+    bytes32 public constant SUPPLY_CAP_KEY = keccak256(bytes(SUPPLY_CAP));
+
+    /**
      * @notice The update type for borrow caps
      */
     string public constant BORROW_CAP = "borrowCap";
+
+    /**
+     * @notice The update type key for borrow caps (keccak256 hash of BORROW_CAP)
+     */
+    bytes32 public constant BORROW_CAP_KEY = keccak256(bytes(BORROW_CAP));
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
@@ -83,6 +92,11 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Thrown when trying to renounce ownership
      */
     error RenounceOwnershipNotAllowed();
+
+    /**
+     * @notice Thrown when the uint256 data length is invalid
+     */
+    error InvalidUintLength();
 
     /**
      * @notice Sets the immutable RiskStewardReceiver address and disables initializers
@@ -133,13 +147,13 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
      */
     function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
-        uint256 newValue = _decodeBytesToUint256(update.newValue);
-        IIsolatedPoolsComptroller comptroller = IIsolatedPoolsComptroller(IVToken(update.market).comptroller());
+        uint256 newValue = _decodeAbiEncodedUint256(update.newValue);
+        ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(update.market).comptroller());
         uint256 currentValue;
 
-        if (Strings.equal(update.updateType, SUPPLY_CAP)) {
+        if (update.updateTypeKey == SUPPLY_CAP_KEY) {
             currentValue = comptroller.supplyCaps(update.market);
-        } else if (Strings.equal(update.updateType, BORROW_CAP)) {
+        } else if (update.updateTypeKey == BORROW_CAP_KEY) {
             currentValue = comptroller.borrowCaps(update.market);
         } else {
             revert UnsupportedUpdateType();
@@ -155,6 +169,71 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
+     * @notice Processes a market cap update from the RiskStewardReceiver.
+     * Directly updates the market supply or borrow cap on the market's comptroller.
+     * Delta validation is already performed by RiskStewardReceiver before execution.
+     * @param update RiskParameterUpdate update to process
+     * @custom:error Throws OnlyRiskStewardReceiver if the sender is not the RiskStewardReceiver
+     * @custom:error Throws UnsupportedUpdateType if the update type is not supported
+     * @custom:event Emits SupplyCapUpdated or BorrowCapUpdated depending on the update with the market and new cap
+     * @custom:access Only callable by the RiskStewardReceiver
+     */
+    function processUpdate(RiskParameterUpdate calldata update) external {
+        if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
+            revert OnlyRiskStewardReceiver();
+        }
+        uint256 newValue = _decodeAbiEncodedUint256(update.newValue);
+
+        if (update.updateTypeKey == SUPPLY_CAP_KEY) {
+            _updateSupplyCaps(update.market, newValue);
+        } else if (update.updateTypeKey == BORROW_CAP_KEY) {
+            _updateBorrowCaps(update.market, newValue);
+        } else {
+            revert UnsupportedUpdateType();
+        }
+    }
+
+    /**
+     * @notice Updates the supply cap for the given market.
+     * @dev Core and isolated pools share the same `setMarketSupplyCaps` signature, so the isolated comptroller
+     *      interface is used for both.
+     * @param market The market to update the supply cap for
+     * @param newValue The new supply cap value
+     * @custom:event Emits SupplyCapUpdated with the market and new supply cap
+     */
+    function _updateSupplyCaps(address market, uint256 newValue) internal {
+        address comptroller = IVToken(market).comptroller();
+        address[] memory newSupplyCapMarkets = new address[](1);
+        newSupplyCapMarkets[0] = market;
+        uint256[] memory newSupplyCaps = new uint256[](1);
+        newSupplyCaps[0] = newValue;
+
+        ICorePoolComptroller(comptroller).setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
+
+        emit SupplyCapUpdated(market, newSupplyCaps[0]);
+    }
+
+    /**
+     * @notice Updates the borrow cap for the given market.
+     * @dev Core and isolated pools share the same `setMarketBorrowCaps` signature, so the isolated comptroller
+     *      interface is used for both.
+     * @param market The market to update the borrow cap for
+     * @param newValue The new borrow cap value
+     * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
+     */
+    function _updateBorrowCaps(address market, uint256 newValue) internal {
+        address comptroller = IVToken(market).comptroller();
+        address[] memory newBorrowCapMarkets = new address[](1);
+        newBorrowCapMarkets[0] = market;
+        uint256[] memory newBorrowCaps = new uint256[](1);
+        newBorrowCaps[0] = newValue;
+
+        ICorePoolComptroller(comptroller).setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
+
+        emit BorrowCapUpdated(market, newBorrowCaps[0]);
+    }
+
+    /**
      * @notice Checks if the difference between new and current values is within the safe delta threshold.
      * @param newValue The new value to check
      * @param currentValue The current value to compare against
@@ -167,78 +246,17 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Processes a market cap update from the RiskStewardReceiver.
-     * Directly updates the market supply or borrow cap on the market's comptroller.
-     * Delta validation is already performed by RiskStewardReceiver before execution.
-     * RiskParameterUpdate shape is as follows:
-     *  * newValue - encoded uint256 value of un padded bytes
-     *  * previousValue - encoded uint256 value of un padded bytes
-     *  * updateType - supplyCap | borrowCap
-     *  * additionalData - encoded bytes of (address underlying, uint16 destChainId)
-     * @param update RiskParameterUpdate update to process
-     * @custom:error Throws OnlyRiskStewardReceiver if the sender is not the RiskStewardReceiver
-     * @custom:error Throws UnsupportedUpdateType if the update type is not supported
-     * @custom:event Emits SupplyCapUpdated or BorrowCapUpdated depending on the update with the market and new cap
-     * @custom:access Only callable by the RiskStewardReceiver
+     * @notice Decodes ABI-encoded bytes into a uint256.
+     * @dev Expects exactly 32 bytes as produced by abi.encode(uint256).
+     * @param data ABI-encoded uint256 payload (32 bytes)
+     * @return value Decoded uint256
      */
-    function processUpdate(RiskParameterUpdate calldata update) external {
-        if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
-            revert OnlyRiskStewardReceiver();
+    function _decodeAbiEncodedUint256(bytes memory data) internal pure returns (uint256 value) {
+        if (data.length != 32) {
+            revert InvalidUintLength();
         }
-        uint256 newValue = _decodeBytesToUint256(update.newValue);
 
-        if (Strings.equal(update.updateType, SUPPLY_CAP)) {
-            _updateSupplyCaps(update.market, newValue);
-        } else if (Strings.equal(update.updateType, BORROW_CAP)) {
-            _updateBorrowCaps(update.market, newValue);
-        } else {
-            revert UnsupportedUpdateType();
-        }
-    }
-
-    /**
-     * @notice Updates the supply cap for the given market.
-     * @param market The market to update the supply cap for
-     * @param newValue The new supply cap value
-     * @custom:event Emits SupplyCapUpdated with the market and new supply cap
-     */
-    function _updateSupplyCaps(address market, uint256 newValue) internal {
-        address comptroller = IVToken(market).comptroller();
-        address[] memory newSupplyCapMarkets = new address[](1);
-        newSupplyCapMarkets[0] = market;
-        uint256[] memory newSupplyCaps = new uint256[](1);
-        newSupplyCaps[0] = newValue;
-
-        IIsolatedPoolsComptroller(comptroller).setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
-
-        emit SupplyCapUpdated(market, newSupplyCaps[0]);
-    }
-
-    /**
-     * @notice Updates the borrow cap for the given market.
-     * @param market The market to update the borrow cap for
-     * @param newValue The new borrow cap value
-     * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
-     */
-    function _updateBorrowCaps(address market, uint256 newValue) internal {
-        address comptroller = IVToken(market).comptroller();
-        address[] memory newBorrowCapMarkets = new address[](1);
-        newBorrowCapMarkets[0] = market;
-        uint256[] memory newBorrowCaps = new uint256[](1);
-        newBorrowCaps[0] = newValue;
-
-        IIsolatedPoolsComptroller(comptroller).setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
-
-        emit BorrowCapUpdated(market, newBorrowCaps[0]);
-    }
-
-    /**
-     * @notice Decodes un-padded bytes to a uint256
-     * @param data The un-padded bytes to decode
-     * @return uint256 The decoded uint256
-     */
-    function _decodeBytesToUint256(bytes memory data) internal pure returns (uint256) {
-        return abi.decode(abi.encodePacked(new bytes(32 - data.length), data), (uint256));
+        value = abi.decode(data, (uint256));
     }
 
     /**

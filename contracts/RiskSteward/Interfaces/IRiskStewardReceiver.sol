@@ -15,22 +15,34 @@ interface IRiskStewardReceiver {
         Executable
     }
 
+    /**
+     * @notice Configuration for a risk parameter update type
+     * @param active Whether this update type configuration is currently active
+     * @param debounce Minimum delay between consecutive update executions for the same (updateType, market) pair
+     * @param timelock Period that must pass after registration before an update can be executed
+     * @param riskSteward Address of the risk steward contract responsible for processing this update type
+     */
     struct RiskParamConfig {
         bool active;
-        uint256 debounce; // delay between updates exicutions
-        uint256 timelock; // Timelock period before update can be executed
+        uint256 debounce;
+        uint256 timelock;
         address riskSteward;
     }
 
     /**
-     * @notice Registered update structure with timelock and approval information
+     * @notice Registered update structure with timelock and execution information
+     * @param updateId Update ID from the Risk Oracle
+     * @param unlockTime Timestamp when this update can be executed (calculated as registration time + timelock)
+     * @param status Current status of the update (Pending, Executed, Rejected, Expired, etc.)
+     * @param executor Address of the executor who executed this update (address(0) if not executed yet)
+     * @param executedAt Timestamp when this update was executed (0 if not executed yet)
      */
     struct RegisteredUpdate {
-        uint256 updateId; // Update ID from the oracle
-        uint256 unlockTime; // Timestamp when this update can be executed
-        UpdateStatus status; // Current status of the update
-        address approver; // Address of the approver who approved this update (address(0) if not approved)
-        uint256 executedAt; // Timestamp when this update was executed (0 if not executed yet)
+        uint256 updateId;
+        uint256 unlockTime;
+        UpdateStatus status;
+        address executor;
+        uint256 executedAt;
     }
 
     /**
@@ -75,14 +87,9 @@ interface IRiskStewardReceiver {
     event UpdateExpired(uint256 indexed updateId);
 
     /**
-     * @notice Event emitted when an approver status is set
+     * @notice Event emitted when an executor status is set
      */
-    event ApproverStatusUpdated(address indexed approver, bool previousApproved, bool indexed approved);
-
-    /**
-     * @notice Event emitted when an update is approved
-     */
-    event SetApproved(uint256 indexed updateId, address indexed approver);
+    event ExecutorStatusUpdated(address indexed executor, bool previousApproved, bool indexed approved);
 
     /**
      * @notice Event emitted when an update is registered
@@ -92,7 +99,22 @@ interface IRiskStewardReceiver {
     /**
      * @notice Event emitted when an update is sent to a destination chain
      */
-    event UpdateSentToDestination(uint256 indexed updateId, uint32 indexed destChainId, string updateType, address indexed market);
+    event UpdateSentToDestination(
+        uint256 indexed updateId,
+        uint32 indexed destLzEid,
+        string updateType,
+        address indexed market
+    );
+
+    /**
+     * @notice Event emitted when an update is resent to a destination chain
+     */
+    event UpdateResentToDestination(
+        uint256 indexed updateId,
+        uint32 indexed destLzEid,
+        string updateType,
+        address indexed market
+    );
 
     /**
      * @notice Thrown if a submitted update is not active and therefore cannot be processed
@@ -140,31 +162,35 @@ interface IRiskStewardReceiver {
     error UpdateNotFound();
 
     /**
-     * @notice Thrown when an address is not an approver
+     * @notice Thrown when an address is not an executor
      */
-    error NotAnApprover();
+    error NotAnExecutor();
 
     /**
-     * @notice Thrown when an update has not been approved
+     * @notice Thrown when there is a non-expired pending update of the same type for the market
      */
-    error UpdateNotApproved();
+    error RegisteredUpdateTypeExist(uint256);
 
-    error RegitredUpdateTypeExist(uint256);
+    /**
+     * @notice Thrown when trying to resend an update that is not in SENT_TO_DESTINATION status
+     */
+    error InvalidUpdateToResend();
+
+    /**
+     * @notice Thrown when attempting to call lzSend from an address other than this contract
+     */
+    error InvalidLzSendCaller();
 
     /**
      * @notice Thrown when trying to renounce ownership
      */
     error RenounceOwnershipNotAllowed();
 
-    function riskParameterConfigs(
-        bytes32
-    ) external view returns (bool active, uint256 debounce, uint256 timelock, address riskSteward);
+    function getRiskParameterConfig(string calldata updateType) external view returns (RiskParamConfig memory);
 
-    function updateTypeLabels(bytes32) external view returns (string memory);
+    function getLastProcessedUpdate(string calldata updateType, address market) external view returns (uint256);
 
-    function lastProcessedUpdate(bytes32, address market) external view returns (uint256);
-
-    function whitelistedApprovers(address) external view returns (bool);
+    function getLastRegisteredUpdate(string calldata updateType, address market) external view returns (uint256);
 
     function setRiskParameterConfig(
         string calldata updateType,
@@ -175,25 +201,20 @@ interface IRiskStewardReceiver {
 
     function setConfigActive(string calldata updateType, bool active) external;
 
-    function setApprover(address approver, bool approved) external;
+    function setWhitelistedExecutor(address executor, bool approved) external;
 
-    function approveUpdate(uint256 updateId) external;
+    function processUpdate(uint256 updateId) external;
 
-    function registerUpdate(uint256 updateId) external;
-
-    function executeUpdate(uint256 updateId) external;
+    function executeRegisteredUpdate(uint256 updateId) external;
 
     function rejectUpdate(uint256 updateId) external;
+
+    function resendRemoteUpdate(uint256 updateId) external;
 
     function getExecutableUpdates(
         string calldata updateType,
         address comptroller
     ) external view returns (uint256[] memory executableUpdates);
 
-    /**
-     * @notice Returns the current status of an update, checking expiration and execution conditions.
-     * @param updateId The oracle update ID to query
-     * @return The current `UpdateStatus` for the given update ID (may differ from stored status if expired or executable)
-     */
     function getUpdateStatus(uint256 updateId) external view returns (UpdateStatus);
 }
