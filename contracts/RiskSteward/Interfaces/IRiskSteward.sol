@@ -29,11 +29,11 @@ interface IRiskSteward {
     function setSafeDeltaBps(uint256 safeDeltaBps_) external;
 
     /**
-     * @notice Checks whether a given update is within the configured safe delta.
+     * @notice Checks whether an update is safe for direct execution (no timelock required).
      * @param update The risk parameter update to evaluate
-     * @return True if the update is within the safe delta, otherwise false
+     * @return True if update is safe for direct execution, false if timelock is required
      */
-    function isWithinSafeDelta(RiskParameterUpdate calldata update) external view returns (bool);
+    function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool);
 
     /**
      * @notice Processes and applies a validated risk parameter update.

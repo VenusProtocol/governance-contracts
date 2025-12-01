@@ -127,12 +127,12 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Checks if an update is within the safe delta threshold
+     * @notice Checks if an update is safe for direct execution (no timelock required)
      * @param update The update to check
-     * @return isWithinSafeDelta True if the update is within the safe delta (no timelock needed), false if exceeds delta (timelock required)
+     * @return True if update is safe for direct execution, false if timelock is required
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
      */
-    function isWithinSafeDelta(RiskParameterUpdate calldata update) external view returns (bool) {
+    function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
         uint256 newValue = _decodeBytesToUint256(update.newValue);
         IIsolatedPoolsComptroller comptroller = IIsolatedPoolsComptroller(IVToken(update.market).comptroller());
         uint256 currentValue;
@@ -145,15 +145,24 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
             revert UnsupportedUpdateType();
         }
 
-        // If current value is 0, always require timelock (not within safe delta)
+        // If current value is 0, always require timelock (not safe for direct execution)
         if (currentValue == 0) {
             return false;
         }
 
+        // Return true if difference is within safe delta (safe for direct execution)
+        return _isWithinSafeDelta(newValue, currentValue);
+    }
+
+    /**
+     * @notice Checks if the difference between new and current values is within the safe delta threshold.
+     * @param newValue The new value to check
+     * @param currentValue The current value to compare against
+     * @return True if the difference is within the safe delta, false otherwise
+     */
+    function _isWithinSafeDelta(uint256 newValue, uint256 currentValue) internal view returns (bool) {
         uint256 diff = newValue > currentValue ? newValue - currentValue : currentValue - newValue;
         uint256 maxDiff = (safeDeltaBps * currentValue) / MAX_BPS;
-
-        // Return true if difference is within the safe delta threshold
         return diff <= maxDiff;
     }
 

@@ -15,9 +15,7 @@ import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
  * @title CollateralFactorsRiskSteward
  * @author Venus
  * @notice Contract that can update collateral factors and liquidation thresholds received from `RiskStewardReceiver`.
- *         Expects the new value to be an encoded uint256 value of un-padded bytes.
- *         Uses a "safe delta" threshold similar to `MarketCapsRiskSteward`, where small changes require no timelock
- *         and larger changes are timelocked and validated by `RiskStewardReceiver`.
+ *         Expects the new value to be an encoded uint256 value of un-padded bytes.`
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
@@ -144,56 +142,28 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Checks if an update is within the safe delta threshold.
+     * @notice Checks if an update is safe for direct execution (no timelock required).
      * @param update The update to check.
-     * @return isWithinSafeDelta_ True if the update is within the safe delta (no timelock needed), false if exceeds delta (timelock required)
+     * @return True if update is safe for direct execution, false if timelock is required
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
      */
-    function isWithinSafeDelta(RiskParameterUpdate calldata update) external view returns (bool isWithinSafeDelta_) {
+    function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
+        // eMode-style updates always require timelock (not safe for direct execution)
+        if (update.poolId != 0) return false;
+
         address comptroller = IVToken(update.market).comptroller();
-        uint96 poolId = update.poolId;
-        // eMode-style updates (poolId != 0) are always considered risky and require timelock
-        if (poolId != 0) {
-            return false;
+
+        string memory uType = update.updateType;
+
+        if (Strings.equal(uType, COLLATERAL_FACTORS)) {
+            return _checkCFWithinSafeDelta(update, comptroller);
         }
 
-        if (Strings.equal(update.updateType, COLLATERAL_FACTORS)) {
-            (uint256 newCollateralFactor, uint256 newLiquidationThreshold) = abi.decode(
-                update.newValue,
-                (uint256, uint256)
-            );
-
-            uint256 currentCollateralFactor;
-            uint256 currentLiquidationThreshold;
-
-            (currentCollateralFactor, currentLiquidationThreshold) = _getCurrentCollateralFactors(
-                comptroller,
-                update.market,
-                poolId
-            );
-
-            // If current values are 0, always require timelock (not within safe delta)
-            if (currentCollateralFactor == 0 || currentLiquidationThreshold == 0) {
-                return false;
-            }
-
-            // Both CF and LT must be within their respective safe deltas
-            return
-                _isWithinSafeDelta(newCollateralFactor, currentCollateralFactor) &&
-                _isWithinSafeDelta(newLiquidationThreshold, currentLiquidationThreshold);
-        } else if (Strings.equal(update.updateType, LIQUIDATION_INCENTIVE)) {
-            (uint256 newLiquidationIncentive) = abi.decode(update.newValue, (uint256));
-            uint256 currentLiquidationIncentive = _getCurrentLiquidationIncentive(comptroller, update.market, poolId);
-
-            // If current value is 0, always require timelock (not within safe delta)
-            if (currentLiquidationIncentive == 0) {
-                return false;
-            }
-
-            return _isWithinSafeDelta(newLiquidationIncentive, currentLiquidationIncentive);
-        } else {
-            revert UnsupportedUpdateType();
+        if (Strings.equal(uType, LIQUIDATION_INCENTIVE)) {
+            return _checkLIWithinSafeDelta(update, comptroller);
         }
+
+        revert UnsupportedUpdateType();
     }
 
     /**
@@ -214,7 +184,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         uint96 poolId = update.poolId;
 
         if (Strings.equal(update.updateType, COLLATERAL_FACTORS)) {
-            _updateCollateralParams(comptroller, update.market, poolId, update.newValue);
+            _updateCollateralFactors(comptroller, update.market, poolId, update.newValue);
         } else if (Strings.equal(update.updateType, LIQUIDATION_INCENTIVE)) {
             _updateLiquidationIncentive(comptroller, update.market, poolId, update.newValue);
         } else {
@@ -231,7 +201,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:event Emits CollateralFactorsUpdated
      * @dev Updates both collateral factor and liquidation threshold together (same setter).
      */
-    function _updateCollateralParams(
+    function _updateCollateralFactors(
         address comptroller,
         address market,
         uint96 poolId,
@@ -247,9 +217,8 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
                 newLiquidationThreshold
             );
         } else {
-            if (poolId != 0) {
-                revert UnsupportedUpdateType();
-            }
+            if (poolId != 0) revert UnsupportedUpdateType();
+            
             IIsolatedPoolsComptroller(comptroller).setCollateralFactor(
                 market,
                 newCollateralFactor,
@@ -278,9 +247,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
             ICorePoolComptroller(comptroller).setLiquidationIncentive(poolId, market, newLiquidationIncentive);
         } else {
-            if (poolId != 0) {
-                revert UnsupportedUpdateType();
-            }
+            if (poolId != 0) revert UnsupportedUpdateType();
             // Isolated pools: liquidation incentive is global (not per-market).
             IIsolatedPoolsComptroller(comptroller).setLiquidationIncentive(newLiquidationIncentive);
         }
@@ -292,7 +259,6 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Returns the current collateral factors for a market on a given comptroller.
      * @param comptroller The comptroller address
      * @param market The market whose collateral factors are being queried
-     * @param poolId The pool identifier for eMode updates (0 for regular market updates)
      * @return currentCollateralFactor The current collateral factor
      * @return currentLiquidationThreshold The current liquidation threshold
      * @dev Returns both collateral factor and liquidation threshold (updated together via the same setter).
@@ -300,17 +266,12 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
      */
     function _getCurrentCollateralFactors(
         address comptroller,
-        address market,
-        uint96 poolId
+        address market
     ) internal view returns (uint256 currentCollateralFactor, uint256 currentLiquidationThreshold) {
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
             (, currentCollateralFactor, , currentLiquidationThreshold, , , ) = ICorePoolComptroller(comptroller)
-                .poolMarkets(poolId, market);
+                .markets(market);
         } else {
-            // Isolated pools: eMode not supported
-            if (poolId != 0) {
-                revert UnsupportedUpdateType();
-            }
             (, currentCollateralFactor, currentLiquidationThreshold) = IIsolatedPoolsComptroller(comptroller).markets(
                 market
             );
@@ -320,27 +281,45 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Returns the current liquidation incentive for a given comptroller.
      * @dev
-     *  - Core pool: uses eMode-specific getter which handles poolId == 0 as regular market.
      *  - Isolated pools: liquidation incentive is global, read from `liquidationIncentiveMantissa()`.
      * @param comptroller The comptroller address
      * @param market The market used for core pool context (ignored for isolated pools)
-     * @param poolId The pool identifier for eMode updates (0 for regular market updates)
      * @return currentLiquidationIncentive The current liquidation incentive mantissa
      */
     function _getCurrentLiquidationIncentive(
         address comptroller,
-        address market,
-        uint96 poolId
+        address market
     ) internal view returns (uint256 currentLiquidationIncentive) {
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
-            (, , , , currentLiquidationIncentive, , ) = ICorePoolComptroller(comptroller).poolMarkets(poolId, market);
+            (, , , , currentLiquidationIncentive, , ) = ICorePoolComptroller(comptroller).markets(market);
         } else {
-            if (poolId != 0) {
-                revert UnsupportedUpdateType();
-            }
             // Isolated pools: No per market LI
             currentLiquidationIncentive = IIsolatedPoolsComptroller(comptroller).liquidationIncentiveMantissa();
         }
+    }
+
+    function _checkCFWithinSafeDelta(
+        RiskParameterUpdate calldata update,
+        address comptroller
+    ) internal view returns (bool) {
+        (uint256 newCF, uint256 newLT) = abi.decode(update.newValue, (uint256, uint256));
+
+        (uint256 currCF, uint256 currLT) = _getCurrentCollateralFactors(comptroller, update.market);
+
+        // If current values are zero, update always requires timelock
+        if (currCF == 0 || currLT == 0) return false;
+
+        return _isWithinSafeDelta(newCF, currCF) && _isWithinSafeDelta(newLT, currLT);
+    }
+
+    function _checkLIWithinSafeDelta(RiskParameterUpdate calldata update, address comptroller) internal view returns (bool) {
+        uint256 newLI = abi.decode(update.newValue, (uint256));
+        uint256 currLI = _getCurrentLiquidationIncentive(comptroller, update.market);
+
+        // If current values are zero, update always requires timelock
+        if (currLI == 0) return false;
+
+        return _isWithinSafeDelta(newLI, currLI);
     }
 
     /**

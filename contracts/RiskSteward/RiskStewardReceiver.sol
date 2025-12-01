@@ -260,12 +260,12 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         _validateRegisterUpdate(update, config);
         registeredUpdates[updateTypeKey][update.market] = updateId;
 
-        // Check if update is within safe delta based on risk steward's validation
+        // Check if update is safe for direct execution based on risk steward's validation
         IRiskSteward riskSteward = IRiskSteward(config.riskSteward);
-        bool withinSafeDelta = riskSteward.isWithinSafeDelta(update);
+        bool safeForDirectExecution = riskSteward.isSafeForDirectExecution(update);
 
-        // If within safe delta, set unlockTime to current time (immediate execution)
-        if (withinSafeDelta) {
+        // If safe for direct execution, execute immediately
+        if (safeForDirectExecution) {
             _executeImmediateUpdate(updateId, update, riskSteward, updateTypeKey);
             return;
         }
