@@ -13,7 +13,6 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * @title MarketCapsRiskSteward
  * @author Venus
  * @notice Contract that can update supply and borrow caps received from RiskStewardReceiver.
- * Expects the new value to be an encoded uint256 value of un padded bytes.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {

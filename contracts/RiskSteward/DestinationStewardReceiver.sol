@@ -204,11 +204,6 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     error InvalidDebounce();
 
     /**
-     * @notice Thrown when a non-zero timelock is provided on the destination (timelock is not used here)
-     */
-    error InvalidTimelock();
-
-    /**
      * @notice Thrown when an address is not a whitelisted executor
      */
     error NotAnExecutor();
@@ -265,7 +260,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @custom:error InvalidDebounce if the debounce is 0
      */
     function setRiskParameterConfig(string calldata updateType, address riskSteward, uint256 debounce) external {
-        _checkAccessAllowed("setRiskParameterConfig(string,address,uint256,uint256)");
+        _checkAccessAllowed("setRiskParameterConfig(string,address,uint256)");
         ensureNonzeroAddress(riskSteward);
 
         if (bytes(updateType).length == 0) {
@@ -316,6 +311,13 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @notice Executes a bridged update after its remote delay has passed.
      * @param updateId The bridged update ID to execute
      * @custom:access Only whitelisted executors can execute updates
+     * @custom:event Emits RemoteUpdateExecuted with the executed update ID
+     * @custom:error NotAnExecutor if the caller is not a whitelisted executor
+     * @custom:error ConfigNotActive if the configuration for the update type is not active
+     * @custom:error UpdateNotFound if the update is not pending for the given (updateType, market)
+     * @custom:error UpdateNotUnlocked if the remote delay has not elapsed
+     * @custom:error UpdateIsExpired if the bridged update has expired on the destination
+     * @custom:error UpdateTooFrequent if the debounce period has not passed since the last execution
      */
     function executeUpdate(uint256 updateId) external {
         if (!whitelistedExecutors[msg.sender]) {
@@ -359,9 +361,11 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     }
 
     /**
-     * @notice Rejects a registered remote update on the destination chain
+     * @notice Rejects a registered remote update on the destination chain.
      * @param updateId The oracle update ID of the update to reject
      * @custom:access Controlled by AccessControlManager
+     * @custom:event Emits UpdateRejected with the rejected update ID
+     * @custom:error UpdateNotFound if there is no pending update with the given ID
      */
     function rejectUpdate(uint256 updateId) external {
         _checkAccessAllowed("rejectUpdate(uint256)");
@@ -390,24 +394,23 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
         uint256 maxUpdates = markets.length;
         uint256[] memory tempArray = new uint256[](maxUpdates);
         uint256 count = 0;
+        RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
+
+        if (!config.active) return new uint256[](0);
 
         for (uint256 i = 0; i < maxUpdates; ++i) {
             address market = markets[i];
-
             uint256 registeredUpdateId = lastRegisteredUpdate[updateTypeKey][market];
             DestinationUpdate memory destUpdate = updates[registeredUpdateId];
-            if (destUpdate.status != UpdateStatus.Pending) continue;
 
-            RiskParameterUpdate memory update = destUpdate.update;
-            RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
-            if (!config.active) continue;
+            if (!_checkPendingUpdate(destUpdate.update)) continue;
+
+            // Validate Remote Delay
+            if (block.timestamp < destUpdate.arrivalTime + REMOTE_DELAY) continue;
 
             // Debounce: skip if last execution for this (updateType, market) is too recent
             uint256 lastExecutionTime = lastExecutedAt[updateTypeKey][market];
             if (lastExecutionTime != 0 && (lastExecutionTime + config.debounce > block.timestamp)) continue;
-
-            if (block.timestamp < destUpdate.arrivalTime + REMOTE_DELAY) continue;
-            if (update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME < block.timestamp) continue;
 
             tempArray[count] = registeredUpdateId;
             count++;
@@ -459,43 +462,52 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @dev Handles incoming LayerZero messages containing a full `RiskParameterUpdate`
      *      sent by the source‑chain `RiskStewardReceiver`.
      */
+    /**
+     * @notice Internal LayerZero receive hook that handles bridged updates from the source-chain `RiskStewardReceiver`.
+     * @param payload Encoded `RiskParameterUpdate` sent from the source chain
+     * @dev Emits `DuplicateUpdateReceived`, `RegisteredPendingUpdateExist`, or `RemoteUpdateRegistered`
+     *      depending on whether the update ID was already seen or a non‑expired pending update exists.
+     */
     function _lzReceive(Origin calldata, bytes32, bytes calldata payload, address, bytes calldata) internal override {
         RiskParameterUpdate memory update = abi.decode(payload, (RiskParameterUpdate));
         uint256 newId = update.updateId;
         uint256 arrivalTime = block.timestamp;
 
         // If this update ID was already stored, treat as a duplicate and do not overwrite
-        if (updates[newId].update.updateId != 0) {
+        if (updates[newId].status != UpdateStatus.None) {
             emit DuplicateUpdateReceived(newId, arrivalTime, update.updateType, update.market);
             return;
         }
+        // If already an update in Process do not override the registered update
+        if (_checkPendingUpdate(update)) {
+            uint256 currentRegisteredId = lastRegisteredUpdate[update.updateTypeKey][update.market];
+            emit RegisteredPendingUpdateExist(currentRegisteredId, arrivalTime, update.updateType, update.market);
+            return;
+        }
 
-        uint256 currentRegisteredId = lastRegisteredUpdate[update.updateTypeKey][update.market];
-
-        // Check if there is an existing registered pending & non-expired update
-            DestinationUpdate storage current = updates[currentRegisteredId];
-            if (current.status == UpdateStatus.Pending) {
-                RiskParameterUpdate storage cur = current.update;
-
-                // If still valid (not expired), do NOT override the registry or store the new update
-                if (cur.timestamp + REMOTE_UPDATE_EXPIRATION_TIME >= block.timestamp) {
-                    emit RegisteredPendingUpdateExist(
-                        currentRegisteredId,
-                        arrivalTime,
-                        update.updateType,
-                        update.market
-                    );
-                    return;
-                }
-            }
-
-        // Otherwise, write new pending entry and store the update
         DestinationUpdate storage destUpdate = updates[newId];
         destUpdate.update = update;
         destUpdate.status = UpdateStatus.Pending;
         destUpdate.arrivalTime = arrivalTime;
         lastRegisteredUpdate[update.updateTypeKey][update.market] = newId;
-
         emit RemoteUpdateRegistered(newId, arrivalTime, update.updateType, update.market);
+    }
+
+    /**
+     * @notice Checks if there is a pending, non‑expired registered update for the same (updateType, market).
+     * @param update The incoming risk parameter update to compare against the currently registered one
+     * @return True if there is a pending, non‑expired registered update for the same (updateType, market), false otherwise
+     */
+    function _checkPendingUpdate(RiskParameterUpdate memory update) internal view returns (bool) {
+        uint256 currentRegisteredId = lastRegisteredUpdate[update.updateTypeKey][update.market];
+
+        if (currentRegisteredId == 0) return false; // no registered update
+
+        DestinationUpdate storage current = updates[currentRegisteredId];
+
+        if (current.status != UpdateStatus.Pending) return false;
+
+        // Check expiration
+        return current.update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME > block.timestamp;
     }
 }

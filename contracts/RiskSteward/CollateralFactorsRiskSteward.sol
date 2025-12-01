@@ -14,7 +14,6 @@ import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
  * @title CollateralFactorsRiskSteward
  * @author Venus
  * @notice Contract that can update collateral factors and liquidation thresholds received from `RiskStewardReceiver`.
- *         Expects the new value to be an encoded uint256 value of un-padded bytes.`
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {

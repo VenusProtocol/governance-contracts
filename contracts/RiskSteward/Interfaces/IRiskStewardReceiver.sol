@@ -147,11 +147,6 @@ interface IRiskStewardReceiver {
     error InvalidDebounce();
 
     /**
-     * @notice Thrown when a timelock value of 0 is set
-     */
-    error InvalidTimelock();
-
-    /**
      * @notice Thrown when update unlock time has not been reached
      */
     error UpdateNotUnlocked();
