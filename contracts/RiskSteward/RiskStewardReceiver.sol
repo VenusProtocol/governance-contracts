@@ -43,7 +43,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     mapping(bytes32 => RiskParamConfig) public riskParameterConfigs;
 
     /**
-     * @notice Master storage of all updates by update ID
+     * @notice Master storage of all registered updates by update ID
      */
     mapping(uint256 updateId => RegisteredUpdate) public updates;
 
@@ -67,11 +67,13 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * variables without shifting down storage in the inheritance chain.
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
-    uint256[47] private __gap;
+    uint256[45] private __gap;
 
     /**
-     * @notice Disables initializers and sets the Risk Oracle
-     * @param riskOracle_ The address of the Risk Oracle contract
+     * @notice Disables initializers and sets the Risk Oracle and LayerZero configuration.
+     * @param riskOracle_ The address of the Risk Oracle contract.
+     * @param endpoint_ The LayerZero endpoint contract used by the underlying `OAppUpgradeable`.
+     * @param layerZeroLzEid_ The LayerZero endpoint ID (EID) for this chain.
      * @custom:oz-upgrades-unsafe-allow constructor
      */
     constructor(address riskOracle_, address endpoint_, uint32 layerZeroLzEid_) OAppUpgradeable(endpoint_) {
@@ -82,30 +84,13 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     }
 
     /**
-     * @notice Initializes the contract with the Access Control Manager.
-     * @param accessControlManager_ The address of the access control manager
+     * @notice Initializes the contract with the Access Control Manager and OApp owner.
+     * @param accessControlManager_ The address of the access control manager.
+     * @param oAppOwner_ The address of the OApp owner passed to `__OApp_init`.
      */
-    function initialize(address accessControlManager_, address owner_) external initializer {
+    function initialize(address accessControlManager_, address oAppOwner_) external initializer {
         __AccessControlled_init(accessControlManager_);
-        __OApp_init(owner_);
-    }
-
-    /**
-     * @dev Overrides OwnableUpgradeable and Ownable2StepUpgradeable to resolve
-     *      the multiple inheritance ownership transfer conflict.
-     */
-    function transferOwnership(
-        address newOwner
-    ) public override(OwnableUpgradeable, Ownable2StepUpgradeable) onlyOwner {
-        Ownable2StepUpgradeable.transferOwnership(newOwner);
-    }
-
-    /**
-     * @dev Internal hook to finalize ownership transfer, resolving the
-     *      OwnableUpgradeable and Ownable2StepUpgradeable inheritance conflict.
-     */
-    function _transferOwnership(address newOwner) internal override(OwnableUpgradeable, Ownable2StepUpgradeable) {
-        Ownable2StepUpgradeable._transferOwnership(newOwner);
+        __OApp_init(oAppOwner_);
     }
 
     /**
@@ -186,7 +171,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     }
 
     /**
-     * @notice Sets the whitelist executor
+     * @notice Manages the whitelist of executors that are allowed to execute timelocked registered updates.
      * @param executor The address of the executor
      * @param approved The whitelist status to set (true to whitelist, false to remove)
      * @custom:access Controlled by AccessControlManager
@@ -210,7 +195,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @notice Processes an update from the Risk Oracle. Validates and either executes immediately,
      * registers with timelock, or forwards cross-chain.
      * @param updateId The update ID from the oracle's perspective
-     * @custom:access Anyone can process updates
      * @custom:event Emits UpdateRegistered, UpdateExecuted, or UpdateSentToDestination depending on the update type
      * @custom:error Throws UpdateAlreadyResolved if the update was already processed
      * @custom:error Throws UpdateIsExpired if the update has expired
@@ -220,7 +204,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      */
     function processUpdate(uint256 updateId) external {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
-        RiskParamConfig memory config = riskParameterConfigs[update.updateTypeKey];
+        RiskParamConfig storage config = riskParameterConfigs[update.updateTypeKey];
         _ensureNoActiveUpdate(update);
         _validateRegisterUpdate(update, config);
 
@@ -251,7 +235,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
         RegisteredUpdate storage registeredUpdate = updates[updateId];
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
-        RiskParamConfig memory config = riskParameterConfigs[update.updateTypeKey];
+        RiskParamConfig storage config = riskParameterConfigs[update.updateTypeKey];
 
         _validateExecuteUpdate(registeredUpdate, update, config);
         _executeUpdate(update, IRiskSteward(config.riskSteward));
@@ -277,8 +261,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     }
 
     /**
-     * @notice Resends a remote update to the destination chain. Only whitelisted executors can call this function.
-     *         This function is useful in case of bridge failures.
+     * @notice Resends a remote update to the destination chain. This function is useful in case of bridge failures.
      * @dev Duplicate update rejection is handled in the destination contract itself, so resending
      *      the same update multiple times is safe and will be deduplicated on the destination side.
      * @param updateId The oracle update ID to resend
@@ -424,6 +407,24 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     }
 
     /**
+     * @dev Overrides OwnableUpgradeable and Ownable2StepUpgradeable to resolve
+     *      the multiple inheritance ownership transfer conflict.
+     */
+    function transferOwnership(
+        address newOwner
+    ) public override(OwnableUpgradeable, Ownable2StepUpgradeable) onlyOwner {
+        Ownable2StepUpgradeable.transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Internal hook to finalize ownership transfer, resolving the
+     *      OwnableUpgradeable and Ownable2StepUpgradeable inheritance conflict.
+     */
+    function _transferOwnership(address newOwner) internal override(OwnableUpgradeable, Ownable2StepUpgradeable) {
+        Ownable2StepUpgradeable._transferOwnership(newOwner);
+    }
+
+    /**
      * @notice Registers an update from the Risk Oracle with a timelock, or executes it immediately if safe.
      * @param update The risk parameter update from the Risk Oracle to register or execute
      * @param config The risk parameter configuration for this update type containing timelock and risk steward address
@@ -470,7 +471,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
         updates[updateId] = RegisteredUpdate({
             updateId: updateId,
-            unlockTime: timestamp, // executes immediately
+            unlockTime: timestamp,
             status: UpdateStatus.Executed,
             executor: address(msg.sender),
             executedAt: timestamp
@@ -482,7 +483,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
     /**
      * @notice Sends a risk parameter update to a destination chain via LayerZero and records it as sent.
-     *         Quotes the messaging fee, sends the encoded update payload, updates tracking mappings, and emits the send event.
      * @param update The risk parameter update to send to the destination chain
      * @custom:event Emits UpdateSentToDestination with the update ID, destination endpoint ID, update type, and market
      */
@@ -543,7 +543,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:error UpdateIsExpired if the update has expired or is not the latest for the given market and type
      * @custom:error UpdateTooFrequent if the debounce period has not passed for the given market and type
      */
-    function _validateRegisterUpdate(RiskParameterUpdate memory update, RiskParamConfig memory config) internal view {
+    function _validateRegisterUpdate(RiskParameterUpdate memory update, RiskParamConfig storage config) internal view {
         // Check if this update was already registered
         if (updates[update.updateId].status != UpdateStatus.None) {
             revert UpdateAlreadyResolved();
@@ -589,7 +589,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     function _validateExecuteUpdate(
         RegisteredUpdate memory registeredUpdate,
         RiskParameterUpdate memory update,
-        RiskParamConfig memory config
+        RiskParamConfig storage config
     ) internal view {
         if (!config.active) {
             revert ConfigNotActive();
@@ -614,7 +614,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @return The current `UpdateStatus` for the given update ID
      */
     function _getCurrentStatus(uint256 updateId) internal view returns (UpdateStatus) {
-        RegisteredUpdate memory registeredUpdate = updates[updateId];
+        RegisteredUpdate storage registeredUpdate = updates[updateId];
         UpdateStatus storedStatus = registeredUpdate.status;
 
         // For non-pending status, return stored status
@@ -623,7 +623,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         }
 
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
-        RiskParamConfig memory config = riskParameterConfigs[update.updateTypeKey];
+        RiskParamConfig storage config = riskParameterConfigs[update.updateTypeKey];
 
         // Check if expired
         if (update.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp) {

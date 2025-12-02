@@ -13,7 +13,7 @@ import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
 /**
  * @title CollateralFactorsRiskSteward
  * @author Venus
- * @notice Contract that can update collateral factors and liquidation thresholds received from `RiskStewardReceiver`.
+ * @notice Contract that can update collateral factors, liquidation thresholds, and liquidation incentive parameters received from `RiskStewardReceiver`.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
@@ -21,24 +21,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     uint256 private constant MAX_BPS = 10000;
 
     /**
-     * @notice The safe delta threshold in basis points. Updates within this delta are considered safe and
-     *         can be executed without a timelock. Updates exceeding this delta require a timelock.
-     */
-    uint256 public safeDeltaBps;
-
-    /**
-     * @notice Address of the Core Pool Comptroller used to distinguish between core and isolated pools.
-     */
-    ICorePoolComptroller public immutable CORE_POOL_COMPTROLLER;
-
-    /**
-     * @notice Address of the `RiskStewardReceiver` used to validate and dispatch incoming updates.
-     */
-    IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
-
-    /**
-     * @notice The update type for collateral factor and liquidation threshold.
-     *         Both parameters share the same setter on the comptroller.
+     * @notice The update type for collateral factor, liquidation threshold, and liquidation incentive.
      */
     string public constant COLLATERAL_FACTORS = "collateralFactors";
 
@@ -58,13 +41,28 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     bytes32 public constant LIQUIDATION_INCENTIVE_KEY = keccak256(bytes(LIQUIDATION_INCENTIVE));
 
     /**
+     * @notice Address of the Core Pool Comptroller used to distinguish between core and isolated pools.
+     */
+    ICorePoolComptroller public immutable CORE_POOL_COMPTROLLER;
+
+    /**
+     * @notice Address of the `RiskStewardReceiver` used to validate and dispatch incoming updates.
+     */
+    IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
+
+    /**
+     * @notice The safe delta threshold in basis points. Updates within this delta are considered safe and
+     *         can be executed without a timelock. Updates exceeding this delta require a timelock.
+     */
+    uint256 public safeDeltaBps;
+
+    /**
      * @dev Storage gap for upgradeability.
      */
     uint256[49] private __gap;
 
     /**
      * @notice Emitted when collateral factors are updated.
-     * @dev Includes both collateral factor and liquidation threshold (updated together via the same setter).
      */
     event CollateralFactorsUpdated(
         address indexed market,
@@ -186,10 +184,10 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Processes a collateral parameter update from the `RiskStewardReceiver`.
      *         Delta validation and timelock checks are already performed by `RiskStewardReceiver` before execution.
      * @param update RiskParameterUpdate update to process
+     * @custom:access Only callable by the `RiskStewardReceiver`
+     * @custom:event Emits CollateralFactorsUpdated or LiquidationIncentiveUpdated
      * @custom:error Throws OnlyRiskStewardReceiver if the sender is not the `RiskStewardReceiver`
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
-     * @custom:event Emits CollateralFactorsUpdated or LiquidationIncentiveUpdated
-     * @custom:access Only callable by the `RiskStewardReceiver`
      */
     function processUpdate(RiskParameterUpdate calldata update) external {
         if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
@@ -210,12 +208,12 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
 
     /**
      * @notice Updates the collateral factors for the given market.
+     * @dev Updates both collateral factor and liquidation threshold together (same setter).
      * @param comptroller The comptroller address
      * @param market The market to update the collateral factors for
      * @param poolId The pool identifier for eMode updates (0 for regular market updates)
      * @param newValue Encoded new collateral factors: `abi.encode(uint256 newCollateralFactor, uint256 newLiquidationThreshold)`
      * @custom:event Emits CollateralFactorsUpdated
-     * @dev Updates both collateral factor and liquidation threshold together (same setter).
      */
     function _updateCollateralFactors(
         address comptroller,
@@ -273,12 +271,12 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
 
     /**
      * @notice Returns the current collateral factors for a market on a given comptroller.
+     * @dev Returns both collateral factor and liquidation threshold (updated together via the same setter).
+     *      For core pool, uses eMode-specific getter which handles poolId == 0 as regular market.
      * @param comptroller The comptroller address
      * @param market The market whose collateral factors are being queried
      * @return currentCollateralFactor The current collateral factor
      * @return currentLiquidationThreshold The current liquidation threshold
-     * @dev Returns both collateral factor and liquidation threshold (updated together via the same setter).
-     *      For core pool, uses eMode-specific getter which handles poolId == 0 as regular market.
      */
     function _getCurrentCollateralFactors(
         address comptroller,
@@ -296,8 +294,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
 
     /**
      * @notice Returns the current liquidation incentive for a given comptroller.
-     * @dev
-     *  - Isolated pools: liquidation incentive is global, read from `liquidationIncentiveMantissa()`.
+     * @dev Isolated pools: liquidation incentive is global, read from `liquidationIncentiveMantissa()`.
      * @param comptroller The comptroller address
      * @param market The market used for core pool context (ignored for isolated pools)
      * @return currentLiquidationIncentive The current liquidation incentive mantissa
@@ -314,6 +311,12 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         }
     }
 
+    /**
+     * @notice Checks whether the new collateral factor and liquidation threshold are within the configured safe delta.
+     * @param update The risk parameter update containing the encoded new collateral factor and liquidation threshold.
+     * @param comptroller The address of the comptroller for which current values are fetched.
+     * @return True if both collateral factor and liquidation threshold remain within the safe delta; otherwise, false.
+     */
     function _checkCFWithinSafeDelta(
         RiskParameterUpdate calldata update,
         address comptroller
@@ -328,6 +331,12 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         return _isWithinSafeDelta(newCF, currCF) && _isWithinSafeDelta(newLT, currLT);
     }
 
+    /**
+     * @notice Checks whether the new liquidation incentive is within the configured safe delta.
+     * @param update The risk parameter update containing the encoded new liquidation incentive.
+     * @param comptroller The address of the comptroller for which the current liquidation incentive is fetched.
+     * @return True if the liquidation incentive remains within the safe delta; otherwise, false.
+     */
     function _checkLIWithinSafeDelta(
         RiskParameterUpdate calldata update,
         address comptroller
@@ -386,7 +395,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Disables `renounceOwnership` function.
      * @custom:error Throws RenounceOwnershipNotAllowed
      */
-    function renounceOwnership() public override {
+    function renounceOwnership() public pure override {
         revert RenounceOwnershipNotAllowed();
     }
 }

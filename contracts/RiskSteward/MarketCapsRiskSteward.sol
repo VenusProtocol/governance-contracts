@@ -12,23 +12,12 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
 /**
  * @title MarketCapsRiskSteward
  * @author Venus
- * @notice Contract that can update supply and borrow caps received from RiskStewardReceiver.
+ * @notice Contract that can update supply and borrow caps updates received from RiskStewardReceiver.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     /// @dev Max basis points i.e., 100%
     uint256 private constant MAX_BPS = 10000;
-
-    /**
-     * @notice The safe delta threshold in basis points. Updates within this delta are considered safe and require no timelock.
-     * Updates exceeding this delta require timelock.
-     */
-    uint256 public safeDeltaBps;
-
-    /**
-     * @notice Address of the RiskStewardReceiver used to validate incoming updates
-     */
-    IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
 
     /**
      * @notice The update type for supply caps
@@ -49,6 +38,17 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice The update type key for borrow caps (keccak256 hash of BORROW_CAP)
      */
     bytes32 public constant BORROW_CAP_KEY = keccak256(bytes(BORROW_CAP));
+
+    /**
+     * @notice Address of the RiskStewardReceiver used to validate incoming updates
+     */
+    IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
+
+    /**
+     * @notice The safe delta threshold in basis points.
+     * @notice Updates within this delta are considered safe and require no timelock. Updates exceeding this delta require timelock.
+     */
+    uint256 public safeDeltaBps;
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
@@ -126,9 +126,9 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Sets the safe delta bps
      * @param safeDeltaBps_ The new safe delta bps
+     * @custom:access Controlled by AccessControlManager
      * @custom:event Emits SafeDeltaBpsUpdated with the old and new safe delta bps
      * @custom:error Throws InvalidSafeDeltaBps if the safe delta bps is greater than MAX_BPS
-     * @custom:access Controlled by AccessControlManager
      */
     function setSafeDeltaBps(uint256 safeDeltaBps_) external {
         _checkAccessAllowed("setSafeDeltaBps(uint256)");
@@ -170,12 +170,11 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Processes a market cap update from the RiskStewardReceiver.
      * Directly updates the market supply or borrow cap on the market's comptroller.
-     * Delta validation is already performed by RiskStewardReceiver before execution.
+     * @custom:access Only callable by the RiskStewardReceiver
      * @param update RiskParameterUpdate update to process
+     * @custom:event Emits SupplyCapUpdated or BorrowCapUpdated depending on the update with the market and new cap
      * @custom:error Throws OnlyRiskStewardReceiver if the sender is not the RiskStewardReceiver
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
-     * @custom:event Emits SupplyCapUpdated or BorrowCapUpdated depending on the update with the market and new cap
-     * @custom:access Only callable by the RiskStewardReceiver
      */
     function processUpdate(RiskParameterUpdate calldata update) external {
         if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
@@ -194,8 +193,6 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
 
     /**
      * @notice Updates the supply cap for the given market.
-     * @dev Core and isolated pools share the same `setMarketSupplyCaps` signature, so the isolated comptroller
-     *      interface is used for both.
      * @param market The market to update the supply cap for
      * @param newValue The new supply cap value
      * @custom:event Emits SupplyCapUpdated with the market and new supply cap
@@ -207,15 +204,13 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
         uint256[] memory newSupplyCaps = new uint256[](1);
         newSupplyCaps[0] = newValue;
 
+        // Core and isolated pools share the same `setMarketSupplyCaps` signature.
         ICorePoolComptroller(comptroller).setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
-
         emit SupplyCapUpdated(market, newSupplyCaps[0]);
     }
 
     /**
      * @notice Updates the borrow cap for the given market.
-     * @dev Core and isolated pools share the same `setMarketBorrowCaps` signature, so the isolated comptroller
-     *      interface is used for both.
      * @param market The market to update the borrow cap for
      * @param newValue The new borrow cap value
      * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
@@ -227,8 +222,8 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
         uint256[] memory newBorrowCaps = new uint256[](1);
         newBorrowCaps[0] = newValue;
 
+        //Core and isolated pools share the same `setMarketBorrowCaps` signature,
         ICorePoolComptroller(comptroller).setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
-
         emit BorrowCapUpdated(market, newBorrowCaps[0]);
     }
 
@@ -262,7 +257,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Disables renounceOwnership function
      * @custom:error Throws RenounceOwnershipNotAllowed
      */
-    function renounceOwnership() public override {
+    function renounceOwnership() public pure override {
         revert RenounceOwnershipNotAllowed();
     }
 }

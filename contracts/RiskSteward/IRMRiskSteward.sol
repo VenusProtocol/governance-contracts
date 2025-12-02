@@ -15,7 +15,7 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
 /**
  * @title IRMRiskSteward
  * @author Venus
- * @notice Contract that can update interest rate models received from RiskStewardReceiver.
+ * @notice Contract that can update interest rate models updates received from RiskStewardReceiver.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {

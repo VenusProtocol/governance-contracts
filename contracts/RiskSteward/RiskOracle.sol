@@ -34,7 +34,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * variables without shifting down storage in the inheritance chain.
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
-    uint256[47] private __gap;
+    uint256[44] private __gap;
 
     /// @notice Event emitted when a risk parameter update is published
     event UpdatePublished(

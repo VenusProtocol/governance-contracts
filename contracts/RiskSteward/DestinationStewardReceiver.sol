@@ -13,9 +13,8 @@ import { OAppUpgradeable, Origin } from "@layerzerolabs/oapp-evm-upgradeable/con
 /**
  * @title DestinationStewardReceiver
  * @author Venus
- * @notice Destination‑chain contract that receives bridged updates from `RiskStewardReceiver` (source chain)
- *         via LayerZero, enforces a fixed remote delay, and then executes the updates on the configured
- *         `IRiskSteward` contracts.
+ * @notice Destination‑chain contract that receives bridged updates from `RiskStewardReceiver` via LayerZero,
+ *         enforces a fixed remote delay, and then executes the updates on the configured `IRiskSteward` contracts.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
@@ -83,8 +82,6 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
 
     /**
      * @notice Mapping from (updateType, market) to currently registered remote update ID
-     * @dev Points to the latest bridged update ID for each (updateType, market) pair.
-     *      All per-update data is stored in the `updates` mapping.
      */
     mapping(bytes32 => mapping(address market => uint256)) public lastRegisteredUpdate;
 
@@ -97,6 +94,13 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @notice Mapping from executor address to whitelist status
      */
     mapping(address => bool) public whitelistedExecutors;
+
+    /**
+     * @dev This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+     */
+    uint256[45] private __gap;
 
     /**
      * @notice Emitted when a risk parameter config is updated for an update type
@@ -123,8 +127,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     );
 
     /**
-     * @notice Emitted when a new bridged update arrives but a pending, non‑expired
-     *         update is already registered for the same (updateType, market).
+     * @notice Emitted when a new bridged update arrives but a pending update is already registered for the same (updateType, market).
      */
     event RegisteredPendingUpdateExist(
         uint256 indexed updateId,
@@ -172,11 +175,6 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @notice Thrown when trying to execute an update before its unlock time
      */
     error UpdateNotUnlocked();
-
-    /**
-     * @notice Thrown when trying to execute an already executed update
-     */
-    error UpdateAlreadyExecuted();
 
     /**
      * @notice Thrown when config for an update type is not active or not configured
@@ -232,24 +230,6 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     }
 
     /**
-     * @dev Overrides OwnableUpgradeable and Ownable2StepUpgradeable to resolve
-     *      the multiple inheritance ownership transfer conflict.
-     */
-    function transferOwnership(
-        address newOwner
-    ) public override(OwnableUpgradeable, Ownable2StepUpgradeable) onlyOwner {
-        Ownable2StepUpgradeable.transferOwnership(newOwner);
-    }
-
-    /**
-     * @dev Internal hook to finalize ownership transfer, resolving the
-     *      OwnableUpgradeable and Ownable2StepUpgradeable inheritance conflict.
-     */
-    function _transferOwnership(address newOwner) internal override(OwnableUpgradeable, Ownable2StepUpgradeable) {
-        Ownable2StepUpgradeable._transferOwnership(newOwner);
-    }
-
-    /**
      * @notice Sets the risk parameter config for a given update type on the destination chain.
      * @param updateType The type of update to configure (e.g., "supplyCap", "borrowCap")
      * @param riskSteward The address for the risk steward contract responsible for processing the update
@@ -272,7 +252,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
         }
 
         bytes32 key = keccak256(bytes(updateType));
-        RiskParamConfig memory previousConfig = riskParameterConfigs[key];
+        RiskParamConfig storage previousConfig = riskParameterConfigs[key];
 
         riskParameterConfigs[key] = RiskParamConfig({ active: true, debounce: debounce, riskSteward: riskSteward });
 
@@ -327,7 +307,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
         DestinationUpdate storage destUpdate = updates[updateId];
         RiskParameterUpdate memory update = destUpdate.update;
         bytes32 updateTypeKey = update.updateTypeKey;
-        RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
+        RiskParamConfig storage config = riskParameterConfigs[updateTypeKey];
 
         if (!config.active) {
             revert ConfigNotActive();
@@ -394,14 +374,14 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
         uint256 maxUpdates = markets.length;
         uint256[] memory tempArray = new uint256[](maxUpdates);
         uint256 count = 0;
-        RiskParamConfig memory config = riskParameterConfigs[updateTypeKey];
+        RiskParamConfig storage config = riskParameterConfigs[updateTypeKey];
 
         if (!config.active) return new uint256[](0);
 
         for (uint256 i = 0; i < maxUpdates; ++i) {
             address market = markets[i];
             uint256 registeredUpdateId = lastRegisteredUpdate[updateTypeKey][market];
-            DestinationUpdate memory destUpdate = updates[registeredUpdateId];
+            DestinationUpdate storage destUpdate = updates[registeredUpdateId];
 
             if (!_checkPendingUpdate(destUpdate.update)) continue;
 
@@ -459,14 +439,28 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     }
 
     /**
-     * @dev Handles incoming LayerZero messages containing a full `RiskParameterUpdate`
-     *      sent by the source‑chain `RiskStewardReceiver`.
+     * @dev Overrides OwnableUpgradeable and Ownable2StepUpgradeable to resolve
+     *      the multiple inheritance ownership transfer conflict.
      */
+    function transferOwnership(
+        address newOwner
+    ) public override(OwnableUpgradeable, Ownable2StepUpgradeable) onlyOwner {
+        Ownable2StepUpgradeable.transferOwnership(newOwner);
+    }
+
+    /**
+     * @dev Internal hook to finalize ownership transfer, resolving the
+     *      OwnableUpgradeable and Ownable2StepUpgradeable inheritance conflict.
+     */
+    function _transferOwnership(address newOwner) internal override(OwnableUpgradeable, Ownable2StepUpgradeable) {
+        Ownable2StepUpgradeable._transferOwnership(newOwner);
+    }
+
     /**
      * @notice Internal LayerZero receive hook that handles bridged updates from the source-chain `RiskStewardReceiver`.
-     * @param payload Encoded `RiskParameterUpdate` sent from the source chain
      * @dev Emits `DuplicateUpdateReceived`, `RegisteredPendingUpdateExist`, or `RemoteUpdateRegistered`
      *      depending on whether the update ID was already seen or a non‑expired pending update exists.
+     * @param payload Encoded `RiskParameterUpdate` sent from the source chain
      */
     function _lzReceive(Origin calldata, bytes32, bytes calldata payload, address, bytes calldata) internal override {
         RiskParameterUpdate memory update = abi.decode(payload, (RiskParameterUpdate));
