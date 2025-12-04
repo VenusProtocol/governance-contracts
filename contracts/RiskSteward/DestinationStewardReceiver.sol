@@ -343,12 +343,16 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     /**
      * @notice Rejects a registered remote update on the destination chain.
      * @param updateId The oracle update ID of the update to reject
-     * @custom:access Controlled by AccessControlManager
+     * @custom:access Only whitelisted executors can reject updates
      * @custom:event Emits UpdateRejected with the rejected update ID
+     * @custom:error NotAnExecutor if the caller is not a whitelisted executor
      * @custom:error UpdateNotFound if there is no pending update with the given ID
      */
     function rejectUpdate(uint256 updateId) external {
-        _checkAccessAllowed("rejectUpdate(uint256)");
+        if (!whitelistedExecutors[msg.sender]) {
+            revert NotAnExecutor();
+        }
+
         DestinationUpdate storage destUpdate = updates[updateId];
 
         if (destUpdate.status != UpdateStatus.Pending) {

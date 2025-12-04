@@ -29,17 +29,6 @@ interface ICorePoolComptroller {
         uint256 newLiquidationThresholdMantissa
     ) external;
 
-    function setLiquidationIncentive(
-        address vToken,
-        uint256 newLiquidationIncentiveMantissa
-    ) external returns (uint256);
-
-    function setLiquidationIncentive(
-        uint96 poolId,
-        address vToken,
-        uint256 newLiquidationIncentiveMantissa
-    ) external returns (uint256);
-
     function markets(
         address
     )
