@@ -8,7 +8,9 @@ import { SignerWithAddress } from "hardhat-deploy-ethers/signers";
 import path from "path";
 
 import {
+  CollateralFactorsRiskSteward,
   DestinationStewardReceiver,
+  IRMRiskSteward,
   MarketCapsRiskSteward,
   MockComptroller,
   MockCoreComptroller,
@@ -21,6 +23,13 @@ const { parseUnits, hexValue } = ethers.utils;
 
 const parseUnitsToHex = (value: number) => {
   return ethers.utils.hexZeroPad(hexValue(BigNumber.from(parseUnits(value.toString(), 18))), 32);
+};
+
+const encodeCollateralFactors = (collateralFactor: number, liquidationThreshold: number) => {
+  return ethers.utils.defaultAbiCoder.encode(
+    ["uint256", "uint256"],
+    [parseUnits(collateralFactor.toString(), 18), parseUnits(liquidationThreshold.toString(), 18)],
+  );
 };
 
 const DAY_AND_ONE_SECOND = 60 * 60 * 24 + 1;
@@ -40,12 +49,18 @@ describe("Risk Steward", async function () {
     DestinationStewardReceiverFactory: ContractFactory,
     RiskOracleFactory: ContractFactory,
     MarketCapsRiskStewardFactory: ContractFactory,
+    CollateralFactorsRiskStewardFactory: ContractFactory,
+    IRMRiskStewardFactory: ContractFactory,
     mockCoreVToken: MockVToken,
     mockVToken: MockVToken,
     mockCoreComptroller: MockCoreComptroller,
     mockComptroller: MockComptroller,
     marketCapsRiskSteward: MarketCapsRiskSteward,
-    destinationMarketCapsRiskSteward: MarketCapsRiskSteward;
+    destinationMarketCapsRiskSteward: MarketCapsRiskSteward,
+    collateralFactorsRiskSteward: CollateralFactorsRiskSteward,
+    destinationCollateralFactorsRiskSteward: CollateralFactorsRiskSteward,
+    irmRiskSteward: IRMRiskSteward,
+    destinationIRMRiskSteward: IRMRiskSteward;
 
   const deployAndConfigureBridge = async (localEndpointV2: any, remoteEndpointV2: any) => {
     // Bridge connection
@@ -93,6 +108,8 @@ describe("Risk Steward", async function () {
     await riskOracle.addAuthorizedSender(deployer.address);
     await riskOracle.addUpdateType("supplyCap");
     await riskOracle.addUpdateType("borrowCap");
+    await riskOracle.addUpdateType("collateralFactors");
+    await riskOracle.addUpdateType("interestRateModel");
 
     await riskStewardReceiver.setRiskParameterConfig(
       "supplyCap",
@@ -106,6 +123,18 @@ describe("Risk Steward", async function () {
       DAY_AND_ONE_SECOND,
       SIX_HOURS,
     );
+    await riskStewardReceiver.setRiskParameterConfig(
+      "collateralFactors",
+      collateralFactorsRiskSteward.address,
+      DAY_AND_ONE_SECOND,
+      SIX_HOURS,
+    );
+    await riskStewardReceiver.setRiskParameterConfig(
+      "interestRateModel",
+      irmRiskSteward.address,
+      DAY_AND_ONE_SECOND,
+      SIX_HOURS,
+    );
 
     await riskStewardReceiver.setWhitelistedExecutor(executor.address, true);
 
@@ -113,6 +142,16 @@ describe("Risk Steward", async function () {
     await destinationRiskStewardReceiver.setRiskParameterConfig(
       "borrowCap",
       destinationMarketCapsRiskSteward.address,
+      SIX_HOURS,
+    );
+    await destinationRiskStewardReceiver.setRiskParameterConfig(
+      "collateralFactors",
+      destinationCollateralFactorsRiskSteward.address,
+      SIX_HOURS,
+    );
+    await destinationRiskStewardReceiver.setRiskParameterConfig(
+      "interestRateModel",
+      destinationIRMRiskSteward.address,
       SIX_HOURS,
     );
     await destinationRiskStewardReceiver.setWhitelistedExecutor(executor.address, true);
@@ -139,6 +178,12 @@ describe("Risk Steward", async function () {
     await mockCoreComptroller.supportMarket(mockCoreVToken.address);
     await mockCoreComptroller.setMarketSupplyCaps([mockCoreVToken.address], [parseUnits("8", 18)]);
     await mockCoreComptroller.setMarketBorrowCaps([mockCoreVToken.address], [parseUnits("8", 18)]);
+    await mockCoreComptroller.setCollateralFactor(
+      0,
+      mockCoreVToken.address,
+      parseUnits("0.5", 18),
+      parseUnits("0.6", 18),
+    );
 
     // Isolated markets
     mockComptroller = await MockComptrollerFactory.deploy();
@@ -219,6 +264,44 @@ describe("Risk Steward", async function () {
       },
     );
 
+    // Collateral factors steward
+    CollateralFactorsRiskStewardFactory = await ethers.getContractFactory("CollateralFactorsRiskSteward");
+    collateralFactorsRiskSteward = await upgrades.deployProxy(
+      CollateralFactorsRiskStewardFactory,
+      [accessControlManager.address, deltaBps50],
+      {
+        constructorArgs: [mockCoreComptroller.address, riskStewardReceiver.address],
+        initializer: "initialize",
+        unsafeAllow: ["state-variable-immutable"],
+      },
+    );
+
+    // Destination collateral factors steward
+    destinationCollateralFactorsRiskSteward = await upgrades.deployProxy(
+      CollateralFactorsRiskStewardFactory,
+      [accessControlManager.address, deltaBps50],
+      {
+        constructorArgs: [mockCoreComptroller.address, destinationRiskStewardReceiver.address],
+        initializer: "initialize",
+        unsafeAllow: ["state-variable-immutable"],
+      },
+    );
+
+    // IRM steward
+    IRMRiskStewardFactory = await ethers.getContractFactory("IRMRiskSteward");
+    irmRiskSteward = await upgrades.deployProxy(IRMRiskStewardFactory, [accessControlManager.address], {
+      constructorArgs: [mockCoreComptroller.address, riskStewardReceiver.address],
+      initializer: "initialize",
+      unsafeAllow: ["state-variable-immutable"],
+    });
+
+    // Destination IRM steward
+    destinationIRMRiskSteward = await upgrades.deployProxy(IRMRiskStewardFactory, [accessControlManager.address], {
+      constructorArgs: [mockCoreComptroller.address, destinationRiskStewardReceiver.address],
+      initializer: "initialize",
+      unsafeAllow: ["state-variable-immutable"],
+    });
+
     await setupPermissionsAndConfigs(accessControlManager);
   };
 
@@ -227,85 +310,361 @@ describe("Risk Steward", async function () {
   });
 
   describe("Risk Parameter Updates E2E", async function () {
-    it("should process SuppllyCap Update", async function () {
-      expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
-      expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
+    describe("immediate execution", async function () {
+      it("should immediately execute SupplyCap update with increased value", async function () {
+        expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
 
-      await riskOracle.publishRiskParameterUpdate(
-        "ipfs://QmW2WQi7j6c7UgJTarActp7tDNikE4B2qXtFCfLPdw8eX9",
-        parseUnitsToHex(10),
-        "supplyCap",
-        mockCoreVToken.address,
-        "0x",
-        0,
-      );
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmSupplyCapIncrease",
+          parseUnitsToHex(10),
+          "supplyCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
 
-      await expect(await riskStewardReceiver.processUpdate(1))
-        .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
-        .withArgs(mockCoreVToken.address, parseUnits("10", 18));
+        await expect(await riskStewardReceiver.processUpdate(1))
+          .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
+          .withArgs(mockCoreVToken.address, parseUnits("10", 18));
 
-      expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("10", 18));
+        expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("10", 18));
+      });
+
+      it("should immediately execute BorrowCap update with decreased value", async function () {
+        expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("8", 18));
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmBorrowCapDecrease",
+          parseUnitsToHex(7),
+          "borrowCap",
+          mockVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await expect(await riskStewardReceiver.processUpdate(1))
+          .to.emit(marketCapsRiskSteward, "BorrowCapUpdated")
+          .withArgs(mockVToken.address, parseUnits("7", 18));
+
+        expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("7", 18));
+      });
+
+      it("should immediately execute CollateralFactors update with increased CF and LT values", async function () {
+        // Set initial collateral factors
+        await mockCoreComptroller.setCollateralFactor(
+          0,
+          mockCoreVToken.address,
+          parseUnits("0.5", 18),
+          parseUnits("0.6", 18),
+        );
+
+        const newCF = parseUnits("0.6", 18);
+        const newLT = parseUnits("0.7", 18);
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmCollateralFactorsIncrease",
+          encodeCollateralFactors(0.6, 0.7),
+          "collateralFactors",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await expect(await riskStewardReceiver.processUpdate(1))
+          .to.emit(collateralFactorsRiskSteward, "CollateralFactorsUpdated")
+          .withArgs(mockCoreVToken.address, newCF, newLT);
+
+        const marketInfo = await mockCoreComptroller.markets(mockCoreVToken.address);
+        expect(marketInfo.collateralFactorMantissa).to.equal(newCF);
+        expect(marketInfo.liquidationThresholdMantissa).to.equal(newLT);
+      });
+
+      it("should immediately execute CollateralFactors update for isolated market", async function () {
+        // Set initial collateral factors for isolated market
+        await mockComptroller.setCollateralFactor(mockVToken.address, parseUnits("0.5", 18), parseUnits("0.6", 18));
+
+        const newCF = parseUnits("0.6", 18);
+        const newLT = parseUnits("0.7", 18);
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmCollateralFactorsIsolated",
+          encodeCollateralFactors(0.6, 0.7),
+          "collateralFactors",
+          mockVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await expect(await riskStewardReceiver.processUpdate(1))
+          .to.emit(collateralFactorsRiskSteward, "CollateralFactorsUpdated")
+          .withArgs(mockVToken.address, newCF, newLT);
+
+        const marketInfo = await mockComptroller.markets(mockVToken.address);
+        expect(marketInfo.collateralFactorMantissa).to.equal(newCF);
+        expect(marketInfo.liquidationThresholdMantissa).to.equal(newLT);
+      });
     });
 
-    it("should register and then execute BorrowCap update when change exceeds safe delta and decreases value", async function () {
-      expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
+    describe("registered and execute updates", async function () {
+      it("should register and then execute BorrowCap update when change exceeds safe delta and decreases value", async function () {
+        expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
 
-      await riskOracle.publishRiskParameterUpdate(
-        "ipfs://QmBorrowCapHighDeltaDecrease",
-        parseUnitsToHex(3),
-        "borrowCap",
-        mockCoreVToken.address,
-        "0x",
-        0,
-      );
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmBorrowCapHighDeltaDecrease",
+          parseUnitsToHex(3),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
 
-      // Not safe for direct execution, so this should only register the update
-      await expect(riskStewardReceiver.processUpdate(1)).to.emit(riskStewardReceiver, "UpdateRegistered");
+        // Not safe for direct execution, so this should only register the update
+        await expect(riskStewardReceiver.processUpdate(1)).to.emit(riskStewardReceiver, "UpdateRegistered");
 
-      // Move forward in time past the timelock
-      await time.increase(SIX_HOURS + 1);
+        // Move forward in time past the timelock
+        await time.increase(SIX_HOURS + 1);
 
-      await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
-        .to.emit(marketCapsRiskSteward, "BorrowCapUpdated")
-        .withArgs(mockCoreVToken.address, parseUnits("3", 18));
+        await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
+          .to.emit(marketCapsRiskSteward, "BorrowCapUpdated")
+          .withArgs(mockCoreVToken.address, parseUnits("3", 18));
 
-      expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("3", 18));
+        expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("3", 18));
+      });
+
+      it("should register and then execute eMode CollateralFactor update with increased CF only (not LT)", async function () {
+        const poolId = 1; // eMode group
+        const initialCF = parseUnits("0.5", 18);
+        const initialLT = parseUnits("0.6", 18);
+
+        // Set initial eMode collateral factors
+        await mockCoreComptroller.setCollateralFactor(poolId, mockCoreVToken.address, initialCF, initialLT);
+
+        const newCF = parseUnits("0.55", 18);
+        const newLT = initialLT;
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmEModeCFIncrease",
+          encodeCollateralFactors(0.55, 0.6),
+          "collateralFactors",
+          mockCoreVToken.address,
+          poolId,
+          0,
+          "0x",
+        );
+
+        // eMode updates always require timelock
+        await expect(riskStewardReceiver.processUpdate(1)).to.emit(riskStewardReceiver, "UpdateRegistered");
+
+        // Move forward in time past the timelock
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
+          .to.emit(collateralFactorsRiskSteward, "CollateralFactorsUpdated")
+          .withArgs(mockCoreVToken.address, newCF, newLT);
+
+        const eModeMarketInfo = await mockCoreComptroller.poolMarkets(poolId, mockCoreVToken.address);
+        expect(eModeMarketInfo.collateralFactorMantissa).to.equal(newCF);
+        expect(eModeMarketInfo.liquidationThresholdMantissa).to.equal(newLT);
+      });
+
+      it("should register and then execute IRM update", async function () {
+        // Create a mock IRM address
+        const newIRM = (await ethers.getSigners())[10].address;
+
+        // Encode the IRM address (32 bytes as expected by IRMRiskSteward)
+        const encodedIRM = ethers.utils.defaultAbiCoder.encode(["address"], [newIRM]);
+
+        expect(await mockCoreVToken.interestRateModel()).to.equal(ethers.constants.AddressZero);
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmIRMUpdate",
+          encodedIRM,
+          "interestRateModel",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        // IRM updates always require timelock, so this should register the update
+        await expect(riskStewardReceiver.processUpdate(1)).to.emit(riskStewardReceiver, "UpdateRegistered");
+
+        // Move forward in time past the timelock
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
+          .to.emit(irmRiskSteward, "InterestRateModelUpdated")
+          .withArgs(mockCoreVToken.address, newIRM);
+
+        expect(await mockCoreVToken.interestRateModel()).to.equal(newIRM);
+      });
+
+      it("should register and then execute IRM update for isolated market", async function () {
+        // Create a mock IRM address
+        const newIRM = (await ethers.getSigners())[11].address;
+
+        // Encode the IRM address (32 bytes as expected by IRMRiskSteward)
+        const encodedIRM = ethers.utils.defaultAbiCoder.encode(["address"], [newIRM]);
+
+        expect(await mockVToken.interestRateModel()).to.equal(ethers.constants.AddressZero);
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmIRMUpdateIsolated",
+          encodedIRM,
+          "interestRateModel",
+          mockVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        // IRM updates always require timelock
+        await expect(riskStewardReceiver.processUpdate(1)).to.emit(riskStewardReceiver, "UpdateRegistered");
+
+        // Move forward in time past the timelock
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
+          .to.emit(irmRiskSteward, "InterestRateModelUpdated")
+          .withArgs(mockVToken.address, newIRM);
+
+        expect(await mockVToken.interestRateModel()).to.equal(newIRM);
+      });
     });
 
-    it("should send remote BorrowCap update to destination chain", async function () {
-      // Initial local caps on core market
-      expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
+    describe("remote updates", async function () {
+      it("should send remote BorrowCap update to destination chain", async function () {
+        // Initial local caps on core market
+        expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
 
-      await riskOracle.publishRiskParameterUpdate(
-        "ipfs://QmBorrowCapRemoteUpdate",
-        parseUnitsToHex(12),
-        "borrowCap",
-        mockCoreVToken.address,
-        "0x",
-        ETHEREUM_LZV2_CHAIN_ID,
-      );
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmBorrowCapRemoteUpdate",
+          parseUnitsToHex(12),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
 
-      // For remote updates, the receiver should forward the update and not touch local caps
-      await expect(riskStewardReceiver.processUpdate(1))
-        .to.emit(riskStewardReceiver, "UpdateSentToDestination")
-        .withArgs(1, ETHEREUM_LZV2_CHAIN_ID, "borrowCap", mockCoreVToken.address);
+        // For remote updates, the receiver should forward the update and not touch local caps
+        await expect(riskStewardReceiver.processUpdate(1))
+          .to.emit(riskStewardReceiver, "UpdateSentToDestination")
+          .withArgs(1, ETHEREUM_LZV2_CHAIN_ID, "borrowCap", mockCoreVToken.address);
 
-      // Local caps remain unchanged on the origin chain
-      expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
+        expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
 
-      // Destination receiver should have the bridged update registered
-      const destUpdate = await destinationRiskStewardReceiver.getRegisteredUpdate("borrowCap", mockCoreVToken.address);
-      expect(destUpdate.update.updateId).to.equal(1);
+        // Destination receiver should have the bridged update registered
+        const destUpdate = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "borrowCap",
+          mockCoreVToken.address,
+        );
+        expect(destUpdate.update.updateId).to.equal(1);
 
-      // Move time forward on destination past the remote delay
-      await time.increase(SIX_HOURS + 1);
+        // Move time forward on destination past the remote delay
+        await time.increase(SIX_HOURS + 1);
 
-      await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1))
-        .to.emit(destinationMarketCapsRiskSteward, "BorrowCapUpdated")
-        .withArgs(mockCoreVToken.address, parseUnits("12", 18));
+        await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1))
+          .to.emit(destinationMarketCapsRiskSteward, "BorrowCapUpdated")
+          .withArgs(mockCoreVToken.address, parseUnits("12", 18));
 
-      // After destination execution, caps should reflect the new remote value
-      expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("12", 18));
+        // After destination execution, caps should reflect the new remote value
+        expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("12", 18));
+      });
+
+      it("should send remote CollateralFactors update for isolated market to destination chain", async function () {
+        // Set initial collateral factors for isolated market
+        await mockComptroller.setCollateralFactor(mockVToken.address, parseUnits("0.5", 18), parseUnits("0.6", 18));
+
+        const newCF = parseUnits("0.6", 18);
+        const newLT = parseUnits("0.7", 18);
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmCollateralFactorsRemoteIsolated",
+          encodeCollateralFactors(0.6, 0.7),
+          "collateralFactors",
+          mockVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await expect(riskStewardReceiver.processUpdate(1))
+          .to.emit(riskStewardReceiver, "UpdateSentToDestination")
+          .withArgs(1, ETHEREUM_LZV2_CHAIN_ID, "collateralFactors", mockVToken.address);
+
+        // Local values remain unchanged on the origin chain
+        const localMarketInfo = await mockComptroller.markets(mockVToken.address);
+        expect(localMarketInfo.collateralFactorMantissa).to.equal(parseUnits("0.5", 18));
+        expect(localMarketInfo.liquidationThresholdMantissa).to.equal(parseUnits("0.6", 18));
+
+        // Destination receiver should have the bridged update registered
+        const destUpdate = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "collateralFactors",
+          mockVToken.address,
+        );
+        expect(destUpdate.update.updateId).to.equal(1);
+
+        // Move time forward on destination past the remote delay
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1))
+          .to.emit(destinationCollateralFactorsRiskSteward, "CollateralFactorsUpdated")
+          .withArgs(mockVToken.address, newCF, newLT);
+
+        const destMarketInfo = await mockComptroller.markets(mockVToken.address);
+        expect(destMarketInfo.collateralFactorMantissa).to.equal(newCF);
+        expect(destMarketInfo.liquidationThresholdMantissa).to.equal(newLT);
+      });
+
+      it("should send remote IRM update for core pool market to destination chain", async function () {
+        // Create a mock IRM address
+        const newIRM = (await ethers.getSigners())[12].address;
+
+        // Encode the IRM address (32 bytes as expected by IRMRiskSteward)
+        const encodedIRM = ethers.utils.defaultAbiCoder.encode(["address"], [newIRM]);
+
+        expect(await mockCoreVToken.interestRateModel()).to.equal(ethers.constants.AddressZero);
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmIRMRemoteUpdate",
+          encodedIRM,
+          "interestRateModel",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await expect(riskStewardReceiver.processUpdate(1))
+          .to.emit(riskStewardReceiver, "UpdateSentToDestination")
+          .withArgs(1, ETHEREUM_LZV2_CHAIN_ID, "interestRateModel", mockCoreVToken.address);
+
+        // Local IRM remains unchanged on the origin chain
+        expect(await mockCoreVToken.interestRateModel()).to.equal(ethers.constants.AddressZero);
+
+        // Destination receiver should have the bridged update registered
+        const destUpdate = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "interestRateModel",
+          mockCoreVToken.address,
+        );
+        expect(destUpdate.update.updateId).to.equal(1);
+
+        // Move time forward on destination past the remote delay
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1))
+          .to.emit(destinationIRMRiskSteward, "InterestRateModelUpdated")
+          .withArgs(mockCoreVToken.address, newIRM);
+
+        // After destination execution, IRM should reflect the new remote value
+        expect(await mockCoreVToken.interestRateModel()).to.equal(newIRM);
+      });
     });
   });
 });

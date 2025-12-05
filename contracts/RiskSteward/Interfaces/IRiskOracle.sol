@@ -12,9 +12,9 @@ pragma solidity 0.8.25;
  * @param previousValue Previous value of the parameter for historical comparison
  * @param timestamp Block timestamp when the update was published
  * @param publisher Address of the account that published this update
- * @param additionalData Additional metadata or data associated with the update
  * @param poolId Pool identifier for eMode-style collateral configuration (0 for regular markets)
  * @param destLzEid LayerZero endpoint ID of the destination chain (0 for local execution)
+ * @param additionalData Additional metadata or data associated with the update
  */
 struct RiskParameterUpdate {
     string referenceId;
@@ -26,9 +26,9 @@ struct RiskParameterUpdate {
     bytes previousValue;
     uint256 timestamp;
     address publisher;
-    bytes additionalData;
     uint96 poolId;
     uint32 destLzEid;
+    bytes additionalData;
 }
 
 /**
@@ -138,8 +138,9 @@ interface IRiskOracle {
      * @param newValue The new value of the risk parameter being updated (encoded as bytes)
      * @param updateType Type of update performed, must be an active update type
      * @param market Address of the market for which the parameter update applies
-     * @param additionalData Additional data or metadata for the update
+     * @param poolId Pool identifier for eMode-style collateral configuration (0 for regular markets)
      * @param dstEid Destination endpoint ID for cross-chain routing
+     * @param additionalData Additional data or metadata for the update
      * @custom:error SenderNotAuthorized Thrown if caller is not an authorized sender
      * @custom:error UnauthorizedUpdateType Thrown if update type is not active
      * @custom:error ZeroAddressNotAllowed Thrown if market is the zero address
@@ -150,8 +151,9 @@ interface IRiskOracle {
         bytes memory newValue,
         string memory updateType,
         address market,
-        bytes memory additionalData,
-        uint32 dstEid
+        uint96 poolId,
+        uint32 dstEid,
+        bytes memory additionalData
     ) external;
 
     /**
@@ -160,8 +162,9 @@ interface IRiskOracle {
      * @param newValues Array of new values for each update (encoded as bytes)
      * @param updateTypes Array of update types, all must be active update types
      * @param markets Array of market addresses for each update
-     * @param additionalData Array of additional data for each update
+     * @param poolIds Array of pool identifiers for eMode-style collateral configuration (0 for regular markets)
      * @param dstEid Array of destination endpoint IDs for cross-chain routing
+     * @param additionalData Array of additional data for each update
      * @custom:error SenderNotAuthorized Thrown if caller is not an authorized sender
      * @custom:error ArrayLengthMismatch Thrown if all arrays don't have the same length
      * @custom:error UnauthorizedUpdateType Thrown if any update type is not active
@@ -173,7 +176,8 @@ interface IRiskOracle {
         bytes[] memory newValues,
         string[] memory updateTypes,
         address[] memory markets,
-        bytes[] memory additionalData,
-        uint32[] memory dstEid
+        uint96[] memory poolIds,
+        uint32[] memory dstEid,
+        bytes[] memory additionalData
     ) external;
 }

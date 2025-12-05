@@ -204,6 +204,8 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @param newValue The new value of the risk parameter being updated
      * @param updateType Type of update performed, must be previously authorized
      * @param market Address for market of the parameter update
+     * @param poolId Pool identifier for eMode-style collateral configuration (0 for regular markets)
+     * @param dstEid Destination endpoint ID for cross-chain routing
      * @param additionalData Additional data for the update
      * @custom:error Throws SenderNotAuthorized if caller is not an authorized sender
      * @custom:error Throws UnauthorizedUpdateType if update type is not active
@@ -214,10 +216,11 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         bytes memory newValue,
         string memory updateType,
         address market,
-        bytes memory additionalData,
-        uint32 dstEid
+        uint96 poolId,
+        uint32 dstEid,
+        bytes memory additionalData
     ) external onlyAuthorized {
-        _publishUpdate(referenceId, newValue, updateType, market, additionalData, dstEid);
+        _publishUpdate(referenceId, newValue, updateType, market, poolId, dstEid, additionalData);
     }
 
     /**
@@ -226,6 +229,8 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @param newValues Array of new values for each update
      * @param updateTypes Array of types for each update, all must be authorized
      * @param markets Array of addresses for markets of the parameter updates
+     * @param poolIds Array of pool identifiers for eMode-style collateral configuration (0 for regular markets)
+     * @param dstEid Array of destination endpoint IDs for cross-chain routing
      * @param additionalData Array of additional data for the updates
      * @custom:error Throws SenderNotAuthorized if caller is not an authorized sender
      * @custom:error Throws UnauthorizedUpdateType if any update type is not active
@@ -236,8 +241,9 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         bytes[] memory newValues,
         string[] memory updateTypes,
         address[] memory markets,
-        bytes[] memory additionalData,
-        uint32[] memory dstEid
+        uint96[] memory poolIds,
+        uint32[] memory dstEid,
+        bytes[] memory additionalData
     ) external onlyAuthorized {
         uint256 length = referenceIds.length;
         if (
@@ -245,13 +251,14 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
             length != newValues.length ||
             length != updateTypes.length ||
             length != markets.length ||
-            length != additionalData.length ||
-            length != dstEid.length
+            length != poolIds.length ||
+            length != dstEid.length ||
+            length != additionalData.length
         ) {
             revert ArrayLengthMismatch();
         }
         for (uint256 i = 0; i < length; ++i) {
-            _publishUpdate(referenceIds[i], newValues[i], updateTypes[i], markets[i], additionalData[i], dstEid[i]);
+            _publishUpdate(referenceIds[i], newValues[i], updateTypes[i], markets[i], poolIds[i], dstEid[i], additionalData[i]);
         }
     }
 
@@ -292,6 +299,8 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @param newValue The new value of the risk parameter being updated
      * @param updateType Type of update performed, must be previously authorized
      * @param market Address for market of the parameter update
+     * @param poolId Pool identifier for eMode-style collateral configuration (0 for regular markets)
+     * @param dstEid Destination endpoint ID for cross-chain routing
      * @param additionalData Additional data for the update
      * @custom:error Throws ZeroAddressNotAllowed if market is zero address
      * @custom:error Throws UnauthorizedUpdateType if update type is not active
@@ -302,8 +311,9 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         bytes memory newValue,
         string memory updateType,
         address market,
-        bytes memory additionalData,
-        uint32 dstEid
+        uint96 poolId,
+        uint32 dstEid,
+        bytes memory additionalData
     ) internal {
         ensureNonzeroAddress(market);
         if (!activeUpdateTypes[updateType]) {
@@ -314,6 +324,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         bytes memory previousValue = updatesById[previousUpdateId].newValue;
 
         bytes32 updateTypeKey = keccak256(bytes(updateType));
+        
         RiskParameterUpdate memory newUpdate = RiskParameterUpdate({
             referenceId: referenceId,
             updateId: updateCounter,
@@ -324,9 +335,9 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
             previousValue: previousValue,
             timestamp: block.timestamp,
             publisher: msg.sender,
-            additionalData: additionalData,
-            poolId: 0,
-            destLzEid: dstEid
+            poolId: poolId,
+            destLzEid: dstEid,
+            additionalData: additionalData
         });
         updatesById[updateCounter] = newUpdate;
 
