@@ -1762,6 +1762,16 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@layerzerolabs/test-devtools-evm-hardhat@npm:^0.5.2":
+  version: 0.5.2
+  resolution: "@layerzerolabs/test-devtools-evm-hardhat@npm:0.5.2"
+  peerDependencies:
+    hardhat: ^2.22.10
+    solidity-bytes-utils: ^0.8.2
+  checksum: b36c14dee73f118742cb27650db5f6432cc60101db9e7e8326647cbdbedc137bceb68b8b20037fecade1383660a14c3cf186e2f52afe9da4be15a6298e3bf554
+  languageName: node
+  linkType: hard
+
 "@matterlabs/hardhat-zksync-deploy@npm:^0.11.0":
   version: 0.11.0
   resolution: "@matterlabs/hardhat-zksync-deploy@npm:0.11.0"
@@ -4874,6 +4884,7 @@ __metadata:
     "@layerzerolabs/oapp-evm": ^0.4.0
     "@layerzerolabs/oapp-evm-upgradeable": ^0.1.2
     "@layerzerolabs/solidity-examples": ^1.0.0
+    "@layerzerolabs/test-devtools-evm-hardhat": ^0.5.2
     "@matterlabs/hardhat-zksync": ^0.2.0
     "@matterlabs/hardhat-zksync-deploy": ^0.11.0
     "@matterlabs/hardhat-zksync-solc": ^1.2.1

@@ -85,13 +85,18 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
     /**
      * @notice Initializes the contract with the Access Control Manager and OApp owner.
-     * @param accessControlManager_ The address of the access control manager.
-     * @param oAppOwner_ The address of the OApp owner passed to `__OApp_init`.
+     * @param _delegate The address of the OApp owner passed to `__OApp_init`.
+     * @custom:oz-upgrades-unsafe-allow missing-initializer-call
      */
-    function initialize(address accessControlManager_, address oAppOwner_) external initializer {
-        __AccessControlled_init(accessControlManager_);
-        __OApp_init(oAppOwner_);
+    function initialize(address _acm, address _delegate) external initializer {
+        __AccessControlled_init(_acm);
+        __OApp_init(_delegate);
     }
+
+    /**
+     * @notice Accepts native tokens (e.g., BNB) sent to this contract.
+     */
+    receive() external payable {}
 
     /**
      * @notice Sets the risk parameter config for a given update type
@@ -487,9 +492,10 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:event Emits UpdateSentToDestination with the update ID, destination endpoint ID, update type, and market
      */
     function _sendRemoteUpdate(RiskParameterUpdate memory update) internal {
-        MessagingFee memory fee = quote(update, "0x", false);
-        lzSend(update.destLzEid, update, "0x", fee, address(this)); // TODO :transfer fee
+        bytes memory option = OptionsBuilder.newOptions().addExecutorLzReceiveOption(1_000_000, 0);
 
+        MessagingFee memory fee = quote(update, option, false);
+        this.lzSend{ value: fee.nativeFee }(update.destLzEid, update, "", fee, address(this));
         updates[update.updateId] = RegisteredUpdate({
             updateId: update.updateId,
             unlockTime: block.timestamp,

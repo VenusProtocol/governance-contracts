@@ -20,7 +20,7 @@ contract MockCoreComptroller {
      * @notice Add a new vToken to be tracked
      * @param vToken The vToken to add
      */
-    function _supportMarket(address vToken) external {
+    function supportMarket(address vToken) external {
         require(!vTokenListed[vToken], "vToken already listed");
         vTokenListed[address(vToken)] = true;
         allVTokens.push(IVToken(vToken));
@@ -31,7 +31,7 @@ contract MockCoreComptroller {
      * @param vTokens The vToken addresses
      * @param newCaps The new supply caps
      */
-    function _setMarketSupplyCaps(address[] calldata vTokens, uint256[] calldata newCaps) external {
+    function setMarketSupplyCaps(address[] calldata vTokens, uint256[] calldata newCaps) external {
         uint256 numMarkets = vTokens.length;
         uint256 numSupplyCaps = newCaps.length;
 
@@ -48,7 +48,7 @@ contract MockCoreComptroller {
      * @param vTokens The vToken addresses
      * @param newCaps The new borrow caps
      */
-    function _setMarketBorrowCaps(address[] calldata vTokens, uint256[] calldata newCaps) external {
+    function setMarketBorrowCaps(address[] calldata vTokens, uint256[] calldata newCaps) external {
         uint256 numMarkets = vTokens.length;
         uint256 numBorrowCaps = newCaps.length;
 

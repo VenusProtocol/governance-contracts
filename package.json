@@ -60,6 +60,7 @@
     "@layerzerolabs/oapp-evm": "^0.4.0",
     "@layerzerolabs/oapp-evm-upgradeable": "^0.1.2",
     "@layerzerolabs/solidity-examples": "^1.0.0",
+    "@layerzerolabs/test-devtools-evm-hardhat": "^0.5.2",
     "@matterlabs/hardhat-zksync": "^0.2.0",
     "@matterlabs/hardhat-zksync-deploy": "^0.11.0",
     "@matterlabs/hardhat-zksync-solc": "^1.2.1",
