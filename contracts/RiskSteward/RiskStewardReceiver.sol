@@ -228,6 +228,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:access Only whitelisted executors can call this function
      * @custom:event Emits UpdateExecuted with the oracle update ID
      * @custom:error Throws NotAnExecutor if the caller is not a whitelisted executor
+     * @custom:error Throws InvalidRegisteredUpdate if the update was never registered
      * @custom:error Throws UpdateAlreadyResolved if the update was already executed or rejected
      * @custom:error Throws UpdateIsExpired if the update has expired
      * @custom:error Throws ConfigNotActive if the config is not active
@@ -249,12 +250,15 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     /**
      * @notice Rejects a registered update
      * @param updateId The oracle update ID of the update to reject
-     * @custom:access Controlled by AccessControlManager
+     * @custom:access Only whitelisted executors can call this function
      * @custom:event Emits UpdateRejected with the oracle update ID
      * @custom:error Throws UpdateAlreadyResolved if the update was already executed or rejected
      */
     function rejectUpdate(uint256 updateId) external {
-        _checkAccessAllowed("rejectUpdate(uint256)");
+        if (!whitelistedExecutors[msg.sender]) {
+            revert NotAnExecutor();
+        }
+
         RegisteredUpdate storage registeredUpdate = updates[updateId];
 
         if (registeredUpdate.status != UpdateStatus.Pending) {
@@ -588,6 +592,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @param update The risk parameter update fetched from the oracle
      * @param config The configuration for this update type
      * @custom:error ConfigNotActive if the configuration for the update type is not active
+     * @custom:error InvalidRegisteredUpdate if the update was never registered
      * @custom:error UpdateAlreadyResolved if the update was already executed or rejected
      * @custom:error UpdateIsExpired if the update has expired
      * @custom:error UpdateNotUnlocked if the unlock time has not passed
@@ -599,6 +604,10 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     ) internal view {
         if (!config.active) {
             revert ConfigNotActive();
+        }
+
+        if (registeredUpdate.status == UpdateStatus.None) {
+            revert InvalidRegisteredUpdate();
         }
 
         if (registeredUpdate.status != UpdateStatus.Pending) {

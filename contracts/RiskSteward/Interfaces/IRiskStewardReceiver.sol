@@ -172,6 +172,11 @@ interface IRiskStewardReceiver {
     error InvalidUpdateToResend();
 
     /**
+     * @notice Thrown when trying to execute an update that was never registered
+     */
+    error InvalidRegisteredUpdate();
+
+    /**
      * @notice Thrown when attempting to call lzSend from an address other than this contract
      */
     error InvalidLzSendCaller();

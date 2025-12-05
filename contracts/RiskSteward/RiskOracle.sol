@@ -258,7 +258,15 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
             revert ArrayLengthMismatch();
         }
         for (uint256 i = 0; i < length; ++i) {
-            _publishUpdate(referenceIds[i], newValues[i], updateTypes[i], markets[i], poolIds[i], dstEid[i], additionalData[i]);
+            _publishUpdate(
+                referenceIds[i],
+                newValues[i],
+                updateTypes[i],
+                markets[i],
+                poolIds[i],
+                dstEid[i],
+                additionalData[i]
+            );
         }
     }
 
@@ -324,7 +332,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         bytes memory previousValue = updatesById[previousUpdateId].newValue;
 
         bytes32 updateTypeKey = keccak256(bytes(updateType));
-        
+
         RiskParameterUpdate memory newUpdate = RiskParameterUpdate({
             referenceId: referenceId,
             updateId: updateCounter,

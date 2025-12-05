@@ -8,6 +8,7 @@ import { SignerWithAddress } from "hardhat-deploy-ethers/signers";
 import path from "path";
 
 import {
+  AccessControlManager,
   CollateralFactorsRiskSteward,
   DestinationStewardReceiver,
   IRMRiskSteward,
@@ -60,7 +61,8 @@ describe("Risk Steward", async function () {
     collateralFactorsRiskSteward: CollateralFactorsRiskSteward,
     destinationCollateralFactorsRiskSteward: CollateralFactorsRiskSteward,
     irmRiskSteward: IRMRiskSteward,
-    destinationIRMRiskSteward: IRMRiskSteward;
+    destinationIRMRiskSteward: IRMRiskSteward,
+    accessControlManager: AccessControlManager;
 
   const deployAndConfigureBridge = async (localEndpointV2: any, remoteEndpointV2: any) => {
     // Bridge connection
@@ -90,6 +92,12 @@ describe("Risk Steward", async function () {
     await accessControlManager.giveCallPermission(
       riskStewardReceiver.address,
       "setWhitelistedExecutor(address,bool)",
+      deployer.address,
+    );
+
+    await accessControlManager.giveCallPermission(
+      riskStewardReceiver.address,
+      "setConfigActive(string,bool)",
       deployer.address,
     );
 
@@ -142,17 +150,17 @@ describe("Risk Steward", async function () {
     await destinationRiskStewardReceiver.setRiskParameterConfig(
       "borrowCap",
       destinationMarketCapsRiskSteward.address,
-      SIX_HOURS,
+      DAY_AND_ONE_SECOND,
     );
     await destinationRiskStewardReceiver.setRiskParameterConfig(
       "collateralFactors",
       destinationCollateralFactorsRiskSteward.address,
-      SIX_HOURS,
+      DAY_AND_ONE_SECOND,
     );
     await destinationRiskStewardReceiver.setRiskParameterConfig(
       "interestRateModel",
       destinationIRMRiskSteward.address,
-      SIX_HOURS,
+      DAY_AND_ONE_SECOND,
     );
     await destinationRiskStewardReceiver.setWhitelistedExecutor(executor.address, true);
   };
@@ -161,7 +169,7 @@ describe("Risk Steward", async function () {
     [deployer, unauthorizedSigner, executor] = await ethers.getSigners();
 
     const accessControlManagerFactory = await ethers.getContractFactory("AccessControlManager");
-    const accessControlManager = await accessControlManagerFactory.deploy();
+    accessControlManager = await accessControlManagerFactory.deploy();
 
     // Core receiver factories
     RiskStewardReceiverFactory = await ethers.getContractFactory("RiskStewardReceiver");
@@ -664,6 +672,518 @@ describe("Risk Steward", async function () {
 
         // After destination execution, IRM should reflect the new remote value
         expect(await mockCoreVToken.interestRateModel()).to.equal(newIRM);
+      });
+    });
+
+    describe("failure cases", async function () {
+      it("should revert when processing an update with inactive config", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmInactiveConfig",
+          parseUnitsToHex(10),
+          "supplyCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.setConfigActive("supplyCap", false);
+
+        await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "ConfigNotActive",
+        );
+      });
+
+      it("should revert when processing an already resolved update", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmAlreadyResolved",
+          parseUnitsToHex(10),
+          "supplyCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "UpdateAlreadyResolved",
+        );
+      });
+
+      it("should revert when processing an expired update", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmExpired",
+          parseUnitsToHex(10),
+          "supplyCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await time.increase(DAY_AND_ONE_SECOND * 2);
+
+        await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "UpdateIsExpired",
+        );
+      });
+
+      it("should revert when processing an update that is not the latest for the market and type", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmFirstUpdate",
+          parseUnitsToHex(10),
+          "supplyCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmSecondUpdate",
+          parseUnitsToHex(12),
+          "supplyCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "UpdateIsExpired",
+        );
+      });
+
+      it("should revert when processing an update too frequently (debounce not passed)", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmFirstDebounce",
+          parseUnitsToHex(10),
+          "supplyCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmSecondDebounce",
+          parseUnitsToHex(11),
+          "supplyCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await expect(riskStewardReceiver.processUpdate(2)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "UpdateTooFrequent",
+        );
+      });
+
+      it("should revert when processing an update when there is a pending registered update of the same type", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmPendingUpdate",
+          parseUnitsToHex(3),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmOverlappingUpdate",
+          parseUnitsToHex(4),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await expect(riskStewardReceiver.processUpdate(2)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "RegisteredUpdateTypeExist",
+        );
+      });
+
+      it("should revert when processing remote update with unsupported update type on destination", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmUnsupportedRemote",
+          parseUnitsToHex(12),
+          "supplyCap", // not consigured in theh fixture
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        const destUpdate = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "supplyCap",
+          mockCoreVToken.address,
+        );
+        expect(destUpdate.update.updateId).to.equal(1);
+
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1)).to.be.revertedWithCustomError(
+          destinationRiskStewardReceiver,
+          "ConfigNotActive",
+        );
+      });
+    });
+
+    describe("failure cases for executing registered updates", async function () {
+      it("should revert when trying to execute update before timelock expires", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmBeforeTimelock",
+          parseUnitsToHex(3),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "UpdateNotUnlocked",
+        );
+      });
+
+      it("should revert when trying to execute an already executed update", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmAlreadyExecuted",
+          parseUnitsToHex(3),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+        await time.increase(SIX_HOURS + 1);
+        await riskStewardReceiver.connect(executor).executeRegisteredUpdate(1);
+
+        await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "UpdateAlreadyResolved",
+        );
+      });
+
+      it("should revert when trying to execute an expired registered update", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmExpiredRegistered",
+          parseUnitsToHex(3),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+        await time.increase(DAY_AND_ONE_SECOND * 2);
+
+        await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "UpdateIsExpired",
+        );
+      });
+
+      it("should revert when trying to execute update with inactive config", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmInactiveConfigExecute",
+          parseUnitsToHex(3),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        await riskStewardReceiver.setConfigActive("borrowCap", false);
+
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "ConfigNotActive",
+        );
+      });
+
+      it("should revert when non-executor tries to execute registered update", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmNonExecutorExecute",
+          parseUnitsToHex(3),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(
+          riskStewardReceiver.connect(unauthorizedSigner).executeRegisteredUpdate(1),
+        ).to.be.revertedWithCustomError(riskStewardReceiver, "NotAnExecutor");
+      });
+
+      it("should revert when trying to execute update that was never registered", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmNeverRegistered",
+          parseUnitsToHex(10),
+          "supplyCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "InvalidRegisteredUpdate",
+        );
+      });
+
+      it("should revert when trying to execute a rejected update", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmRejectedUpdate",
+          parseUnitsToHex(3),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        await riskStewardReceiver.connect(executor).rejectUpdate(1);
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "UpdateAlreadyResolved",
+        );
+      });
+    });
+
+    describe("failure cases at destination receiver", async function () {
+      it("should revert when non-executor tries to execute update on destination", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmDestNonExecutor",
+          parseUnitsToHex(12),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        const destUpdate = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "borrowCap",
+          mockCoreVToken.address,
+        );
+        expect(destUpdate.update.updateId).to.equal(1);
+
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(
+          destinationRiskStewardReceiver.connect(unauthorizedSigner).executeUpdate(1),
+        ).to.be.revertedWithCustomError(destinationRiskStewardReceiver, "NotAnExecutor");
+      });
+
+      it("should revert when trying to execute update with unconfigured update type on destination", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmDestUnconfigured",
+          parseUnitsToHex(10),
+          "supplyCap", // not configured for remote
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        const destUpdate = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "supplyCap",
+          mockCoreVToken.address,
+        );
+        expect(destUpdate.update.updateId).to.equal(1);
+
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1)).to.be.revertedWithCustomError(
+          destinationRiskStewardReceiver,
+          "ConfigNotActive",
+        );
+      });
+
+      it("should revert when trying to execute update that doesn't exist on destination", async function () {
+        await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(999)).to.be.revertedWithCustomError(
+          destinationRiskStewardReceiver,
+          "ConfigNotActive",
+        ); //reverts early
+      });
+
+      it("should revert when trying to execute update before remote delay expires", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmDestBeforeDelay",
+          parseUnitsToHex(12),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        const destUpdate = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "borrowCap",
+          mockCoreVToken.address,
+        );
+        expect(destUpdate.update.updateId).to.equal(1);
+
+        await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1)).to.be.revertedWithCustomError(
+          destinationRiskStewardReceiver,
+          "UpdateNotUnlocked",
+        );
+      });
+
+      it("should revert when trying to execute expired update on destination", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmDestExpired",
+          parseUnitsToHex(12),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        const destUpdate = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "borrowCap",
+          mockCoreVToken.address,
+        );
+        expect(destUpdate.update.updateId).to.equal(1);
+
+        await time.increase(DAY_AND_ONE_SECOND * 3);
+
+        await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1)).to.be.revertedWithCustomError(
+          destinationRiskStewardReceiver,
+          "UpdateIsExpired",
+        );
+      });
+
+      it("should revert when trying to execute update too frequently on destination (debounce)", async function () {
+        await riskStewardReceiver.setRiskParameterConfig(
+          "borrowCap",
+          marketCapsRiskSteward.address,
+          SIX_HOURS,
+          SIX_HOURS,
+        );
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmDestFirstDebounce",
+          parseUnitsToHex(12),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        const destUpdate1 = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "borrowCap",
+          mockCoreVToken.address,
+        );
+        expect(destUpdate1.update.updateId).to.equal(1);
+
+        await time.increase(SIX_HOURS + 1);
+        await destinationRiskStewardReceiver.connect(executor).executeUpdate(1);
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmDestSecondDebounce",
+          parseUnitsToHex(13),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await time.increase(2);
+        await riskStewardReceiver.processUpdate(2);
+
+        const destUpdate2 = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "borrowCap",
+          mockCoreVToken.address,
+        );
+        expect(destUpdate2.update.updateId).to.equal(2);
+
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(2)).to.be.revertedWithCustomError(
+          destinationRiskStewardReceiver,
+          "UpdateTooFrequent",
+        );
+      });
+
+      it("should revert when trying to execute already executed update on destination", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmDestAlreadyExecuted",
+          parseUnitsToHex(12),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        const destUpdate = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "borrowCap",
+          mockCoreVToken.address,
+        );
+        expect(destUpdate.update.updateId).to.equal(1);
+
+        await time.increase(SIX_HOURS + 1);
+        await destinationRiskStewardReceiver.connect(executor).executeUpdate(1);
+
+        await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1)).to.be.revertedWithCustomError(
+          destinationRiskStewardReceiver,
+          "UpdateNotFound",
+        );
       });
     });
   });
