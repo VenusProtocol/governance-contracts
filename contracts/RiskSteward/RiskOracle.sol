@@ -219,7 +219,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         uint96 poolId,
         uint32 dstEid,
         bytes memory additionalData
-    ) external onlyAuthorized {
+    ) external {
         _publishUpdate(referenceId, newValue, updateType, market, poolId, dstEid, additionalData);
     }
 
@@ -244,7 +244,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         uint96[] memory poolIds,
         uint32[] memory dstEid,
         bytes[] memory additionalData
-    ) external onlyAuthorized {
+    ) external {
         uint256 length = referenceIds.length;
         if (
             length == 0 ||
@@ -310,6 +310,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @param poolId Pool identifier for eMode-style collateral configuration (0 for regular markets)
      * @param dstEid Destination endpoint ID for cross-chain routing
      * @param additionalData Additional data for the update
+     * @custom:error Throws SenderNotAuthorized if caller is not an authorized sender
      * @custom:error Throws ZeroAddressNotAllowed if market is zero address
      * @custom:error Throws UnauthorizedUpdateType if update type is not active
      * @custom:event Emits UpdatePublished when update is successfully published
@@ -322,7 +323,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         uint96 poolId,
         uint32 dstEid,
         bytes memory additionalData
-    ) internal {
+    ) internal onlyAuthorized {
         ensureNonzeroAddress(market);
         if (!activeUpdateTypes[updateType]) {
             revert UnauthorizedUpdateType();

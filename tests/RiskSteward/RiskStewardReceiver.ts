@@ -560,11 +560,12 @@ describe("Risk Steward", async function () {
           "0x",
         );
 
-        // For remote updates, the receiver should forward the update and not touch local caps
+        // For remote updates, the receiver should forward the update
         await expect(riskStewardReceiver.processUpdate(1))
           .to.emit(riskStewardReceiver, "UpdateSentToDestination")
           .withArgs(1, ETHEREUM_LZV2_CHAIN_ID, "borrowCap", mockCoreVToken.address);
 
+        // do not touch local caps (can be improved by deploying a diffrent vToken for remote updates)
         expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("8", 18));
 
         // Destination receiver should have the bridged update registered
@@ -989,6 +990,69 @@ describe("Risk Steward", async function () {
       });
     });
 
+    describe("reject update", async function () {
+      it("should successfully reject a registered update in RSR", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmRejectTest",
+          parseUnitsToHex(3),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        await expect(riskStewardReceiver.connect(executor).rejectUpdate(1))
+          .to.emit(riskStewardReceiver, "UpdateRejected")
+          .withArgs(1);
+
+        const updateStatus = await riskStewardReceiver.getUpdateStatus(1);
+        expect(updateStatus).to.equal(3); // UpdateStatus.Rejected
+      });
+
+      it("should revert when non-executor tries to reject update in RSR", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmRejectNonExecutor",
+          parseUnitsToHex(3),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        await expect(riskStewardReceiver.connect(unauthorizedSigner).rejectUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "NotAnExecutor",
+        );
+      });
+
+      it("should revert when trying to reject an already executed update in RSR", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmRejectExecuted",
+          parseUnitsToHex(3),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+        await time.increase(SIX_HOURS + 1);
+        await riskStewardReceiver.connect(executor).executeRegisteredUpdate(1);
+
+        await expect(riskStewardReceiver.connect(executor).rejectUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "UpdateAlreadyResolved",
+        );
+      });
+    });
+
     describe("failure cases at destination receiver", async function () {
       it("should revert when non-executor tries to execute update on destination", async function () {
         await riskOracle.publishRiskParameterUpdate(
@@ -1184,6 +1248,281 @@ describe("Risk Steward", async function () {
           destinationRiskStewardReceiver,
           "UpdateNotFound",
         );
+      });
+    });
+
+    describe("reject update at destination receiver", async function () {
+      it("should successfully reject a registered update on destination", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmDestRejectTest",
+          parseUnitsToHex(12),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        const destUpdate = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "borrowCap",
+          mockCoreVToken.address,
+        );
+        expect(destUpdate.update.updateId).to.equal(1);
+
+        await expect(destinationRiskStewardReceiver.connect(executor).rejectUpdate(1))
+          .to.emit(destinationRiskStewardReceiver, "UpdateRejected")
+          .withArgs(1);
+
+        const rejectedUpdate = await destinationRiskStewardReceiver.getRegisteredUpdate(
+          "borrowCap",
+          mockCoreVToken.address,
+        );
+        expect(rejectedUpdate.status).to.equal(3); // UpdateStatus.Rejected
+      });
+
+      it("should revert when non-executor tries to reject update on destination", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmDestRejectNonExecutor",
+          parseUnitsToHex(12),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        await expect(
+          destinationRiskStewardReceiver.connect(unauthorizedSigner).rejectUpdate(1),
+        ).to.be.revertedWithCustomError(destinationRiskStewardReceiver, "NotAnExecutor");
+      });
+
+      it("should revert when trying to reject an already executed update on destination", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmDestRejectExecuted",
+          parseUnitsToHex(12),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        await time.increase(SIX_HOURS + 1);
+        await destinationRiskStewardReceiver.connect(executor).executeUpdate(1);
+
+        await expect(destinationRiskStewardReceiver.connect(executor).rejectUpdate(1)).to.be.revertedWithCustomError(
+          destinationRiskStewardReceiver,
+          "UpdateNotFound",
+        );
+      });
+
+      it("should prevent execution after rejecting an update on destination", async function () {
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmDestRejectThenExecute",
+          parseUnitsToHex(12),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        await destinationRiskStewardReceiver.connect(executor).rejectUpdate(1);
+
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1)).to.be.revertedWithCustomError(
+          destinationRiskStewardReceiver,
+          "UpdateNotFound",
+        );
+      });
+    });
+
+    describe("getExecutableUpdates", async function () {
+      describe("RiskStewardReceiver", async function () {
+        it("should return executable updates excluding rejected ones", async function () {
+          // Create additional markets
+          const mockCoreVToken2 = await (await ethers.getContractFactory("MockVToken")).deploy(
+            mockCoreComptroller.address,
+          );
+          const mockCoreVToken3 = await (await ethers.getContractFactory("MockVToken")).deploy(
+            mockCoreComptroller.address,
+          );
+          const mockCoreVToken4 = await (await ethers.getContractFactory("MockVToken")).deploy(
+            mockCoreComptroller.address,
+          );
+
+          await mockCoreComptroller.supportMarket(mockCoreVToken2.address);
+          await mockCoreComptroller.supportMarket(mockCoreVToken3.address);
+          await mockCoreComptroller.supportMarket(mockCoreVToken4.address);
+          await mockCoreComptroller.setMarketBorrowCaps(
+            [mockCoreVToken2.address, mockCoreVToken3.address, mockCoreVToken4.address],
+            [parseUnits("8", 18), parseUnits("8", 18), parseUnits("8", 18)],
+          );
+
+          // Register 4 updates for different markets (large changes to trigger registration)
+          await riskOracle.publishRiskParameterUpdate(
+            "ipfs://QmUpdate1",
+            parseUnitsToHex(13),
+            "borrowCap",
+            mockCoreVToken.address,
+            0,
+            0,
+            "0x",
+          );
+          await riskOracle.publishRiskParameterUpdate(
+            "ipfs://QmUpdate2",
+            parseUnitsToHex(14),
+            "borrowCap",
+            mockCoreVToken2.address,
+            0,
+            0,
+            "0x",
+          );
+          await riskOracle.publishRiskParameterUpdate(
+            "ipfs://QmUpdate3",
+            parseUnitsToHex(15),
+            "borrowCap",
+            mockCoreVToken3.address,
+            0,
+            0,
+            "0x",
+          );
+          await riskOracle.publishRiskParameterUpdate(
+            "ipfs://QmUpdate4",
+            parseUnitsToHex(16),
+            "borrowCap",
+            mockCoreVToken4.address,
+            0,
+            0,
+            "0x",
+          );
+
+          await riskStewardReceiver.processUpdate(1);
+          await riskStewardReceiver.processUpdate(2);
+          await riskStewardReceiver.processUpdate(3);
+          await riskStewardReceiver.processUpdate(4);
+
+          // Before timelock expires, should return empty
+          let executableUpdates = await riskStewardReceiver.getExecutableUpdates(
+            "borrowCap",
+            mockCoreComptroller.address,
+          );
+          expect(executableUpdates).to.be.an("array").that.is.empty;
+
+          // Reject one update (update 2) before time elapses
+          await riskStewardReceiver.connect(executor).rejectUpdate(2);
+
+          // Move time forward past timelock
+          await time.increase(SIX_HOURS + 1);
+
+          // Get executable updates - should not include the rejected one
+          executableUpdates = await riskStewardReceiver.getExecutableUpdates(
+            "borrowCap",
+            mockCoreComptroller.address,
+          );
+          expect(executableUpdates).to.have.lengthOf(3);
+          const updateIds = executableUpdates.map((id: any) => id.toNumber());
+          expect(updateIds).to.include.members([1, 3, 4]);
+          expect(updateIds).to.not.include(2);
+        });
+      });
+
+      describe("DestinationStewardReceiver", async function () {
+        it("should return executable updates excluding rejected ones", async function () {
+          // Create additional markets
+          const mockCoreVToken2 = await (await ethers.getContractFactory("MockVToken")).deploy(
+            mockCoreComptroller.address,
+          );
+          const mockCoreVToken3 = await (await ethers.getContractFactory("MockVToken")).deploy(
+            mockCoreComptroller.address,
+          );
+          const mockCoreVToken4 = await (await ethers.getContractFactory("MockVToken")).deploy(
+            mockCoreComptroller.address,
+          );
+
+          await mockCoreComptroller.supportMarket(mockCoreVToken2.address);
+          await mockCoreComptroller.supportMarket(mockCoreVToken3.address);
+          await mockCoreComptroller.supportMarket(mockCoreVToken4.address);
+          await mockCoreComptroller.setMarketBorrowCaps(
+            [mockCoreVToken2.address, mockCoreVToken3.address, mockCoreVToken4.address],
+            [parseUnits("8", 18), parseUnits("8", 18), parseUnits("8", 18)],
+          );
+
+          // Register 4 remote updates for different markets
+          await riskOracle.publishRiskParameterUpdate(
+            "ipfs://QmDestUpdate1",
+            parseUnitsToHex(12),
+            "borrowCap",
+            mockCoreVToken.address,
+            0,
+            ETHEREUM_LZV2_CHAIN_ID,
+            "0x",
+          );
+          await riskOracle.publishRiskParameterUpdate(
+            "ipfs://QmDestUpdate2",
+            parseUnitsToHex(13),
+            "borrowCap",
+            mockCoreVToken2.address,
+            0,
+            ETHEREUM_LZV2_CHAIN_ID,
+            "0x",
+          );
+          await riskOracle.publishRiskParameterUpdate(
+            "ipfs://QmDestUpdate3",
+            parseUnitsToHex(14),
+            "borrowCap",
+            mockCoreVToken3.address,
+            0,
+            ETHEREUM_LZV2_CHAIN_ID,
+            "0x",
+          );
+          await riskOracle.publishRiskParameterUpdate(
+            "ipfs://QmDestUpdate4",
+            parseUnitsToHex(15),
+            "borrowCap",
+            mockCoreVToken4.address,
+            0,
+            ETHEREUM_LZV2_CHAIN_ID,
+            "0x",
+          );
+
+          await riskStewardReceiver.processUpdate(1);
+          await riskStewardReceiver.processUpdate(2);
+          await riskStewardReceiver.processUpdate(3);
+          await riskStewardReceiver.processUpdate(4);
+
+          // Before remote delay expires, should return empty
+          let executableUpdates = await destinationRiskStewardReceiver.getExecutableUpdates(
+            "borrowCap",
+            mockCoreComptroller.address,
+          );
+          expect(executableUpdates).to.be.an("array").that.is.empty;
+
+          // Reject one update (update 2) before time elapses
+          await destinationRiskStewardReceiver.connect(executor).rejectUpdate(2);
+
+          // Move time forward past remote delay
+          await time.increase(SIX_HOURS + 1);
+
+          // Get executable updates - should not include the rejected one
+          executableUpdates = await destinationRiskStewardReceiver.getExecutableUpdates(
+            "borrowCap",
+            mockCoreComptroller.address,
+          );
+          expect(executableUpdates).to.have.lengthOf(3);
+          const updateIds = executableUpdates.map((id: any) => id.toNumber());
+          expect(updateIds).to.include.members([1, 3, 4]);
+          expect(updateIds).to.not.include(2);
+        });
       });
     });
   });
