@@ -2,7 +2,7 @@
 pragma solidity 0.8.25;
 
 import { RiskParameterUpdate } from "./Interfaces/IRiskOracle.sol";
-import { IVToken } from "../interfaces/IVToken.sol";
+import { ICorePoolVToken } from "../interfaces/ICorePoolVToken.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IRiskStewardReceiver } from "./Interfaces/IRiskStewardReceiver.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
@@ -147,7 +147,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      */
     function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
         uint256 newValue = _decodeAbiEncodedUint256(update.newValue);
-        ICorePoolComptroller comptroller = ICorePoolComptroller(IVToken(update.market).comptroller());
+        ICorePoolComptroller comptroller = ICorePoolComptroller(ICorePoolVToken(update.market).comptroller());
         uint256 currentValue;
 
         if (update.updateTypeKey == SUPPLY_CAP_KEY) {
@@ -198,7 +198,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:event Emits SupplyCapUpdated with the market and new supply cap
      */
     function _updateSupplyCaps(address market, uint256 newValue) internal {
-        address comptroller = IVToken(market).comptroller();
+        address comptroller = ICorePoolVToken(market).comptroller();
         address[] memory newSupplyCapMarkets = new address[](1);
         newSupplyCapMarkets[0] = market;
         uint256[] memory newSupplyCaps = new uint256[](1);
@@ -216,7 +216,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
      */
     function _updateBorrowCaps(address market, uint256 newValue) internal {
-        address comptroller = IVToken(market).comptroller();
+        address comptroller = ICorePoolVToken(market).comptroller();
         address[] memory newBorrowCapMarkets = new address[](1);
         newBorrowCapMarkets[0] = market;
         uint256[] memory newBorrowCaps = new uint256[](1);

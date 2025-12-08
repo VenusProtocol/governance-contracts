@@ -2,8 +2,8 @@
 pragma solidity 0.8.25;
 
 import { RiskParameterUpdate } from "./Interfaces/IRiskOracle.sol";
-import { IVToken } from "../interfaces/IVToken.sol";
-import { IVToken as IILVToken } from "../interfaces/IILVToken.sol";
+import { ICorePoolVToken } from "../interfaces/ICorePoolVToken.sol";
+import { IIsolatedPoolVToken } from "../interfaces/IIsolatedPoolVToken.sol";
 import { InterestRateModel } from "@venusprotocol/isolated-pools/contracts/InterestRateModel.sol";
 import { InterestRateModelV8 } from "@venusprotocol/venus-protocol/contracts/InterestRateModels/InterestRateModelV8.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
@@ -175,12 +175,12 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:event Emits InterestRateModelUpdated with the market and new IRM address
      */
     function _updateIRM(address market, address newIRM) internal {
-        address comptroller = IVToken(market).comptroller();
+        address comptroller = ICorePoolVToken(market).comptroller();
 
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
-            IVToken(market)._setInterestRateModel(InterestRateModelV8(newIRM));
+            ICorePoolVToken(market)._setInterestRateModel(InterestRateModelV8(newIRM));
         } else {
-            IILVToken(market).setInterestRateModel(InterestRateModel(newIRM));
+            IIsolatedPoolVToken(market).setInterestRateModel(InterestRateModel(newIRM));
         }
 
         emit InterestRateModelUpdated(market, newIRM);

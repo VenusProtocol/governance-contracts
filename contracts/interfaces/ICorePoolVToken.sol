@@ -3,7 +3,8 @@ pragma solidity 0.8.25;
 
 import { InterestRateModelV8 } from "@venusprotocol/venus-protocol/contracts/InterestRateModels/InterestRateModelV8.sol";
 
-interface IVToken {
+interface ICorePoolVToken {
     function comptroller() external view returns (address);
+    function interestRateModel() external view returns (address);
     function _setInterestRateModel(InterestRateModelV8 newInterestRateModel) external returns (uint);
 }

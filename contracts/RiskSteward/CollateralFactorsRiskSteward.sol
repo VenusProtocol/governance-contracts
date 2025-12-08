@@ -2,7 +2,7 @@
 pragma solidity 0.8.25;
 
 import { RiskParameterUpdate } from "./Interfaces/IRiskOracle.sol";
-import { IVToken } from "../interfaces/IVToken.sol";
+import { ICorePoolVToken } from "../interfaces/ICorePoolVToken.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
 import { IRiskStewardReceiver } from "./Interfaces/IRiskStewardReceiver.sol";
@@ -148,7 +148,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         if (update.poolId != 0) return false;
 
         if (update.updateTypeKey == COLLATERAL_FACTORS_KEY) {
-            address comptroller = IVToken(update.market).comptroller();
+            address comptroller = ICorePoolVToken(update.market).comptroller();
 
             (uint256 newCF, uint256 newLT) = _decodeAbiEncodedTwoUint256(update.newValue);
             (uint256 currCF, uint256 currLT) = _getCurrentCollateralFactors(comptroller, update.market);
@@ -176,7 +176,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
             revert OnlyRiskStewardReceiver();
         }
 
-        address comptroller = IVToken(update.market).comptroller();
+        address comptroller = ICorePoolVToken(update.market).comptroller();
         uint96 poolId = update.poolId;
 
         if (update.updateTypeKey == COLLATERAL_FACTORS_KEY) {

@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
 
-import { IVToken } from "../interfaces/IVToken.sol";
+import { ICorePoolVToken } from "../interfaces/ICorePoolVToken.sol";
 
 contract MockCoreComptroller {
     /// @notice Mapping of vToken addresses to their supply caps
@@ -23,7 +23,7 @@ contract MockCoreComptroller {
     mapping(uint96 => mapping(address => uint256)) internal _eModeLiquidationThresholdMantissa;
 
     /// @notice Array of all vTokens
-    IVToken[] public allVTokens;
+    ICorePoolVToken[] public allVTokens;
 
     /// @notice Mapping of vToken addresses to boolean indicating if they are listed
     mapping(address => bool) public vTokenListed;
@@ -35,7 +35,7 @@ contract MockCoreComptroller {
     function supportMarket(address vToken) external {
         require(!vTokenListed[vToken], "vToken already listed");
         vTokenListed[address(vToken)] = true;
-        allVTokens.push(IVToken(vToken));
+        allVTokens.push(ICorePoolVToken(vToken));
     }
 
     /**
@@ -173,7 +173,7 @@ contract MockCoreComptroller {
      * @notice Get all vTokens
      * @return Array of vToken addresses
      */
-    function getAllMarkets() external view returns (IVToken[] memory) {
+    function getAllMarkets() external view returns (ICorePoolVToken[] memory) {
         return allVTokens;
     }
 }

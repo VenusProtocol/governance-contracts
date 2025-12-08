@@ -1350,15 +1350,15 @@ describe("Risk Steward", async function () {
       describe("RiskStewardReceiver", async function () {
         it("should return executable updates excluding rejected ones", async function () {
           // Create additional markets
-          const mockCoreVToken2 = await (await ethers.getContractFactory("MockVToken")).deploy(
-            mockCoreComptroller.address,
-          );
-          const mockCoreVToken3 = await (await ethers.getContractFactory("MockVToken")).deploy(
-            mockCoreComptroller.address,
-          );
-          const mockCoreVToken4 = await (await ethers.getContractFactory("MockVToken")).deploy(
-            mockCoreComptroller.address,
-          );
+          const mockCoreVToken2 = await (
+            await ethers.getContractFactory("MockVToken")
+          ).deploy(mockCoreComptroller.address);
+          const mockCoreVToken3 = await (
+            await ethers.getContractFactory("MockVToken")
+          ).deploy(mockCoreComptroller.address);
+          const mockCoreVToken4 = await (
+            await ethers.getContractFactory("MockVToken")
+          ).deploy(mockCoreComptroller.address);
 
           await mockCoreComptroller.supportMarket(mockCoreVToken2.address);
           await mockCoreComptroller.supportMarket(mockCoreVToken3.address);
@@ -1425,10 +1425,7 @@ describe("Risk Steward", async function () {
           await time.increase(SIX_HOURS + 1);
 
           // Get executable updates - should not include the rejected one
-          executableUpdates = await riskStewardReceiver.getExecutableUpdates(
-            "borrowCap",
-            mockCoreComptroller.address,
-          );
+          executableUpdates = await riskStewardReceiver.getExecutableUpdates("borrowCap", mockCoreComptroller.address);
           expect(executableUpdates).to.have.lengthOf(3);
           const updateIds = executableUpdates.map((id: any) => id.toNumber());
           expect(updateIds).to.include.members([1, 3, 4]);
@@ -1439,15 +1436,15 @@ describe("Risk Steward", async function () {
       describe("DestinationStewardReceiver", async function () {
         it("should return executable updates excluding rejected ones", async function () {
           // Create additional markets
-          const mockCoreVToken2 = await (await ethers.getContractFactory("MockVToken")).deploy(
-            mockCoreComptroller.address,
-          );
-          const mockCoreVToken3 = await (await ethers.getContractFactory("MockVToken")).deploy(
-            mockCoreComptroller.address,
-          );
-          const mockCoreVToken4 = await (await ethers.getContractFactory("MockVToken")).deploy(
-            mockCoreComptroller.address,
-          );
+          const mockCoreVToken2 = await (
+            await ethers.getContractFactory("MockVToken")
+          ).deploy(mockCoreComptroller.address);
+          const mockCoreVToken3 = await (
+            await ethers.getContractFactory("MockVToken")
+          ).deploy(mockCoreComptroller.address);
+          const mockCoreVToken4 = await (
+            await ethers.getContractFactory("MockVToken")
+          ).deploy(mockCoreComptroller.address);
 
           await mockCoreComptroller.supportMarket(mockCoreVToken2.address);
           await mockCoreComptroller.supportMarket(mockCoreVToken3.address);
