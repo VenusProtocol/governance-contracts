@@ -70,8 +70,8 @@ jobs:
 
       - name: "Test the contracts and generate the coverage report"
         run: |
-          source .env.example
-          yarn hardhat compile && yarn hardhat coverage
+          yarn hardhat compile
+          yarn hardhat coverage
 
       - name: "Add test summary"
         run: |
