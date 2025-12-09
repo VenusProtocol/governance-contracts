@@ -55,9 +55,10 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Emitted when collateral factors are updated.
      */
     event CollateralFactorsUpdated(
+        uint256 indexed updateId,
         address indexed market,
-        uint256 indexed newCollateralFactor,
-        uint256 indexed newLiquidationThreshold
+        uint256 newCollateralFactor,
+        uint256 newLiquidationThreshold
     );
 
     /**
@@ -108,17 +109,11 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Initializes the contract as ownable and access controlled. Sets the safe delta bps initial value.
+     * @notice Initializes the contract as ownable and access controlled.
      * @param accessControlManager_ The address of the access control manager
-     * @param safeDeltaBps_ The safe delta threshold in basis points (0 to MAX_BPS). Updates within this delta require no timelock.
-     * @custom:error Throws InvalidSafeDeltaBps if the safe delta bps is greater than MAX_BPS
      */
-    function initialize(address accessControlManager_, uint256 safeDeltaBps_) external initializer {
+    function initialize(address accessControlManager_) external initializer {
         __AccessControlled_init(accessControlManager_);
-        if (safeDeltaBps_ > MAX_BPS) {
-            revert InvalidSafeDeltaBps();
-        }
-        safeDeltaBps = safeDeltaBps_;
     }
 
     /**
@@ -163,15 +158,15 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Processes a collateral parameter update from the `RiskStewardReceiver`.
+     * @notice Applies a collateral parameter update from the `RiskStewardReceiver`.
      *         Delta validation and timelock checks are already performed by `RiskStewardReceiver` before execution.
-     * @param update RiskParameterUpdate update to process
+     * @param update RiskParameterUpdate update to apply
      * @custom:access Only callable by the `RiskStewardReceiver`
-     * @custom:event Emits CollateralFactorsUpdated
+     * @custom:event Emits CollateralFactorsUpdated with updateId
      * @custom:error Throws OnlyRiskStewardReceiver if the sender is not the `RiskStewardReceiver`
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
      */
-    function processUpdate(RiskParameterUpdate calldata update) external {
+    function applyUpdate(RiskParameterUpdate calldata update) external {
         if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
             revert OnlyRiskStewardReceiver();
         }
@@ -180,7 +175,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         uint96 poolId = update.poolId;
 
         if (update.updateTypeKey == COLLATERAL_FACTORS_KEY) {
-            _updateCollateralFactors(comptroller, update.market, poolId, update.newValue);
+            _updateCollateralFactors(update.updateId, comptroller, update.market, poolId, update.newValue);
         } else {
             revert UnsupportedUpdateType();
         }
@@ -189,13 +184,15 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Updates the collateral factors for the given market.
      * @dev Updates both collateral factor and liquidation threshold together (same setter).
+     * @param updateId The update ID from the Risk Oracle
      * @param comptroller The comptroller address
      * @param market The market to update the collateral factors for
      * @param poolId The pool identifier for eMode updates (0 for regular market updates)
      * @param newValue Encoded new collateral factors: `abi.encode(uint256 newCollateralFactor, uint256 newLiquidationThreshold)`
-     * @custom:event Emits CollateralFactorsUpdated
+     * @custom:event Emits CollateralFactorsUpdated with updateId
      */
     function _updateCollateralFactors(
+        uint256 updateId,
         address comptroller,
         address market,
         uint96 poolId,
@@ -220,7 +217,7 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
             );
         }
 
-        emit CollateralFactorsUpdated(market, newCollateralFactor, newLiquidationThreshold);
+        emit CollateralFactorsUpdated(updateId, market, newCollateralFactor, newLiquidationThreshold);
     }
 
     /**

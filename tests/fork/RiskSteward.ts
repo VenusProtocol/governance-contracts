@@ -145,11 +145,10 @@ const riskStewardFixture = async () => {
   );
 
   // Deploy MarketCapsRiskSteward
-  const deltaBps50 = 5000; // 50%
   const MarketCapsRiskStewardFactory = await ethers.getContractFactory("MarketCapsRiskSteward");
   const marketCapsRiskSteward = await upgrades.deployProxy(
     MarketCapsRiskStewardFactory,
-    [accessControlManager.address, deltaBps50],
+    [accessControlManager.address],
     {
       constructorArgs: [riskStewardReceiver.address],
       initializer: "initialize",
@@ -161,7 +160,7 @@ const riskStewardFixture = async () => {
   const CollateralFactorsRiskStewardFactory = await ethers.getContractFactory("CollateralFactorsRiskSteward");
   const collateralFactorsRiskSteward = await upgrades.deployProxy(
     CollateralFactorsRiskStewardFactory,
-    [accessControlManager.address, deltaBps50],
+    [accessControlManager.address],
     {
       constructorArgs: [comptroller.address, riskStewardReceiver.address],
       initializer: "initialize",
@@ -176,6 +175,22 @@ const riskStewardFixture = async () => {
     initializer: "initialize",
     unsafeAllow: ["state-variable-immutable"],
   });
+
+  // Set safeDeltaBps for stewards (5000 = 50%)
+  const deltaBps50 = 5000;
+  await accessControlManager.giveCallPermission(
+    marketCapsRiskSteward.address,
+    "setSafeDeltaBps(uint256)",
+    timelock.address,
+  );
+  await accessControlManager.giveCallPermission(
+    collateralFactorsRiskSteward.address,
+    "setSafeDeltaBps(uint256)",
+    timelock.address,
+  );
+
+  await marketCapsRiskSteward.connect(timelock).setSafeDeltaBps(deltaBps50);
+  await collateralFactorsRiskSteward.connect(timelock).setSafeDeltaBps(deltaBps50);
 
   await setupACMPermissions(
     accessControlManager,
@@ -290,7 +305,7 @@ if (FORK_MAINNET) {
 
           await expect(riskStewardReceiver.processUpdate(1))
             .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
-            .withArgs(vCake_CORE.address, newCap);
+            .withArgs(1, vCake_CORE.address, newCap);
 
           expect(await comptroller.supplyCaps(vCake_CORE.address)).to.equal(newCap);
         });
@@ -318,7 +333,7 @@ if (FORK_MAINNET) {
 
           await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
             .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
-            .withArgs(vDai_CORE.address, newCap);
+            .withArgs(1, vDai_CORE.address, newCap);
 
           expect(await comptroller.supplyCaps(vDai_CORE.address)).to.equal(newCap);
         });
@@ -344,7 +359,7 @@ if (FORK_MAINNET) {
 
           await expect(riskStewardReceiver.processUpdate(1))
             .to.emit(marketCapsRiskSteward, "BorrowCapUpdated")
-            .withArgs(vWbnb_CORE.address, newCap);
+            .withArgs(1, vWbnb_CORE.address, newCap);
 
           expect(await comptroller.borrowCaps(vWbnb_CORE.address)).to.equal(newCap);
         });
@@ -372,7 +387,7 @@ if (FORK_MAINNET) {
 
           await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
             .to.emit(marketCapsRiskSteward, "BorrowCapUpdated")
-            .withArgs(vUsdt_DeFI.address, newCap);
+            .withArgs(1, vUsdt_DeFI.address, newCap);
 
           expect(await comptroller_defi.borrowCaps(vUsdt_DeFI.address)).to.equal(newCap);
         });
@@ -403,7 +418,7 @@ if (FORK_MAINNET) {
 
           await expect(riskStewardReceiver.processUpdate(1))
             .to.emit(collateralFactorsRiskSteward, "CollateralFactorsUpdated")
-            .withArgs(vCake_CORE.address, newCF, newLT);
+            .withArgs(1, vCake_CORE.address, newCF, newLT);
 
           const updatedMarketInfo = await comptroller.markets(vCake_CORE.address);
           expect(updatedMarketInfo.collateralFactorMantissa).to.equal(newCF);
@@ -438,7 +453,7 @@ if (FORK_MAINNET) {
 
           await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
             .to.emit(collateralFactorsRiskSteward, "CollateralFactorsUpdated")
-            .withArgs(vBsw_Defi.address, newCF, newLT);
+            .withArgs(1, vBsw_Defi.address, newCF, newLT);
 
           const updatedMarketInfo = await comptroller_defi.markets(vBsw_Defi.address);
           expect(updatedMarketInfo.collateralFactorMantissa).to.equal(newCF);
@@ -475,7 +490,7 @@ if (FORK_MAINNET) {
 
           await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
             .to.emit(irmRiskSteward, "InterestRateModelUpdated")
-            .withArgs(vDai_CORE.address, newIRM.address);
+            .withArgs(1, vDai_CORE.address, newIRM.address);
 
           expect(await vDai_CORE.interestRateModel()).to.equal(newIRM.address);
         });
@@ -508,7 +523,7 @@ if (FORK_MAINNET) {
 
           await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
             .to.emit(irmRiskSteward, "InterestRateModelUpdated")
-            .withArgs(vUsdt_DeFI.address, newIRM.address);
+            .withArgs(1, vUsdt_DeFI.address, newIRM.address);
 
           expect(await vUsdt_DeFI.interestRateModel()).to.equal(newIRM.address);
         });

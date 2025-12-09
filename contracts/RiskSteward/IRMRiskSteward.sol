@@ -58,7 +58,11 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Emitted when an interest rate model is updated
      */
-    event InterestRateModelUpdated(address indexed market, address indexed newInterestRateModel);
+    event InterestRateModelUpdated(
+        uint256 indexed updateId,
+        address indexed market,
+        address indexed newInterestRateModel
+    );
 
     /**
      * @notice Emitted when the safe delta bps is updated
@@ -130,23 +134,23 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Processes an interest rate model update from the RiskStewardReceiver.
+     * @notice Applies an interest rate model update from the RiskStewardReceiver.
      * Directly updates the market interest rate model on the vToken.
      * Delta validation is already performed by RiskStewardReceiver before execution.
-     * @param update RiskParameterUpdate update to process
+     * @param update RiskParameterUpdate update to apply
      * @custom:error Throws OnlyRiskStewardReceiver if the sender is not the RiskStewardReceiver
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
-     * @custom:event Emits InterestRateModelUpdated with the market and new IRM address
+     * @custom:event Emits InterestRateModelUpdated with the updateId, market and new IRM address
      * @custom:access Only callable by the RiskStewardReceiver
      */
-    function processUpdate(RiskParameterUpdate calldata update) external {
+    function applyUpdate(RiskParameterUpdate calldata update) external {
         if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
             revert OnlyRiskStewardReceiver();
         }
 
         if (update.updateTypeKey == INTEREST_RATE_MODEL_KEY) {
             address newIRM = _decodeAbiEncodedAddress(update.newValue);
-            _updateIRM(update.market, newIRM);
+            _updateIRM(update.updateId, update.market, newIRM);
         } else {
             revert UnsupportedUpdateType();
         }
@@ -170,11 +174,12 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
 
     /**
      * @notice Updates the interest rate model for the given market.
+     * @param updateId The update ID from the Risk Oracle
      * @param market The market to update the interest rate model for
      * @param newIRM The new interest rate model address
-     * @custom:event Emits InterestRateModelUpdated with the market and new IRM address
+     * @custom:event Emits InterestRateModelUpdated with the updateId, market and new IRM address
      */
-    function _updateIRM(address market, address newIRM) internal {
+    function _updateIRM(uint256 updateId, address market, address newIRM) internal {
         address comptroller = ICorePoolVToken(market).comptroller();
 
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
@@ -183,7 +188,7 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
             IIsolatedPoolVToken(market).setInterestRateModel(InterestRateModel(newIRM));
         }
 
-        emit InterestRateModelUpdated(market, newIRM);
+        emit InterestRateModelUpdated(updateId, market, newIRM);
     }
 
     /**

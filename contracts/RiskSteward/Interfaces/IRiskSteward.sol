@@ -36,8 +36,8 @@ interface IRiskSteward {
     function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool);
 
     /**
-     * @notice Processes and applies a validated risk parameter update.
-     * @param update The risk parameter update to process
+     * @notice Applies a validated risk parameter update.
+     * @param update The risk parameter update to apply
      */
-    function processUpdate(RiskParameterUpdate calldata update) external;
+    function applyUpdate(RiskParameterUpdate calldata update) external;
 }

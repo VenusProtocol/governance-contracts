@@ -332,7 +332,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
             revert UpdateTooFrequent();
         }
 
-        IRiskSteward(config.riskSteward).processUpdate(update);
+        IRiskSteward(config.riskSteward).applyUpdate(update);
 
         lastExecutedAt[updateTypeKey][update.market] = block.timestamp;
         destUpdate.status = UpdateStatus.Executed;

@@ -60,12 +60,12 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Emitted when a supply cap is updated
      */
-    event SupplyCapUpdated(address indexed market, uint256 indexed newSupplyCap);
+    event SupplyCapUpdated(uint256 indexed updateId, address indexed market, uint256 newSupplyCap);
 
     /**
      * @notice Emitted when a borrow cap is updated
      */
-    event BorrowCapUpdated(address indexed market, uint256 indexed newBorrowCap);
+    event BorrowCapUpdated(uint256 indexed updateId, address indexed market, uint256 newBorrowCap);
 
     /**
      * @notice Emitted when the safe delta bps is updated
@@ -110,17 +110,11 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Initializes the contract as ownable and access controlled. Sets the safe delta bps initial value.
+     * @notice Initializes the contract as ownable and access controlled.
      * @param accessControlManager_ The address of the access control manager
-     * @param safeDeltaBps_ The safe delta threshold in basis points (0 to MAX_BPS). Updates within this delta require no timelock.
-     * @custom:error Throws InvalidSafeDeltaBps if the safe delta bps is greater than MAX_BPS
      */
-    function initialize(address accessControlManager_, uint256 safeDeltaBps_) external initializer {
+    function initialize(address accessControlManager_) external initializer {
         __AccessControlled_init(accessControlManager_);
-        if (safeDeltaBps_ > MAX_BPS) {
-            revert InvalidSafeDeltaBps();
-        }
-        safeDeltaBps = safeDeltaBps_;
     }
 
     /**
@@ -168,24 +162,24 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Processes a market cap update from the RiskStewardReceiver.
+     * @notice Applies a market cap update from the RiskStewardReceiver.
      * Directly updates the market supply or borrow cap on the market's comptroller.
      * @custom:access Only callable by the RiskStewardReceiver
-     * @param update RiskParameterUpdate update to process
-     * @custom:event Emits SupplyCapUpdated or BorrowCapUpdated depending on the update with the market and new cap
+     * @param update RiskParameterUpdate update to apply
+     * @custom:event Emits SupplyCapUpdated or BorrowCapUpdated depending on the update with the updateId, market and new cap
      * @custom:error Throws OnlyRiskStewardReceiver if the sender is not the RiskStewardReceiver
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
      */
-    function processUpdate(RiskParameterUpdate calldata update) external {
+    function applyUpdate(RiskParameterUpdate calldata update) external {
         if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
             revert OnlyRiskStewardReceiver();
         }
         uint256 newValue = _decodeAbiEncodedUint256(update.newValue);
 
         if (update.updateTypeKey == SUPPLY_CAP_KEY) {
-            _updateSupplyCaps(update.market, newValue);
+            _updateSupplyCaps(update.updateId, update.market, newValue);
         } else if (update.updateTypeKey == BORROW_CAP_KEY) {
-            _updateBorrowCaps(update.market, newValue);
+            _updateBorrowCaps(update.updateId, update.market, newValue);
         } else {
             revert UnsupportedUpdateType();
         }
@@ -193,11 +187,12 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
 
     /**
      * @notice Updates the supply cap for the given market.
+     * @param updateId The update ID from the Risk Oracle
      * @param market The market to update the supply cap for
      * @param newValue The new supply cap value
-     * @custom:event Emits SupplyCapUpdated with the market and new supply cap
+     * @custom:event Emits SupplyCapUpdated with the updateId, market and new supply cap
      */
-    function _updateSupplyCaps(address market, uint256 newValue) internal {
+    function _updateSupplyCaps(uint256 updateId, address market, uint256 newValue) internal {
         address comptroller = ICorePoolVToken(market).comptroller();
         address[] memory newSupplyCapMarkets = new address[](1);
         newSupplyCapMarkets[0] = market;
@@ -206,16 +201,17 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
 
         // Core and isolated pools share the same `setMarketSupplyCaps` signature.
         ICorePoolComptroller(comptroller).setMarketSupplyCaps(newSupplyCapMarkets, newSupplyCaps);
-        emit SupplyCapUpdated(market, newSupplyCaps[0]);
+        emit SupplyCapUpdated(updateId, market, newSupplyCaps[0]);
     }
 
     /**
      * @notice Updates the borrow cap for the given market.
+     * @param updateId The update ID from the Risk Oracle
      * @param market The market to update the borrow cap for
      * @param newValue The new borrow cap value
-     * @custom:event Emits BorrowCapUpdated with the market and new borrow cap
+     * @custom:event Emits BorrowCapUpdated with the updateId, market and new borrow cap
      */
-    function _updateBorrowCaps(address market, uint256 newValue) internal {
+    function _updateBorrowCaps(uint256 updateId, address market, uint256 newValue) internal {
         address comptroller = ICorePoolVToken(market).comptroller();
         address[] memory newBorrowCapMarkets = new address[](1);
         newBorrowCapMarkets[0] = market;
@@ -224,7 +220,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
 
         //Core and isolated pools share the same `setMarketBorrowCaps` signature,
         ICorePoolComptroller(comptroller).setMarketBorrowCaps(newBorrowCapMarkets, newBorrowCaps);
-        emit BorrowCapUpdated(market, newBorrowCaps[0]);
+        emit BorrowCapUpdated(updateId, market, newBorrowCaps[0]);
     }
 
     /**

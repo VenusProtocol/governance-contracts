@@ -250,21 +250,16 @@ describe("Risk Steward", async function () {
     await deployAndConfigureBridge(localEndpointV2, remoteEndpointV2);
 
     // Market caps stewards
-    const deltaBps50 = 5000; // 50%
     MarketCapsRiskStewardFactory = await ethers.getContractFactory("MarketCapsRiskSteward");
-    marketCapsRiskSteward = await upgrades.deployProxy(
-      MarketCapsRiskStewardFactory,
-      [accessControlManager.address, deltaBps50],
-      {
-        constructorArgs: [riskStewardReceiver.address],
-        initializer: "initialize",
-        unsafeAllow: ["state-variable-immutable"],
-      },
-    );
+    marketCapsRiskSteward = await upgrades.deployProxy(MarketCapsRiskStewardFactory, [accessControlManager.address], {
+      constructorArgs: [riskStewardReceiver.address],
+      initializer: "initialize",
+      unsafeAllow: ["state-variable-immutable"],
+    });
 
     destinationMarketCapsRiskSteward = await upgrades.deployProxy(
       MarketCapsRiskStewardFactory,
-      [accessControlManager.address, deltaBps50],
+      [accessControlManager.address],
       {
         constructorArgs: [destinationRiskStewardReceiver.address],
         initializer: "initialize",
@@ -276,7 +271,7 @@ describe("Risk Steward", async function () {
     CollateralFactorsRiskStewardFactory = await ethers.getContractFactory("CollateralFactorsRiskSteward");
     collateralFactorsRiskSteward = await upgrades.deployProxy(
       CollateralFactorsRiskStewardFactory,
-      [accessControlManager.address, deltaBps50],
+      [accessControlManager.address],
       {
         constructorArgs: [mockCoreComptroller.address, riskStewardReceiver.address],
         initializer: "initialize",
@@ -287,13 +282,41 @@ describe("Risk Steward", async function () {
     // Destination collateral factors steward
     destinationCollateralFactorsRiskSteward = await upgrades.deployProxy(
       CollateralFactorsRiskStewardFactory,
-      [accessControlManager.address, deltaBps50],
+      [accessControlManager.address],
       {
         constructorArgs: [mockCoreComptroller.address, destinationRiskStewardReceiver.address],
         initializer: "initialize",
         unsafeAllow: ["state-variable-immutable"],
       },
     );
+
+    // Set safeDeltaBps for stewards (5000 = 50%)
+    const deltaBps50 = 5000;
+    await accessControlManager.giveCallPermission(
+      marketCapsRiskSteward.address,
+      "setSafeDeltaBps(uint256)",
+      deployer.address,
+    );
+    await accessControlManager.giveCallPermission(
+      destinationMarketCapsRiskSteward.address,
+      "setSafeDeltaBps(uint256)",
+      deployer.address,
+    );
+    await accessControlManager.giveCallPermission(
+      collateralFactorsRiskSteward.address,
+      "setSafeDeltaBps(uint256)",
+      deployer.address,
+    );
+    await accessControlManager.giveCallPermission(
+      destinationCollateralFactorsRiskSteward.address,
+      "setSafeDeltaBps(uint256)",
+      deployer.address,
+    );
+
+    await marketCapsRiskSteward.setSafeDeltaBps(deltaBps50);
+    await destinationMarketCapsRiskSteward.setSafeDeltaBps(deltaBps50);
+    await collateralFactorsRiskSteward.setSafeDeltaBps(deltaBps50);
+    await destinationCollateralFactorsRiskSteward.setSafeDeltaBps(deltaBps50);
 
     // IRM steward
     IRMRiskStewardFactory = await ethers.getContractFactory("IRMRiskSteward");
@@ -334,7 +357,7 @@ describe("Risk Steward", async function () {
 
         await expect(await riskStewardReceiver.processUpdate(1))
           .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
-          .withArgs(mockCoreVToken.address, parseUnits("10", 18));
+          .withArgs(1, mockCoreVToken.address, parseUnits("10", 18));
 
         expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("10", 18));
       });
@@ -354,7 +377,7 @@ describe("Risk Steward", async function () {
 
         await expect(await riskStewardReceiver.processUpdate(1))
           .to.emit(marketCapsRiskSteward, "BorrowCapUpdated")
-          .withArgs(mockVToken.address, parseUnits("7", 18));
+          .withArgs(1, mockVToken.address, parseUnits("7", 18));
 
         expect(await mockComptroller.borrowCaps(mockVToken.address)).to.equal(parseUnits("7", 18));
       });
@@ -383,7 +406,7 @@ describe("Risk Steward", async function () {
 
         await expect(await riskStewardReceiver.processUpdate(1))
           .to.emit(collateralFactorsRiskSteward, "CollateralFactorsUpdated")
-          .withArgs(mockCoreVToken.address, newCF, newLT);
+          .withArgs(1, mockCoreVToken.address, newCF, newLT);
 
         const marketInfo = await mockCoreComptroller.markets(mockCoreVToken.address);
         expect(marketInfo.collateralFactorMantissa).to.equal(newCF);
@@ -409,7 +432,7 @@ describe("Risk Steward", async function () {
 
         await expect(await riskStewardReceiver.processUpdate(1))
           .to.emit(collateralFactorsRiskSteward, "CollateralFactorsUpdated")
-          .withArgs(mockVToken.address, newCF, newLT);
+          .withArgs(1, mockVToken.address, newCF, newLT);
 
         const marketInfo = await mockComptroller.markets(mockVToken.address);
         expect(marketInfo.collateralFactorMantissa).to.equal(newCF);
@@ -439,7 +462,7 @@ describe("Risk Steward", async function () {
 
         await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
           .to.emit(marketCapsRiskSteward, "BorrowCapUpdated")
-          .withArgs(mockCoreVToken.address, parseUnits("3", 18));
+          .withArgs(1, mockCoreVToken.address, parseUnits("3", 18));
 
         expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("3", 18));
       });
@@ -473,7 +496,7 @@ describe("Risk Steward", async function () {
 
         await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
           .to.emit(collateralFactorsRiskSteward, "CollateralFactorsUpdated")
-          .withArgs(mockCoreVToken.address, newCF, newLT);
+          .withArgs(1, mockCoreVToken.address, newCF, newLT);
 
         const eModeMarketInfo = await mockCoreComptroller.poolMarkets(poolId, mockCoreVToken.address);
         expect(eModeMarketInfo.collateralFactorMantissa).to.equal(newCF);
@@ -507,7 +530,7 @@ describe("Risk Steward", async function () {
 
         await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
           .to.emit(irmRiskSteward, "InterestRateModelUpdated")
-          .withArgs(mockCoreVToken.address, newIRM);
+          .withArgs(1, mockCoreVToken.address, newIRM);
 
         expect(await mockCoreVToken.interestRateModel()).to.equal(newIRM);
       });
@@ -539,7 +562,7 @@ describe("Risk Steward", async function () {
 
         await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
           .to.emit(irmRiskSteward, "InterestRateModelUpdated")
-          .withArgs(mockVToken.address, newIRM);
+          .withArgs(1, mockVToken.address, newIRM);
 
         expect(await mockVToken.interestRateModel()).to.equal(newIRM);
       });
@@ -580,7 +603,7 @@ describe("Risk Steward", async function () {
 
         await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1))
           .to.emit(destinationMarketCapsRiskSteward, "BorrowCapUpdated")
-          .withArgs(mockCoreVToken.address, parseUnits("12", 18));
+          .withArgs(1, mockCoreVToken.address, parseUnits("12", 18));
 
         // After destination execution, caps should reflect the new remote value
         expect(await mockCoreComptroller.borrowCaps(mockCoreVToken.address)).to.equal(parseUnits("12", 18));
@@ -624,7 +647,7 @@ describe("Risk Steward", async function () {
 
         await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1))
           .to.emit(destinationCollateralFactorsRiskSteward, "CollateralFactorsUpdated")
-          .withArgs(mockVToken.address, newCF, newLT);
+          .withArgs(1, mockVToken.address, newCF, newLT);
 
         const destMarketInfo = await mockComptroller.markets(mockVToken.address);
         expect(destMarketInfo.collateralFactorMantissa).to.equal(newCF);
@@ -669,7 +692,7 @@ describe("Risk Steward", async function () {
 
         await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1))
           .to.emit(destinationIRMRiskSteward, "InterestRateModelUpdated")
-          .withArgs(mockCoreVToken.address, newIRM);
+          .withArgs(1, mockCoreVToken.address, newIRM);
 
         // After destination execution, IRM should reflect the new remote value
         expect(await mockCoreVToken.interestRateModel()).to.equal(newIRM);
