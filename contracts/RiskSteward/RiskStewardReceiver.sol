@@ -75,6 +75,26 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     uint256[44] private __gap;
 
     /**
+     * @dev Ensures the caller is a whitelisted executor.
+     */
+    modifier onlyWhitelistedExecutors() {
+        if (!whitelistedExecutors[msg.sender]) {
+            revert NotAnExecutor();
+        }
+        _;
+    }
+
+    /**
+     * @dev Ensures the contract is not paused.
+     */
+    modifier whenNotPaused() {
+        if (paused) {
+            revert PausedError();
+        }
+        _;
+    }
+
+    /**
      * @notice Disables initializers and sets the Risk Oracle and LayerZero configuration.
      * @param riskOracle_ The address of the Risk Oracle contract.
      * @param endpoint_ The LayerZero endpoint contract used by the underlying `OAppUpgradeable`.
@@ -228,8 +248,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:error Throws UpdateTooFrequent if the debounce period has not passed
      * @custom:error Throws RegisteredUpdateTypeExist if there is a non-expired pending update of the same type
      */
-    function processUpdate(uint256 updateId) external {
-        _checkPausedState();
+    function processUpdate(uint256 updateId) external whenNotPaused {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
         RiskParamConfig storage config = riskParameterConfigs[update.updateTypeKey];
         _ensureNoActiveUpdate(update);
@@ -243,7 +262,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         _registerUpdate(update, config, safeForDirectExecution, isRemoteUpdate);
 
         if (isRemoteUpdate) {
-            _sendRemoteUpdate(update);
+            _sendRemoteUpdate(update, "");
         } else if (safeForDirectExecution) {
             _executeUpdate(update, riskSteward);
         }
@@ -262,11 +281,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:error Throws ConfigNotActive if the config is not active
      * @custom:error Throws UpdateNotUnlocked if the unlock time has not passed
      */
-    function executeRegisteredUpdate(uint256 updateId) external {
-        if (!whitelistedExecutors[msg.sender]) {
-            revert NotAnExecutor();
-        }
-
+    function executeRegisteredUpdate(uint256 updateId) external onlyWhitelistedExecutors {
         RegisteredUpdate storage registeredUpdate = updates[updateId];
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
         RiskParamConfig storage config = riskParameterConfigs[update.updateTypeKey];
@@ -282,11 +297,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:event Emits UpdateRejected with the oracle update ID
      * @custom:error Throws UpdateAlreadyResolved if the update was already executed or rejected
      */
-    function rejectUpdate(uint256 updateId) external {
-        if (!whitelistedExecutors[msg.sender]) {
-            revert NotAnExecutor();
-        }
-
+    function rejectUpdate(uint256 updateId) external onlyWhitelistedExecutors {
         RegisteredUpdate storage registeredUpdate = updates[updateId];
 
         if (registeredUpdate.status != UpdateStatus.Pending) {
@@ -302,17 +313,14 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @dev Duplicate update rejection is handled in the destination contract itself, so resending
      *      the same update multiple times is safe and will be deduplicated on the destination side.
      * @param updateId The oracle update ID to resend
+     * @param options LayerZero message options; if empty, default executor option is used
      * @custom:access Only whitelisted executors can call this function
      * @custom:event Emits UpdateResentToDestination with the update ID, destination chain ID, update type, and market
      * @custom:error Throws NotAnExecutor if the caller is not a whitelisted executor
      * @custom:error Throws InvalidUpdateToResend if the update status is not SENT_TO_DESTINATION
      * @custom:error Throws UpdateIsExpired if the update has expired
      */
-    function resendRemoteUpdate(uint256 updateId) external {
-        if (!whitelistedExecutors[msg.sender]) {
-            revert NotAnExecutor();
-        }
-
+    function resendRemoteUpdate(uint256 updateId, bytes calldata options) external onlyWhitelistedExecutors {
         RegisteredUpdate storage registeredUpdate = updates[updateId];
         if (registeredUpdate.status != UpdateStatus.SENT_TO_DESTINATION) {
             revert InvalidUpdateToResend();
@@ -325,7 +333,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
             revert UpdateIsExpired();
         }
 
-        _sendRemoteUpdate(update);
+        _sendRemoteUpdate(update, options);
         emit UpdateResentToDestination(update.updateId, update.destLzEid, update.updateType, update.market);
     }
 
@@ -437,10 +445,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         }
 
         bytes memory payload = abi.encode(update);
-        bytes memory options_ = options.length == 0
-            ? OptionsBuilder.newOptions().addExecutorLzReceiveOption(1_000_000, 0)
-            : options;
-        _lzSend(dstEid, payload, options_, fee, refundAddress);
+        _lzSend(dstEid, payload, options, fee, refundAddress);
     }
 
     /**
@@ -520,10 +525,13 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @notice Sends a risk parameter update to a destination chain via LayerZero and records it as sent.
      *         The update should already be registered before calling this function.
      * @param update The risk parameter update to send to the destination chain
+     * @param options LayerZero message options; if empty, default executor option is used
      * @custom:event Emits UpdateSentToDestination with the update ID, destination endpoint ID, update type, and market
      */
-    function _sendRemoteUpdate(RiskParameterUpdate memory update) internal {
-        bytes memory option = OptionsBuilder.newOptions().addExecutorLzReceiveOption(1_000_000, 0);
+    function _sendRemoteUpdate(RiskParameterUpdate memory update, bytes memory options) internal {
+        bytes memory option = options.length == 0
+            ? OptionsBuilder.newOptions().addExecutorLzReceiveOption(1_000_000, 0)
+            : options;
 
         MessagingFee memory fee = quote(update, option, false);
         this.lzSend{ value: fee.nativeFee }(update.destLzEid, update, option, fee, address(this));
@@ -568,15 +576,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         revert RegisteredUpdateTypeExist(registeredUpdateId);
     }
 
-    /**
-     * @notice Reverts if the contract is paused.
-     * @custom:error PausedError if the contract is paused
-     */
-    function _checkPausedState() internal view {
-        if (paused) {
-            revert PausedError();
-        }
-    }
 
     /**
      * @notice Validates an oracle update before registration.

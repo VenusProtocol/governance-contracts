@@ -289,6 +289,17 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     }
 
     /**
+     * @notice Modifier that ensures only whitelisted executors can call the function
+     * @custom:error NotAnExecutor if the caller is not a whitelisted executor
+     */
+    modifier onlyWhitelistedExecutors() {
+        if (!whitelistedExecutors[msg.sender]) {
+            revert NotAnExecutor();
+        }
+        _;
+    }
+
+    /**
      * @notice Executes a bridged update after its remote delay has passed.
      * @param updateId The bridged update ID to execute
      * @custom:access Only whitelisted executors can execute updates
@@ -300,11 +311,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @custom:error UpdateIsExpired if the bridged update has expired on the destination
      * @custom:error UpdateTooFrequent if the debounce period has not passed since the last execution
      */
-    function executeUpdate(uint256 updateId) external {
-        if (!whitelistedExecutors[msg.sender]) {
-            revert NotAnExecutor();
-        }
-
+    function executeUpdate(uint256 updateId) external onlyWhitelistedExecutors {
         DestinationUpdate storage destUpdate = updates[updateId];
         RiskParameterUpdate memory update = destUpdate.update;
         bytes32 updateTypeKey = update.updateTypeKey;
@@ -349,11 +356,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @custom:error NotAnExecutor if the caller is not a whitelisted executor
      * @custom:error UpdateNotFound if there is no pending update with the given ID
      */
-    function rejectUpdate(uint256 updateId) external {
-        if (!whitelistedExecutors[msg.sender]) {
-            revert NotAnExecutor();
-        }
-
+    function rejectUpdate(uint256 updateId) external onlyWhitelistedExecutors {
         DestinationUpdate storage destUpdate = updates[updateId];
 
         if (destUpdate.status != UpdateStatus.Pending) {
