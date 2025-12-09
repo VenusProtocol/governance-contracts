@@ -5,7 +5,7 @@ import { LZ_V2_EID, SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
 import { getLzV2Endpoint } from "../helpers/deploy/deploymentUtils";
 
 const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
-  const { deployments, getNamedAccounts, upgrades } = hre;
+  const { deployments, getNamedAccounts } = hre;
   const { deploy } = deployments;
   const { deployer } = await getNamedAccounts();
 

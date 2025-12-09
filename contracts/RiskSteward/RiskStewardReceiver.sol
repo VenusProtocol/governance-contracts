@@ -218,8 +218,8 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     }
 
     /**
-     * @notice Processes an update from the Risk Oracle. Validates and either executes immediately,
-     * registers with timelock, or forwards cross-chain.
+     * @notice Processes an update from the Risk Oracle. Validates, registers the update,
+     * and either executes immediately, registers with timelock, or forwards cross-chain.
      * @param updateId The update ID from the oracle's perspective
      * @custom:event Emits UpdateRegistered, UpdateExecuted, or UpdateSentToDestination depending on the update type
      * @custom:error Throws UpdateAlreadyResolved if the update was already processed
@@ -235,12 +235,18 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         _ensureNoActiveUpdate(update);
         _validateRegisterUpdate(update, config);
 
-        // Check Remote Update
-        if (update.destLzEid != 0 && update.destLzEid != LAYER_ZERO_EID) {
+        bool isRemoteUpdate = update.destLzEid != 0 && update.destLzEid != LAYER_ZERO_EID;
+
+        IRiskSteward riskSteward = IRiskSteward(config.riskSteward);
+        bool safeForDirectExecution = isRemoteUpdate ? false : riskSteward.isSafeForDirectExecution(update);
+
+        _registerUpdate(update, config, safeForDirectExecution, isRemoteUpdate);
+
+        if (isRemoteUpdate) {
             _sendRemoteUpdate(update);
-            return;
+        } else if (safeForDirectExecution) {
+            _executeUpdate(update, riskSteward);
         }
-        _registerOrExecuteUpdate(update, config);
     }
 
     /**
@@ -456,28 +462,24 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     }
 
     /**
-     * @notice Registers an update from the Risk Oracle with a timelock, or executes it immediately if safe.
-     * @param update The risk parameter update from the Risk Oracle to register or execute
-     * @param config The risk parameter configuration for this update type containing timelock and risk steward address
-     * @custom:event Emits UpdateRegistered with the oracle update ID, unlock time (or current timestamp if executed immediately), update type, and market
-     * @custom:event Emits UpdateExecuted if the update is safe for direct execution and is executed immediately
+     * @notice Registers an update from the Risk Oracle with a timelock.
+     * @param update The risk parameter update from the Risk Oracle to register
+     * @param config The risk parameter configuration for this update type containing timelock
+     * @param safeForDirectExecution Whether the update is safe for direct execution
+     * @param isRemoteUpdate Whether the update is a remote update to be sent cross-chain
+     * @custom:event Emits UpdateRegistered with the oracle update ID, unlock time, update type, and market
      */
-    function _registerOrExecuteUpdate(RiskParameterUpdate memory update, RiskParamConfig memory config) internal {
+    function _registerUpdate(
+        RiskParameterUpdate memory update,
+        RiskParamConfig memory config,
+        bool safeForDirectExecution,
+        bool isRemoteUpdate
+    ) internal {
         uint256 updateId = update.updateId;
-        lastRegisteredUpdate[update.updateTypeKey][update.market] = update.updateId;
+        uint256 unlockTime = (safeForDirectExecution || isRemoteUpdate)
+            ? block.timestamp
+            : block.timestamp + config.timelock;
 
-        IRiskSteward riskSteward = IRiskSteward(config.riskSteward);
-        bool safeForDirectExecution = riskSteward.isSafeForDirectExecution(update);
-
-        // If safe for direct execution, execute immediately
-        if (safeForDirectExecution) {
-            emit UpdateRegistered(updateId, block.timestamp, update.updateType, update.market);
-            _executeUpdate(update, riskSteward);
-            return;
-        }
-
-        // Otherwise, use the configured timelock period to register the update
-        uint256 unlockTime = block.timestamp + config.timelock;
         updates[updateId] = RegisteredUpdate({
             updateId: updateId,
             unlockTime: unlockTime,
@@ -485,12 +487,15 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
             executor: address(0),
             executedAt: 0
         });
+
+        lastRegisteredUpdate[update.updateTypeKey][update.market] = updateId;
         emit UpdateRegistered(updateId, unlockTime, update.updateType, update.market);
     }
 
     /**
      * @notice Executes a validated update via the risk steward and records its execution metadata.
      *         Updates the registered update storage, last processed tracking, and emits the execution event.
+     *         Preserves the unlockTime that was set during registration.
      * @param update The risk parameter update to execute
      * @param steward The risk steward contract that will process the update
      * @custom:event Emits UpdateExecuted with the oracle update ID
@@ -500,13 +505,12 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         uint256 timestamp = block.timestamp;
         steward.applyUpdate(update);
 
-        updates[updateId] = RegisteredUpdate({
-            updateId: updateId,
-            unlockTime: timestamp,
-            status: UpdateStatus.Executed,
-            executor: address(msg.sender),
-            executedAt: timestamp
-        });
+        RegisteredUpdate storage registeredUpdate = updates[updateId];
+
+        // Preserve the unlockTime set during registration
+        registeredUpdate.status = UpdateStatus.Executed;
+        registeredUpdate.executor = address(msg.sender);
+        registeredUpdate.executedAt = timestamp;
 
         lastProcessedUpdate[update.updateTypeKey][update.market] = updateId;
         emit UpdateExecuted(updateId);
@@ -514,6 +518,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
     /**
      * @notice Sends a risk parameter update to a destination chain via LayerZero and records it as sent.
+     *         The update should already be registered before calling this function.
      * @param update The risk parameter update to send to the destination chain
      * @custom:event Emits UpdateSentToDestination with the update ID, destination endpoint ID, update type, and market
      */
@@ -521,17 +526,14 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         bytes memory option = OptionsBuilder.newOptions().addExecutorLzReceiveOption(1_000_000, 0);
 
         MessagingFee memory fee = quote(update, option, false);
-        this.lzSend{ value: fee.nativeFee }(update.destLzEid, update, "", fee, address(this));
-        updates[update.updateId] = RegisteredUpdate({
-            updateId: update.updateId,
-            unlockTime: block.timestamp,
-            status: UpdateStatus.SENT_TO_DESTINATION,
-            executor: address(msg.sender),
-            executedAt: block.timestamp
-        });
+        this.lzSend{ value: fee.nativeFee }(update.destLzEid, update, option, fee, address(this));
+
+        RegisteredUpdate storage registeredUpdate = updates[update.updateId];
+        registeredUpdate.status = UpdateStatus.SENT_TO_DESTINATION;
+        registeredUpdate.executor = address(msg.sender);
+        registeredUpdate.executedAt = block.timestamp;
 
         bytes32 updateTypeKey = update.updateTypeKey;
-        lastRegisteredUpdate[updateTypeKey][update.market] = update.updateId;
         lastProcessedUpdate[updateTypeKey][update.market] = update.updateId;
 
         emit UpdateSentToDestination(update.updateId, update.destLzEid, update.updateType, update.market);

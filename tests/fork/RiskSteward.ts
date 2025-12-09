@@ -102,7 +102,7 @@ const setupACMPermissions = async (
 };
 
 const riskStewardFixture = async () => {
-  const [deployer, updateSender, executor] = await ethers.getSigners();
+  const [, updateSender, executor] = await ethers.getSigners();
 
   const timelock = await initMainnetUser(NORMAL_TIMELOCK, parseUnits("2"));
   const accessControlManager = AccessControlManager__factory.connect(ACM, timelock);
