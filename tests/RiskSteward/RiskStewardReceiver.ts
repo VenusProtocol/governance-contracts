@@ -228,7 +228,7 @@ describe("Risk Steward", async function () {
       {
         constructorArgs: [riskOracle.address, localEndpointV2.address, BSC_LZV2_CHAIN_ID],
         initializer: "initialize",
-        unsafeAllow: ["state-variable-immutable"],
+        unsafeAllow: ["state-variable-immutable", "constructor"],
       },
     );
 
@@ -244,7 +244,7 @@ describe("Risk Steward", async function () {
       {
         constructorArgs: [remoteEndpointV2.address, ETHEREUM_LZV2_CHAIN_ID],
         initializer: "initialize",
-        unsafeAllow: ["state-variable-immutable"],
+        unsafeAllow: ["state-variable-immutable", "constructor"],
       },
     );
 
@@ -256,7 +256,7 @@ describe("Risk Steward", async function () {
     marketCapsRiskSteward = await upgrades.deployProxy(MarketCapsRiskStewardFactory, [accessControlManager.address], {
       constructorArgs: [riskStewardReceiver.address],
       initializer: "initialize",
-      unsafeAllow: ["state-variable-immutable"],
+      unsafeAllow: ["state-variable-immutable", "constructor"],
     });
 
     destinationMarketCapsRiskSteward = await upgrades.deployProxy(
@@ -265,7 +265,7 @@ describe("Risk Steward", async function () {
       {
         constructorArgs: [destinationRiskStewardReceiver.address],
         initializer: "initialize",
-        unsafeAllow: ["state-variable-immutable"],
+        unsafeAllow: ["state-variable-immutable", "constructor"],
       },
     );
 
@@ -277,7 +277,7 @@ describe("Risk Steward", async function () {
       {
         constructorArgs: [mockCoreComptroller.address, riskStewardReceiver.address],
         initializer: "initialize",
-        unsafeAllow: ["state-variable-immutable"],
+        unsafeAllow: ["state-variable-immutable", "constructor"],
       },
     );
 
@@ -288,7 +288,7 @@ describe("Risk Steward", async function () {
       {
         constructorArgs: [mockCoreComptroller.address, destinationRiskStewardReceiver.address],
         initializer: "initialize",
-        unsafeAllow: ["state-variable-immutable"],
+        unsafeAllow: ["state-variable-immutable", "constructor"],
       },
     );
 
@@ -325,14 +325,14 @@ describe("Risk Steward", async function () {
     irmRiskSteward = await upgrades.deployProxy(IRMRiskStewardFactory, [accessControlManager.address], {
       constructorArgs: [mockCoreComptroller.address, riskStewardReceiver.address],
       initializer: "initialize",
-      unsafeAllow: ["state-variable-immutable"],
+      unsafeAllow: ["state-variable-immutable", "constructor"],
     });
 
     // Destination IRM steward
     destinationIRMRiskSteward = await upgrades.deployProxy(IRMRiskStewardFactory, [accessControlManager.address], {
       constructorArgs: [mockCoreComptroller.address, destinationRiskStewardReceiver.address],
       initializer: "initialize",
-      unsafeAllow: ["state-variable-immutable"],
+      unsafeAllow: ["state-variable-immutable", "constructor"],
     });
 
     await setupPermissionsAndConfigs(accessControlManager);
