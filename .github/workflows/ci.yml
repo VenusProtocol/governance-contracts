@@ -69,7 +69,9 @@ jobs:
         run: "yarn typechain"
 
       - name: "Test the contracts and generate the coverage report"
-        run: "npx hardhat coverage"
+        run: |
+          source .env.example
+          yarn hardhat compile && yarn hardhat coverage
 
       - name: "Add test summary"
         run: |
