@@ -143,21 +143,6 @@
 
 ## Contract Address: 0x0000000000000000000000000000000000000000
 
-- **Function Signature**: `addPool(string,address,uint256,uint256,uint256)`
-- **Addresses**:
-
-## Contract Address: 0x0000000000000000000000000000000000000000
-
-- **Function Signature**: `setPoolName(address,string)`
-- **Addresses**:
-
-## Contract Address: 0x0000000000000000000000000000000000000000
-
-- **Function Signature**: `updatePoolMetadata(address,VenusPoolMetaData)`
-- **Addresses**:
-
-## Contract Address: 0x0000000000000000000000000000000000000000
-
 - **Function Signature**: `setProtocolSeizeShare(uint256)`
 - **Addresses**:
   - `NormalTimelock`
@@ -189,11 +174,6 @@
 - **Function Signature**: `setRewardTokenSpeeds(address[],uint256[],uint256[])`
 - **Addresses**:
   - `NormalTimelock`
-
-## Contract Address: 0x0000000000000000000000000000000000000000
-
-- **Function Signature**: `setLastRewardingBlock(address[],uint32[],uint32[])`
-- **Addresses**:
 
 ## Contract Address: 0x1401404e6279BB8C06E5E3999eCA3e2008B46A76
 
@@ -597,11 +577,6 @@
 
 ## Contract Address: 0x0000000000000000000000000000000000000000
 
-- **Function Signature**: `setLastRewardingBlocks(address[],uint32[],uint32[])`
-- **Addresses**:
-
-## Contract Address: 0x0000000000000000000000000000000000000000
-
 - **Function Signature**: `setLastRewardingBlockTimestamps(address[],uint256[],uint256[])`
 - **Addresses**:
   - `NormalTimelock`
@@ -782,7 +757,26 @@
   - `CriticalTimelock`
   - `FastTrackTimelock`
 
+## Contract Address: 0xa30dcc21B8393A4031cD6364829CDfE2b6D7B283
+
+- **Function Signature**: `setRewardRecipient(address)`
+- **Addresses**:
+  - `NormalTimelock`
+
+## Contract Address: 0xa30dcc21B8393A4031cD6364829CDfE2b6D7B283
+
+- **Function Signature**: `setMaxLoopsLimit(uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+
 ## Contract Address: 0x0000000000000000000000000000000000000000
 
-- **Function Signature**: `addMarket(AddMarketInput)`
+- **Function Signature**: `setRewardRecipient(address)`
 - **Addresses**:
+  - `NormalTimelock`
+
+## Contract Address: 0x0000000000000000000000000000000000000000
+
+- **Function Signature**: `setMaxLoopsLimit(uint256)`
+- **Addresses**:
+  - `NormalTimelock`

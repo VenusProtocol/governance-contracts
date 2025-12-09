@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
           cache: "yarn"
 
       - name: Install dependencies
@@ -42,7 +42,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: "yarn"
 
       - name: Install dependencies
@@ -87,7 +87,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: "yarn"
 
       - name: Install dependencies
@@ -112,7 +112,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: "yarn"
 
       - name: Install dependencies
