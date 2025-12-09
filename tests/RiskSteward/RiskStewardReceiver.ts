@@ -95,6 +95,8 @@ describe("Risk Steward", async function () {
       deployer.address,
     );
 
+    await accessControlManager.giveCallPermission(riskStewardReceiver.address, "setPaused(bool)", deployer.address);
+
     await accessControlManager.giveCallPermission(
       riskStewardReceiver.address,
       "setConfigActive(string,bool)",
@@ -437,6 +439,46 @@ describe("Risk Steward", async function () {
         const marketInfo = await mockComptroller.markets(mockVToken.address);
         expect(marketInfo.collateralFactorMantissa).to.equal(newCF);
         expect(marketInfo.liquidationThresholdMantissa).to.equal(newLT);
+      });
+    });
+
+    describe("pause control", async function () {
+      it("should pause, block processUpdate, and resume when unpaused", async function () {
+        expect(await riskStewardReceiver.paused()).to.equal(false);
+
+        await expect(riskStewardReceiver.setPaused(true))
+          .to.emit(riskStewardReceiver, "PauseStatusUpdated")
+          .withArgs(false, true);
+        expect(await riskStewardReceiver.paused()).to.equal(true);
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmPauseTestSupplyCap",
+          parseUnitsToHex(9),
+          "supplyCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "PausedError",
+        );
+
+        await expect(riskStewardReceiver.setPaused(false))
+          .to.emit(riskStewardReceiver, "PauseStatusUpdated")
+          .withArgs(true, false);
+        expect(await riskStewardReceiver.paused()).to.equal(false);
+
+        await expect(riskStewardReceiver.processUpdate(1))
+          .to.emit(marketCapsRiskSteward, "SupplyCapUpdated")
+          .withArgs(1, mockCoreVToken.address, parseUnits("9", 18));
+        expect(await mockCoreComptroller.supplyCaps(mockCoreVToken.address)).to.equal(parseUnits("9", 18));
+      });
+
+      it("should revert for unauthorized pause attempts", async function () {
+        await expect(riskStewardReceiver.connect(unauthorizedSigner).setPaused(true)).to.be.reverted;
       });
     });
 

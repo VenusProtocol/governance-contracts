@@ -117,6 +117,13 @@ interface IRiskStewardReceiver {
     );
 
     /**
+     * @notice Event emitted when the pause status changes
+     * @param previousPaused Previous pause state
+     * @param paused Current pause state
+     */
+    event PauseStatusUpdated(bool previousPaused, bool paused);
+
+    /**
      * @notice Thrown if a submitted update is not active and therefore cannot be processed
      */
     error ConfigNotActive();
@@ -185,6 +192,16 @@ interface IRiskStewardReceiver {
      * @notice Thrown when trying to renounce ownership
      */
     error RenounceOwnershipNotAllowed();
+
+    /**
+     * @notice Thrown when processUpdate is called while the contract is paused
+     */
+    error PausedError();
+
+    /**
+     * @notice Thrown when trying to set the same pause status
+     */
+    error PauseStatusUnchanged();
 
     function getRiskParameterConfig(string calldata updateType) external view returns (RiskParamConfig memory);
 

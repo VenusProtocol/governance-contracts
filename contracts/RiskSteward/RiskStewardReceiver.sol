@@ -38,6 +38,11 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     IRiskOracle public immutable RISK_ORACLE;
 
     /**
+     * @notice Pause flag
+     */
+    bool public paused;
+
+    /**
      * @notice Mapping of supported risk configurations and their validation parameters (keyed by hashed updateType)
      */
     mapping(bytes32 => RiskParamConfig) public riskParameterConfigs;
@@ -67,7 +72,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * variables without shifting down storage in the inheritance chain.
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
-    uint256[45] private __gap;
+    uint256[44] private __gap;
 
     /**
      * @notice Disables initializers and sets the Risk Oracle and LayerZero configuration.
@@ -85,18 +90,34 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
     /**
      * @notice Initializes the contract with the Access Control Manager and OApp owner.
-     * @param _delegate The address of the OApp owner passed to `__OApp_init`.
+     * @param acm_ The address of the Access Control Manager
+     * @param delegate_ The address of the OApp owner passed to `__OApp_init`.
      * @custom:oz-upgrades-unsafe-allow missing-initializer-call
      */
-    function initialize(address _acm, address _delegate) external initializer {
-        __AccessControlled_init(_acm);
-        __OApp_init(_delegate);
+    function initialize(address acm_, address delegate_) external initializer {
+        __AccessControlled_init(acm_);
+        __OApp_init(delegate_);
     }
 
     /**
      * @notice Accepts native tokens (e.g., BNB) sent to this contract.
      */
     receive() external payable {}
+
+    /**
+     * @notice Sets the pause status for `processUpdate`.
+     * @param paused_ True to pause, false to unpause
+     * @custom:access Controlled by AccessControlManager
+     * @custom:event Emits PauseStatusUpdated
+     */
+    function setPaused(bool paused_) external {
+        _checkAccessAllowed("setPaused(bool)");
+        if (paused == paused_) {
+            revert PauseStatusUnchanged();
+        }
+        emit PauseStatusUpdated(paused, paused_);
+        paused = paused_;
+    }
 
     /**
      * @notice Sets the risk parameter config for a given update type
@@ -208,6 +229,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:error Throws RegisteredUpdateTypeExist if there is a non-expired pending update of the same type
      */
     function processUpdate(uint256 updateId) external {
+        _checkPausedState();
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
         RiskParamConfig storage config = riskParameterConfigs[update.updateTypeKey];
         _ensureNoActiveUpdate(update);
@@ -542,6 +564,16 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
         // If still pending & not expired reject new update
         revert RegisteredUpdateTypeExist(registeredUpdateId);
+    }
+
+    /**
+     * @notice Reverts if the contract is paused.
+     * @custom:error PausedError if the contract is paused
+     */
+    function _checkPausedState() internal view {
+        if (paused) {
+            revert PausedError();
+        }
     }
 
     /**
