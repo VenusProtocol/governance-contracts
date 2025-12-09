@@ -576,7 +576,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         revert RegisteredUpdateTypeExist(registeredUpdateId);
     }
 
-
     /**
      * @notice Validates an oracle update before registration.
      * @param update The risk parameter update to validate
