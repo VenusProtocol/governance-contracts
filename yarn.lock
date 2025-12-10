@@ -993,7 +993,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.4.4, @ethersproject/providers@npm:^5.7.1, @ethersproject/providers@npm:^5.7.2":
+"@ethersproject/providers@npm:5.7.2, @ethersproject/providers@npm:^5.4.4, @ethersproject/providers@npm:^5.7.2":
   version: 5.7.2
   resolution: "@ethersproject/providers@npm:5.7.2"
   dependencies:
@@ -1021,7 +1021,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ethersproject/providers@npm:5.8.0, @ethersproject/providers@npm:^5.4.4, @ethersproject/providers@npm:^5.7.0, @ethersproject/providers@npm:^5.7.2":
 "@ethersproject/providers@npm:5.8.0, @ethersproject/providers@npm:^5.7.0":
   version: 5.8.0
   resolution: "@ethersproject/providers@npm:5.8.0"
@@ -1460,15 +1459,15 @@ __metadata:
   linkType: hard
 
 "@layerzerolabs/lz-evm-messagelib-v2@npm:^3.0.147":
-  version: 3.0.147
-  resolution: "@layerzerolabs/lz-evm-messagelib-v2@npm:3.0.147"
+  version: 3.0.151
+  resolution: "@layerzerolabs/lz-evm-messagelib-v2@npm:3.0.151"
   peerDependencies:
     "@arbitrum/nitro-contracts": ^1.1.0
     "@axelar-network/axelar-gmp-sdk-solidity": ^5.6.4
     "@chainlink/contracts-ccip": ^0.7.6
     "@eth-optimism/contracts": ^0.6.0
-    "@layerzerolabs/lz-evm-protocol-v2": ^3.0.147
-    "@layerzerolabs/lz-evm-v1-0.7": ^3.0.147
+    "@layerzerolabs/lz-evm-protocol-v2": ^3.0.151
+    "@layerzerolabs/lz-evm-v1-0.7": ^3.0.151
     "@openzeppelin/contracts": ^4.8.1 || ^5.0.0
     "@openzeppelin/contracts-upgradeable": ^4.8.1 || ^5.0.0
     hardhat-deploy: ^0.12.4
@@ -1476,19 +1475,19 @@ __metadata:
   peerDependenciesMeta:
     "@arbitrum/nitro-contracts":
       optional: true
-  checksum: 37d785c2018f265d2ef1e944ce8cbff9bced13a7f68cc359c4922fe5b0f379f34c16fa06e2296b9d1f74a18acc2921e1e455a0a2d1a4a64c22dfb0acadf9a2cb
+  checksum: a972651916ce5959d54331ca8b72e55394d9005ab40a7f8b3aaf3edaa2cfa69c3b1acdcb72ec618f594979d6508299078ba883589736998a78bdc94fb273dd13
   languageName: node
   linkType: hard
 
 "@layerzerolabs/lz-evm-protocol-v2@npm:^3.0.147":
-  version: 3.0.147
-  resolution: "@layerzerolabs/lz-evm-protocol-v2@npm:3.0.147"
+  version: 3.0.151
+  resolution: "@layerzerolabs/lz-evm-protocol-v2@npm:3.0.151"
   peerDependencies:
     "@openzeppelin/contracts": ^4.8.1 || ^5.0.0
     "@openzeppelin/contracts-upgradeable": ^4.8.1 || ^5.0.0
     hardhat-deploy: ^0.12.4
     solidity-bytes-utils: ^0.8.0
-  checksum: f1c39c5bb358dbdd70b0a0db2562d97e4aeab62e1570fd4c516320c95c8ec758cd14d2a46b11fdf2b6032e0e6fc27b8546b746c0869b6b482e48ab76a3fa3fca
+  checksum: 4ccfc78aefb937603e2bfc118bf6d329fc465c93f9da3af49275844337a774fba335504f71690d5ce238a940d5ddde5df5e774a7ac6c11eb4908b17373512614
   languageName: node
   linkType: hard
 
@@ -1503,32 +1502,32 @@ __metadata:
   linkType: hard
 
 "@layerzerolabs/oapp-evm-upgradeable@npm:^0.1.2":
-  version: 0.1.2
-  resolution: "@layerzerolabs/oapp-evm-upgradeable@npm:0.1.2"
+  version: 0.1.3
+  resolution: "@layerzerolabs/oapp-evm-upgradeable@npm:0.1.3"
   dependencies:
     ethers: ^5.7.2
   peerDependencies:
-    "@layerzerolabs/lz-evm-messagelib-v2": ^3.0.75
-    "@layerzerolabs/lz-evm-protocol-v2": ^3.0.75
-    "@layerzerolabs/lz-evm-v1-0.7": ^3.0.75
+    "@layerzerolabs/lz-evm-messagelib-v2": ^3.0.148
+    "@layerzerolabs/lz-evm-protocol-v2": ^3.0.148
+    "@layerzerolabs/lz-evm-v1-0.7": ^3.0.148
     "@openzeppelin/contracts": ^4.8.1 || ^5.0.0
     "@openzeppelin/contracts-upgradeable": ^4.8.1 || ^5.0.0
-  checksum: c383f4778f6f78f9f603c46c3df9ef7d2f5039ec0463c4c1d3e3da3bc572f7658f5441a849a0f8ee49bf1708074443011fc7408253ff27d798ea40d733b240f2
+  checksum: 91329f053695d3db5a8cfc5ca8ac08fb129d64645f3d4af5b5872af4b417040cff1f18319a9d8098be22825e4adeb101905217d6a48460ce2022abcf3332109f
   languageName: node
   linkType: hard
 
 "@layerzerolabs/oapp-evm@npm:^0.4.0":
-  version: 0.4.0
-  resolution: "@layerzerolabs/oapp-evm@npm:0.4.0"
+  version: 0.4.1
+  resolution: "@layerzerolabs/oapp-evm@npm:0.4.1"
   dependencies:
     ethers: ^5.7.2
   peerDependencies:
-    "@layerzerolabs/lz-evm-messagelib-v2": ^3.0.75
-    "@layerzerolabs/lz-evm-protocol-v2": ^3.0.75
-    "@layerzerolabs/lz-evm-v1-0.7": ^3.0.75
+    "@layerzerolabs/lz-evm-messagelib-v2": ^3.0.148
+    "@layerzerolabs/lz-evm-protocol-v2": ^3.0.148
+    "@layerzerolabs/lz-evm-v1-0.7": ^3.0.148
     "@openzeppelin/contracts": ^4.8.1 || ^5.0.0
     "@openzeppelin/contracts-upgradeable": ^4.8.1 || ^5.0.0
-  checksum: 67456a2b2f0a3e9bf7eeb9ff65ea627183407b23e7fdfbea8e2da2cae9a15856c7756df382957b33dbde72d79ce9ee4e0dd831279b2fb43a322d852490ff02f0
+  checksum: a1a6a0ff025be8dce0b36ef7559c056cfd210de04e4d96252cd51c0d33189b41d185f80493f7def5c943d0e88dd16321f9c3986e686cf4ac1a8eb6bdbfd30a9c
   languageName: node
   linkType: hard
 
@@ -1553,12 +1552,12 @@ __metadata:
   linkType: hard
 
 "@layerzerolabs/test-devtools-evm-hardhat@npm:^0.5.2":
-  version: 0.5.2
-  resolution: "@layerzerolabs/test-devtools-evm-hardhat@npm:0.5.2"
+  version: 0.5.3
+  resolution: "@layerzerolabs/test-devtools-evm-hardhat@npm:0.5.3"
   peerDependencies:
     hardhat: ^2.22.10
     solidity-bytes-utils: ^0.8.2
-  checksum: b36c14dee73f118742cb27650db5f6432cc60101db9e7e8326647cbdbedc137bceb68b8b20037fecade1383660a14c3cf186e2f52afe9da4be15a6298e3bf554
+  checksum: d1220701c20f377feeef03606fd7f6d7883f8dc7d0734e93e9d5b2d18405b34dcb19cfb075458ae44addab3015eed3ec66f37f8066f32098bea282ed4c6e5f6c
   languageName: node
   linkType: hard
 
@@ -1786,10 +1785,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/edr-darwin-arm64@npm:0.12.0-next.16":
-  version: 0.12.0-next.16
-  resolution: "@nomicfoundation/edr-darwin-arm64@npm:0.12.0-next.16"
-  checksum: a72237ed7aad4cb2aa45e1236be023c584a4447869e11393bdf232bad32cc34c8182e8159bc2b77ac9e0befd450e727cffb946d72a32b6b66c937b25f1924953
 "@nomicfoundation/edr-darwin-arm64@npm:0.3.4":
   version: 0.3.4
   resolution: "@nomicfoundation/edr-darwin-arm64@npm:0.3.4"
@@ -1811,10 +1806,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/edr-darwin-x64@npm:0.12.0-next.16":
-  version: 0.12.0-next.16
-  resolution: "@nomicfoundation/edr-darwin-x64@npm:0.12.0-next.16"
-  checksum: db10ff877a3f994a6ccfe7f1b10268364f41983a226cd2f9274698e3a71dbffefe031ab9a4a19ce8a46e6ff4781e15cc808c1d3d27b4e4bf0b9b36556e8d3a9d
 "@nomicfoundation/edr-darwin-x64@npm:0.3.4":
   version: 0.3.4
   resolution: "@nomicfoundation/edr-darwin-x64@npm:0.3.4"
@@ -1836,10 +1827,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/edr-linux-arm64-gnu@npm:0.12.0-next.16":
-  version: 0.12.0-next.16
-  resolution: "@nomicfoundation/edr-linux-arm64-gnu@npm:0.12.0-next.16"
-  checksum: 0ffd2bb6ee6f20605bacfa361d44d5e9d7331940258b56fa6d6ba917c3ae7fcb7c64b968d23f546a26adacfaed9755fb4d722aac80b76b5d36b3d54cda1a116f
 "@nomicfoundation/edr-linux-arm64-gnu@npm:0.3.4":
   version: 0.3.4
   resolution: "@nomicfoundation/edr-linux-arm64-gnu@npm:0.3.4"
@@ -1861,10 +1848,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/edr-linux-arm64-musl@npm:0.12.0-next.16":
-  version: 0.12.0-next.16
-  resolution: "@nomicfoundation/edr-linux-arm64-musl@npm:0.12.0-next.16"
-  checksum: 2caaf25e27c60c1c21cd860f1937a0358dd40f01e51950276dc14a5026cbcf2d8fee02572f5b799147baed89306963ddcaff1745a04d2515040dd65dfaa394cd
 "@nomicfoundation/edr-linux-arm64-musl@npm:0.3.4":
   version: 0.3.4
   resolution: "@nomicfoundation/edr-linux-arm64-musl@npm:0.3.4"
@@ -1886,10 +1869,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/edr-linux-x64-gnu@npm:0.12.0-next.16":
-  version: 0.12.0-next.16
-  resolution: "@nomicfoundation/edr-linux-x64-gnu@npm:0.12.0-next.16"
-  checksum: 8c7fc00626d60e61d5960a7dc21e1955b7f5c5f14df73517f702892cb96d1536a12b121894671d6380de026cc9517ad579f50c93435d020a8595bd9fc9401045
 "@nomicfoundation/edr-linux-x64-gnu@npm:0.3.4":
   version: 0.3.4
   resolution: "@nomicfoundation/edr-linux-x64-gnu@npm:0.3.4"
@@ -1911,10 +1890,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/edr-linux-x64-musl@npm:0.12.0-next.16":
-  version: 0.12.0-next.16
-  resolution: "@nomicfoundation/edr-linux-x64-musl@npm:0.12.0-next.16"
-  checksum: 13b503ae7625c1ec30d70462322bc36133b8a66ce5b27cf7a4ac7a1fe8ae4d77c652ff0aeaaeb6e4d1f942f99e1a7840a7b72f90ba95b3f3e8374c9d891d1164
 "@nomicfoundation/edr-linux-x64-musl@npm:0.3.4":
   version: 0.3.4
   resolution: "@nomicfoundation/edr-linux-x64-musl@npm:0.3.4"
@@ -1936,10 +1911,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/edr-win32-x64-msvc@npm:0.12.0-next.16":
-  version: 0.12.0-next.16
-  resolution: "@nomicfoundation/edr-win32-x64-msvc@npm:0.12.0-next.16"
-  checksum: 53ef3ce82c7187f42f8d93099325259b5037487170cc559115d2ecf138583512b8f5f900e4445885c4e0ffa6f06dcdceaf635b67ac6d6008600f1010edd035a8
 "@nomicfoundation/edr-win32-arm64-msvc@npm:0.3.4":
   version: 0.3.4
   resolution: "@nomicfoundation/edr-win32-arm64-msvc@npm:0.3.4"
@@ -1975,21 +1946,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@nomicfoundation/edr@npm:0.12.0-next.16":
-  version: 0.12.0-next.16
-  resolution: "@nomicfoundation/edr@npm:0.12.0-next.16"
 "@nomicfoundation/edr@npm:^0.3.1":
   version: 0.3.4
   resolution: "@nomicfoundation/edr@npm:0.3.4"
   dependencies:
-    "@nomicfoundation/edr-darwin-arm64": 0.12.0-next.16
-    "@nomicfoundation/edr-darwin-x64": 0.12.0-next.16
-    "@nomicfoundation/edr-linux-arm64-gnu": 0.12.0-next.16
-    "@nomicfoundation/edr-linux-arm64-musl": 0.12.0-next.16
-    "@nomicfoundation/edr-linux-x64-gnu": 0.12.0-next.16
-    "@nomicfoundation/edr-linux-x64-musl": 0.12.0-next.16
-    "@nomicfoundation/edr-win32-x64-msvc": 0.12.0-next.16
-  checksum: a40fabbb58d609289bdb1aacd2ac94f46855ce20acf4016374df1ac7611c979ee1ac9285d16b55a13226be6934b47169ceb5de8c07aab9689c37645f9b865c36
     "@nomicfoundation/edr-darwin-arm64": 0.3.4
     "@nomicfoundation/edr-darwin-x64": 0.3.4
     "@nomicfoundation/edr-linux-arm64-gnu": 0.3.4
@@ -3284,13 +3244,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/async-eventemitter@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "@types/async-eventemitter@npm:0.2.1"
-  checksum: 36ba0a6f52082f76b19b9123a2fa0497f94fe15218fa54040cc45f0edff483ec3be93a38c177cd4dab79f5e32333fbdf3682d4dc94197438e86694b1fddd6896
-  languageName: node
-  linkType: hard
-
 "@types/bn.js@npm:^4.11.3":
   version: 4.11.6
   resolution: "@types/bn.js@npm:4.11.6"
@@ -3542,16 +3495,6 @@ __metadata:
   version: 6.9.7
   resolution: "@types/qs@npm:6.9.7"
   checksum: 7fd6f9c25053e9b5bb6bc9f9f76c1d89e6c04f7707a7ba0e44cc01f17ef5284adb82f230f542c2d5557d69407c9a40f0f3515e8319afd14e1e16b5543ac6cdba
-  languageName: node
-  linkType: hard
-
-"@types/readable-stream@npm:^2.3.13":
-  version: 2.3.15
-  resolution: "@types/readable-stream@npm:2.3.15"
-  dependencies:
-    "@types/node": "*"
-    safe-buffer: ~5.1.1
-  checksum: ec36f525cad09b6c65a1dafcb5ad99b9e2ed824ec49b7aa23180ac427e5d35b8a0706193ecd79ab4253a283ad485ba03d5917a98daaaa144f0ea34f4823e9d82
   languageName: node
   linkType: hard
 
@@ -4159,21 +4102,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"abstract-level@npm:^1.0.0, abstract-level@npm:^1.0.2, abstract-level@npm:^1.0.3":
-  version: 1.0.3
-  resolution: "abstract-level@npm:1.0.3"
-  dependencies:
-    buffer: ^6.0.3
-    catering: ^2.1.0
-    is-buffer: ^2.0.5
-    level-supports: ^4.0.0
-    level-transcoder: ^1.0.1
-    module-error: ^1.0.1
-    queue-microtask: ^1.2.3
-  checksum: 70d61a3924526ebc257b138992052f9ff571a6cee5a7660836e37a1cc7081273c3acf465dd2f5e1897b38dc743a6fd9dba14a5d8a2a9d39e5787cd3da99f301d
-  languageName: node
-  linkType: hard
-
 "acorn-import-assertions@npm:^1.7.6":
   version: 1.8.0
   resolution: "acorn-import-assertions@npm:1.8.0"
@@ -4647,15 +4575,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"async-eventemitter@npm:^0.2.4":
-  version: 0.2.4
-  resolution: "async-eventemitter@npm:0.2.4"
-  dependencies:
-    async: ^2.4.0
-  checksum: b9e77e0f58ebd7188c50c23d613d1263e0ab501f5e677e02b57cc97d7032beaf60aafa189887e7105569c791e212df4af00b608be1e9a4c425911d577124911e
-  languageName: node
-  linkType: hard
-
 "async-function@npm:^1.0.0":
   version: 1.0.0
   resolution: "async-function@npm:1.0.0"
@@ -4814,22 +4733,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"bigint-crypto-utils@npm:^3.0.23":
-  version: 3.1.8
-  resolution: "bigint-crypto-utils@npm:3.1.8"
-  dependencies:
-    bigint-mod-arith: ^3.1.0
-  checksum: deb004aacf0ac6150b3cebe472c8166a7a315c411260d6c20e43c8c9b1e48831879e5a2e8e7af1ef1aefc542ad7d842a1de4bef12b98e50c825d9243321efe52
-  languageName: node
-  linkType: hard
-
-"bigint-mod-arith@npm:^3.1.0":
-  version: 3.1.2
-  resolution: "bigint-mod-arith@npm:3.1.2"
-  checksum: badddd745f6e6c45674b22335d26a9ea83250e749abde20c5f84b24afbc747e259bc36798530953332349ed898f38ec39125b326cae8b8ee2dddfaea7ddf8448
-  languageName: node
-  linkType: hard
-
 "bignumber.js@npm:^9.1.1":
   version: 9.1.1
   resolution: "bignumber.js@npm:9.1.1"
@@ -4983,18 +4886,6 @@ __metadata:
   version: 1.1.0
   resolution: "brorand@npm:1.1.0"
   checksum: 8a05c9f3c4b46572dec6ef71012b1946db6cae8c7bb60ccd4b7dd5a84655db49fe043ecc6272e7ef1f69dc53d6730b9e2a3a03a8310509a3d797a618cbee52be
-  languageName: node
-  linkType: hard
-
-"browser-level@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "browser-level@npm:1.0.1"
-  dependencies:
-    abstract-level: ^1.0.2
-    catering: ^2.1.1
-    module-error: ^1.0.2
-    run-parallel-limit: ^1.1.0
-  checksum: 67fbc77ce832940bfa25073eccff279f512ad56f545deb996a5b23b02316f5e76f4a79d381acc27eda983f5c9a2566aaf9c97e4fdd0748288c4407307537a29b
   languageName: node
   linkType: hard
 
@@ -5307,13 +5198,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"catering@npm:^2.1.0, catering@npm:^2.1.1":
-  version: 2.1.1
-  resolution: "catering@npm:2.1.1"
-  checksum: 205daefa69c935b0c19f3d8f2e0a520dd69aebe9bda55902958003f7c9cff8f967dfb90071b421bd6eb618576f657a89d2bc0986872c9bc04bbd66655e9d4bd6
-  languageName: node
-  linkType: hard
-
 "cbor@npm:^8.0.0, cbor@npm:^8.1.0":
   version: 8.1.0
   resolution: "cbor@npm:8.1.0"
@@ -5529,20 +5413,6 @@ __metadata:
     inherits: ^2.0.1
     safe-buffer: ^5.0.1
   checksum: 47d3568dbc17431a339bad1fe7dff83ac0891be8206911ace3d3b818fc695f376df809bea406e759cdea07fff4b454fa25f1013e648851bec790c1d75763032e
-  languageName: node
-  linkType: hard
-
-"classic-level@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "classic-level@npm:1.2.0"
-  dependencies:
-    abstract-level: ^1.0.2
-    catering: ^2.1.0
-    module-error: ^1.0.1
-    napi-macros: ~2.0.0
-    node-gyp: latest
-    node-gyp-build: ^4.3.0
-  checksum: 88ddd12f2192c2775107d5e462998ac01095cb0222ca01dc2be77d8dcbbf9883c4c0a0248529cceee40a2f1232c68027b1aca731da9f767ad8e9483cbd61dd37
   languageName: node
   linkType: hard
 
@@ -7517,7 +7387,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"ethers@npm:^5.7.0, ethers@npm:^5.7.1, ethers@npm:^5.7.2, ethers@npm:~5.7.0, ethers@npm:~5.7.2":
+"ethers@npm:^5.7.0, ethers@npm:^5.7.2, ethers@npm:~5.7.0, ethers@npm:~5.7.2":
   version: 5.7.2
   resolution: "ethers@npm:5.7.2"
   dependencies:
@@ -8072,6 +7942,19 @@ __metadata:
   languageName: node
   linkType: hard
 
+"fs-extra@npm:^0.30.0":
+  version: 0.30.0
+  resolution: "fs-extra@npm:0.30.0"
+  dependencies:
+    graceful-fs: ^4.1.2
+    jsonfile: ^2.1.0
+    klaw: ^1.0.0
+    path-is-absolute: ^1.0.0
+    rimraf: ^2.2.8
+  checksum: 6edfd65fc813baa27f1603778c0f5ec11f8c5006a20b920437813ee2023eba18aeec8bef1c89b2e6c84f9fc90fdc7c916f4a700466c8c69d22a35d018f2570f0
+  languageName: node
+  linkType: hard
+
 "fs-extra@npm:^10.0.0, fs-extra@npm:^10.1.0":
   version: 10.1.0
   resolution: "fs-extra@npm:10.1.0"
@@ -8223,13 +8106,6 @@ __metadata:
     es-abstract: ^1.22.1
     functions-have-names: ^1.2.3
   checksum: 7a3f9bd98adab09a07f6e1f03da03d3f7c26abbdeaeee15223f6c04a9fb5674792bdf5e689dac19b97ac71de6aad2027ba3048a9b883aa1b3173eed6ab07f479
-  languageName: node
-  linkType: hard
-
-"functional-red-black-tree@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "functional-red-black-tree@npm:1.0.1"
-  checksum: ca6c170f37640e2d94297da8bb4bf27a1d12bea3e00e6a3e007fd7aa32e37e000f5772acf941b4e4f3cf1c95c3752033d0c509af157ad8f526e7f00723b9eb9f
   languageName: node
   linkType: hard
 
@@ -8473,7 +8349,7 @@ __metadata:
     minimatch: ^3.0.4
     once: ^1.3.0
     path-is-absolute: ^1.0.0
-  checksum: d72a834a393948d6c4a5cacc6a29fe5fe190e1cd134e55dfba09aee0be6fe15be343e96d8ec43558ab67ff8af28e4420c7f63a4d4db1c779e515015e9c318616
+  checksum: b61f48973bbdcf5159997b0874a2165db572b368b931135832599875919c237fc05c12984e38fe828e69aa8a921eb0e8a4997266211c517c9cfaae8a93988bb8
   languageName: node
   linkType: hard
 
@@ -8942,72 +8818,6 @@ __metadata:
   peerDependencies:
     hardhat: ^2.0.2
   checksum: 77f8f8d085ff3d9d7787f0227e5355e1800f7d6707bc70171e0567bf69706703ae7f6f53dce1be1d409e7e71e3629a434c94b546bdbbc1e4c1af47cd5d0c6776
-  languageName: node
-  linkType: hard
-
-"hardhat@npm:2.19.4":
-  version: 2.19.4
-  resolution: "hardhat@npm:2.19.4"
-  dependencies:
-    "@ethersproject/abi": ^5.1.2
-    "@metamask/eth-sig-util": ^4.0.0
-    "@nomicfoundation/ethereumjs-block": 5.0.2
-    "@nomicfoundation/ethereumjs-blockchain": 7.0.2
-    "@nomicfoundation/ethereumjs-common": 4.0.2
-    "@nomicfoundation/ethereumjs-evm": 2.0.2
-    "@nomicfoundation/ethereumjs-rlp": 5.0.2
-    "@nomicfoundation/ethereumjs-statemanager": 2.0.2
-    "@nomicfoundation/ethereumjs-trie": 6.0.2
-    "@nomicfoundation/ethereumjs-tx": 5.0.2
-    "@nomicfoundation/ethereumjs-util": 9.0.2
-    "@nomicfoundation/ethereumjs-vm": 7.0.2
-    "@nomicfoundation/solidity-analyzer": ^0.1.0
-    "@sentry/node": ^5.18.1
-    "@types/bn.js": ^5.1.0
-    "@types/lru-cache": ^5.1.0
-    adm-zip: ^0.4.16
-    aggregate-error: ^3.0.0
-    ansi-escapes: ^4.3.0
-    chalk: ^2.4.2
-    chokidar: ^3.4.0
-    ci-info: ^2.0.0
-    debug: ^4.1.1
-    enquirer: ^2.3.0
-    env-paths: ^2.2.0
-    ethereum-cryptography: ^1.0.3
-    ethereumjs-abi: ^0.6.8
-    find-up: ^2.1.0
-    fp-ts: 1.19.3
-    fs-extra: ^7.0.1
-    glob: 7.2.0
-    immutable: ^4.0.0-rc.12
-    io-ts: 1.10.4
-    keccak: ^3.0.2
-    lodash: ^4.17.11
-    mnemonist: ^0.38.0
-    mocha: ^10.0.0
-    p-map: ^4.0.0
-    raw-body: ^2.4.1
-    resolve: 1.17.0
-    semver: ^6.3.0
-    solc: 0.7.3
-    source-map-support: ^0.5.13
-    stacktrace-parser: ^0.1.10
-    tsort: 0.0.1
-    undici: ^5.14.0
-    uuid: ^8.3.2
-    ws: ^7.4.6
-  peerDependencies:
-    ts-node: "*"
-    typescript: "*"
-  peerDependenciesMeta:
-    ts-node:
-      optional: true
-    typescript:
-      optional: true
-  bin:
-    hardhat: internal/cli/bootstrap.js
-  checksum: 05dcaeab5bb641e74426ad47acfda903dcd3fd229b0d30f45b9de1d3c54fe6364161f3c88517984233d18f5b9294a050500ca7336b6ca069fa259fede6f5acb1
   languageName: node
   linkType: hard
 
@@ -9856,7 +9666,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"is-buffer@npm:^2.0.5, is-buffer@npm:~2.0.3":
+"is-buffer@npm:~2.0.3":
   version: 2.0.5
   resolution: "is-buffer@npm:2.0.5"
   checksum: 764c9ad8b523a9f5a32af29bdf772b08eb48c04d2ad0a7240916ac2688c983bf5f8504bf25b35e66240edeb9d9085461f9b5dae1f3d2861c6b06a65fe983de42
@@ -10476,6 +10286,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"jsonfile@npm:^2.1.0":
+  version: 2.4.0
+  resolution: "jsonfile@npm:2.4.0"
+  dependencies:
+    graceful-fs: ^4.1.6
+  dependenciesMeta:
+    graceful-fs:
+      optional: true
+  checksum: f5064aabbc9e35530dc471d8b203ae1f40dbe949ddde4391c6f6a6d310619a15f0efdae5587df594d1d70c555193aaeee9d2ed4aec9ffd5767bd5e4e62d49c3d
+  languageName: node
+  linkType: hard
+
 "jsonfile@npm:^4.0.0":
   version: 4.0.0
   resolution: "jsonfile@npm:4.0.0"
@@ -10592,33 +10414,6 @@ __metadata:
     graceful-fs:
       optional: true
   checksum: 8f69e4797c26e7c3f2426bfa85f38a3da3c2cb1b4c6bd850d2377aed440d41ce9d806f2885c2e2e224372c56af4b1d43b8a499adecf9a05e7373dc6b8b7c52e4
-  languageName: node
-  linkType: hard
-
-"level-supports@npm:^4.0.0":
-  version: 4.0.1
-  resolution: "level-supports@npm:4.0.1"
-  checksum: d4552b42bb8cdeada07b0f6356c7a90fefe76279147331f291aceae26e3e56d5f927b09ce921647c0230bfe03ddfbdcef332be921e5c2194421ae2bfa3cf6368
-  languageName: node
-  linkType: hard
-
-"level-transcoder@npm:^1.0.1":
-  version: 1.0.1
-  resolution: "level-transcoder@npm:1.0.1"
-  dependencies:
-    buffer: ^6.0.3
-    module-error: ^1.0.1
-  checksum: 304f08d802faf3491a533b6d87ad8be3cabfd27f2713bbe9d4c633bf50fcb9460eab5a6776bf015e101ead7ba1c1853e05e7f341112f17a9d0cb37ee5a421a25
-  languageName: node
-  linkType: hard
-
-"level@npm:^8.0.0":
-  version: 8.0.0
-  resolution: "level@npm:8.0.0"
-  dependencies:
-    browser-level: ^1.0.1
-    classic-level: ^1.2.0
-  checksum: 13eb25bd71bfdca6cd714d1233adf9da97de9a8a4bf9f28d62a390b5c96d0250abaf983eb90eb8c4e89c7a985bb330750683d106f12670e5ea8fba1d7e608a1f
   languageName: node
   linkType: hard
 
@@ -11744,13 +11539,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"module-error@npm:^1.0.1, module-error@npm:^1.0.2":
-  version: 1.0.2
-  resolution: "module-error@npm:1.0.2"
-  checksum: 5d653e35bd55b3e95f8aee2cdac108082ea892e71b8f651be92cde43e4ee86abee4fa8bd7fc3fe5e68b63926d42f63c54cd17b87a560c31f18739295575a3962
-  languageName: node
-  linkType: hard
-
 "module-not-found-error@npm:^1.0.1":
   version: 1.0.1
   resolution: "module-not-found-error@npm:1.0.1"
@@ -11821,13 +11609,6 @@ __metadata:
   bin:
     nanoid: bin/nanoid.cjs
   checksum: 7d0eda657002738aa5206107bd0580aead6c95c460ef1bdd0b1a87a9c7ae6277ac2e9b945306aaa5b32c6dcb7feaf462d0f552e7f8b5718abfc6ead5c94a71b3
-  languageName: node
-  linkType: hard
-
-"napi-macros@npm:~2.0.0":
-  version: 2.0.0
-  resolution: "napi-macros@npm:2.0.0"
-  checksum: 30384819386977c1f82034757014163fa60ab3c5a538094f778d38788bebb52534966279956f796a92ea771c7f8ae072b975df65de910d051ffbdc927f62320c
   languageName: node
   linkType: hard
 
@@ -11945,7 +11726,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"node-gyp-build@npm:^4.2.0, node-gyp-build@npm:^4.3.0":
+"node-gyp-build@npm:^4.2.0":
   version: 4.6.0
   resolution: "node-gyp-build@npm:4.6.0"
   bin:
@@ -13281,7 +13062,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"queue-microtask@npm:^1.2.2, queue-microtask@npm:^1.2.3":
+"queue-microtask@npm:^1.2.2":
   version: 1.2.3
   resolution: "queue-microtask@npm:1.2.3"
   checksum: b676f8c040cdc5b12723ad2f91414d267605b26419d5c821ff03befa817ddd10e238d22b25d604920340fd73efd8ba795465a0377c4adf45a4a41e4234e42dc4
@@ -13639,7 +13420,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"require-from-string@npm:^2.0.2":
+"require-from-string@npm:^2.0.0, require-from-string@npm:^2.0.2":
   version: 2.0.2
   resolution: "require-from-string@npm:2.0.2"
   checksum: a03ef6895445f33a4015300c426699bc66b2b044ba7b670aa238610381b56d3f07c686251740d575e22f4c87531ba662d06937508f0f3c0f1ddc04db3130560b
@@ -13871,13 +13652,6 @@ __metadata:
   dependencies:
     queue-microtask: ^1.2.2
   checksum: cb4f97ad25a75ebc11a8ef4e33bb962f8af8516bb2001082ceabd8902e15b98f4b84b4f8a9b222e5d57fc3bd1379c483886ed4619367a7680dad65316993021d
-  languageName: node
-  linkType: hard
-
-"rustbn.js@npm:~0.2.0":
-  version: 0.2.0
-  resolution: "rustbn.js@npm:0.2.0"
-  checksum: 2148e7ba34e70682907ee29df4784639e6eb025481b2c91249403b7ec57181980161868d9aa24822a5075dd1bb5a180dfedc77309e5f0d27b6301f9b563af99a
   languageName: node
   linkType: hard
 
@@ -14468,6 +14242,13 @@ __metadata:
   dependencies:
     array.prototype.findlast: ^1.2.2
   checksum: 124cd54dc187860c83f4e8a3cbc41f890fbd0aaad4695356763034bdc782046eac414b161b7f354e423e075dba303d6bef213682df8932fee5d143d52135cd4e
+  languageName: node
+  linkType: hard
+
+"solidity-bytes-utils@npm:^0.8.4":
+  version: 0.8.4
+  resolution: "solidity-bytes-utils@npm:0.8.4"
+  checksum: 3eb3d7628c60727e3c528fd4bf7a3427e2fb145b9793964605ccde81e774a4681f8778552670c7d95671a198387199e8fc1b042173449b044528284a508f9fc5
   languageName: node
   linkType: hard
 
