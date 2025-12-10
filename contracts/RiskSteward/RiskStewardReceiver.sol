@@ -112,7 +112,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @notice Initializes the contract with the Access Control Manager and OApp owner.
      * @param acm_ The address of the Access Control Manager
      * @param delegate_ The address of the OApp owner passed to `__OApp_init`.
-     * @custom:oz-upgrades-unsafe-allow missing-initializer-call
      */
     function initialize(address acm_, address delegate_) external initializer {
         __AccessControlled_init(acm_);

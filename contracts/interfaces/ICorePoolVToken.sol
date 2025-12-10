@@ -5,6 +5,8 @@ import { InterestRateModelV8 } from "@venusprotocol/venus-protocol/contracts/Int
 
 interface ICorePoolVToken {
     function comptroller() external view returns (address);
+
     function interestRateModel() external view returns (address);
+
     function _setInterestRateModel(InterestRateModelV8 newInterestRateModel) external returns (uint);
 }

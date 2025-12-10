@@ -5,6 +5,8 @@ import { InterestRateModel } from "@venusprotocol/isolated-pools/contracts/Inter
 
 interface IIsolatedPoolVToken {
     function comptroller() external view returns (address);
+
     function interestRateModel() external view returns (address);
+
     function setInterestRateModel(InterestRateModel newInterestRateModel) external;
 }

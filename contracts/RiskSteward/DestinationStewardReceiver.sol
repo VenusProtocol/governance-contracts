@@ -223,7 +223,6 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @notice Initializes the contract with the Access Control Manager and owner.
      * @param accessControlManager_ The address of the access control manager
      * @param delegate_ The owner (and LayerZero delegate) of this contract
-     * @custom:oz-upgrades-unsafe-allow missing-initializer-call
      */
     function initialize(address accessControlManager_, address delegate_) external initializer {
         __AccessControlled_init(accessControlManager_);
