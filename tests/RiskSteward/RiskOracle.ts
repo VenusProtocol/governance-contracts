@@ -489,5 +489,47 @@ describe("RiskOracle", async function () {
         riskOracle.getLatestUpdateByParameterAndMarket("supplyCap", deployer.address),
       ).to.be.revertedWithCustomError(riskOracle, "NoUpdateFound");
     });
+
+    it("should return all update", async function () {
+      // beforeEach already adds "supplyCap", so add different ones
+      await riskOracle.addUpdateType("borrowCap");
+      await riskOracle.addUpdateType("collateralFactors");
+
+      const length = await riskOracle.allUpdateTypesLength();
+      expect(length).to.equal(3);
+
+      const allTypes = await riskOracle.getAllUpdateTypes();
+      expect(allTypes.length).to.equal(3);
+      expect(allTypes).to.include("supplyCap");
+      expect(allTypes).to.include("borrowCap");
+      expect(allTypes).to.include("collateralFactors");
+    });
+
+    it("should return empty array when no update types are added", async function () {
+      const { riskOracle: freshOracle } = await loadFixture(riskOracleFixture);
+      const length = await freshOracle.allUpdateTypesLength();
+      expect(length).to.equal(0);
+
+      const allTypes = await freshOracle.getAllUpdateTypes();
+      expect(allTypes.length).to.equal(0);
+    });
+
+    it("should correctly return all update types after deactivating one", async function () {
+      // beforeEach already adds "supplyCap", so add a different one
+      await riskOracle.addUpdateType("borrowCap");
+
+      const length = await riskOracle.allUpdateTypesLength();
+      expect(length).to.equal(2);
+
+      await riskOracle.setUpdateTypeActive("supplyCap", false);
+
+      const allTypes = await riskOracle.getAllUpdateTypes();
+      expect(allTypes.length).to.equal(2);
+      expect(allTypes).to.include("supplyCap");
+      expect(allTypes).to.include("borrowCap");
+
+      expect(await riskOracle.activeUpdateTypes("supplyCap")).to.be.false;
+      expect(await riskOracle.activeUpdateTypes("borrowCap")).to.be.true;
+    })
   });
 });

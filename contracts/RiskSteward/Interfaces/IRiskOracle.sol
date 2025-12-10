@@ -45,6 +45,18 @@ interface IRiskOracle {
     function allUpdateTypes(uint256 index) external view returns (string memory);
 
     /**
+     * @notice Returns the total number of update types in the allUpdateTypes array
+     * @return The length of the allUpdateTypes array
+     */
+    function allUpdateTypesLength() external view returns (uint256);
+
+    /**
+     * @notice Returns all update types in the allUpdateTypes array
+     * @return An array of all update type strings
+     */
+    function getAllUpdateTypes() external view returns (string[] memory);
+
+    /**
      * @notice Checks if a given update type is currently active
      * @param updateType The update type string to check
      * @return True if the update type is active, false otherwise

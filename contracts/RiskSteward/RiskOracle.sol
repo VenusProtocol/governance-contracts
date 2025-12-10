@@ -366,6 +366,22 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
     }
 
     /**
+     * @notice Returns the total number of update types in the allUpdateTypes array
+     * @return The length of the allUpdateTypes array
+     */
+    function allUpdateTypesLength() external view returns (uint256) {
+        return allUpdateTypes.length;
+    }
+
+    /**
+     * @notice Returns all update types in the allUpdateTypes array
+     * @return An array of all update type strings
+     */
+    function getAllUpdateTypes() external view returns (string[] memory) {
+        return allUpdateTypes;
+    }
+
+    /**
      * @notice Checks if an update type exists in the allUpdateTypes array
      * @param updateType The update type to check
      * @return True if the update type exists, false otherwise
