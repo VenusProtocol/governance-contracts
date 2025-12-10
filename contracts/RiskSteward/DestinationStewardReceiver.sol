@@ -157,6 +157,16 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     event ExecutorStatusUpdated(address indexed executor, bool previousApproved, bool indexed approved);
 
     /**
+     * @notice Emitted when a risk parameter config active status is updated
+     */
+    event ConfigActiveUpdated(
+        bytes32 indexed updateTypeHash,
+        string updateType,
+        bool previousActive,
+        bool indexed active
+    );
+
+    /**
      * @notice Emitted when an update is rejected on the destination
      */
     event UpdateRejected(uint256 indexed updateId);
@@ -197,6 +207,11 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     error InvalidUpdateType();
 
     /**
+     * @notice Thrown when an update type is not supported
+     */
+    error UnsupportedUpdateType();
+
+    /**
      * @notice Thrown when a debounce value of 0 is set
      */
     error InvalidDebounce();
@@ -205,6 +220,17 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @notice Thrown when an address is not a whitelisted executor
      */
     error NotAnExecutor();
+
+    /**
+     * @notice Modifier that ensures only whitelisted executors can call the function
+     * @custom:error NotAnExecutor if the caller is not a whitelisted executor
+     */
+    modifier onlyWhitelistedExecutors() {
+        if (!whitelistedExecutors[msg.sender]) {
+            revert NotAnExecutor();
+        }
+        _;
+    }
 
     /**
      * @notice Disables initializers and sets immutable values.
@@ -269,6 +295,31 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     }
 
     /**
+     * @notice Sets the active status of a risk parameter config
+     * @param updateType The type of update to configure
+     * @param active The active status to set
+     * @custom:access Controlled by AccessControlManager
+     * @custom:event Emits ConfigActiveUpdated with the update type hash, update type, previous active status, and the active status
+     * @custom:error Throws UnsupportedUpdateType if the update type is not supported
+     */
+    function setConfigActive(string calldata updateType, bool active) external {
+        _checkAccessAllowed("setConfigActive(string,bool)");
+        bytes32 key = keccak256(bytes(updateType));
+
+        if (riskParameterConfigs[key].riskSteward == address(0)) {
+            revert UnsupportedUpdateType();
+        }
+
+        bool previousActive = riskParameterConfigs[key].active;
+        if (previousActive == active) {
+            return;
+        }
+
+        riskParameterConfigs[key].active = active;
+        emit ConfigActiveUpdated(key, updateType, previousActive, active);
+    }
+
+    /**
      * @notice Sets the whitelist status of an executor on the destination chain.
      * @param executor The address of the executor
      * @param approved The whitelist status to set (true to whitelist, false to remove)
@@ -288,17 +339,6 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     }
 
     /**
-     * @notice Modifier that ensures only whitelisted executors can call the function
-     * @custom:error NotAnExecutor if the caller is not a whitelisted executor
-     */
-    modifier onlyWhitelistedExecutors() {
-        if (!whitelistedExecutors[msg.sender]) {
-            revert NotAnExecutor();
-        }
-        _;
-    }
-
-    /**
      * @notice Executes a bridged update after its remote delay has passed.
      * @param updateId The bridged update ID to execute
      * @custom:access Only whitelisted executors can execute updates
@@ -315,6 +355,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
         RiskParameterUpdate memory update = destUpdate.update;
         bytes32 updateTypeKey = update.updateTypeKey;
         RiskParamConfig storage config = riskParameterConfigs[updateTypeKey];
+        uint256 currentTime = block.timestamp;
 
         if (!config.active) {
             revert ConfigNotActive();
@@ -324,21 +365,21 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
             revert UpdateNotFound();
         }
 
-        if (block.timestamp < destUpdate.arrivalTime + REMOTE_DELAY) {
+        if (currentTime < destUpdate.arrivalTime + REMOTE_DELAY) {
             revert UpdateNotUnlocked();
         }
 
-        if (update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME < block.timestamp) {
+        if (update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME < currentTime) {
             revert UpdateIsExpired();
         }
 
         // Destination-side debounce based on last execution for this (updateType, market)
         uint256 lastExecutionTime = lastExecutedAt[updateTypeKey][update.market];
-        if (lastExecutionTime != 0 && (lastExecutionTime + config.debounce > block.timestamp)) {
+        if (lastExecutionTime != 0 && (lastExecutionTime + config.debounce > currentTime)) {
             revert UpdateTooFrequent();
         }
 
-        lastExecutedAt[updateTypeKey][update.market] = block.timestamp;
+        lastExecutedAt[updateTypeKey][update.market] = currentTime;
         destUpdate.status = UpdateStatus.Executed;
         destUpdate.executor = msg.sender;
 
@@ -390,7 +431,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
             uint256 registeredUpdateId = lastRegisteredUpdate[updateTypeKey][market];
             DestinationUpdate storage destUpdate = updates[registeredUpdateId];
 
-            if (!_checkPendingUpdate(destUpdate.update)) continue;
+            if (!_checkPendingUpdate(registeredUpdateId)) continue;
 
             // Validate Remote Delay
             if (block.timestamp < destUpdate.arrivalTime + REMOTE_DELAY) continue;
@@ -479,9 +520,10 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
             emit DuplicateUpdateReceived(newId, arrivalTime, update.updateType, update.market);
             return;
         }
+
         // If already an update in Process do not override the registered update
-        if (_checkPendingUpdate(update)) {
-            uint256 currentRegisteredId = lastRegisteredUpdate[update.updateTypeKey][update.market];
+        uint256 currentRegisteredId = lastRegisteredUpdate[update.updateTypeKey][update.market];
+        if (_checkPendingUpdate(currentRegisteredId)) {
             emit RegisteredPendingUpdateExist(currentRegisteredId, arrivalTime, update.updateType, update.market);
             return;
         }
@@ -496,12 +538,10 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
 
     /**
      * @notice Checks if there is a pending, non‑expired registered update for the same (updateType, market).
-     * @param update The incoming risk parameter update to compare against the currently registered one
+     * @param currentRegisteredId The currently registered update ID for the same (updateType, market)
      * @return True if there is a pending, non‑expired registered update for the same (updateType, market), false otherwise
      */
-    function _checkPendingUpdate(RiskParameterUpdate memory update) internal view returns (bool) {
-        uint256 currentRegisteredId = lastRegisteredUpdate[update.updateTypeKey][update.market];
-
+    function _checkPendingUpdate(uint256 currentRegisteredId) internal view returns (bool) {
         if (currentRegisteredId == 0) return false; // no registered update
 
         DestinationUpdate storage current = updates[currentRegisteredId];

@@ -114,6 +114,11 @@ describe("Risk Steward", async function () {
       "setWhitelistedExecutor(address,bool)",
       deployer.address,
     );
+    await accessControlManager.giveCallPermission(
+      destinationRiskStewardReceiver.address,
+      "setConfigActive(string,bool)",
+      deployer.address,
+    );
 
     await riskOracle.addAuthorizedSender(deployer.address);
     await riskOracle.addUpdateType("supplyCap");
@@ -1407,6 +1412,30 @@ describe("Risk Steward", async function () {
         await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1)).to.be.revertedWithCustomError(
           destinationRiskStewardReceiver,
           "UpdateNotFound",
+        );
+      });
+
+      it("should revert when executing update with inactive config on destination", async function () {
+        await destinationRiskStewardReceiver.setConfigActive("borrowCap", false);
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmDestInactiveConfig",
+          parseUnitsToHex(12),
+          "borrowCap",
+          mockCoreVToken.address,
+          0,
+          ETHEREUM_LZV2_CHAIN_ID,
+          "0x",
+        );
+
+        await riskStewardReceiver.processUpdate(1);
+
+        // Move time forward past remote delay
+        await time.increase(SIX_HOURS + 1);
+
+        await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1)).to.be.revertedWithCustomError(
+          destinationRiskStewardReceiver,
+          "ConfigNotActive",
         );
       });
     });
