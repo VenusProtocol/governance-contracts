@@ -1,3 +1,53 @@
+## [2.14.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.14.0-dev.1...v2.14.0-dev.2) (2025-11-03)
+
+
+### Features
+
+* add slim package scripts ([8f5df9c](https://github.com/VenusProtocol/governance-contracts/commit/8f5df9cfc21994a670e308614eb154cc4184adfa))
+
+
+### Bug Fixes
+
+* add repo URL ([e6db68d](https://github.com/VenusProtocol/governance-contracts/commit/e6db68d7c05c8fc00397b9c21188747fec40654f))
+
+## [2.14.0-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.13.1-dev.2...v2.14.0-dev.1) (2025-10-23)
+
+
+### Features
+
+* add slim package scripts ([d3d36a5](https://github.com/VenusProtocol/governance-contracts/commit/d3d36a54902a483553500afda1919820d71cd3e4))
+
+## [2.13.1-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.13.1-dev.1...v2.13.1-dev.2) (2025-10-20)
+
+
+### Bug Fixes
+
+* use hardhat verify ([d2f1158](https://github.com/VenusProtocol/governance-contracts/commit/d2f11580923ff875fa79a2be2b0a5a01c13424d2))
+
+## [2.13.1-dev.1](https://github.com/VenusProtocol/governance-contracts/compare/v2.13.0...v2.13.1-dev.1) (2025-10-09)
+
+
+### Bug Fixes
+
+* revert bnbmainnet permission updates ([34b53a3](https://github.com/VenusProtocol/governance-contracts/commit/34b53a3cb617fd569ffb38a9bc90255e563d3494))
+
+## [2.13.0](https://github.com/VenusProtocol/governance-contracts/compare/v2.12.0...v2.13.0) (2025-09-29)
+
+
+### Features
+
+* deployed on bepolia ([1e63179](https://github.com/VenusProtocol/governance-contracts/commit/1e631799966aeb926377bf99d2b18528d55f05c3))
+* updating deployment files ([52d208d](https://github.com/VenusProtocol/governance-contracts/commit/52d208d36c60d4fb5c2732c0c092502311137ed5))
+* updating deployment files ([026907e](https://github.com/VenusProtocol/governance-contracts/commit/026907ed3e227b8159ca9f2fcd2c7d5fed5ba427))
+
+
+### Bug Fixes
+
+* deployed acm aggregator ([1a75783](https://github.com/VenusProtocol/governance-contracts/commit/1a757831b920b4dcaf89812959017f4526f823b4))
+* fixed lint ([91d8be3](https://github.com/VenusProtocol/governance-contracts/commit/91d8be3dbc5a9d911bb083008fa07bee3c800f11))
+* fixed yarn lock ([0de320b](https://github.com/VenusProtocol/governance-contracts/commit/0de320b1fef3801f5a3e98a0d7cd29768bb64a3d))
+* removed berachain ([b44c8f2](https://github.com/VenusProtocol/governance-contracts/commit/b44c8f285774984e07a30992c82300e521673cb6))
+
 ## [2.13.0-dev.2](https://github.com/VenusProtocol/governance-contracts/compare/v2.13.0-dev.1...v2.13.0-dev.2) (2025-08-11)
 
 

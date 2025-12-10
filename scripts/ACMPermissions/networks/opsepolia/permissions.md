@@ -738,3 +738,51 @@
   - `NormalTimelock`
   - `CriticalTimelock`
   - `FastTrackTimelock`
+
+## Contract Address: 0x0000000000000000000000000000000000000000
+
+- **Function Signature**: `setSnapshot(uint256,uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `CriticalTimelock`
+  - `FastTrackTimelock`
+
+## Contract Address: 0x0000000000000000000000000000000000000000
+
+- **Function Signature**: `setGrowthRate(uint256,uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `CriticalTimelock`
+  - `FastTrackTimelock`
+
+## Contract Address: 0x0000000000000000000000000000000000000000
+
+- **Function Signature**: `setSnapshotGap(uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+  - `CriticalTimelock`
+  - `FastTrackTimelock`
+
+## Contract Address: 0xc66c4058A8524253C22a9461Df6769CE09F7d61e
+
+- **Function Signature**: `setRewardRecipient(address)`
+- **Addresses**:
+  - `NormalTimelock`
+
+## Contract Address: 0xc66c4058A8524253C22a9461Df6769CE09F7d61e
+
+- **Function Signature**: `setMaxLoopsLimit(uint256)`
+- **Addresses**:
+  - `NormalTimelock`
+
+## Contract Address: 0x0000000000000000000000000000000000000000
+
+- **Function Signature**: `setRewardRecipient(address)`
+- **Addresses**:
+  - `NormalTimelock`
+
+## Contract Address: 0x0000000000000000000000000000000000000000
+
+- **Function Signature**: `setMaxLoopsLimit(uint256)`
+- **Addresses**:
+  - `NormalTimelock`
