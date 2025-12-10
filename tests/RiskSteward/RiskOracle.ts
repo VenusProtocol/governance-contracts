@@ -530,6 +530,6 @@ describe("RiskOracle", async function () {
 
       expect(await riskOracle.activeUpdateTypes("supplyCap")).to.be.false;
       expect(await riskOracle.activeUpdateTypes("borrowCap")).to.be.true;
-    })
+    });
   });
 });

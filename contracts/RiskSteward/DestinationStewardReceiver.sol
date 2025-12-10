@@ -338,11 +338,11 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
             revert UpdateTooFrequent();
         }
 
-        IRiskSteward(config.riskSteward).applyUpdate(update);
-
         lastExecutedAt[updateTypeKey][update.market] = block.timestamp;
         destUpdate.status = UpdateStatus.Executed;
         destUpdate.executor = msg.sender;
+
+        IRiskSteward(config.riskSteward).applyUpdate(update);
 
         emit RemoteUpdateExecuted(updateId);
     }

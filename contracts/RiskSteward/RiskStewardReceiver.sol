@@ -524,16 +524,14 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     function _executeUpdate(RiskParameterUpdate memory update, IRiskSteward steward) internal {
         uint256 updateId = update.updateId;
         uint256 timestamp = block.timestamp;
-        steward.applyUpdate(update);
-
         RegisteredUpdate storage registeredUpdate = updates[updateId];
 
-        // Preserve the unlockTime set during registration
         registeredUpdate.status = UpdateStatus.Executed;
         registeredUpdate.executor = address(msg.sender);
         registeredUpdate.executedAt = timestamp;
-
         lastProcessedUpdate[update.updateTypeKey][update.market] = updateId;
+
+        steward.applyUpdate(update);
         emit UpdateExecuted(updateId);
     }
 
