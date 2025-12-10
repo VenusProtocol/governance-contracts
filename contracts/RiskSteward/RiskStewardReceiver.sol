@@ -278,7 +278,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         _registerUpdate(update, config, safeForDirectExecution, isRemoteUpdate);
 
         if (isRemoteUpdate) {
-            _sendRemoteUpdate(update, "");
+            _sendRemoteUpdate(update, "", 0);
         } else if (safeForDirectExecution) {
             _executeUpdate(update, riskSteward);
         }
@@ -336,7 +336,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:error Throws InvalidUpdateToResend if the update status is not SENT_TO_DESTINATION
      * @custom:error Throws UpdateIsExpired if the update has expired
      */
-    function resendRemoteUpdate(uint256 updateId, bytes calldata options) external onlyWhitelistedExecutors {
+    function resendRemoteUpdate(uint256 updateId, bytes calldata options) external payable onlyWhitelistedExecutors {
         RegisteredUpdate storage registeredUpdate = updates[updateId];
         if (registeredUpdate.status != UpdateStatus.SENT_TO_DESTINATION) {
             revert InvalidUpdateToResend();
@@ -349,7 +349,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
             revert UpdateIsExpired();
         }
 
-        _sendRemoteUpdate(update, options);
+        _sendRemoteUpdate(update, options, msg.value);
         emit UpdateResentToDestination(update.updateId, update.destLzEid, update.updateType, update.market);
     }
 
@@ -540,14 +540,22 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      *         The update should already be registered before calling this function.
      * @param update The risk parameter update to send to the destination chain
      * @param options LayerZero message options; if empty, default executor option is used
+     * @param nativeFee Native tokens supplied to cover the bridge fee (0 to use the quoted amount)
      * @custom:event Emits UpdateSentToDestination with the update ID, destination endpoint ID, update type, and market
      */
-    function _sendRemoteUpdate(RiskParameterUpdate memory update, bytes memory options) internal {
+    function _sendRemoteUpdate(RiskParameterUpdate memory update, bytes memory options, uint256 nativeFee) internal {
         bytes memory option = options.length == 0
             ? OptionsBuilder.newOptions().addExecutorLzReceiveOption(1_000_000, 0)
             : options;
 
-        MessagingFee memory fee = quote(update, option, false);
+        MessagingFee memory fee;
+
+        if (nativeFee == 0) {
+            fee = quote(update, option, false);
+        } else {
+            fee = MessagingFee(nativeFee, 0);
+        }
+
         this.lzSend{ value: fee.nativeFee }(update.destLzEid, update, option, fee, address(this));
 
         RegisteredUpdate storage registeredUpdate = updates[update.updateId];

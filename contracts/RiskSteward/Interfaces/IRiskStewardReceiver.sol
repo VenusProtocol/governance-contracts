@@ -241,7 +241,7 @@ interface IRiskStewardReceiver {
 
     function rejectUpdate(uint256 updateId) external;
 
-    function resendRemoteUpdate(uint256 updateId, bytes calldata options) external;
+    function resendRemoteUpdate(uint256 updateId, bytes calldata options) external payable;
 
     function getExecutableUpdates(
         string calldata updateType,
