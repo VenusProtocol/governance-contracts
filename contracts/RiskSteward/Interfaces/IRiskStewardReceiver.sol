@@ -117,11 +117,21 @@ interface IRiskStewardReceiver {
     );
 
     /**
+     * @notice Emitted when leftover native tokens are swept by owner
+     */
+    event SweepNative(address indexed receiver, uint256 amount);
+
+    /**
      * @notice Event emitted when the pause status changes
      * @param previousPaused Previous pause state
      * @param paused Current pause state
      */
     event PauseStatusUpdated(bool previousPaused, bool paused);
+
+    /**
+     * @custom:error TransferFailed
+     */
+    error TransferFailed();
 
     /**
      * @notice Thrown if a submitted update is not active and therefore cannot be processed
@@ -152,6 +162,11 @@ interface IRiskStewardReceiver {
      * @notice Thrown when a debounce value of 0 is set
      */
     error InvalidDebounce();
+
+    /**
+     * @notice Thrown when a timelock value is greater than or equal to the expiration time
+     */
+    error InvalidTimelock();
 
     /**
      * @notice Thrown when update unlock time has not been reached

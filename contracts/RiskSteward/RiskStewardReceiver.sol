@@ -25,7 +25,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     /**
      * @notice Period after which a proposed update becomes expired and can no longer be applied
      */
-    uint256 public constant UPDATE_EXPIRATION_TIME = 1 days;
+    uint256 public constant UPDATE_EXPIRATION_TIME = 2 days;
 
     /**
      * @notice Source chain LayerZero endpoint ID
@@ -124,6 +124,19 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     receive() external payable {}
 
     /**
+     * @notice Allows the owner to sweep leftover native tokens (e.g., BNB) from the contract.
+     * @custom:event Emits SweepNative event.
+     */
+    function sweepNative() external onlyOwner {
+        uint256 balance = address(this).balance;
+        if (balance > 0) {
+            (bool success, ) = payable(owner()).call{ value: balance }("");
+            if (!success) revert TransferFailed();
+            emit SweepNative(owner(), balance);
+        }
+    }
+
+    /**
      * @notice Sets the pause status for `processUpdate`.
      * @param paused_ True to pause, false to unpause
      * @custom:access Controlled by AccessControlManager
@@ -148,6 +161,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:event Emits RiskParameterConfigUpdated
      * @custom:error Throws UnsupportedUpdateType if the update type is an empty string
      * @custom:error Throws InvalidDebounce if the debounce is 0
+     * @custom:error Throws InvalidTimelock if the timelock is greater than or equal to the expiration time
      * @custom:error Throws ZeroAddressNotAllowed if the risk steward address is zero
      */
     function setRiskParameterConfig(
@@ -164,6 +178,9 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         }
         if (debounce == 0) {
             revert InvalidDebounce();
+        }
+        if (timelock >= UPDATE_EXPIRATION_TIME) {
+            revert InvalidTimelock();
         }
 
         bytes32 key = keccak256(bytes(updateType));
