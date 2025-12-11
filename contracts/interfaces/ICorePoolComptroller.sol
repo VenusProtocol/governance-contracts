@@ -27,7 +27,7 @@ interface ICorePoolComptroller {
         address vToken,
         uint256 newCollateralFactorMantissa,
         uint256 newLiquidationThresholdMantissa
-    ) external;
+    ) external returns (uint256);
 
     function markets(
         address

@@ -158,7 +158,7 @@ describe("RiskOracle", async function () {
     it("should set update type active status to false", async function () {
       await riskOracle.addUpdateType("supplyCap");
       await expect(riskOracle.setUpdateTypeActive("supplyCap", false))
-        .to.emit(riskOracle, "UpdateTypeActiveStatusSet")
+        .to.emit(riskOracle, "UpdateTypeActiveStatusChanged")
         .withArgs("supplyCap", true, false);
 
       expect(await riskOracle.activeUpdateTypes("supplyCap")).to.be.false;
@@ -168,7 +168,7 @@ describe("RiskOracle", async function () {
       await riskOracle.addUpdateType("supplyCap");
       await riskOracle.setUpdateTypeActive("supplyCap", false);
       await expect(riskOracle.setUpdateTypeActive("supplyCap", true))
-        .to.emit(riskOracle, "UpdateTypeActiveStatusSet")
+        .to.emit(riskOracle, "UpdateTypeActiveStatusChanged")
         .withArgs("supplyCap", false, true);
 
       expect(await riskOracle.activeUpdateTypes("supplyCap")).to.be.true;
@@ -185,7 +185,7 @@ describe("RiskOracle", async function () {
       await riskOracle.addUpdateType("supplyCap");
       await expect(riskOracle.setUpdateTypeActive("supplyCap", true)).to.be.revertedWithCustomError(
         riskOracle,
-        "UpdateTypeStatusAlreadySet",
+        "UpdateTypeStatusUnchanged",
       );
     });
 
@@ -294,7 +294,7 @@ describe("RiskOracle", async function () {
         riskOracle
           .connect(authorizedSender)
           .publishRiskParameterUpdate("ipfs://QmTest", parseUnitsToHex(10), "supplyCap", deployer.address, 0, 0, "0x"),
-      ).to.be.revertedWithCustomError(riskOracle, "UnauthorizedUpdateType");
+      ).to.be.revertedWithCustomError(riskOracle, "UpdateTypeNotActive");
     });
 
     it("should revert when publishing with zero address market", async function () {
@@ -430,7 +430,7 @@ describe("RiskOracle", async function () {
             dstEids,
             additionalData,
           ),
-      ).to.be.revertedWithCustomError(riskOracle, "UnauthorizedUpdateType");
+      ).to.be.revertedWithCustomError(riskOracle, "UpdateTypeNotActive");
     });
   });
 

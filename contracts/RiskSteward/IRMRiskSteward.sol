@@ -19,9 +19,6 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
-    /// @dev Max basis points i.e., 100%
-    uint256 private constant MAX_BPS = 10000;
-
     /**
      * @notice The update type for interest rate model
      */
@@ -33,7 +30,10 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
     bytes32 public constant INTEREST_RATE_MODEL_KEY = keccak256(bytes(INTEREST_RATE_MODEL));
 
     /**
-     * @notice Address of the Core Pool Comptroller used to distinguish between core and isolated pools.
+     * @notice Address of the BNB Core Pool Comptroller.
+     * @dev This comptroller is specific to the BNB Core Pool, which uses a different ABI
+     *      than isolated pools. It is used solely to detect and handle BNB Core Pool
+     *      markets, and would not be used for remote-chain (isolated pool) deployments.
      */
     ICorePoolComptroller public immutable CORE_POOL_COMPTROLLER;
 
@@ -41,12 +41,6 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Address of the RiskStewardReceiver used to validate incoming updates
      */
     IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
-
-    /**
-     * @notice The safe delta threshold in basis points. Updates within this delta are considered safe and require no timelock.
-     * Updates exceeding this delta require timelock.
-     */
-    uint256 public safeDeltaBps;
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
@@ -63,16 +57,6 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
         address indexed market,
         address indexed newInterestRateModel
     );
-
-    /**
-     * @notice Emitted when the safe delta bps is updated
-     */
-    event SafeDeltaBpsUpdated(uint256 indexed oldSafeDeltaBps, uint256 indexed newSafeDeltaBps);
-
-    /**
-     * @notice Thrown when a safeDeltaBps value is greater than MAX_BPS
-     */
-    error InvalidSafeDeltaBps();
 
     /**
      * @notice Thrown when an update type that is not supported is operated on
@@ -95,6 +79,11 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
     error InvalidAddressLength();
 
     /**
+     * @notice Thrown when Core Pool VToken._setInterestRateModel fails.
+     */
+    error SetInterestRateModelFailed(uint256 errorCode);
+
+    /**
      * @notice Sets the immutable CORE_POOL_COMPTROLLER and RISK_STEWARD_RECEIVER addresses and disables initializers
      * @param corePoolComptroller_ The address of the Core Pool Comptroller
      * @param riskStewardReceiver_ The address of the RiskStewardReceiver
@@ -102,7 +91,6 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:oz-upgrades-unsafe-allow constructor
      */
     constructor(address corePoolComptroller_, address riskStewardReceiver_) {
-        ensureNonzeroAddress(corePoolComptroller_);
         ensureNonzeroAddress(riskStewardReceiver_);
         CORE_POOL_COMPTROLLER = ICorePoolComptroller(corePoolComptroller_);
         RISK_STEWARD_RECEIVER = IRiskStewardReceiver(riskStewardReceiver_);
@@ -115,22 +103,6 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
      */
     function initialize(address accessControlManager_) external initializer {
         __AccessControlled_init(accessControlManager_);
-    }
-
-    /**
-     * @notice Sets the safe delta bps
-     * @param safeDeltaBps_ The new safe delta bps
-     * @custom:event Emits SafeDeltaBpsUpdated with the old and new safe delta bps
-     * @custom:error Throws InvalidSafeDeltaBps if the safe delta bps is greater than MAX_BPS
-     * @custom:access Controlled by AccessControlManager
-     */
-    function setSafeDeltaBps(uint256 safeDeltaBps_) external {
-        _checkAccessAllowed("setSafeDeltaBps(uint256)");
-        if (safeDeltaBps_ > MAX_BPS) {
-            revert InvalidSafeDeltaBps();
-        }
-        emit SafeDeltaBpsUpdated(safeDeltaBps, safeDeltaBps_);
-        safeDeltaBps = safeDeltaBps_;
     }
 
     /**
@@ -183,7 +155,8 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
         address comptroller = ICorePoolVToken(market).comptroller();
 
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
-            ICorePoolVToken(market)._setInterestRateModel(InterestRateModelV8(newIRM));
+            uint256 errorCode = ICorePoolVToken(market)._setInterestRateModel(InterestRateModelV8(newIRM));
+            if (errorCode != 0) revert SetInterestRateModelFailed(errorCode);
         } else {
             IIsolatedPoolVToken(market).setInterestRateModel(InterestRateModel(newIRM));
         }

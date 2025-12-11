@@ -31,7 +31,10 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     bytes32 public constant COLLATERAL_FACTORS_KEY = keccak256(bytes(COLLATERAL_FACTORS));
 
     /**
-     * @notice Address of the Core Pool Comptroller used to distinguish between core and isolated pools.
+     * @notice Address of the BNB Core Pool Comptroller.
+     * @dev This comptroller is specific to the BNB Core Pool, which uses a different ABI
+     *      than isolated pools. It is used solely to detect and handle BNB Core Pool
+     *      markets, and would not be used for remote-chain (isolated pool) deployments.
      */
     ICorePoolComptroller public immutable CORE_POOL_COMPTROLLER;
 
@@ -72,6 +75,11 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     error InvalidSafeDeltaBps();
 
     /**
+     * @notice Thrown when Core Pool Comptroller.setCollateralFactor fails.
+     */
+    error SetCollateralFactorFailed(uint256 errorCode);
+
+    /**
      * @notice Thrown when an update type that is not supported is operated on.
      */
     error UnsupportedUpdateType();
@@ -99,12 +107,9 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @custom:oz-upgrades-unsafe-allow constructor
      */
     constructor(address corePoolComptroller_, address riskStewardReceiver_) {
-        ensureNonzeroAddress(corePoolComptroller_);
         ensureNonzeroAddress(riskStewardReceiver_);
-
         CORE_POOL_COMPTROLLER = ICorePoolComptroller(corePoolComptroller_);
         RISK_STEWARD_RECEIVER = IRiskStewardReceiver(riskStewardReceiver_);
-
         _disableInitializers();
     }
 
@@ -201,12 +206,13 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         (uint256 newCollateralFactor, uint256 newLiquidationThreshold) = abi.decode(newValue, (uint256, uint256));
 
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
-            ICorePoolComptroller(comptroller).setCollateralFactor(
+            uint256 errorCode = ICorePoolComptroller(comptroller).setCollateralFactor(
                 poolId,
                 market,
                 newCollateralFactor,
                 newLiquidationThreshold
             );
+            if (errorCode != 0) revert SetCollateralFactorFailed(errorCode);
         } else {
             if (poolId != 0) revert UnsupportedUpdateType();
 

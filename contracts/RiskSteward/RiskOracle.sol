@@ -59,7 +59,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
     event UpdateTypeAdded(string indexed updateType);
 
     /// @notice Event emitted when an update type's active status is changed
-    event UpdateTypeActiveStatusSet(string indexed updateType, bool previousActive, bool indexed active);
+    event UpdateTypeActiveStatusChanged(string indexed updateType, bool previousActive, bool indexed active);
 
     /// @notice Thrown when sender is not authorized
     error SenderNotAuthorized();
@@ -77,10 +77,10 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
     error UpdateTypeNotFound();
 
     /// @notice Thrown when update type active status is already set to the desired value
-    error UpdateTypeStatusAlreadySet();
+    error UpdateTypeStatusUnchanged();
 
-    /// @notice Thrown when update type is unauthorized
-    error UnauthorizedUpdateType();
+    /// @notice Thrown when update type is not active
+    error UpdateTypeNotActive();
 
     /// @notice Thrown when no update is found
     error NoUpdateFound();
@@ -178,9 +178,9 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @param updateType The update type to set active status for
      * @param active True to activate, false to deactivate
      * @custom:error Throws UpdateTypeNotFound if update type doesn't exist
-     * @custom:error Throws UpdateTypeStatusAlreadySet if status is already set to the desired value
+     * @custom:error Throws UpdateTypeStatusUnchanged if status is already set to the desired value
      * @custom:error Throws Unauthorized if caller is not allowed by AccessControlManager
-     * @custom:event Emits UpdateTypeActiveStatusSet when status is successfully changed
+     * @custom:event Emits UpdateTypeActiveStatusChanged when status is successfully changed
      */
     function setUpdateTypeActive(string memory updateType, bool active) external {
         _checkAccessAllowed("setUpdateTypeActive(string,bool)");
@@ -191,11 +191,11 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
 
         bool previousActive = activeUpdateTypes[updateType];
         if (previousActive == active) {
-            revert UpdateTypeStatusAlreadySet();
+            revert UpdateTypeStatusUnchanged();
         }
 
         activeUpdateTypes[updateType] = active;
-        emit UpdateTypeActiveStatusSet(updateType, previousActive, active);
+        emit UpdateTypeActiveStatusChanged(updateType, previousActive, active);
     }
 
     /**
@@ -208,7 +208,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @param dstEid Destination endpoint ID for cross-chain routing
      * @param additionalData Additional data for the update
      * @custom:error Throws SenderNotAuthorized if caller is not an authorized sender
-     * @custom:error Throws UnauthorizedUpdateType if update type is not active
+     * @custom:error Throws UpdateTypeNotActive if update type is not active
      * @custom:event Emits UpdatePublished when update is successfully published
      */
     function publishRiskParameterUpdate(
@@ -233,7 +233,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @param dstEid Array of destination endpoint IDs for cross-chain routing
      * @param additionalData Array of additional data for the updates
      * @custom:error Throws SenderNotAuthorized if caller is not an authorized sender
-     * @custom:error Throws UnauthorizedUpdateType if any update type is not active
+     * @custom:error Throws UpdateTypeNotActive if any update type is not active
      * @custom:event Emits UpdatePublished for each successfully published update
      */
     function publishBulkRiskParameterUpdates(
@@ -311,7 +311,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @param dstEid Destination endpoint ID for cross-chain routing
      * @param additionalData Additional data for the update
      * @custom:error Throws ZeroAddressNotAllowed if market is zero address
-     * @custom:error Throws UnauthorizedUpdateType if update type is not active
+     * @custom:error Throws UpdateTypeNotActive if update type is not active
      * @custom:event Emits UpdatePublished when update is successfully published
      */
     function _publishUpdate(
@@ -325,7 +325,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
     ) internal {
         ensureNonzeroAddress(market);
         if (!activeUpdateTypes[updateType]) {
-            revert UnauthorizedUpdateType();
+            revert UpdateTypeNotActive();
         }
         ++updateCounter;
         uint256 previousUpdateId = latestUpdateIdByMarketAndType[market][updateType];

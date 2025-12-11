@@ -8,5 +8,5 @@ interface ICorePoolVToken {
 
     function interestRateModel() external view returns (address);
 
-    function _setInterestRateModel(InterestRateModelV8 newInterestRateModel) external returns (uint);
+    function _setInterestRateModel(InterestRateModelV8 newInterestRateModel) external returns (uint256);
 }

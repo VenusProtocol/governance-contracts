@@ -138,9 +138,9 @@ interface IRiskOracle {
      * @param updateType The update type to set active status for
      * @param active True to activate the update type, false to deactivate it
      * @custom:error UpdateTypeNotFound Thrown if update type doesn't exist
-     * @custom:error UpdateTypeStatusAlreadySet Thrown if status is already set to the desired value
+     * @custom:error UpdateTypeStatusUnchanged Thrown if status is already set to the desired value
      * @custom:error Unauthorized Thrown if caller is not allowed by AccessControlManager
-     * @custom:event UpdateTypeActiveStatusSet Emitted when status is successfully changed
+     * @custom:event UpdateTypeActiveStatusChanged Emitted when status is successfully changed
      */
     function setUpdateTypeActive(string memory updateType, bool active) external;
 
@@ -154,7 +154,7 @@ interface IRiskOracle {
      * @param dstEid Destination endpoint ID for cross-chain routing
      * @param additionalData Additional data or metadata for the update
      * @custom:error SenderNotAuthorized Thrown if caller is not an authorized sender
-     * @custom:error UnauthorizedUpdateType Thrown if update type is not active
+     * @custom:error UpdateTypeNotActive Thrown if update type is not active
      * @custom:error ZeroAddressNotAllowed Thrown if market is the zero address
      * @custom:event UpdatePublished Emitted when the update is successfully published
      */
@@ -179,7 +179,7 @@ interface IRiskOracle {
      * @param additionalData Array of additional data for each update
      * @custom:error SenderNotAuthorized Thrown if caller is not an authorized sender
      * @custom:error ArrayLengthMismatch Thrown if all arrays don't have the same length
-     * @custom:error UnauthorizedUpdateType Thrown if any update type is not active
+     * @custom:error UpdateTypeNotActive Thrown if any update type is not active
      * @custom:error ZeroAddressNotAllowed Thrown if any market is the zero address
      * @custom:event UpdatePublished Emitted for each successfully published update
      */

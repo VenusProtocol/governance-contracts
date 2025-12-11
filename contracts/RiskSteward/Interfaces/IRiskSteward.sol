@@ -11,22 +11,10 @@ import { IRiskStewardReceiver } from "./IRiskStewardReceiver.sol";
  */
 interface IRiskSteward {
     /**
-     * @notice Returns the safe delta threshold in basis points.
-     * @return The safe delta threshold in basis points
-     */
-    function safeDeltaBps() external view returns (uint256);
-
-    /**
      * @notice Returns the `IRiskStewardReceiver` associated with this steward.
      * @return The risk steward receiver contract
      */
     function RISK_STEWARD_RECEIVER() external view returns (IRiskStewardReceiver);
-
-    /**
-     * @notice Updates the safe delta threshold in basis points.
-     * @param safeDeltaBps_ The new safe delta threshold in basis points
-     */
-    function setSafeDeltaBps(uint256 safeDeltaBps_) external;
 
     /**
      * @notice Checks whether an update is safe for direct execution (no timelock required).

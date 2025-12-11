@@ -140,7 +140,7 @@ const riskStewardFixture = async () => {
     {
       constructorArgs: [riskOracle.address, LZ_BSC_ENDPOINT, BSC_LZV2_CHAIN_ID],
       initializer: "initialize",
-      unsafeAllow: ["state-variable-immutable"],
+      unsafeAllow: ["state-variable-immutable", "constructor"],
     },
   );
 
@@ -458,6 +458,40 @@ if (FORK_MAINNET) {
           const updatedMarketInfo = await comptroller_defi.markets(vBsw_Defi.address);
           expect(updatedMarketInfo.collateralFactorMantissa).to.equal(newCF);
           expect(updatedMarketInfo.liquidationThresholdMantissa).to.equal(newLT);
+        });
+
+        it("should revert when core pool collateral factor update fails on comptroller", async function () {
+          const marketInfo = await comptroller.markets(vCake_CORE.address);
+          const currentCF = marketInfo.collateralFactorMantissa;
+          const currentLT = marketInfo.liquidationThresholdMantissa;
+
+          // Force failure by proposing CF > 1.0 (mantissa 1e18)
+          const failingCF = "1.1";
+
+          await riskOracle
+            .connect(updateSender)
+            .publishRiskParameterUpdate(
+              "ipfs://QmCollateralFactorsForkFail",
+              encodeCollateralFactors(Number(failingCF), Number(failingCF)),
+              "collateralFactors",
+              vCake_CORE.address,
+              0,
+              0,
+              "0x",
+            );
+
+          // Should be registered due to unsafe delta
+          await expect(riskStewardReceiver.processUpdate(1)).to.emit(riskStewardReceiver, "UpdateRegistered");
+
+          await time.increase(SIX_HOURS + 1);
+
+          await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(1))
+            .to.be.revertedWithCustomError(collateralFactorsRiskSteward, "SetCollateralFactorFailed")
+            .withArgs(6);
+
+          const updatedMarketInfo = await comptroller.markets(vCake_CORE.address);
+          expect(updatedMarketInfo.collateralFactorMantissa).to.equal(currentCF);
+          expect(updatedMarketInfo.liquidationThresholdMantissa).to.equal(currentLT);
         });
       });
 
