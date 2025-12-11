@@ -286,7 +286,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
     /**
      * @notice Executes a registered update. Only whitelisted executors can call this function.
-     *         This function can be used for updates that are in Executable status.
+     *         This function can be used for updates that have completed their timelock and are ready to execute.
      * @param updateId The oracle update ID of the update to execute
      * @custom:access Only whitelisted executors can call this function
      * @custom:event Emits UpdateExecuted with the oracle update ID
@@ -371,7 +371,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
         for (uint256 i = 0; i < maxUpdates; ++i) {
             uint256 registeredUpdateId = lastRegisteredUpdate[updateTypeKey][markets[i]];
-            if (_getCurrentStatus(registeredUpdateId) != UpdateStatus.Executable) continue;
+            if (!_isUpdateExecutable(registeredUpdateId)) continue;
             tempArray[count] = registeredUpdateId;
             count++;
         }
@@ -384,12 +384,12 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     }
 
     /**
-     * @notice Returns the current status of an update, checking expiration and execution conditions.
+     * @notice Returns whether a registered update is ready to be executed.
      * @param updateId The oracle update ID to query
-     * @return The current `UpdateStatus` for the given update ID (may differ from stored status if expired or executable)
+     * @return True if the update is pending, not expired, active, and past its timelock
      */
-    function getUpdateStatus(uint256 updateId) external view returns (UpdateStatus) {
-        return _getCurrentStatus(updateId);
+    function isUpdateExecutable(uint256 updateId) external view returns (bool) {
+        return _isUpdateExecutable(updateId);
     }
 
     /**
@@ -678,33 +678,30 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     }
 
     /**
-     * @notice Computes the current status of an update, including expiration and executability checks.
+     * @notice Checks if an update has completed all conditions to be executed.
      * @param updateId The oracle update ID to query
-     * @return The current `UpdateStatus` for the given update ID
+     * @return True if the update is pending, not expired, active, and past its timelock
      */
-    function _getCurrentStatus(uint256 updateId) internal view returns (UpdateStatus) {
+    function _isUpdateExecutable(uint256 updateId) internal view returns (bool) {
         RegisteredUpdate storage registeredUpdate = updates[updateId];
-        UpdateStatus storedStatus = registeredUpdate.status;
-
-        // For non-pending status, return stored status
-        if (storedStatus != UpdateStatus.Pending) {
-            return storedStatus;
+        if (registeredUpdate.status != UpdateStatus.Pending) {
+            return false;
         }
 
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
         RiskParamConfig storage config = riskParameterConfigs[update.updateTypeKey];
 
-        // Check if expired
+        if (!config.active) {
+            return false;
+        }
+
+        // Check expiration
         if (update.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp) {
-            return UpdateStatus.Expired;
+            return false;
         }
 
-        // Check execution conditions
-        if (config.active && block.timestamp >= registeredUpdate.unlockTime) {
-            return UpdateStatus.Executable;
-        }
-
-        return UpdateStatus.Pending;
+        // Check UnlockTime
+        return block.timestamp >= registeredUpdate.unlockTime;
     }
 
     /**

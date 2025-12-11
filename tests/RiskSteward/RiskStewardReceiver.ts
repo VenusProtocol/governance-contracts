@@ -1078,8 +1078,8 @@ describe("Risk Steward", async function () {
           .to.emit(riskStewardReceiver, "UpdateRejected")
           .withArgs(1);
 
-        const updateStatus = await riskStewardReceiver.getUpdateStatus(1);
-        expect(updateStatus).to.equal(3); // UpdateStatus.Rejected
+        const update = await riskStewardReceiver.updates(1);
+        expect(update.status).to.equal(3); // UpdateStatus.Rejected
       });
 
       it("should revert when non-executor tries to reject update in RSR", async function () {

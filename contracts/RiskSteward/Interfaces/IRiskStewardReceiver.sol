@@ -11,8 +11,7 @@ interface IRiskStewardReceiver {
         Executed,
         Rejected,
         Expired,
-        SENT_TO_DESTINATION,
-        Executable
+        SENT_TO_DESTINATION
     }
 
     /**
@@ -248,5 +247,5 @@ interface IRiskStewardReceiver {
         address comptroller
     ) external view returns (uint256[] memory executableUpdates);
 
-    function getUpdateStatus(uint256 updateId) external view returns (UpdateStatus);
+    function isUpdateExecutable(uint256 updateId) external view returns (bool);
 }
