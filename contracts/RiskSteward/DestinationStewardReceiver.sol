@@ -237,6 +237,11 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     error RemoteDelayUnchanged();
 
     /**
+     * @notice Thrown when trying to renounce ownership
+     */
+    error RenounceOwnershipNotAllowed();
+
+    /**
      * @notice Modifier that ensures only whitelisted executors can call the function
      * @custom:error NotAnExecutor if the caller is not a whitelisted executor
      */
@@ -592,5 +597,13 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
 
         // Check expiration
         return current.update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME > block.timestamp;
+    }
+
+    /**
+     * @notice Disables renounceOwnership function
+     * @custom:error Throws RenounceOwnershipNotAllowed
+     */
+    function renounceOwnership() public pure override {
+        revert RenounceOwnershipNotAllowed();
     }
 }
