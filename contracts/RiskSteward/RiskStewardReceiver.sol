@@ -629,14 +629,15 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         }
 
         uint256 currentTime = block.timestamp;
+        uint256 expirationTime = update.timestamp + UPDATE_EXPIRATION_TIME;
 
         // Check expiration
-        if (update.timestamp + UPDATE_EXPIRATION_TIME < currentTime) {
+        if (expirationTime < currentTime) {
             revert UpdateIsExpired();
         }
 
         // Check if update will still be valid when timelock unlocks
-        if (update.timestamp + UPDATE_EXPIRATION_TIME < currentTime + config.timelock) {
+        if (expirationTime < currentTime + config.timelock) {
             revert UpdateWillExpireBeforeUnlock();
         }
 
