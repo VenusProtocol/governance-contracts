@@ -127,7 +127,7 @@ describe("RiskOracle", async function () {
     it("should add update type", async function () {
       await expect(riskOracle.addUpdateType("supplyCap")).to.emit(riskOracle, "UpdateTypeAdded").withArgs("supplyCap");
 
-      expect(await riskOracle.activeUpdateTypes("supplyCap")).to.be.true;
+      expect(await riskOracle.getActiveUpdateTypes("supplyCap")).to.be.true;
       expect(await riskOracle.allUpdateTypes(0)).to.equal("supplyCap");
     });
 
@@ -161,7 +161,7 @@ describe("RiskOracle", async function () {
         .to.emit(riskOracle, "UpdateTypeActiveStatusChanged")
         .withArgs("supplyCap", true, false);
 
-      expect(await riskOracle.activeUpdateTypes("supplyCap")).to.be.false;
+      expect(await riskOracle.getActiveUpdateTypes("supplyCap")).to.be.false;
     });
 
     it("should set update type active status to true", async function () {
@@ -171,7 +171,7 @@ describe("RiskOracle", async function () {
         .to.emit(riskOracle, "UpdateTypeActiveStatusChanged")
         .withArgs("supplyCap", false, true);
 
-      expect(await riskOracle.activeUpdateTypes("supplyCap")).to.be.true;
+      expect(await riskOracle.getActiveUpdateTypes("supplyCap")).to.be.true;
     });
 
     it("should revert when setting status for non-existent update type", async function () {
@@ -228,7 +228,7 @@ describe("RiskOracle", async function () {
         );
 
       expect(await riskOracle.updateCounter()).to.equal(1);
-      expect(await riskOracle.latestUpdateIdByMarketAndType(market, "supplyCap")).to.equal(1);
+      expect(await riskOracle.getLatestUpdateIdByMarketAndType("supplyCap", market)).to.equal(1);
 
       const update = await riskOracle.getUpdateById(1);
       expect(update.updateId).to.equal(1);
@@ -277,7 +277,7 @@ describe("RiskOracle", async function () {
 
       expect(firstUpdate.previousValue).to.equal("0x");
       expect(secondUpdate.previousValue).to.equal(firstValue);
-      expect(await riskOracle.latestUpdateIdByMarketAndType(market, "supplyCap")).to.equal(2);
+      expect(await riskOracle.getLatestUpdateIdByMarketAndType("supplyCap", market)).to.equal(2);
     });
 
     it("should revert when non-authorized sender tries to publish", async function () {
@@ -373,8 +373,8 @@ describe("RiskOracle", async function () {
         );
 
       expect(await riskOracle.updateCounter()).to.equal(2);
-      expect(await riskOracle.latestUpdateIdByMarketAndType(market1, "supplyCap")).to.equal(1);
-      expect(await riskOracle.latestUpdateIdByMarketAndType(market2, "borrowCap")).to.equal(2);
+      expect(await riskOracle.getLatestUpdateIdByMarketAndType("supplyCap", market1)).to.equal(1);
+      expect(await riskOracle.getLatestUpdateIdByMarketAndType("borrowCap", market2)).to.equal(2);
     });
 
     it("should revert when array lengths don't match", async function () {
@@ -479,14 +479,14 @@ describe("RiskOracle", async function () {
         .connect(authorizedSender)
         .publishRiskParameterUpdate("ipfs://QmSecond", secondValue, "supplyCap", market, 0, 0, "0x");
 
-      const latestUpdate = await riskOracle.getLatestUpdateByParameterAndMarket("supplyCap", market);
+      const latestUpdate = await riskOracle.getLatestUpdateByMarketAndType("supplyCap", market);
       expect(latestUpdate.updateId).to.equal(2);
       expect(latestUpdate.newValue).to.equal(secondValue);
     });
 
     it("should revert when getting latest update for non-existent market and type", async function () {
       await expect(
-        riskOracle.getLatestUpdateByParameterAndMarket("supplyCap", deployer.address),
+        riskOracle.getLatestUpdateByMarketAndType("supplyCap", deployer.address),
       ).to.be.revertedWithCustomError(riskOracle, "NoUpdateFound");
     });
 
@@ -528,8 +528,8 @@ describe("RiskOracle", async function () {
       expect(allTypes).to.include("supplyCap");
       expect(allTypes).to.include("borrowCap");
 
-      expect(await riskOracle.activeUpdateTypes("supplyCap")).to.be.false;
-      expect(await riskOracle.activeUpdateTypes("borrowCap")).to.be.true;
+      expect(await riskOracle.getActiveUpdateTypes("supplyCap")).to.be.false;
+      expect(await riskOracle.getActiveUpdateTypes("borrowCap")).to.be.true;
     });
   });
 });

@@ -61,7 +61,14 @@ interface IRiskOracle {
      * @param updateType The update type string to check
      * @return True if the update type is active, false otherwise
      */
-    function activeUpdateTypes(string memory updateType) external view returns (bool);
+    function getActiveUpdateTypes(string memory updateType) external view returns (bool);
+
+    /**
+     * @notice Checks if a given update type is currently active
+     * @param updateTypeKey The keccak256 hash of the update type string
+     * @return True if the update type key is active, false otherwise
+     */
+    function activeUpdateTypes(bytes32 updateTypeKey) external view returns (bool);
 
     /**
      * @notice Checks if an address is authorized to publish updates
@@ -72,11 +79,11 @@ interface IRiskOracle {
 
     /**
      * @notice Gets the latest update ID for a specific market and update type combination
+     * @param updateTypeKey The keccak256 hash of the update type string
      * @param market The market address
-     * @param updateType The update type string
-     * @return The latest update ID for the given market and update type, or 0 if none exists
+     * @return The latest update ID for the given market and update type key, or 0 if none exists
      */
-    function latestUpdateIdByMarketAndType(address market, string memory updateType) external view returns (uint256);
+    function latestUpdateIdByMarketAndType(bytes32 updateTypeKey, address market) external view returns (uint256);
 
     /**
      * @notice Returns the total number of updates that have been published
@@ -91,10 +98,18 @@ interface IRiskOracle {
      * @return The most recent RiskParameterUpdate for the specified parameter and market
      * @custom:error NoUpdateFound Thrown if no update exists for the specified parameter and market
      */
-    function getLatestUpdateByParameterAndMarket(
+    function getLatestUpdateByMarketAndType(
         string memory updateType,
         address market
     ) external view returns (RiskParameterUpdate memory);
+
+    /**
+     * @notice Gets the latest update ID for a specific market and update type (string) combination
+     * @param updateType The update type identifier
+     * @param market The market address
+     * @return The latest update ID for the given market and update type, or 0 if none exists
+     */
+    function getLatestUpdateIdByMarketAndType(string memory updateType, address market) external view returns (uint256);
 
     /**
      * @notice Fetches the update for a provided update ID

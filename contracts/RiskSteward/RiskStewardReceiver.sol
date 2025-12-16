@@ -624,11 +624,11 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         }
 
         // Check if this is the latest update for this market and type
-        RiskParameterUpdate memory latestForMarketAndType = RISK_ORACLE.getLatestUpdateByParameterAndMarket(
+        uint256 latestUpdateIdForMarketAndType = RISK_ORACLE.getLatestUpdateIdByMarketAndType(
             update.updateType,
             update.market
         );
-        if (latestForMarketAndType.updateId != update.updateId) {
+        if (latestUpdateIdForMarketAndType != update.updateId) {
             revert UpdateIsExpired();
         }
 
