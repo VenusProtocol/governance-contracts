@@ -63,12 +63,7 @@ interface IRiskStewardReceiver {
     /**
      * @notice Event emitted when a risk parameter config active status is set
      */
-    event ConfigActiveUpdated(
-        bytes32 indexed updateTypeHash,
-        string updateType,
-        bool previousActive,
-        bool indexed active
-    );
+    event ConfigActiveUpdated(bytes32 indexed updateTypeHash, string updateType, bool previousActive, bool active);
 
     /**
      * @notice Event emitted when an update is successfully executed
@@ -88,7 +83,7 @@ interface IRiskStewardReceiver {
     /**
      * @notice Event emitted when an executor status is set
      */
-    event ExecutorStatusUpdated(address indexed executor, bool previousApproved, bool indexed approved);
+    event ExecutorStatusUpdated(address indexed executor, bool previousApproved, bool approved);
 
     /**
      * @notice Event emitted when an update is registered
@@ -99,9 +94,9 @@ interface IRiskStewardReceiver {
      * @notice Event emitted when an update is sent to a destination chain
      */
     event UpdateSentToDestination(
-        uint256 indexed updateId,
+        uint256 updateId,
         uint32 indexed destLzEid,
-        string updateType,
+        string indexed updateType,
         address indexed market
     );
 
@@ -109,9 +104,9 @@ interface IRiskStewardReceiver {
      * @notice Event emitted when an update is resent to a destination chain
      */
     event UpdateResentToDestination(
-        uint256 indexed updateId,
+        uint256 updateId,
         uint32 indexed destLzEid,
-        string updateType,
+        string indexed updateType,
         address indexed market
     );
 

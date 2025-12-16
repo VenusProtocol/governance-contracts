@@ -70,7 +70,7 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Emitted when the safe delta bps is updated
      */
-    event SafeDeltaBpsUpdated(uint256 indexed oldSafeDeltaBps, uint256 indexed newSafeDeltaBps);
+    event SafeDeltaBpsUpdated(uint256 oldSafeDeltaBps, uint256 newSafeDeltaBps);
 
     /**
      * @notice Thrown when a safeDeltaBps value is greater than MAX_BPS

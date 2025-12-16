@@ -660,7 +660,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:error UpdateNotUnlocked if the unlock time has not passed
      */
     function _validateExecuteUpdate(
-        RegisteredUpdate memory registeredUpdate,
+        RegisteredUpdate storage registeredUpdate,
         RiskParameterUpdate memory update,
         RiskParamConfig storage config
     ) internal view {

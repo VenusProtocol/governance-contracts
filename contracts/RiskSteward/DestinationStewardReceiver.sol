@@ -122,7 +122,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     event RemoteUpdateRegistered(
         uint256 indexed updateId,
         uint256 arrivalTime,
-        string updateType,
+        string indexed updateType,
         address indexed market
     );
 
@@ -132,7 +132,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     event RegisteredPendingUpdateExist(
         uint256 indexed updateId,
         uint256 arrivalTime,
-        string updateType,
+        string indexed updateType,
         address indexed market
     );
 
@@ -142,7 +142,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     event DuplicateUpdateReceived(
         uint256 indexed updateId,
         uint256 arrivalTime,
-        string updateType,
+        string indexed updateType,
         address indexed market
     );
 
@@ -154,7 +154,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     /**
      * @notice Emitted when an executor status is set on the destination
      */
-    event ExecutorStatusUpdated(address indexed executor, bool previousApproved, bool indexed approved);
+    event ExecutorStatusUpdated(address indexed executor, bool previousApproved, bool approved);
 
     /**
      * @notice Emitted when a risk parameter config active status is updated
