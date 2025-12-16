@@ -605,6 +605,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:error UpdateAlreadyResolved if the update was already registered
      * @custom:error ConfigNotActive if the configuration for the update type is not active
      * @custom:error UpdateIsExpired if the update has expired or is not the latest for the given market and type
+     * @custom:error UpdateWillExpireBeforeUnlock if the update will expire before its timelock unlocks
      * @custom:error UpdateTooFrequent if the debounce period has not passed for the given market and type
      */
     function _validateRegisterUpdate(RiskParameterUpdate memory update, RiskParamConfig storage config) internal view {
@@ -627,15 +628,22 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
             revert UpdateIsExpired();
         }
 
+        uint256 currentTime = block.timestamp;
+
         // Check expiration
-        if (update.timestamp + UPDATE_EXPIRATION_TIME < block.timestamp) {
+        if (update.timestamp + UPDATE_EXPIRATION_TIME < currentTime) {
             revert UpdateIsExpired();
+        }
+
+        // Check if update will still be valid when timelock unlocks
+        if (update.timestamp + UPDATE_EXPIRATION_TIME < currentTime + config.timelock) {
+            revert UpdateWillExpireBeforeUnlock();
         }
 
         // Check debounce
         uint256 lastProcessedId = lastProcessedUpdate[update.updateTypeKey][update.market];
         uint256 lastExecutionTime = updates[lastProcessedId].executedAt;
-        if (lastExecutionTime != 0 && (lastExecutionTime + config.debounce > block.timestamp)) {
+        if (lastExecutionTime != 0 && (lastExecutionTime + config.debounce > currentTime)) {
             revert UpdateTooFrequent();
         }
     }

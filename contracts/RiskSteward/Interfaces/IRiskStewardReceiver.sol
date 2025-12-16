@@ -217,6 +217,11 @@ interface IRiskStewardReceiver {
      */
     error PauseStatusUnchanged();
 
+    /**
+     * @notice Thrown when an update will expire before its timelock unlocks
+     */
+    error UpdateWillExpireBeforeUnlock();
+
     function getRiskParameterConfig(string calldata updateType) external view returns (RiskParamConfig memory);
 
     function getLastProcessedUpdate(string calldata updateType, address market) external view returns (uint256);
