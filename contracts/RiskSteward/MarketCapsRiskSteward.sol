@@ -5,8 +5,7 @@ import { RiskParameterUpdate } from "./Interfaces/IRiskOracle.sol";
 import { ICorePoolVToken } from "../interfaces/ICorePoolVToken.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IRiskStewardReceiver } from "./Interfaces/IRiskStewardReceiver.sol";
-import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
-import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
+import { BaseRiskSteward } from "./BaseRiskSteward.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
 /**
@@ -15,10 +14,7 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * @notice Contract that can update supply and borrow caps updates received from RiskStewardReceiver.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
-    /// @dev Max basis points i.e., 100%
-    uint256 private constant MAX_BPS = 10000;
-
+contract MarketCapsRiskSteward is BaseRiskSteward {
     /**
      * @notice The update type for supply caps
      */
@@ -43,12 +39,6 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Address of the RiskStewardReceiver used to validate incoming updates
      */
     IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
-
-    /**
-     * @notice The safe delta threshold in basis points.
-     * @notice Updates within this delta are considered safe and require no timelock. Updates exceeding this delta require timelock.
-     */
-    uint256 public safeDeltaBps;
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
@@ -86,11 +76,6 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Thrown when the update is not coming from the RiskStewardReceiver
      */
     error OnlyRiskStewardReceiver();
-
-    /**
-     * @notice Thrown when trying to renounce ownership
-     */
-    error RenounceOwnershipNotAllowed();
 
     /**
      * @notice Thrown when the uint256 data length is invalid
@@ -224,18 +209,6 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Checks if the difference between new and current values is within the safe delta threshold.
-     * @param newValue The new value to check
-     * @param currentValue The current value to compare against
-     * @return True if the difference is within the safe delta, false otherwise
-     */
-    function _isWithinSafeDelta(uint256 newValue, uint256 currentValue) internal view returns (bool) {
-        uint256 diff = newValue > currentValue ? newValue - currentValue : currentValue - newValue;
-        uint256 maxDiff = (safeDeltaBps * currentValue) / MAX_BPS;
-        return diff <= maxDiff;
-    }
-
-    /**
      * @notice Decodes ABI-encoded bytes into a uint256.
      * @dev Expects exactly 32 bytes as produced by abi.encode(uint256).
      * @param data ABI-encoded uint256 payload (32 bytes)
@@ -247,13 +220,5 @@ contract MarketCapsRiskSteward is IRiskSteward, AccessControlledV8 {
         }
 
         value = abi.decode(data, (uint256));
-    }
-
-    /**
-     * @notice Disables renounceOwnership function
-     * @custom:error Throws RenounceOwnershipNotAllowed
-     */
-    function renounceOwnership() public pure override {
-        revert RenounceOwnershipNotAllowed();
     }
 }

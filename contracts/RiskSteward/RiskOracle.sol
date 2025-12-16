@@ -36,61 +36,6 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      */
     uint256[44] private __gap;
 
-    /// @notice Event emitted when a risk parameter update is published
-    event UpdatePublished(
-        string referenceId,
-        uint256 indexed updateId,
-        address indexed market,
-        string indexed updateType,
-        bytes newValue,
-        bytes previousValue,
-        uint256 timestamp,
-        address publisher,
-        bytes additionalData
-    );
-
-    /// @notice Event emitted when a new authorized sender is added
-    event AuthorizedSenderAdded(address indexed sender);
-
-    /// @notice Event emitted when an authorized sender is removed
-    event AuthorizedSenderRemoved(address indexed sender);
-
-    /// @notice Event emitted when a new update type is added
-    event UpdateTypeAdded(string indexed updateType);
-
-    /// @notice Event emitted when an update type's active status is changed
-    event UpdateTypeActiveStatusChanged(string indexed updateType, bool previousActive, bool active);
-
-    /// @notice Thrown when sender is not authorized
-    error SenderNotAuthorized();
-
-    /// @notice Thrown when sender is already authorized
-    error SenderAlreadyAuthorized();
-
-    /// @notice Thrown when update type string is invalid
-    error InvalidUpdateTypeString();
-
-    /// @notice Thrown when update type already exists
-    error UpdateTypeAlreadyExists();
-
-    /// @notice Thrown when update type doesn't exist
-    error UpdateTypeNotFound();
-
-    /// @notice Thrown when update type active status is already set to the desired value
-    error UpdateTypeStatusUnchanged();
-
-    /// @notice Thrown when update type is not active
-    error UpdateTypeNotActive();
-
-    /// @notice Thrown when no update is found
-    error NoUpdateFound();
-
-    /// @notice Thrown when update ID is invalid
-    error InvalidUpdateId();
-
-    /// @notice Thrown when array lengths don't match in bulk operations
-    error ArrayLengthMismatch();
-
     /**
      * @notice Modifier that restricts function access to authorized senders only
      */
