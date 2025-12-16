@@ -124,9 +124,9 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Sets the safe delta bps.
      * @param safeDeltaBps_ The new safe delta bps
+     * @custom:access Controlled by AccessControlManager
      * @custom:event Emits SafeDeltaBpsUpdated with the old and new safe delta bps
      * @custom:error Throws InvalidSafeDeltaBps if the safe delta bps is greater than MAX_BPS
-     * @custom:access Controlled by AccessControlManager
      */
     function setSafeDeltaBps(uint256 safeDeltaBps_) external {
         _checkAccessAllowed("setSafeDeltaBps(uint256)");

@@ -121,6 +121,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
     /**
      * @notice Adds a new sender to the list of addresses authorized to perform updates
      * @param sender Address to be authorized
+     * @custom:access Controlled by AccessControlManager
      * @custom:error Throws ZeroAddressNotAllowed if sender is zero address
      * @custom:error Throws SenderAlreadyAuthorized if sender is already authorized
      * @custom:error Throws Unauthorized if caller is not allowed by AccessControlManager
@@ -139,6 +140,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
     /**
      * @notice Removes an address from the list of authorized senders
      * @param sender Address to be unauthorized
+     * @custom:access Controlled by AccessControlManager
      * @custom:error Throws SenderNotAuthorized if sender is not currently authorized
      * @custom:error Throws Unauthorized if caller is not allowed by AccessControlManager
      * @custom:event Emits AuthorizedSenderRemoved when sender is successfully removed
@@ -155,6 +157,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
     /**
      * @notice Adds a new type of update to the list of authorized update types
      * @param newUpdateType New type of update to allow
+     * @custom:access Controlled by AccessControlManager
      * @custom:error Throws InvalidUpdateTypeString if update type string is empty or exceeds 64 characters
      * @custom:error Throws UpdateTypeAlreadyExists if update type already exists
      * @custom:error Throws Unauthorized if caller is not allowed by AccessControlManager
@@ -180,6 +183,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @notice Sets the active status of an existing update type
      * @param updateType The update type to set active status for
      * @param active True to activate, false to deactivate
+     * @custom:access Controlled by AccessControlManager
      * @custom:error Throws UpdateTypeNotFound if update type doesn't exist
      * @custom:error Throws UpdateTypeStatusUnchanged if status is already set to the desired value
      * @custom:error Throws Unauthorized if caller is not allowed by AccessControlManager

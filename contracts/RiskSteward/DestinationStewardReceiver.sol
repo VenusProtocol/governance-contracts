@@ -61,7 +61,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     uint256 public constant REMOTE_UPDATE_EXPIRATION_TIME = 2 days;
 
     /**
-     * @notice Source chain LayerZero endpoint ID
+     * @notice Destination chain LayerZero endpoint ID
      */
     uint32 public immutable LAYER_ZERO_EID;
 
