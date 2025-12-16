@@ -208,6 +208,11 @@ interface IRiskStewardReceiver {
     error PausedError();
 
     /**
+     * @notice Thrown when an invalid LayerZero endpoint ID is provided
+     */
+    error InvalidLayerZeroEid();
+
+    /**
      * @notice Thrown when trying to set the same pause status
      */
     error PauseStatusUnchanged();

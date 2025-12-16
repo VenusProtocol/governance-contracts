@@ -104,6 +104,9 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     constructor(address riskOracle_, address endpoint_, uint32 layerZeroLzEid_) OAppUpgradeable(endpoint_) {
         _disableInitializers();
         ensureNonzeroAddress(riskOracle_);
+        ensureNonzeroAddress(endpoint_);
+        if (layerZeroLzEid_ == 0) revert InvalidLayerZeroEid();
+
         RISK_ORACLE = IRiskOracle(riskOracle_);
         LAYER_ZERO_EID = layerZeroLzEid_;
     }

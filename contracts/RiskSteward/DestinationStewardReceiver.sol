@@ -222,6 +222,11 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     error NotAnExecutor();
 
     /**
+     * @notice Thrown when an invalid LayerZero endpoint ID is provided
+     */
+    error InvalidLayerZeroEid();
+
+    /**
      * @notice Thrown when an invalid remote delay is provided
      */
     error InvalidRemoteDelay();
@@ -251,6 +256,8 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     constructor(address endpoint_, uint32 layerZeroEid_) OAppUpgradeable(endpoint_) {
         _disableInitializers();
         ensureNonzeroAddress(endpoint_);
+        if (layerZeroEid_ == 0) revert InvalidLayerZeroEid();
+
         LAYER_ZERO_EID = layerZeroEid_;
     }
 
