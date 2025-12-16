@@ -162,7 +162,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @param timelock The timelock period before the update can be executed
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits RiskParameterConfigUpdated
-     * @custom:error Throws UnsupportedUpdateType if the update type is an empty string
+     * @custom:error InvalidUpdateType if the update type string is empty
      * @custom:error Throws InvalidDebounce if the debounce is 0
      * @custom:error Throws InvalidTimelock if the timelock is greater than or equal to the expiration time
      * @custom:error Throws ZeroAddressNotAllowed if the risk steward address is zero
@@ -177,7 +177,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         ensureNonzeroAddress(riskSteward);
 
         if (bytes(updateType).length == 0) {
-            revert UnsupportedUpdateType();
+            revert InvalidUpdateType();
         }
         if (debounce == 0) {
             revert InvalidDebounce();
@@ -217,6 +217,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits ConfigActiveUpdated with the update type hash, update type, previous active status, and the active status
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
+     * @custom:error Throws ConfigStatusUnchanged if the active status is already set to the desired value
      */
     function setConfigActive(string calldata updateType, bool active) external {
         _checkAccessAllowed("setConfigActive(string,bool)");
@@ -228,7 +229,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
         bool previousActive = riskParameterConfigs[key].active;
         if (previousActive == active) {
-            return;
+            revert ConfigStatusUnchanged();
         }
 
         riskParameterConfigs[key].active = active;
@@ -242,6 +243,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits ExecutorStatusUpdated with the executor address, previous approval status, and approval status
      * @custom:error Throws ZeroAddressNotAllowed if the executor address is zero
+     * @custom:error Throws ExecutorStatusUnchanged if the executor whitelist status is already set to the desired value
      */
     function setWhitelistedExecutor(address executor, bool approved) external {
         _checkAccessAllowed("setWhitelistedExecutor(address,bool)");
@@ -249,7 +251,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
         bool previousApproved = whitelistedExecutors[executor];
         if (previousApproved == approved) {
-            return;
+            revert ExecutorStatusUnchanged();
         }
 
         whitelistedExecutors[executor] = approved;

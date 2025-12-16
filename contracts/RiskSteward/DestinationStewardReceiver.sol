@@ -242,6 +242,16 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     error RenounceOwnershipNotAllowed();
 
     /**
+     * @notice Thrown when trying to set the same config active status
+     */
+    error ConfigStatusUnchanged();
+
+    /**
+     * @notice Thrown when trying to set the same executor whitelist status
+     */
+    error ExecutorStatusUnchanged();
+
+    /**
      * @notice Modifier that ensures only whitelisted executors can call the function
      * @custom:error NotAnExecutor if the caller is not a whitelisted executor
      */
@@ -324,6 +334,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits ConfigActiveUpdated with the update type hash, update type, previous active status, and the active status
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
+     * @custom:error Throws ConfigStatusUnchanged if the active status is already set to the desired value
      */
     function setConfigActive(string calldata updateType, bool active) external {
         _checkAccessAllowed("setConfigActive(string,bool)");
@@ -335,7 +346,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
 
         bool previousActive = riskParameterConfigs[key].active;
         if (previousActive == active) {
-            return;
+            revert ConfigStatusUnchanged();
         }
 
         riskParameterConfigs[key].active = active;
@@ -372,13 +383,15 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @param approved The whitelist status to set (true to whitelist, false to remove)
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits ExecutorStatusUpdated with the executor address, previous approval status, and new approval status
+     * @custom:error Throws ZeroAddressNotAllowed if the executor address is zero
+     * @custom:error Throws ExecutorStatusUnchanged if the executor whitelist status is already set to the desired value
      */
     function setWhitelistedExecutor(address executor, bool approved) external {
         _checkAccessAllowed("setWhitelistedExecutor(address,bool)");
         ensureNonzeroAddress(executor);
         bool previousApproved = whitelistedExecutors[executor];
         if (previousApproved == approved) {
-            return;
+            revert ExecutorStatusUnchanged();
         }
 
         whitelistedExecutors[executor] = approved;

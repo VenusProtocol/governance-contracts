@@ -153,6 +153,11 @@ interface IRiskStewardReceiver {
     error UnsupportedUpdateType();
 
     /**
+     * @notice Thrown when an empty update type string is provided
+     */
+    error InvalidUpdateType();
+
+    /**
      * @notice Thrown when a debounce value of 0 is set
      */
     error InvalidDebounce();
@@ -216,6 +221,16 @@ interface IRiskStewardReceiver {
      * @notice Thrown when trying to set the same pause status
      */
     error PauseStatusUnchanged();
+
+    /**
+     * @notice Thrown when trying to set the same config active status
+     */
+    error ConfigStatusUnchanged();
+
+    /**
+     * @notice Thrown when trying to set the same executor whitelist status
+     */
+    error ExecutorStatusUnchanged();
 
     /**
      * @notice Thrown when an update will expire before its timelock unlocks
