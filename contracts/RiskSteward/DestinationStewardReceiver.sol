@@ -45,8 +45,8 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @param update The full risk parameter update payload received from the source chain
      * @param status Current local status of the bridged update (Pending, Executed, Rejected)
      * @param arrivalTime Timestamp when the update was received on this chain
-     * @param executor Address of the executor who executed this update on the destination (address(0) if not executed yet)
-     * @dev Unlock time is derived as `arrivalTime + REMOTE_DELAY` instead of being stored separately.
+     * @param executor Address of the executor who executed this update on the destination (address(0) if (expirationTime == 0 || expirationTime <= remoteDelay)not executed yet)
+     * @dev Unlock time is derived as `arrivalTime + remoteDelay` instead of being stored separately.
      */
     struct DestinationUpdate {
         RiskParameterUpdate update;
@@ -61,14 +61,14 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     uint256 public constant REMOTE_UPDATE_EXPIRATION_TIME = 2 days;
 
     /**
-     * @notice Fixed delay before a bridged update can be executed on the destination chain
-     */
-    uint256 public constant REMOTE_DELAY = 6 hours;
-
-    /**
      * @notice Source chain LayerZero endpoint ID
      */
     uint32 public immutable LAYER_ZERO_EID;
+
+    /**
+     * @notice Delay before a bridged update can be executed on the destination chain
+     */
+    uint256 public remoteDelay;
 
     /**
      * @notice Mapping of supported risk configurations per update type (hashed updateType string)
@@ -100,7 +100,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * variables without shifting down storage in the inheritance chain.
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
-    uint256[45] private __gap;
+    uint256[44] private __gap;
 
     /**
      * @notice Emitted when a risk parameter config is updated for an update type
@@ -222,6 +222,16 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     error NotAnExecutor();
 
     /**
+     * @notice Thrown when an invalid remote delay is provided
+     */
+    error InvalidRemoteDelay();
+
+    /**
+     * @notice Thrown when trying to set the same remote delay value
+     */
+    error RemoteDelayUnchanged();
+
+    /**
      * @notice Modifier that ensures only whitelisted executors can call the function
      * @custom:error NotAnExecutor if the caller is not a whitelisted executor
      */
@@ -242,7 +252,6 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
         _disableInitializers();
         ensureNonzeroAddress(endpoint_);
         LAYER_ZERO_EID = layerZeroEid_;
-        emit RemoteDelaySet(REMOTE_DELAY);
     }
 
     /**
@@ -253,6 +262,8 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     function initialize(address accessControlManager_, address delegate_) external initializer {
         __AccessControlled_init(accessControlManager_);
         __OApp_init(delegate_);
+        remoteDelay = 6 hours; // Default value
+        emit RemoteDelaySet(remoteDelay);
     }
 
     /**
@@ -320,6 +331,30 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     }
 
     /**
+     * @notice Sets the remote delay before bridged updates can be executed on the destination chain.
+     * @param newRemoteDelay The new remote delay in seconds
+     * @custom:access Controlled by AccessControlManager
+     * @custom:event Emits RemoteDelaySet with the new remote delay value
+     * @custom:error InvalidRemoteDelay if the delay is 0 or greater than or equal to the remote update expiration time
+     * @custom:error RemoteDelayUnchanged if the new delay is equal to the current delay
+     */
+    function setRemoteDelay(uint256 newRemoteDelay) external {
+        _checkAccessAllowed("setRemoteDelay(uint256)");
+
+        if (newRemoteDelay == 0 || newRemoteDelay >= REMOTE_UPDATE_EXPIRATION_TIME) {
+            revert InvalidRemoteDelay();
+        }
+
+        uint256 previousDelay = remoteDelay;
+        if (previousDelay == newRemoteDelay) {
+            revert RemoteDelayUnchanged();
+        }
+
+        remoteDelay = newRemoteDelay;
+        emit RemoteDelaySet(newRemoteDelay);
+    }
+
+    /**
      * @notice Sets the whitelist status of an executor on the destination chain.
      * @param executor The address of the executor
      * @param approved The whitelist status to set (true to whitelist, false to remove)
@@ -365,7 +400,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
             revert UpdateNotFound();
         }
 
-        if (currentTime < destUpdate.arrivalTime + REMOTE_DELAY) {
+        if (currentTime < destUpdate.arrivalTime + remoteDelay) {
             revert UpdateNotUnlocked();
         }
 
@@ -434,7 +469,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
             if (!_checkPendingUpdate(registeredUpdateId)) continue;
 
             // Validate Remote Delay
-            if (block.timestamp < destUpdate.arrivalTime + REMOTE_DELAY) continue;
+            if (block.timestamp < destUpdate.arrivalTime + remoteDelay) continue;
 
             // Debounce: skip if last execution for this (updateType, market) is too recent
             uint256 lastExecutionTime = lastExecutedAt[updateTypeKey][market];
