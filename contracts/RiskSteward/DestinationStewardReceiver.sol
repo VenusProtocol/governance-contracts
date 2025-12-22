@@ -424,7 +424,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
         if (current.status != UpdateStatus.Pending) return false;
 
         // Check expiration
-        return current.update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME > block.timestamp;
+        return current.update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME >= block.timestamp;
     }
 
     /**
