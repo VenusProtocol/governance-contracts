@@ -371,4 +371,12 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         }
         return false;
     }
+
+    /**
+     * @notice Disables renounceOwnership function
+     * @custom:error Throws RenounceOwnershipNotAllowed
+     */
+    function renounceOwnership() public pure override {
+        revert RenounceOwnershipNotAllowed();
+    }
 }
