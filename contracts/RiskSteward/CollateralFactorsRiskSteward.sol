@@ -129,10 +129,10 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
      */
     function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
-        // eMode-style updates always require timelock (not safe for direct execution)
-        if (update.poolId != 0) return false;
-
         if (update.updateTypeKey == COLLATERAL_FACTORS_KEY) {
+            // eMode-style updates always require timelock (not safe for direct execution)
+            if (update.poolId != 0) return false;
+            
             address comptroller = ICorePoolVToken(update.market).comptroller();
 
             (uint256 newCF, uint256 newLT) = _decodeAbiEncodedTwoUint256(update.newValue);
