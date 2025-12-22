@@ -95,7 +95,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         if (!authorizedSenders[sender]) {
             revert SenderNotAuthorized();
         }
-        authorizedSenders[sender] = false;
+        delete authorizedSenders[sender];
         emit AuthorizedSenderRemoved(sender);
     }
 
