@@ -47,7 +47,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
     /**
      * @notice Mapping from (updateType, market) to currently registered remote update ID
      */
-    mapping(bytes32 => mapping(address market => uint256)) public lastRegisteredUpdate;
+    mapping(bytes32 => mapping(address market => uint256)) public lastRegisteredUpdateId;
 
     /**
      * @notice Track last executed update timestamp per (updateType, market)
@@ -303,7 +303,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
 
         for (uint256 i = 0; i < maxUpdates; ++i) {
             address market = markets[i];
-            uint256 registeredUpdateId = lastRegisteredUpdate[updateTypeKey][market];
+            uint256 registeredUpdateId = lastRegisteredUpdateId[updateTypeKey][market];
             DestinationUpdate storage destUpdate = updates[registeredUpdateId];
 
             if (!_checkPendingUpdate(registeredUpdateId)) continue;
@@ -346,7 +346,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
         address market
     ) external view returns (DestinationUpdate memory) {
         bytes32 key = keccak256(bytes(updateType));
-        uint256 updateId = lastRegisteredUpdate[key][market];
+        uint256 updateId = lastRegisteredUpdateId[key][market];
         return updates[updateId];
     }
 
@@ -397,7 +397,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
         }
 
         // If already an update in Process do not override the registered update
-        uint256 currentRegisteredId = lastRegisteredUpdate[update.updateTypeKey][update.market];
+        uint256 currentRegisteredId = lastRegisteredUpdateId[update.updateTypeKey][update.market];
         if (_checkPendingUpdate(currentRegisteredId)) {
             emit RegisteredPendingUpdateExist(currentRegisteredId, arrivalTime, update.updateType, update.market);
             return;
@@ -407,7 +407,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
         destUpdate.update = update;
         destUpdate.status = UpdateStatus.Pending;
         destUpdate.arrivalTime = arrivalTime;
-        lastRegisteredUpdate[update.updateTypeKey][update.market] = newId;
+        lastRegisteredUpdateId[update.updateTypeKey][update.market] = newId;
         emit RemoteUpdateRegistered(newId, arrivalTime, update.updateType, update.market);
     }
 
