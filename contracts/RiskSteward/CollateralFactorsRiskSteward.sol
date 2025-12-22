@@ -194,6 +194,8 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
      * @param market The market to update the collateral factors for
      * @param poolId The pool identifier for eMode updates (0 for regular market updates)
      * @param newValue Encoded new collateral factors: `abi.encode(uint256 newCollateralFactor, uint256 newLiquidationThreshold)`
+     * @custom:error Throws SetCollateralFactorFailed if the core pool comptroller call to setCollateralFactor returns a non‑zero error code
+     * @custom:error Throws UnsupportedUpdateType if a non‑core comptroller is used together with a non‑zero poolId
      * @custom:event Emits CollateralFactorsUpdated with updateId
      */
     function _updateCollateralFactors(
@@ -229,7 +231,6 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
     /**
      * @notice Returns the current collateral factors for a market on a given comptroller.
      * @dev Returns both collateral factor and liquidation threshold (updated together via the same setter).
-     *      For core pool, uses eMode-specific getter which handles poolId == 0 as regular market.
      * @param comptroller The comptroller address
      * @param market The market whose collateral factors are being queried
      * @return currentCollateralFactor The current collateral factor

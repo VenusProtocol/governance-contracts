@@ -412,9 +412,9 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
     }
 
     /**
-     * @notice Checks if there is a pending, non‑expired registered update for the same (updateType, market).
-     * @param currentRegisteredId The currently registered update ID for the same (updateType, market)
-     * @return True if there is a pending, non‑expired registered update for the same (updateType, market), false otherwise
+     * @notice Checks whether a given registered update ID corresponds to a pending, non‑expired update.
+     * @param currentRegisteredId The currently registered update ID for a specific (updateType, market) pair
+     * @return True if currentRegisteredId is non‑zero, the update status is Pending, and it has not expired; otherwise false
      */
     function _checkPendingUpdate(uint256 currentRegisteredId) internal view returns (bool) {
         if (currentRegisteredId == 0) return false; // no registered update

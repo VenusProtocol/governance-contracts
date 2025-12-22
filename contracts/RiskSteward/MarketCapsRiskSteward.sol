@@ -135,6 +135,7 @@ contract MarketCapsRiskSteward is BaseRiskSteward {
      */
     function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
         uint256 newValue = _decodeAbiEncodedUint256(update.newValue);
+        // Use the core pool comptroller interface here because the getter used below has the same signature for both core and isolated pools.
         ICorePoolComptroller comptroller = ICorePoolComptroller(ICorePoolVToken(update.market).comptroller());
         uint256 currentValue;
 

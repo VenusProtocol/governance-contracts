@@ -107,7 +107,6 @@ contract IRMRiskSteward is BaseRiskSteward {
     /**
      * @notice Applies an interest rate model update from the RiskStewardReceiver.
      * Directly updates the market interest rate model on the vToken.
-     * Delta validation is already performed by RiskStewardReceiver before execution.
      * @param update RiskParameterUpdate update to apply
      * @custom:error Throws OnlyRiskStewardReceiver if the sender is not the RiskStewardReceiver
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
@@ -156,6 +155,7 @@ contract IRMRiskSteward is BaseRiskSteward {
      * @param updateId The update ID from the Risk Oracle
      * @param market The market to update the interest rate model for
      * @param newIRM The new interest rate model address
+     * @custom:error Throws SetInterestRateModelFailed if the core pool vToken call to _setInterestRateModel returns a non-zero error code
      * @custom:event Emits InterestRateModelUpdated with the updateId, market and new IRM address
      */
     function _updateIRM(uint256 updateId, address market, address newIRM) internal {

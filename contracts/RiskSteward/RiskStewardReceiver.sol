@@ -361,7 +361,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     /**
      * @notice Returns an array of update IDs for executable registered updates for a given update type and comptroller.
      * @param updateType The human‑readable identifier of the update type to filter by
-     * @param comptroller The address of the Isolated Pools Comptroller that manages the markets
+     * @param comptroller The address of the Comptroller (either Core Pool or Isolated Pools) that manages the markets
      * @return executableUpdates Array of update IDs that are ready to be executed
      */
     function getExecutableUpdates(
@@ -369,6 +369,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         address comptroller
     ) external view returns (uint256[] memory executableUpdates) {
         bytes32 updateTypeKey = keccak256(bytes(updateType));
+        // Both Core and Isolated Pools comptrollers expose the same signature
         address[] memory markets = ICorePoolComptroller(comptroller).getAllMarkets();
         uint256 maxUpdates = markets.length;
         uint256[] memory tempArray = new uint256[](maxUpdates);
