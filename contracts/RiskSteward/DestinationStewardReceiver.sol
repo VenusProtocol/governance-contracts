@@ -117,7 +117,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
         _checkAccessAllowed("setRiskParameterConfig(string,address,uint256)");
         ensureNonzeroAddress(riskSteward);
 
-        if (bytes(updateType).length == 0) {
+        if (bytes(updateType).length == 0 || bytes(updateType).length > 64) {
             revert InvalidUpdateType();
         }
 

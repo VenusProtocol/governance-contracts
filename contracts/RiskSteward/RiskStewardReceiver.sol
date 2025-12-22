@@ -176,7 +176,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         _checkAccessAllowed("setRiskParameterConfig(string,address,uint256,uint256)");
         ensureNonzeroAddress(riskSteward);
 
-        if (bytes(updateType).length == 0) {
+        if (bytes(updateType).length == 0 || bytes(updateType).length > 64) {
             revert InvalidUpdateType();
         }
         if (debounce == 0) {

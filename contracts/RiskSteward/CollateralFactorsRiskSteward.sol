@@ -188,7 +188,7 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
         uint96 poolId,
         bytes memory newValue
     ) internal {
-        (uint256 newCollateralFactor, uint256 newLiquidationThreshold) = abi.decode(newValue, (uint256, uint256));
+        (uint256 newCollateralFactor, uint256 newLiquidationThreshold) = _decodeAbiEncodedTwoUint256(newValue);
 
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
             uint256 errorCode = ICorePoolComptroller(comptroller).setCollateralFactor(
