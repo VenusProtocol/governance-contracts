@@ -367,7 +367,8 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @return True if the update type exists, false otherwise
      */
     function _updateTypeExists(bytes32 updateTypeKey) internal view returns (bool) {
-        for (uint256 i = 0; i < allUpdateTypes.length; ++i) {
+        uint256 length = allUpdateTypes.length;
+        for (uint256 i = 0; i < length; ++i) {
             if (keccak256(bytes(allUpdateTypes[i])) == updateTypeKey) {
                 return true;
             }
