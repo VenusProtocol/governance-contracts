@@ -63,6 +63,11 @@ contract IRMRiskSteward is BaseRiskSteward {
     error UnsupportedUpdateType();
 
     /**
+     * @notice Thrown when attempting to apply a redundant IRM value (no-op change).
+     */
+    error RedundantValue();
+
+    /**
      * @notice Thrown when the update is not coming from the RiskStewardReceiver
      */
     error OnlyRiskStewardReceiver();
@@ -129,12 +134,20 @@ contract IRMRiskSteward is BaseRiskSteward {
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
      * @dev For IRM updates, always returns false as we cannot compare IRM values
      */
-    function isSafeForDirectExecution(RiskParameterUpdate calldata update) external pure returns (bool) {
+    function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
         if (update.updateTypeKey != INTEREST_RATE_MODEL_KEY) {
             revert UnsupportedUpdateType();
         }
 
-        // always require timelock (not safe for direct execution)
+        address newIRM = _decodeAbiEncodedAddress(update.newValue);
+        address currentIRM = address(ICorePoolVToken(update.market).interestRateModel());
+
+        // Revert on redundant updates
+        if (newIRM == currentIRM) {
+            revert RedundantValue();
+        }
+
+        // Always require timelock (not safe for direct execution)
         return false;
     }
 

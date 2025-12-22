@@ -85,6 +85,11 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
     error InvalidTwoUintLength();
 
     /**
+     * @notice Thrown when attempting to apply a redundant value (no-op change).
+     */
+    error RedundantValue();
+
+    /**
      * @notice Sets the immutable `CORE_POOL_COMPTROLLER` and `RISK_STEWARD_RECEIVER` addresses and disables initializers.
      * @param corePoolComptroller_ The address of the Core Pool Comptroller
      * @param riskStewardReceiver_ The address of the `RiskStewardReceiver`
@@ -118,8 +123,13 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
         if (safeDeltaBps_ > MAX_BPS) {
             revert InvalidSafeDeltaBps();
         }
-        emit SafeDeltaBpsUpdated(safeDeltaBps, safeDeltaBps_);
+        uint256 oldSafeDeltaBps = safeDeltaBps;
+
+        if (safeDeltaBps_ == oldSafeDeltaBps) {
+            revert InvalidSafeDeltaBps();
+        }
         safeDeltaBps = safeDeltaBps_;
+        emit SafeDeltaBpsUpdated(oldSafeDeltaBps, safeDeltaBps_);
     }
 
     /**
@@ -137,6 +147,11 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
 
             (uint256 newCF, uint256 newLT) = _decodeAbiEncodedTwoUint256(update.newValue);
             (uint256 currCF, uint256 currLT) = _getCurrentCollateralFactors(comptroller, update.market);
+
+            // Revert on redundant updates only when both CF and LT are unchanged.
+            if (newCF == currCF && newLT == currLT) {
+                revert RedundantValue();
+            }
 
             // If current values are zero, update always requires timelock
             if (currCF == 0 || currLT == 0) return false;

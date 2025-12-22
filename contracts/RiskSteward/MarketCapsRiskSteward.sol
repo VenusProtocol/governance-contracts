@@ -83,6 +83,11 @@ contract MarketCapsRiskSteward is BaseRiskSteward {
     error InvalidUintLength();
 
     /**
+     * @notice Thrown when attempting to apply a redundant value (no-op change).
+     */
+    error RedundantValue();
+
+    /**
      * @notice Sets the immutable RiskStewardReceiver address and disables initializers
      * @param riskStewardReceiver_ The address of the RiskStewardReceiver
      * @custom:error Throws ZeroAddressNotAllowed if the RiskStewardReceiver address is zero
@@ -114,8 +119,12 @@ contract MarketCapsRiskSteward is BaseRiskSteward {
         if (safeDeltaBps_ > MAX_BPS) {
             revert InvalidSafeDeltaBps();
         }
-        emit SafeDeltaBpsUpdated(safeDeltaBps, safeDeltaBps_);
+        uint256 oldSafeDeltaBps = safeDeltaBps;
+        if (safeDeltaBps_ == oldSafeDeltaBps) {
+            revert InvalidSafeDeltaBps();
+        }
         safeDeltaBps = safeDeltaBps_;
+        emit SafeDeltaBpsUpdated(oldSafeDeltaBps, safeDeltaBps_);
     }
 
     /**
@@ -135,6 +144,11 @@ contract MarketCapsRiskSteward is BaseRiskSteward {
             currentValue = comptroller.borrowCaps(update.market);
         } else {
             revert UnsupportedUpdateType();
+        }
+
+        // Revert on redundant updates
+        if (newValue == currentValue) {
+            revert RedundantValue();
         }
 
         // If current value is 0, always require timelock (not safe for direct execution)
