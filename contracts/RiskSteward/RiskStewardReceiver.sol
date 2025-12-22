@@ -9,8 +9,9 @@ import { IRiskStewardReceiver } from "./Interfaces/IRiskStewardReceiver.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
-import { OAppUpgradeable, MessagingFee, Origin } from "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppUpgradeable.sol";
+import { OAppSenderUpgradeable, MessagingFee } from "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppSenderUpgradeable.sol";
 import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/OptionsBuilder.sol";
+import { OAppCoreUpgradeable } from "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppCoreUpgradeable.sol";
 
 /**
  * @title RiskStewardReceiver
@@ -19,7 +20,7 @@ import { OptionsBuilder } from "@layerzerolabs/oapp-evm/contracts/oapp/libs/Opti
  *         and either executes them locally via the configured RiskSteward or forwards them cross‑chain.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUpgradeable {
+contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppSenderUpgradeable {
     using OptionsBuilder for bytes;
 
     /**
@@ -101,7 +102,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @param layerZeroLzEid_ The LayerZero endpoint ID (EID) for this chain.
      * @custom:oz-upgrades-unsafe-allow constructor
      */
-    constructor(address riskOracle_, address endpoint_, uint32 layerZeroLzEid_) OAppUpgradeable(endpoint_) {
+    constructor(address riskOracle_, address endpoint_, uint32 layerZeroLzEid_) OAppCoreUpgradeable(endpoint_) {
         _disableInitializers();
         ensureNonzeroAddress(riskOracle_);
         ensureNonzeroAddress(endpoint_);
@@ -118,7 +119,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      */
     function initialize(address acm_, address delegate_) external initializer {
         __AccessControlled_init(acm_);
-        __OApp_init(delegate_);
+        __OAppSender_init(delegate_);
     }
 
     /**
@@ -721,17 +722,6 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         // Check UnlockTime
         return block.timestamp >= registeredUpdate.unlockTime;
     }
-
-    /**
-     * @dev LayerZero message receive hook
-     */
-    function _lzReceive(
-        Origin calldata origin,
-        bytes32 guid,
-        bytes calldata message,
-        address executor,
-        bytes calldata extraData
-    ) internal virtual override {}
 
     /**
      * @notice Disables renounceOwnership function

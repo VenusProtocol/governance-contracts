@@ -9,7 +9,8 @@ import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
-import { OAppUpgradeable, Origin } from "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppUpgradeable.sol";
+import { OAppReceiverUpgradeable, Origin } from "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppReceiverUpgradeable.sol";
+import { OAppCoreUpgradeable } from "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppCoreUpgradeable.sol";
 
 /**
  * @title DestinationStewardReceiver
@@ -18,7 +19,7 @@ import { OAppUpgradeable, Origin } from "@layerzerolabs/oapp-evm-upgradeable/con
  *         enforces a fixed remote delay, and then executes the updates on the configured `IRiskSteward` contracts.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessControlledV8, OAppUpgradeable {
+contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessControlledV8, OAppReceiverUpgradeable {
     /**
      * @notice Time before a bridged update is considered stale on the destination chain
      */
@@ -83,7 +84,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
      * @param layerZeroEid_ LayerZero endpoint ID for this destination chain
      * @custom:oz-upgrades-unsafe-allow constructor
      */
-    constructor(address endpoint_, uint32 layerZeroEid_) OAppUpgradeable(endpoint_) {
+    constructor(address endpoint_, uint32 layerZeroEid_) OAppCoreUpgradeable(endpoint_) {
         _disableInitializers();
         ensureNonzeroAddress(endpoint_);
         if (layerZeroEid_ == 0) revert InvalidLayerZeroEid();
@@ -98,7 +99,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
      */
     function initialize(address accessControlManager_, address delegate_) external initializer {
         __AccessControlled_init(accessControlManager_);
-        __OApp_init(delegate_);
+        __OAppReceiver_init(delegate_);
         remoteDelay = 6 hours; // Default value
         emit RemoteDelaySet(remoteDelay);
     }
