@@ -110,7 +110,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
      * @param riskSteward The address for the risk steward contract responsible for processing the update
      * @param debounce The debounce period for updates of this type on the destination (anti‑DoS)
      * @custom:access Controlled by AccessControlManager
-     * @custom:event Emits RiskParameterConfigUpdated (with previousTimelock and timelock always emitted as 0)
+     * @custom:event Emits RiskParameterConfigUpdated
      * @custom:error InvalidUpdateType if the update type string is empty
      * @custom:error InvalidDebounce if the debounce is 0
      */
