@@ -27,7 +27,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
     mapping(address => bool) public authorizedSenders;
 
     /// @notice Mapping to store the latest update ID for each combination of update type key and market
-    mapping(bytes32 => mapping(address => uint256)) public latestUpdateIdByMarketAndType;
+    mapping(bytes32 updateTypeKey => mapping(address market => uint256 updateId)) public latestUpdateIdByMarketAndType;
 
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
@@ -230,7 +230,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @return The most recent RiskParameterUpdate for the specified parameter and market
      * @custom:error Throws NoUpdateFound if no update exists for the specified parameter and market
      */
-    function getLatestUpdateByMarketAndType(
+    function getLatestUpdateByTypeAndMarket(
         string memory updateType,
         address market
     ) external view returns (RiskParameterUpdate memory) {
@@ -332,7 +332,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @param market The market address
      * @return The latest update ID for the given market and update type, or 0 if none exists
      */
-    function getLatestUpdateIdByMarketAndType(
+    function getLatestUpdateIdByTypeAndMarket(
         string memory updateType,
         address market
     ) external view returns (uint256) {

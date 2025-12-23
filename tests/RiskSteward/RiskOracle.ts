@@ -228,7 +228,7 @@ describe("RiskOracle", async function () {
         );
 
       expect(await riskOracle.updateCounter()).to.equal(1);
-      expect(await riskOracle.getLatestUpdateIdByMarketAndType("supplyCap", market)).to.equal(1);
+      expect(await riskOracle.getLatestUpdateIdByTypeAndMarket("supplyCap", market)).to.equal(1);
 
       const update = await riskOracle.getUpdateById(1);
       expect(update.updateId).to.equal(1);
@@ -277,7 +277,7 @@ describe("RiskOracle", async function () {
 
       expect(firstUpdate.previousValue).to.equal("0x");
       expect(secondUpdate.previousValue).to.equal(firstValue);
-      expect(await riskOracle.getLatestUpdateIdByMarketAndType("supplyCap", market)).to.equal(2);
+      expect(await riskOracle.getLatestUpdateIdByTypeAndMarket("supplyCap", market)).to.equal(2);
     });
 
     it("should revert when non-authorized sender tries to publish", async function () {
@@ -373,8 +373,8 @@ describe("RiskOracle", async function () {
         );
 
       expect(await riskOracle.updateCounter()).to.equal(2);
-      expect(await riskOracle.getLatestUpdateIdByMarketAndType("supplyCap", market1)).to.equal(1);
-      expect(await riskOracle.getLatestUpdateIdByMarketAndType("borrowCap", market2)).to.equal(2);
+      expect(await riskOracle.getLatestUpdateIdByTypeAndMarket("supplyCap", market1)).to.equal(1);
+      expect(await riskOracle.getLatestUpdateIdByTypeAndMarket("borrowCap", market2)).to.equal(2);
     });
 
     it("should revert when array lengths don't match", async function () {
@@ -479,14 +479,14 @@ describe("RiskOracle", async function () {
         .connect(authorizedSender)
         .publishRiskParameterUpdate("ipfs://QmSecond", secondValue, "supplyCap", market, 0, 0, "0x");
 
-      const latestUpdate = await riskOracle.getLatestUpdateByMarketAndType("supplyCap", market);
+      const latestUpdate = await riskOracle.getLatestUpdateByTypeAndMarket("supplyCap", market);
       expect(latestUpdate.updateId).to.equal(2);
       expect(latestUpdate.newValue).to.equal(secondValue);
     });
 
     it("should revert when getting latest update for non-existent market and type", async function () {
       await expect(
-        riskOracle.getLatestUpdateByMarketAndType("supplyCap", deployer.address),
+        riskOracle.getLatestUpdateByTypeAndMarket("supplyCap", deployer.address),
       ).to.be.revertedWithCustomError(riskOracle, "NoUpdateFound");
     });
 

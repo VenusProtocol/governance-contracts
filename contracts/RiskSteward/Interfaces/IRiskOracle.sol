@@ -153,7 +153,7 @@ interface IRiskOracle {
      * @return The most recent RiskParameterUpdate for the specified parameter and market
      * @custom:error NoUpdateFound Thrown if no update exists for the specified parameter and market
      */
-    function getLatestUpdateByMarketAndType(
+    function getLatestUpdateByTypeAndMarket(
         string memory updateType,
         address market
     ) external view returns (RiskParameterUpdate memory);
@@ -164,7 +164,7 @@ interface IRiskOracle {
      * @param market The market address
      * @return The latest update ID for the given market and update type, or 0 if none exists
      */
-    function getLatestUpdateIdByMarketAndType(string memory updateType, address market) external view returns (uint256);
+    function getLatestUpdateIdByTypeAndMarket(string memory updateType, address market) external view returns (uint256);
 
     /**
      * @notice Fetches the update for a provided update ID
