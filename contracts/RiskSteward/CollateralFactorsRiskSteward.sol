@@ -70,6 +70,11 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
     error SetCollateralFactorFailed(uint256 errorCode);
 
     /**
+     * @notice Thrown when an invalid pool configuration is used (non-core comptroller with non-zero poolId).
+     */
+    error InvalidPool();
+
+    /**
      * @notice Thrown when an update type that is not supported is operated on.
      */
     error UnsupportedUpdateType();
@@ -117,6 +122,7 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits SafeDeltaBpsUpdated with the old and new safe delta bps
      * @custom:error Throws InvalidSafeDeltaBps if the safe delta bps is greater than MAX_BPS
+     * @custom:error Throws RedundantValue if the new safe delta bps is equal to the current value
      */
     function setSafeDeltaBps(uint256 safeDeltaBps_) external {
         _checkAccessAllowed("setSafeDeltaBps(uint256)");
@@ -126,7 +132,7 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
         uint256 oldSafeDeltaBps = safeDeltaBps;
 
         if (safeDeltaBps_ == oldSafeDeltaBps) {
-            revert InvalidSafeDeltaBps();
+            revert RedundantValue();
         }
         safeDeltaBps = safeDeltaBps_;
         emit SafeDeltaBpsUpdated(oldSafeDeltaBps, safeDeltaBps_);
@@ -137,6 +143,7 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
      * @param update The update to check.
      * @return True if update is safe for direct execution, false if timelock is required
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
+     * @custom:error Throws RedundantValue if the new collateral factor and liquidation threshold are unchanged
      */
     function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
         if (update.updateTypeKey == COLLATERAL_FACTORS_KEY) {
@@ -195,7 +202,7 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
      * @param poolId The pool identifier for eMode updates (0 for regular market updates)
      * @param newValue Encoded new collateral factors: `abi.encode(uint256 newCollateralFactor, uint256 newLiquidationThreshold)`
      * @custom:error Throws SetCollateralFactorFailed if the core pool comptroller call to setCollateralFactor returns a non‑zero error code
-     * @custom:error Throws UnsupportedUpdateType if a non‑core comptroller is used together with a non‑zero poolId
+     * @custom:error Throws InvalidPool if a non‑core comptroller is used together with a non‑zero poolId
      * @custom:event Emits CollateralFactorsUpdated with updateId
      */
     function _updateCollateralFactors(
@@ -216,7 +223,7 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
             );
             if (errorCode != 0) revert SetCollateralFactorFailed(errorCode);
         } else {
-            if (poolId != 0) revert UnsupportedUpdateType();
+            if (poolId != 0) revert InvalidPool();
 
             IIsolatedPoolsComptroller(comptroller).setCollateralFactor(
                 market,
@@ -256,12 +263,12 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
      * @param data ABI-encoded (uint256, uint256) payload
      * @return a First uint256
      * @return b Second uint256
+     * @custom:error Throws InvalidTwoUintLength if data length is not 64 bytes
      */
     function _decodeAbiEncodedTwoUint256(bytes memory data) internal pure returns (uint256 a, uint256 b) {
         if (data.length != 64) {
             revert InvalidTwoUintLength();
         }
-
         (a, b) = abi.decode(data, (uint256, uint256));
     }
 }

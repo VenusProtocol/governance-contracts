@@ -131,6 +131,7 @@ contract IRMRiskSteward is BaseRiskSteward {
      * @param update The update to check
      * @return True if update is safe for direct execution, false if timelock is required
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
+     * @custom:error Throws RedundantValue if the new IRM address is equal to the current IRM address
      * @dev For IRM updates, always returns false as we cannot compare IRM values
      */
     function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {

@@ -113,6 +113,7 @@ contract MarketCapsRiskSteward is BaseRiskSteward {
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits SafeDeltaBpsUpdated with the old and new safe delta bps
      * @custom:error Throws InvalidSafeDeltaBps if the safe delta bps is greater than MAX_BPS
+     * @custom:error Throws RedundantValue if the new safe delta bps is equal to the current value
      */
     function setSafeDeltaBps(uint256 safeDeltaBps_) external {
         _checkAccessAllowed("setSafeDeltaBps(uint256)");
@@ -121,7 +122,7 @@ contract MarketCapsRiskSteward is BaseRiskSteward {
         }
         uint256 oldSafeDeltaBps = safeDeltaBps;
         if (safeDeltaBps_ == oldSafeDeltaBps) {
-            revert InvalidSafeDeltaBps();
+            revert RedundantValue();
         }
         safeDeltaBps = safeDeltaBps_;
         emit SafeDeltaBpsUpdated(oldSafeDeltaBps, safeDeltaBps_);
@@ -132,6 +133,7 @@ contract MarketCapsRiskSteward is BaseRiskSteward {
      * @param update The update to check
      * @return True if update is safe for direct execution, false if timelock is required
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
+     * @custom:error Throws RedundantValue if the new cap value is equal to the current cap value
      */
     function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
         uint256 newValue = _decodeAbiEncodedUint256(update.newValue);
@@ -228,12 +230,12 @@ contract MarketCapsRiskSteward is BaseRiskSteward {
      * @dev Expects exactly 32 bytes as produced by abi.encode(uint256).
      * @param data ABI-encoded uint256 payload (32 bytes)
      * @return value Decoded uint256
+     * @custom:error Throws InvalidUintLength if data length is not 32 bytes
      */
     function _decodeAbiEncodedUint256(bytes memory data) internal pure returns (uint256 value) {
         if (data.length != 32) {
             revert InvalidUintLength();
         }
-
         value = abi.decode(data, (uint256));
     }
 }
