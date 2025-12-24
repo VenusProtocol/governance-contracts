@@ -889,6 +889,36 @@ describe("Risk Steward", async function () {
         );
       });
 
+      it("should revert when processing an update that will expire before the timelock unlocks", async function () {
+        // Set a timelock that's close to UPDATE_EXPIRATION_TIME (2 days = 172800 seconds)
+        const nearMaxTimelock = 172799; // Just under 2 days
+
+        await riskStewardReceiver.setRiskParameterConfig(
+          "supplyCap",
+          marketCapsRiskSteward.address,
+          DAY_AND_ONE_SECOND,
+          nearMaxTimelock,
+        );
+
+        await riskOracle.publishRiskParameterUpdate(
+          "ipfs://QmWillExpireBeforeUnlock",
+          parseUnitsToHex(10),
+          "supplyCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        );
+
+        // Advance time so that the update will expire before timelock unlocks
+        await time.increase(2);
+
+        await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
+          riskStewardReceiver,
+          "UpdateWillExpireBeforeUnlock",
+        );
+      });
+
       it("should revert when processing remote update with unsupported update type on destination", async function () {
         await riskOracle.publishRiskParameterUpdate(
           "ipfs://QmUnsupportedRemote",

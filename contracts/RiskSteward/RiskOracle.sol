@@ -59,7 +59,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
     event UpdateTypeAdded(string indexed updateType);
 
     /// @notice Event emitted when an update type's active status is changed
-    event UpdateTypeActiveStatusChanged(string indexed updateType, bool previousActive, bool indexed active);
+    event UpdateTypeActiveStatusChanged(string indexed updateType, bool previousActive, bool active);
 
     /// @notice Thrown when sender is not authorized
     error SenderNotAuthorized();
