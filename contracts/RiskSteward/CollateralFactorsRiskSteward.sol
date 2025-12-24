@@ -6,9 +6,8 @@ import { ICorePoolVToken } from "../interfaces/ICorePoolVToken.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
 import { IRiskStewardReceiver } from "./Interfaces/IRiskStewardReceiver.sol";
-import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
+import { BaseRiskSteward } from "./BaseRiskSteward.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
-import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
 
 /**
  * @title CollateralFactorsRiskSteward
@@ -16,10 +15,7 @@ import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
  * @notice Contract that can update collateral factors and liquidation thresholds received from `RiskStewardReceiver`.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
-    /// @dev Max basis points i.e., 100%
-    uint256 private constant MAX_BPS = 10000;
-
+contract CollateralFactorsRiskSteward is BaseRiskSteward {
     /**
      * @notice The update type for collateral factor and liquidation threshold.
      */
@@ -42,12 +38,6 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Address of the `RiskStewardReceiver` used to validate and dispatch incoming updates.
      */
     IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
-
-    /**
-     * @notice The safe delta threshold in basis points. Updates within this delta are considered safe and
-     *         can be executed without a timelock. Updates exceeding this delta require a timelock.
-     */
-    uint256 public safeDeltaBps;
 
     /**
      * @dev Storage gap for upgradeability.
@@ -90,11 +80,6 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     error OnlyRiskStewardReceiver();
 
     /**
-     * @notice Thrown when trying to renounce ownership.
-     */
-    error RenounceOwnershipNotAllowed();
-
-    /**
      * @notice Thrown when the two uint256 data length is invalid
      */
     error InvalidTwoUintLength();
@@ -124,9 +109,9 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     /**
      * @notice Sets the safe delta bps.
      * @param safeDeltaBps_ The new safe delta bps
+     * @custom:access Controlled by AccessControlManager
      * @custom:event Emits SafeDeltaBpsUpdated with the old and new safe delta bps
      * @custom:error Throws InvalidSafeDeltaBps if the safe delta bps is greater than MAX_BPS
-     * @custom:access Controlled by AccessControlManager
      */
     function setSafeDeltaBps(uint256 safeDeltaBps_) external {
         _checkAccessAllowed("setSafeDeltaBps(uint256)");
@@ -250,18 +235,6 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
     }
 
     /**
-     * @notice Checks if the difference between new and current values is within the safe delta threshold.
-     * @param newValue The new value to check
-     * @param currentValue The current value to compare against
-     * @return True if the difference is within the safe delta, false otherwise
-     */
-    function _isWithinSafeDelta(uint256 newValue, uint256 currentValue) internal view returns (bool) {
-        uint256 diff = newValue > currentValue ? newValue - currentValue : currentValue - newValue;
-        uint256 maxDiff = (safeDeltaBps * currentValue) / MAX_BPS;
-        return diff <= maxDiff;
-    }
-
-    /**
      * @notice Decodes ABI-encoded bytes into two uint256 values.
      * @dev Expects exactly 64 bytes as produced by abi.encode(uint256,uint256).
      * @param data ABI-encoded (uint256, uint256) payload
@@ -274,13 +247,5 @@ contract CollateralFactorsRiskSteward is IRiskSteward, AccessControlledV8 {
         }
 
         (a, b) = abi.decode(data, (uint256, uint256));
-    }
-
-    /**
-     * @notice Disables `renounceOwnership` function.
-     * @custom:error Throws RenounceOwnershipNotAllowed
-     */
-    function renounceOwnership() public pure override {
-        revert RenounceOwnershipNotAllowed();
     }
 }

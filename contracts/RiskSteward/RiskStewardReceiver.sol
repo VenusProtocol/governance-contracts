@@ -104,6 +104,9 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     constructor(address riskOracle_, address endpoint_, uint32 layerZeroLzEid_) OAppUpgradeable(endpoint_) {
         _disableInitializers();
         ensureNonzeroAddress(riskOracle_);
+        ensureNonzeroAddress(endpoint_);
+        if (layerZeroLzEid_ == 0) revert InvalidLayerZeroEid();
+
         RISK_ORACLE = IRiskOracle(riskOracle_);
         LAYER_ZERO_EID = layerZeroLzEid_;
     }
@@ -159,7 +162,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @param timelock The timelock period before the update can be executed
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits RiskParameterConfigUpdated
-     * @custom:error Throws UnsupportedUpdateType if the update type is an empty string
+     * @custom:error InvalidUpdateType if the update type string is empty
      * @custom:error Throws InvalidDebounce if the debounce is 0
      * @custom:error Throws InvalidTimelock if the timelock is greater than or equal to the expiration time
      * @custom:error Throws ZeroAddressNotAllowed if the risk steward address is zero
@@ -174,7 +177,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         ensureNonzeroAddress(riskSteward);
 
         if (bytes(updateType).length == 0) {
-            revert UnsupportedUpdateType();
+            revert InvalidUpdateType();
         }
         if (debounce == 0) {
             revert InvalidDebounce();
@@ -214,6 +217,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits ConfigActiveUpdated with the update type hash, update type, previous active status, and the active status
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
+     * @custom:error Throws ConfigStatusUnchanged if the active status is already set to the desired value
      */
     function setConfigActive(string calldata updateType, bool active) external {
         _checkAccessAllowed("setConfigActive(string,bool)");
@@ -225,7 +229,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
         bool previousActive = riskParameterConfigs[key].active;
         if (previousActive == active) {
-            return;
+            revert ConfigStatusUnchanged();
         }
 
         riskParameterConfigs[key].active = active;
@@ -239,6 +243,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits ExecutorStatusUpdated with the executor address, previous approval status, and approval status
      * @custom:error Throws ZeroAddressNotAllowed if the executor address is zero
+     * @custom:error Throws ExecutorStatusUnchanged if the executor whitelist status is already set to the desired value
      */
     function setWhitelistedExecutor(address executor, bool approved) external {
         _checkAccessAllowed("setWhitelistedExecutor(address,bool)");
@@ -246,7 +251,7 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
 
         bool previousApproved = whitelistedExecutors[executor];
         if (previousApproved == approved) {
-            return;
+            revert ExecutorStatusUnchanged();
         }
 
         whitelistedExecutors[executor] = approved;
@@ -267,15 +272,15 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
     function processUpdate(uint256 updateId) external whenNotPaused {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
         RiskParamConfig storage config = riskParameterConfigs[update.updateTypeKey];
-        _ensureNoActiveUpdate(update);
-        _validateRegisterUpdate(update, config);
-
         bool isRemoteUpdate = update.destLzEid != 0 && update.destLzEid != LAYER_ZERO_EID;
+
+        // Skip active update check for remote updates since they are sent immediately and not registered locally
+        if (!isRemoteUpdate) _ensureNoActiveUpdate(update);
+        _validateRegisterUpdate(update, config, isRemoteUpdate);
 
         IRiskSteward riskSteward = IRiskSteward(config.riskSteward);
         bool safeForDirectExecution = isRemoteUpdate ? false : riskSteward.isSafeForDirectExecution(update);
-
-        _registerUpdate(update, config, safeForDirectExecution, isRemoteUpdate);
+        _registerUpdate(update, config, safeForDirectExecution || isRemoteUpdate);
 
         if (isRemoteUpdate) {
             _sendRemoteUpdate(update, "", 0);
@@ -486,20 +491,16 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @notice Registers an update from the Risk Oracle with a timelock.
      * @param update The risk parameter update from the Risk Oracle to register
      * @param config The risk parameter configuration for this update type containing timelock
-     * @param safeForDirectExecution Whether the update is safe for direct execution
-     * @param isRemoteUpdate Whether the update is a remote update to be sent cross-chain
+     * @param useImmediateUnlock Whether to unlock the update immediately or use timelock
      * @custom:event Emits UpdateRegistered with the oracle update ID, unlock time, update type, and market
      */
     function _registerUpdate(
         RiskParameterUpdate memory update,
         RiskParamConfig memory config,
-        bool safeForDirectExecution,
-        bool isRemoteUpdate
+        bool useImmediateUnlock
     ) internal {
         uint256 updateId = update.updateId;
-        uint256 unlockTime = (safeForDirectExecution || isRemoteUpdate)
-            ? block.timestamp
-            : block.timestamp + config.timelock;
+        uint256 unlockTime = useImmediateUnlock ? block.timestamp : block.timestamp + config.timelock;
 
         updates[updateId] = RegisteredUpdate({
             updateId: updateId,
@@ -602,13 +603,18 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
      * @notice Validates an oracle update before registration.
      * @param update The risk parameter update to validate
      * @param config The configuration for this update type
+     * @param isRemoteUpdate Whether the update is destined for a remote chain
      * @custom:error UpdateAlreadyResolved if the update was already registered
      * @custom:error ConfigNotActive if the configuration for the update type is not active
      * @custom:error UpdateIsExpired if the update has expired or is not the latest for the given market and type
      * @custom:error UpdateWillExpireBeforeUnlock if the update will expire before its timelock unlocks
-     * @custom:error UpdateTooFrequent if the debounce period has not passed for the given market and type
+     * @custom:error UpdateTooFrequent if the debounce period has not passed for the given market and type (only for local updates)
      */
-    function _validateRegisterUpdate(RiskParameterUpdate memory update, RiskParamConfig storage config) internal view {
+    function _validateRegisterUpdate(
+        RiskParameterUpdate memory update,
+        RiskParamConfig storage config,
+        bool isRemoteUpdate
+    ) internal view {
         // Check if this update was already registered
         if (updates[update.updateId].status != UpdateStatus.None) {
             revert UpdateAlreadyResolved();
@@ -620,11 +626,11 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
         }
 
         // Check if this is the latest update for this market and type
-        RiskParameterUpdate memory latestForMarketAndType = RISK_ORACLE.getLatestUpdateByParameterAndMarket(
+        uint256 latestUpdateIdForMarketAndType = RISK_ORACLE.getLatestUpdateIdByTypeAndMarket(
             update.updateType,
             update.market
         );
-        if (latestForMarketAndType.updateId != update.updateId) {
+        if (latestUpdateIdForMarketAndType != update.updateId) {
             revert UpdateIsExpired();
         }
 
@@ -641,11 +647,13 @@ contract RiskStewardReceiver is IRiskStewardReceiver, AccessControlledV8, OAppUp
             revert UpdateWillExpireBeforeUnlock();
         }
 
-        // Check debounce
-        uint256 lastProcessedId = lastProcessedUpdate[update.updateTypeKey][update.market];
-        uint256 lastExecutionTime = updates[lastProcessedId].executedAt;
-        if (lastExecutionTime != 0 && (lastExecutionTime + config.debounce > currentTime)) {
-            revert UpdateTooFrequent();
+        // Check debounce (only for local updates)
+        if (!isRemoteUpdate) {
+            uint256 lastProcessedId = lastProcessedUpdate[update.updateTypeKey][update.market];
+            uint256 lastExecutionTime = updates[lastProcessedId].executedAt;
+            if (lastExecutionTime != 0 && (lastExecutionTime + config.debounce > currentTime)) {
+                revert UpdateTooFrequent();
+            }
         }
     }
 

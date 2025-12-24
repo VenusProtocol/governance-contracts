@@ -8,8 +8,7 @@ import { InterestRateModel } from "@venusprotocol/isolated-pools/contracts/Inter
 import { InterestRateModelV8 } from "@venusprotocol/venus-protocol/contracts/InterestRateModels/InterestRateModelV8.sol";
 import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
 import { IRiskStewardReceiver } from "./Interfaces/IRiskStewardReceiver.sol";
-import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
-import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
+import { BaseRiskSteward } from "./BaseRiskSteward.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
 /**
@@ -18,7 +17,7 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * @notice Contract that can update interest rate models updates received from RiskStewardReceiver.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
+contract IRMRiskSteward is BaseRiskSteward {
     /**
      * @notice The update type for interest rate model
      */
@@ -67,11 +66,6 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
      * @notice Thrown when the update is not coming from the RiskStewardReceiver
      */
     error OnlyRiskStewardReceiver();
-
-    /**
-     * @notice Thrown when trying to renounce ownership
-     */
-    error RenounceOwnershipNotAllowed();
 
     /**
      * @notice Thrown when the address length is invalid
@@ -174,13 +168,5 @@ contract IRMRiskSteward is IRiskSteward, AccessControlledV8 {
     function _decodeAbiEncodedAddress(bytes memory data) internal pure returns (address) {
         if (data.length != 32) revert InvalidAddressLength();
         return abi.decode(data, (address));
-    }
-
-    /**
-     * @notice Disables renounceOwnership function
-     * @custom:error Throws RenounceOwnershipNotAllowed
-     */
-    function renounceOwnership() public pure override {
-        revert RenounceOwnershipNotAllowed();
     }
 }

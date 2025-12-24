@@ -3,6 +3,7 @@ pragma solidity 0.8.25;
 
 import { OwnableUpgradeable } from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import { Ownable2StepUpgradeable } from "@openzeppelin/contracts-upgradeable/access/Ownable2StepUpgradeable.sol";
+import { IDestinationStewardReceiver } from "./Interfaces/IDestinationStewardReceiver.sol";
 import { RiskParameterUpdate } from "./Interfaces/IRiskOracle.sol";
 import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
@@ -17,58 +18,21 @@ import { OAppUpgradeable, Origin } from "@layerzerolabs/oapp-evm-upgradeable/con
  *         enforces a fixed remote delay, and then executes the updates on the configured `IRiskSteward` contracts.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
-    /**
-     * @notice Local status of an update on the destination chain
-     */
-    enum UpdateStatus {
-        None,
-        Pending,
-        Executed,
-        Rejected
-    }
-
-    /**
-     * @notice Configuration for a risk parameter update type on the destination chain.
-     * @param active Whether this update type configuration is currently active
-     * @param debounce Minimum delay between consecutive executions for the same (updateType, market) pair
-     * @param riskSteward Address of the risk steward contract responsible for processing this update type
-     */
-    struct RiskParamConfig {
-        bool active;
-        uint256 debounce;
-        address riskSteward;
-    }
-
-    /**
-     * @notice Destination-side storage for a bridged risk parameter update.
-     * @param update The full risk parameter update payload received from the source chain
-     * @param status Current local status of the bridged update (Pending, Executed, Rejected)
-     * @param arrivalTime Timestamp when the update was received on this chain
-     * @param executor Address of the executor who executed this update on the destination (address(0) if not executed yet)
-     * @dev Unlock time is derived as `arrivalTime + REMOTE_DELAY` instead of being stored separately.
-     */
-    struct DestinationUpdate {
-        RiskParameterUpdate update;
-        UpdateStatus status;
-        uint256 arrivalTime;
-        address executor;
-    }
-
+contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessControlledV8, OAppUpgradeable {
     /**
      * @notice Time before a bridged update is considered stale on the destination chain
      */
     uint256 public constant REMOTE_UPDATE_EXPIRATION_TIME = 2 days;
 
     /**
-     * @notice Fixed delay before a bridged update can be executed on the destination chain
-     */
-    uint256 public constant REMOTE_DELAY = 6 hours;
-
-    /**
-     * @notice Source chain LayerZero endpoint ID
+     * @notice Destination chain LayerZero endpoint ID
      */
     uint32 public immutable LAYER_ZERO_EID;
+
+    /**
+     * @notice Delay before a bridged update can be executed on the destination chain
+     */
+    uint256 public remoteDelay;
 
     /**
      * @notice Mapping of supported risk configurations per update type (hashed updateType string)
@@ -100,126 +64,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * variables without shifting down storage in the inheritance chain.
      * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
      */
-    uint256[45] private __gap;
-
-    /**
-     * @notice Emitted when a risk parameter config is updated for an update type
-     */
-    event RiskParameterConfigUpdated(
-        bytes32 indexed updateTypeHash,
-        string updateType,
-        address indexed previousRiskSteward,
-        address indexed riskSteward,
-        uint256 previousDebounce,
-        uint256 debounce,
-        bool previousActive,
-        bool active
-    );
-
-    /**
-     * @notice Emitted when a bridged update is registered on the destination
-     */
-    event RemoteUpdateRegistered(
-        uint256 indexed updateId,
-        uint256 arrivalTime,
-        string indexed updateType,
-        address indexed market
-    );
-
-    /**
-     * @notice Emitted when a new bridged update arrives but a pending update is already registered for the same (updateType, market).
-     */
-    event RegisteredPendingUpdateExist(
-        uint256 indexed updateId,
-        uint256 arrivalTime,
-        string indexed updateType,
-        address indexed market
-    );
-
-    /**
-     * @notice Emitted when a duplicate bridged update (same updateId) is received.
-     */
-    event DuplicateUpdateReceived(
-        uint256 indexed updateId,
-        uint256 arrivalTime,
-        string indexed updateType,
-        address indexed market
-    );
-
-    /**
-     * @notice Emitted when a bridged update is executed on the destination
-     */
-    event RemoteUpdateExecuted(uint256 indexed updateId);
-
-    /**
-     * @notice Emitted when an executor status is set on the destination
-     */
-    event ExecutorStatusUpdated(address indexed executor, bool previousApproved, bool approved);
-
-    /**
-     * @notice Emitted when a risk parameter config active status is updated
-     */
-    event ConfigActiveUpdated(
-        bytes32 indexed updateTypeHash,
-        string updateType,
-        bool previousActive,
-        bool indexed active
-    );
-
-    /**
-     * @notice Emitted when an update is rejected on the destination
-     */
-    event UpdateRejected(uint256 indexed updateId);
-
-    /**
-     * @notice Emitted when the remote delay is set in the constructor
-     */
-    event RemoteDelaySet(uint256 remoteDelay);
-
-    /**
-     * @notice Thrown when trying to operate on an update that was never registered
-     */
-    error UpdateNotFound();
-
-    /**
-     * @notice Thrown when trying to execute an update before its unlock time
-     */
-    error UpdateNotUnlocked();
-
-    /**
-     * @notice Thrown when config for an update type is not active or not configured
-     */
-    error ConfigNotActive();
-
-    /**
-     * @notice Thrown when a bridged update has expired on the destination
-     */
-    error UpdateIsExpired();
-
-    /**
-     * @notice Thrown when the debounce period hasn't passed for applying an update to a specific market / update type
-     */
-    error UpdateTooFrequent();
-
-    /**
-     * @notice Thrown when an empty update type string is provided
-     */
-    error InvalidUpdateType();
-
-    /**
-     * @notice Thrown when an update type is not supported
-     */
-    error UnsupportedUpdateType();
-
-    /**
-     * @notice Thrown when a debounce value of 0 is set
-     */
-    error InvalidDebounce();
-
-    /**
-     * @notice Thrown when an address is not a whitelisted executor
-     */
-    error NotAnExecutor();
+    uint256[44] private __gap;
 
     /**
      * @notice Modifier that ensures only whitelisted executors can call the function
@@ -241,8 +86,9 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     constructor(address endpoint_, uint32 layerZeroEid_) OAppUpgradeable(endpoint_) {
         _disableInitializers();
         ensureNonzeroAddress(endpoint_);
+        if (layerZeroEid_ == 0) revert InvalidLayerZeroEid();
+
         LAYER_ZERO_EID = layerZeroEid_;
-        emit RemoteDelaySet(REMOTE_DELAY);
     }
 
     /**
@@ -253,6 +99,8 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
     function initialize(address accessControlManager_, address delegate_) external initializer {
         __AccessControlled_init(accessControlManager_);
         __OApp_init(delegate_);
+        remoteDelay = 6 hours; // Default value
+        emit RemoteDelaySet(remoteDelay);
     }
 
     /**
@@ -301,6 +149,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits ConfigActiveUpdated with the update type hash, update type, previous active status, and the active status
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
+     * @custom:error Throws ConfigStatusUnchanged if the active status is already set to the desired value
      */
     function setConfigActive(string calldata updateType, bool active) external {
         _checkAccessAllowed("setConfigActive(string,bool)");
@@ -312,11 +161,35 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
 
         bool previousActive = riskParameterConfigs[key].active;
         if (previousActive == active) {
-            return;
+            revert ConfigStatusUnchanged();
         }
 
         riskParameterConfigs[key].active = active;
         emit ConfigActiveUpdated(key, updateType, previousActive, active);
+    }
+
+    /**
+     * @notice Sets the remote delay before bridged updates can be executed on the destination chain.
+     * @param newRemoteDelay The new remote delay in seconds
+     * @custom:access Controlled by AccessControlManager
+     * @custom:event Emits RemoteDelaySet with the new remote delay value
+     * @custom:error InvalidRemoteDelay if the delay is 0 or greater than or equal to the remote update expiration time
+     * @custom:error RemoteDelayUnchanged if the new delay is equal to the current delay
+     */
+    function setRemoteDelay(uint256 newRemoteDelay) external {
+        _checkAccessAllowed("setRemoteDelay(uint256)");
+
+        if (newRemoteDelay == 0 || newRemoteDelay >= REMOTE_UPDATE_EXPIRATION_TIME) {
+            revert InvalidRemoteDelay();
+        }
+
+        uint256 previousDelay = remoteDelay;
+        if (previousDelay == newRemoteDelay) {
+            revert RemoteDelayUnchanged();
+        }
+
+        remoteDelay = newRemoteDelay;
+        emit RemoteDelaySet(newRemoteDelay);
     }
 
     /**
@@ -325,13 +198,15 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
      * @param approved The whitelist status to set (true to whitelist, false to remove)
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits ExecutorStatusUpdated with the executor address, previous approval status, and new approval status
+     * @custom:error Throws ZeroAddressNotAllowed if the executor address is zero
+     * @custom:error Throws ExecutorStatusUnchanged if the executor whitelist status is already set to the desired value
      */
     function setWhitelistedExecutor(address executor, bool approved) external {
         _checkAccessAllowed("setWhitelistedExecutor(address,bool)");
         ensureNonzeroAddress(executor);
         bool previousApproved = whitelistedExecutors[executor];
         if (previousApproved == approved) {
-            return;
+            revert ExecutorStatusUnchanged();
         }
 
         whitelistedExecutors[executor] = approved;
@@ -365,7 +240,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
             revert UpdateNotFound();
         }
 
-        if (currentTime < destUpdate.arrivalTime + REMOTE_DELAY) {
+        if (currentTime < destUpdate.arrivalTime + remoteDelay) {
             revert UpdateNotUnlocked();
         }
 
@@ -434,7 +309,7 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
             if (!_checkPendingUpdate(registeredUpdateId)) continue;
 
             // Validate Remote Delay
-            if (block.timestamp < destUpdate.arrivalTime + REMOTE_DELAY) continue;
+            if (block.timestamp < destUpdate.arrivalTime + remoteDelay) continue;
 
             // Debounce: skip if last execution for this (updateType, market) is too recent
             uint256 lastExecutionTime = lastExecutedAt[updateTypeKey][market];
@@ -550,5 +425,13 @@ contract DestinationStewardReceiver is AccessControlledV8, OAppUpgradeable {
 
         // Check expiration
         return current.update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME > block.timestamp;
+    }
+
+    /**
+     * @notice Disables renounceOwnership function
+     * @custom:error Throws RenounceOwnershipNotAllowed
+     */
+    function renounceOwnership() public pure override {
+        revert RenounceOwnershipNotAllowed();
     }
 }
