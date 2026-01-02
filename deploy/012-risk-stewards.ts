@@ -96,8 +96,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     skipIfAlreadyDeployed: true,
   });
 
-  if ((await riskStewardReceiver.owner()) === deployer) {
-    const marketCapsSteward = await hre.ethers.getContract("MarketCapsRiskSteward");
+  const marketCapsSteward = await hre.ethers.getContract("MarketCapsRiskSteward");
+  if ((await marketCapsSteward.owner()) === deployer) {
     await marketCapsSteward.transferOwnership(normalTimelockAddress);
   }
 
@@ -121,8 +121,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     skipIfAlreadyDeployed: true,
   });
 
-  if ((await riskStewardReceiver.owner()) === deployer) {
-    const collateralFactorsSteward = await hre.ethers.getContract("CollateralFactorsRiskSteward");
+  const collateralFactorsSteward = await hre.ethers.getContract("CollateralFactorsRiskSteward");
+  if ((await collateralFactorsSteward.owner()) === deployer) {
     await collateralFactorsSteward.transferOwnership(normalTimelockAddress);
   }
 
@@ -146,8 +146,8 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     skipIfAlreadyDeployed: true,
   });
 
-  if ((await riskStewardReceiver.owner()) === deployer) {
-    const irmRiskSteward = await hre.ethers.getContract("IRMRiskSteward");
+  const irmRiskSteward = await hre.ethers.getContract("IRMRiskSteward");
+  if ((await irmRiskSteward.owner()) === deployer) {
     await irmRiskSteward.transferOwnership(normalTimelockAddress);
   }
 };
@@ -155,6 +155,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 func.tags = ["risk-stewards", "bsc"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
-  !(hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet" || hre.network.name !== "hardhat");
+  !(hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet" || hre.network.name == "hardhat");
 
 export default func;
