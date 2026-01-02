@@ -611,7 +611,7 @@
       ]
     },
     "CollateralFactorsRiskSteward": {
-      "address": "0x1d100DAD71E56776bA3BdA3ec36D776BCE512B84",
+      "address": "0xBe9174A13577B016280aEc20a3b369C5BA272241",
       "abi": [
         {
           "anonymous": false,
@@ -1265,7 +1265,7 @@
       ]
     },
     "CollateralFactorsRiskSteward_Implementation": {
-      "address": "0x28Be3ef68AFa00b1151669F2e6dA2DE8d1bb1Abc",
+      "address": "0xA8122Fe0F9db39E266DE7A5BF953Cd72a87fe345",
       "abi": [
         {
           "inputs": [
@@ -1804,7 +1804,7 @@
       ]
     },
     "CollateralFactorsRiskSteward_Proxy": {
-      "address": "0x1d100DAD71E56776bA3BdA3ec36D776BCE512B84",
+      "address": "0xBe9174A13577B016280aEc20a3b369C5BA272241",
       "abi": [
         {
           "inputs": [
@@ -5972,7 +5972,7 @@
       ]
     },
     "IRMRiskSteward": {
-      "address": "0x96834aF3d481C3f70dd31a4a3fe7607C2FC6Aa5b",
+      "address": "0xa7E80c303f2EcF9436F11Da14C512B09B44854f4",
       "abi": [
         {
           "anonymous": false,
@@ -6578,7 +6578,7 @@
       ]
     },
     "IRMRiskSteward_Implementation": {
-      "address": "0x5715933d62852C15eF97b6B4BB498CF45c40C244",
+      "address": "0xDD150De13849fB0776B466114b95770714c8Cc9d",
       "abi": [
         {
           "inputs": [
@@ -7069,7 +7069,7 @@
       ]
     },
     "IRMRiskSteward_Proxy": {
-      "address": "0x96834aF3d481C3f70dd31a4a3fe7607C2FC6Aa5b",
+      "address": "0xa7E80c303f2EcF9436F11Da14C512B09B44854f4",
       "abi": [
         {
           "inputs": [

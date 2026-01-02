@@ -20,7 +20,6 @@
     "MarketCapsRiskSteward": "0xecC583037338D1EFE2C15bb2c6ac81E0294375C2",
     "MarketCapsRiskSteward_Implementation": "0xc1CBE65c1aF1d3d4251A3Ce3e69b58D51F91dbC0",
     "MarketCapsRiskSteward_Proxy": "0xecC583037338D1EFE2C15bb2c6ac81E0294375C2",
-    "MockRiskOracle": "0xFD28623359397880F822cD09d42D54058fc47Ce7",
     "NormalTimelock": "0xce10739590001705F7FF231611ba4A48B2820327",
     "OmnichainProposalSender": "0xCfD34AEB46b1CB4779c945854d405E91D27A1899",
     "RiskOracle": "0x4DEA4D1A9F6101D4adacE89f16064D780D2F241d",
