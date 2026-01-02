@@ -4,6 +4,9 @@
   "addresses": {
     "ACMCommandsAggregator": "0xB59523628D92f914ec6624Be4281397E8aFD71EF",
     "AccessControlManager": "0x45f8a08F534f34A97187626E05d4b6648Eeaa9AA",
+    "CollateralFactorsRiskSteward": "0xBf821F512EA224201108303cc6dA200391Eb38aC",
+    "CollateralFactorsRiskSteward_Implementation": "0x817e0dE83b61CCf8b5868Dd422685A0c26399c2e",
+    "CollateralFactorsRiskSteward_Proxy": "0xBf821F512EA224201108303cc6dA200391Eb38aC",
     "CriticalTimelock": "0x23B893a7C45a5Eb8c8C062b9F32d0D2e43eD286D",
     "FastTrackTimelock": "0x3CFf21b7AF8390fE68799D58727d3b4C25a83cb6",
     "GovernorAlpha": "0x7df10b2118eb04d9806b15198019f83741a9f8f4",
@@ -11,8 +14,20 @@
     "GovernorBravoDelegator": "0x5573422A1a59385C247ec3a66B93B7C08eC2f8f2",
     "GovernorBravoDelegator_Implementation": "0x4baf88aba7f86f6540728bef454b224c5d2215e7",
     "GovernorBravoDelegator_Proxy": "0x5573422A1a59385C247ec3a66B93B7C08eC2f8f2",
+    "IRMRiskSteward": "0xE7AcaF3d6CeBA793d94f867FFCE0A1e9a6b3977C",
+    "IRMRiskSteward_Implementation": "0x028aE09365D13Dcb1F347feA03aC1cf1f422BED6",
+    "IRMRiskSteward_Proxy": "0xE7AcaF3d6CeBA793d94f867FFCE0A1e9a6b3977C",
+    "MarketCapsRiskSteward": "0xecC583037338D1EFE2C15bb2c6ac81E0294375C2",
+    "MarketCapsRiskSteward_Implementation": "0xc1CBE65c1aF1d3d4251A3Ce3e69b58D51F91dbC0",
+    "MarketCapsRiskSteward_Proxy": "0xecC583037338D1EFE2C15bb2c6ac81E0294375C2",
     "MockRiskOracle": "0xFD28623359397880F822cD09d42D54058fc47Ce7",
     "NormalTimelock": "0xce10739590001705F7FF231611ba4A48B2820327",
-    "OmnichainProposalSender": "0xCfD34AEB46b1CB4779c945854d405E91D27A1899"
+    "OmnichainProposalSender": "0xCfD34AEB46b1CB4779c945854d405E91D27A1899",
+    "RiskOracle": "0x4DEA4D1A9F6101D4adacE89f16064D780D2F241d",
+    "RiskOracle_Implementation": "0xA55eaE955E4aC038a7aFCcB373E35FD1fab13f34",
+    "RiskOracle_Proxy": "0x4DEA4D1A9F6101D4adacE89f16064D780D2F241d",
+    "RiskStewardReceiver": "0x2F6eb64826f3A067eBFFb5909De7AA4e0Cb31b81",
+    "RiskStewardReceiver_Implementation": "0xFfc0438D9E9FFf9b59f8EF9718d7C8e508D0b0CA",
+    "RiskStewardReceiver_Proxy": "0x2F6eb64826f3A067eBFFb5909De7AA4e0Cb31b81"
   }
 }
