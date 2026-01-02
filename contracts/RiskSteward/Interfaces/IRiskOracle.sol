@@ -92,6 +92,9 @@ interface IRiskOracle {
     /// @notice Thrown when array lengths don't match in bulk operations
     error ArrayLengthMismatch();
 
+    /// @notice Thrown when trying to renounce ownership
+    error RenounceOwnershipNotAllowed();
+
     /**
      * @notice Returns the update type string at the given index in the allUpdateTypes array
      * @param index The index in the allUpdateTypes array

@@ -63,6 +63,11 @@ contract IRMRiskSteward is BaseRiskSteward {
     error UnsupportedUpdateType();
 
     /**
+     * @notice Thrown when attempting to apply a redundant IRM value (no-op change).
+     */
+    error RedundantValue();
+
+    /**
      * @notice Thrown when the update is not coming from the RiskStewardReceiver
      */
     error OnlyRiskStewardReceiver();
@@ -102,7 +107,6 @@ contract IRMRiskSteward is BaseRiskSteward {
     /**
      * @notice Applies an interest rate model update from the RiskStewardReceiver.
      * Directly updates the market interest rate model on the vToken.
-     * Delta validation is already performed by RiskStewardReceiver before execution.
      * @param update RiskParameterUpdate update to apply
      * @custom:error Throws OnlyRiskStewardReceiver if the sender is not the RiskStewardReceiver
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
@@ -127,14 +131,23 @@ contract IRMRiskSteward is BaseRiskSteward {
      * @param update The update to check
      * @return True if update is safe for direct execution, false if timelock is required
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
+     * @custom:error Throws RedundantValue if the new IRM address is equal to the current IRM address
      * @dev For IRM updates, always returns false as we cannot compare IRM values
      */
-    function isSafeForDirectExecution(RiskParameterUpdate calldata update) external pure returns (bool) {
+    function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
         if (update.updateTypeKey != INTEREST_RATE_MODEL_KEY) {
             revert UnsupportedUpdateType();
         }
 
-        // always require timelock (not safe for direct execution)
+        address newIRM = _decodeAbiEncodedAddress(update.newValue);
+        address currentIRM = address(ICorePoolVToken(update.market).interestRateModel());
+
+        // Revert on redundant updates
+        if (newIRM == currentIRM) {
+            revert RedundantValue();
+        }
+
+        // Always require timelock (not safe for direct execution)
         return false;
     }
 
@@ -143,6 +156,7 @@ contract IRMRiskSteward is BaseRiskSteward {
      * @param updateId The update ID from the Risk Oracle
      * @param market The market to update the interest rate model for
      * @param newIRM The new interest rate model address
+     * @custom:error Throws SetInterestRateModelFailed if the core pool vToken call to _setInterestRateModel returns a non-zero error code
      * @custom:event Emits InterestRateModelUpdated with the updateId, market and new IRM address
      */
     function _updateIRM(uint256 updateId, address market, address newIRM) internal {
