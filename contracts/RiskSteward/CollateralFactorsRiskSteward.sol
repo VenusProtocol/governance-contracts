@@ -70,11 +70,6 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
     error SetCollateralFactorFailed(uint256 errorCode);
 
     /**
-     * @notice Thrown when an invalid pool configuration is used (non-core comptroller with non-zero poolId).
-     */
-    error InvalidPool();
-
-    /**
      * @notice Thrown when an update type that is not supported is operated on.
      */
     error UnsupportedUpdateType();
@@ -88,11 +83,6 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
      * @notice Thrown when the two uint256 data length is invalid
      */
     error InvalidTwoUintLength();
-
-    /**
-     * @notice Thrown when attempting to apply a redundant value (no-op change).
-     */
-    error RedundantValue();
 
     /**
      * @notice Sets the immutable `CORE_POOL_COMPTROLLER` and `RISK_STEWARD_RECEIVER` addresses and disables initializers.
@@ -122,20 +112,14 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
      * @custom:access Controlled by AccessControlManager
      * @custom:event Emits SafeDeltaBpsUpdated with the old and new safe delta bps
      * @custom:error Throws InvalidSafeDeltaBps if the safe delta bps is greater than MAX_BPS
-     * @custom:error Throws RedundantValue if the new safe delta bps is equal to the current value
      */
     function setSafeDeltaBps(uint256 safeDeltaBps_) external {
         _checkAccessAllowed("setSafeDeltaBps(uint256)");
         if (safeDeltaBps_ > MAX_BPS) {
             revert InvalidSafeDeltaBps();
         }
-        uint256 oldSafeDeltaBps = safeDeltaBps;
-
-        if (safeDeltaBps_ == oldSafeDeltaBps) {
-            revert RedundantValue();
-        }
+        emit SafeDeltaBpsUpdated(safeDeltaBps, safeDeltaBps_);
         safeDeltaBps = safeDeltaBps_;
-        emit SafeDeltaBpsUpdated(oldSafeDeltaBps, safeDeltaBps_);
     }
 
     /**
@@ -143,22 +127,16 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
      * @param update The update to check.
      * @return True if update is safe for direct execution, false if timelock is required
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
-     * @custom:error Throws RedundantValue if the new collateral factor and liquidation threshold are unchanged
      */
     function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
-        if (update.updateTypeKey == COLLATERAL_FACTORS_KEY) {
-            // eMode-style updates always require timelock (not safe for direct execution)
-            if (update.poolId != 0) return false;
+        // eMode-style updates always require timelock (not safe for direct execution)
+        if (update.poolId != 0) return false;
 
+        if (update.updateTypeKey == COLLATERAL_FACTORS_KEY) {
             address comptroller = ICorePoolVToken(update.market).comptroller();
 
             (uint256 newCF, uint256 newLT) = _decodeAbiEncodedTwoUint256(update.newValue);
             (uint256 currCF, uint256 currLT) = _getCurrentCollateralFactors(comptroller, update.market);
-
-            // Revert on redundant updates only when both CF and LT are unchanged.
-            if (newCF == currCF && newLT == currLT) {
-                revert RedundantValue();
-            }
 
             // If current values are zero, update always requires timelock
             if (currCF == 0 || currLT == 0) return false;
@@ -201,8 +179,6 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
      * @param market The market to update the collateral factors for
      * @param poolId The pool identifier for eMode updates (0 for regular market updates)
      * @param newValue Encoded new collateral factors: `abi.encode(uint256 newCollateralFactor, uint256 newLiquidationThreshold)`
-     * @custom:error Throws SetCollateralFactorFailed if the core pool comptroller call to setCollateralFactor returns a non‑zero error code
-     * @custom:error Throws InvalidPool if a non‑core comptroller is used together with a non‑zero poolId
      * @custom:event Emits CollateralFactorsUpdated with updateId
      */
     function _updateCollateralFactors(
@@ -212,7 +188,7 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
         uint96 poolId,
         bytes memory newValue
     ) internal {
-        (uint256 newCollateralFactor, uint256 newLiquidationThreshold) = _decodeAbiEncodedTwoUint256(newValue);
+        (uint256 newCollateralFactor, uint256 newLiquidationThreshold) = abi.decode(newValue, (uint256, uint256));
 
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
             uint256 errorCode = ICorePoolComptroller(comptroller).setCollateralFactor(
@@ -223,7 +199,7 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
             );
             if (errorCode != 0) revert SetCollateralFactorFailed(errorCode);
         } else {
-            if (poolId != 0) revert InvalidPool();
+            if (poolId != 0) revert UnsupportedUpdateType();
 
             IIsolatedPoolsComptroller(comptroller).setCollateralFactor(
                 market,
@@ -238,6 +214,7 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
     /**
      * @notice Returns the current collateral factors for a market on a given comptroller.
      * @dev Returns both collateral factor and liquidation threshold (updated together via the same setter).
+     *      For core pool, uses eMode-specific getter which handles poolId == 0 as regular market.
      * @param comptroller The comptroller address
      * @param market The market whose collateral factors are being queried
      * @return currentCollateralFactor The current collateral factor
@@ -263,12 +240,12 @@ contract CollateralFactorsRiskSteward is BaseRiskSteward {
      * @param data ABI-encoded (uint256, uint256) payload
      * @return a First uint256
      * @return b Second uint256
-     * @custom:error Throws InvalidTwoUintLength if data length is not 64 bytes
      */
     function _decodeAbiEncodedTwoUint256(bytes memory data) internal pure returns (uint256 a, uint256 b) {
         if (data.length != 64) {
             revert InvalidTwoUintLength();
         }
+
         (a, b) = abi.decode(data, (uint256, uint256));
     }
 }

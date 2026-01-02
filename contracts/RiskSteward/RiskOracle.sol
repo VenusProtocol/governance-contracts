@@ -57,7 +57,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
     /**
      * @notice Initializes the contract with access control manager
      * @param accessControlManager_ Address of the access control manager
-     * @custom:error Reverts with "invalid acess control manager address" if accessControlManager_ is zero address
+     * @custom:error Throws ZeroAddressNotAllowed if accessControlManager_ is zero address
      */
     function initialize(address accessControlManager_) external initializer {
         __AccessControlled_init(accessControlManager_);
@@ -95,7 +95,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
         if (!authorizedSenders[sender]) {
             revert SenderNotAuthorized();
         }
-        delete authorizedSenders[sender];
+        authorizedSenders[sender] = false;
         emit AuthorizedSenderRemoved(sender);
     }
 
@@ -162,7 +162,6 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @param additionalData Additional data for the update
      * @custom:error Throws SenderNotAuthorized if caller is not an authorized sender
      * @custom:error Throws UpdateTypeNotActive if update type is not active
-     * @custom:error Throws ZeroAddressNotAllowed if market is zero address
      * @custom:event Emits UpdatePublished when update is successfully published
      */
     function publishRiskParameterUpdate(
@@ -187,9 +186,7 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @param dstEid Array of destination endpoint IDs for cross-chain routing
      * @param additionalData Array of additional data for the updates
      * @custom:error Throws SenderNotAuthorized if caller is not an authorized sender
-     * @custom:error Throws ArrayLengthMismatch if the array lengths do not match or if no updates are provided
      * @custom:error Throws UpdateTypeNotActive if any update type is not active
-     * @custom:error Throws ZeroAddressNotAllowed if any market is zero address
      * @custom:event Emits UpdatePublished for each successfully published update
      */
     function publishBulkRiskParameterUpdates(
@@ -367,20 +364,11 @@ contract RiskOracle is IRiskOracle, AccessControlledV8 {
      * @return True if the update type exists, false otherwise
      */
     function _updateTypeExists(bytes32 updateTypeKey) internal view returns (bool) {
-        uint256 length = allUpdateTypes.length;
-        for (uint256 i = 0; i < length; ++i) {
+        for (uint256 i = 0; i < allUpdateTypes.length; ++i) {
             if (keccak256(bytes(allUpdateTypes[i])) == updateTypeKey) {
                 return true;
             }
         }
         return false;
-    }
-
-    /**
-     * @notice Disables renounceOwnership function
-     * @custom:error Throws RenounceOwnershipNotAllowed
-     */
-    function renounceOwnership() public pure override {
-        revert RenounceOwnershipNotAllowed();
     }
 }

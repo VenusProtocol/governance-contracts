@@ -9,8 +9,7 @@ import { IRiskSteward } from "./Interfaces/IRiskSteward.sol";
 import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroller.sol";
-import { OAppReceiverUpgradeable, Origin } from "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppReceiverUpgradeable.sol";
-import { OAppCoreUpgradeable } from "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppCoreUpgradeable.sol";
+import { OAppUpgradeable, Origin } from "@layerzerolabs/oapp-evm-upgradeable/contracts/oapp/OAppUpgradeable.sol";
 
 /**
  * @title DestinationStewardReceiver
@@ -19,7 +18,7 @@ import { OAppCoreUpgradeable } from "@layerzerolabs/oapp-evm-upgradeable/contrac
  *         enforces a fixed remote delay, and then executes the updates on the configured `IRiskSteward` contracts.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
-contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessControlledV8, OAppReceiverUpgradeable {
+contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessControlledV8, OAppUpgradeable {
     /**
      * @notice Time before a bridged update is considered stale on the destination chain
      */
@@ -48,7 +47,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
     /**
      * @notice Mapping from (updateType, market) to currently registered remote update ID
      */
-    mapping(bytes32 => mapping(address market => uint256)) public lastRegisteredUpdateId;
+    mapping(bytes32 => mapping(address market => uint256)) public lastRegisteredUpdate;
 
     /**
      * @notice Track last executed update timestamp per (updateType, market)
@@ -84,7 +83,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
      * @param layerZeroEid_ LayerZero endpoint ID for this destination chain
      * @custom:oz-upgrades-unsafe-allow constructor
      */
-    constructor(address endpoint_, uint32 layerZeroEid_) OAppCoreUpgradeable(endpoint_) {
+    constructor(address endpoint_, uint32 layerZeroEid_) OAppUpgradeable(endpoint_) {
         _disableInitializers();
         ensureNonzeroAddress(endpoint_);
         if (layerZeroEid_ == 0) revert InvalidLayerZeroEid();
@@ -99,7 +98,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
      */
     function initialize(address accessControlManager_, address delegate_) external initializer {
         __AccessControlled_init(accessControlManager_);
-        __OAppReceiver_init(delegate_);
+        __OApp_init(delegate_);
         remoteDelay = 6 hours; // Default value
         emit RemoteDelaySet(remoteDelay);
     }
@@ -110,7 +109,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
      * @param riskSteward The address for the risk steward contract responsible for processing the update
      * @param debounce The debounce period for updates of this type on the destination (anti‑DoS)
      * @custom:access Controlled by AccessControlManager
-     * @custom:event Emits RiskParameterConfigUpdated
+     * @custom:event Emits RiskParameterConfigUpdated (with previousTimelock and timelock always emitted as 0)
      * @custom:error InvalidUpdateType if the update type string is empty
      * @custom:error InvalidDebounce if the debounce is 0
      */
@@ -118,7 +117,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
         _checkAccessAllowed("setRiskParameterConfig(string,address,uint256)");
         ensureNonzeroAddress(riskSteward);
 
-        if (bytes(updateType).length == 0 || bytes(updateType).length > 64) {
+        if (bytes(updateType).length == 0) {
             revert InvalidUpdateType();
         }
 
@@ -304,7 +303,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
 
         for (uint256 i = 0; i < maxUpdates; ++i) {
             address market = markets[i];
-            uint256 registeredUpdateId = lastRegisteredUpdateId[updateTypeKey][market];
+            uint256 registeredUpdateId = lastRegisteredUpdate[updateTypeKey][market];
             DestinationUpdate storage destUpdate = updates[registeredUpdateId];
 
             if (!_checkPendingUpdate(registeredUpdateId)) continue;
@@ -347,7 +346,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
         address market
     ) external view returns (DestinationUpdate memory) {
         bytes32 key = keccak256(bytes(updateType));
-        uint256 updateId = lastRegisteredUpdateId[key][market];
+        uint256 updateId = lastRegisteredUpdate[key][market];
         return updates[updateId];
     }
 
@@ -398,7 +397,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
         }
 
         // If already an update in Process do not override the registered update
-        uint256 currentRegisteredId = lastRegisteredUpdateId[update.updateTypeKey][update.market];
+        uint256 currentRegisteredId = lastRegisteredUpdate[update.updateTypeKey][update.market];
         if (_checkPendingUpdate(currentRegisteredId)) {
             emit RegisteredPendingUpdateExist(currentRegisteredId, arrivalTime, update.updateType, update.market);
             return;
@@ -408,14 +407,14 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
         destUpdate.update = update;
         destUpdate.status = UpdateStatus.Pending;
         destUpdate.arrivalTime = arrivalTime;
-        lastRegisteredUpdateId[update.updateTypeKey][update.market] = newId;
+        lastRegisteredUpdate[update.updateTypeKey][update.market] = newId;
         emit RemoteUpdateRegistered(newId, arrivalTime, update.updateType, update.market);
     }
 
     /**
-     * @notice Checks whether a given registered update ID corresponds to a pending, non‑expired update.
-     * @param currentRegisteredId The currently registered update ID for a specific (updateType, market) pair
-     * @return True if currentRegisteredId is non‑zero, the update status is Pending, and it has not expired; otherwise false
+     * @notice Checks if there is a pending, non‑expired registered update for the same (updateType, market).
+     * @param currentRegisteredId The currently registered update ID for the same (updateType, market)
+     * @return True if there is a pending, non‑expired registered update for the same (updateType, market), false otherwise
      */
     function _checkPendingUpdate(uint256 currentRegisteredId) internal view returns (bool) {
         if (currentRegisteredId == 0) return false; // no registered update
@@ -425,7 +424,7 @@ contract DestinationStewardReceiver is IDestinationStewardReceiver, AccessContro
         if (current.status != UpdateStatus.Pending) return false;
 
         // Check expiration
-        return current.update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME >= block.timestamp;
+        return current.update.timestamp + REMOTE_UPDATE_EXPIRATION_TIME > block.timestamp;
     }
 
     /**
