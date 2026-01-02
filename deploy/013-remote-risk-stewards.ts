@@ -1,3 +1,4 @@
+import { ethers } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
@@ -13,9 +14,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
 
   const normalTimelockAddress = (await hre.ethers.getContract("NormalTimelock")).address;
   const accessControlManager = await hre.ethers.getContract("AccessControlManager");
-  const corePoolComptroller = (await hre.ethers.getContractOrNull("Unitroller")) || {
-    address: "0x0000000000000000000000000000000000000001",
-  };
 
   // Explicitly mentioning Default Proxy Admin contract path to fetch it from hardhat-deploy instead of OpenZeppelin
   // as zksync doesnot compile OpenZeppelin contracts using zksolc. It is backward compatible for all networks as well.
@@ -80,7 +78,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("CollateralFactorsRiskSteward", {
     from: deployer,
     log: true,
-    args: [corePoolComptroller.address, destinationRiskStewardReceiver.address],
+    args: [ethers.constants.AddressZero, destinationRiskStewardReceiver.address],
     proxy: {
       owner: networkName === "hardhat" ? deployer : normalTimelockAddress,
       proxyContract: "OptimizedTransparentUpgradeableProxy",
@@ -105,7 +103,7 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   await deploy("IRMRiskSteward", {
     from: deployer,
     log: true,
-    args: [corePoolComptroller.address, destinationRiskStewardReceiver.address],
+    args: [ethers.constants.AddressZero, destinationRiskStewardReceiver.address],
     proxy: {
       owner: networkName === "hardhat" ? deployer : normalTimelockAddress,
       proxyContract: "OptimizedTransparentUpgradeableProxy",
