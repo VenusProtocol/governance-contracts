@@ -1,7 +1,7 @@
 import { loadFixture } from "@nomicfoundation/hardhat-network-helpers";
 import { time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
-import { BigNumber, ContractFactory } from "ethers";
+import { ContractFactory } from "ethers";
 import fs from "fs";
 import { ethers, upgrades } from "hardhat";
 import { SignerWithAddress } from "hardhat-deploy-ethers/signers";
@@ -20,10 +20,10 @@ import {
   RiskStewardReceiver,
 } from "../../typechain";
 
-const { parseUnits, hexValue } = ethers.utils;
+const { parseUnits } = ethers.utils;
 
 const parseUnitsToHex = (value: number) => {
-  return ethers.utils.hexZeroPad(hexValue(BigNumber.from(parseUnits(value.toString(), 18))), 32);
+  return ethers.utils.defaultAbiCoder.encode(["uint256"], [parseUnits(value.toString(), 18)]);
 };
 
 const encodeCollateralFactors = (collateralFactor: number, liquidationThreshold: number) => {
