@@ -97,6 +97,60 @@ export const getLzEndpoint = async (networkName: SUPPORTED_NETWORKS): Promise<st
   }[networkName];
 };
 
+export const getLzV2Endpoint = async (networkName: SUPPORTED_NETWORKS): Promise<string> => {
+  const lzEndpointMock = await ethers.getContractOrNull("EndpointV2Mock");
+  return {
+    ethereum: "0x1a44076050125825900e736c501f859c50fE728c",
+    bscmainnet: "0x1a44076050125825900e736c501f859c50fE728c",
+    opbnbmainnet: "0x1a44076050125825900e736c501f859c50fE728c",
+    arbitrumone: "0x1a44076050125825900e736c501f859c50fE728c",
+    sepolia: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+    bsctestnet: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+    opbnbtestnet: "",
+    arbitrumsepolia: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+    zksyncsepolia: "0xe2Ef622A13e71D9Dd2BBd12cd4b27e1516FA8a09",
+    zksyncmainnet: "0xd07C30aF3Ff30D96BDc9c6044958230Eb797DDBF",
+    opmainnet: "0x1a44076050125825900e736c501f859c50fE728c",
+    opsepolia: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+    basesepolia: "0x6EDCE65403992e310A62460808c4b910D972f10f",
+    basemainnet: "0x1a44076050125825900e736c501f859c50fE728c",
+    unichainsepolia: "0xb8815f3f882614048CbE201a67eF9c6F10fe5035",
+    unichainmainnet: "0x6F475642a6e85809B1c36Fa62763669b1b48DD5B",
+    berachainbepolia: "0x6C7Ab2202C98C4227C5c46f1417D81144DA716Ff",
+    hardhat: lzEndpointMock?.address || "",
+  }[networkName];
+};
+
+export const getRiskOracle = async (networkName: SUPPORTED_NETWORKS) => {
+  const mockRiskOracle = await ethers.getContractOrNull("MockRiskOracle");
+  switch (networkName) {
+    case SUPPORTED_NETWORKS.BSCTESTNET:
+      return "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F";
+    case SUPPORTED_NETWORKS.BSCMAINNET:
+      return "0x66A8cb6c4230B044378aC3676D47Ed4fE18e3cFB";
+    case SUPPORTED_NETWORKS.HARDHAT:
+      return mockRiskOracle?.address || "";
+    case SUPPORTED_NETWORKS.SEPOLIA:
+      return "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F";
+    case SUPPORTED_NETWORKS.ETHERUEM:
+      return "0x91429ddc50B38bAF3Ba9CB5eB0275507Ac65CBF4";
+    case SUPPORTED_NETWORKS.OPBNBTESTNET:
+      return "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F";
+    case SUPPORTED_NETWORKS.ARBITRUM_SEPOLIA:
+      return "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F";
+    case SUPPORTED_NETWORKS.OPSEPOLIA:
+      return "0x66A8cb6c4230B044378aC3676D47Ed4fE18e3cFB";
+    case SUPPORTED_NETWORKS.BASESEPOLIA:
+      return "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F";
+    case SUPPORTED_NETWORKS.UNICHAINSEPOLIA:
+      return "0x7BD97DD6C199532d11Cf5f55E13a120dB6dd0F4F";
+    case SUPPORTED_NETWORKS.ZKSYNC_SEPOLIA:
+      return "0x1f7474B549840158464Eca63735429815867b40e";
+    default:
+      throw new Error(`Risk Oracle Unsupported network: ${networkName}`);
+  }
+};
+
 export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {
   if (testnetNetworks.includes(network as string)) {
     return LZ_CHAINID.bsctestnet;
@@ -108,6 +162,10 @@ export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {
 
 export const onlyHardhat = () => async (hre: HardhatRuntimeEnvironment) => {
   return hre.network.name !== "hardhat";
+};
+
+export const skipRemoteNetworks = () => async (hre: HardhatRuntimeEnvironment) => {
+  return hre.network.name !== "bscmainnet" && hre.network.name !== "bsctestnet" && hre.network.name !== "hardhat";
 };
 
 // eslint-disable-next-line @typescript-eslint/no-empty-function
