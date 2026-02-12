@@ -13,6 +13,21 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     log: true,
     autoMine: true,
   });
+
+  await deploy("EndpointV2Mock", {
+    from: deployer,
+    contract: {
+      abi: require("../node_modules/@layerzerolabs/test-devtools-evm-hardhat/artifacts/contracts/mocks/EndpointV2Mock.sol/EndpointV2Mock.json")
+        .abi,
+      bytecode:
+        require("../node_modules/@layerzerolabs/test-devtools-evm-hardhat/artifacts/contracts/mocks/EndpointV2Mock.sol/EndpointV2Mock.json")
+          .bytecode,
+    },
+    args: [40102],
+    log: true,
+    autoMine: true,
+    skipIfAlreadyDeployed: true,
+  });
 };
 
 func.tags = ["mocks"];

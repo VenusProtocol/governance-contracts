@@ -4,19 +4,25 @@
   "addresses": {
     "ACMCommandsAggregator": "0xEEeF13364fD22b8eA6932A9ed337e2638f8E0eD6",
     "AccessControlManager": "0x1652E12C8ABE2f0D84466F0fc1fA4286491B3BC1",
+    "CollateralFactorsRiskSteward": "0xC1eCF5Ee6B2F43194359c02FB460B31e4494895d",
+    "CollateralFactorsRiskSteward_Implementation": "0xfdFd4BEdc16339fE2dfa19Bab8bC9B8DA4149F75",
+    "CollateralFactorsRiskSteward_Proxy": "0xC1eCF5Ee6B2F43194359c02FB460B31e4494895d",
     "CriticalTimelock": "0x45d2263c6E0dbF84eBffB1Ee0b80aC740607990B",
     "DefaultProxyAdmin": "0xa9aaf2A1cCf2C3a87997942abaA740887cC89241",
+    "DestinationStewardReceiver": "0xCbab4C50D8458958515763dA4Db0Ba74769a5653",
+    "DestinationStewardReceiver_Implementation": "0x225D2c0cf62d46f7FA69a8E8fdD379304C5500fF",
+    "DestinationStewardReceiver_Proxy": "0xCbab4C50D8458958515763dA4Db0Ba74769a5653",
     "FastTrackTimelock": "0xe0Fa35b6279dd802C382ae54c50C8B16deaC0885",
-    "MarketCapsRiskSteward": "0x7831156A181288ce76B5952624Df6C842F4Cc0c1",
-    "MarketCapsRiskSteward_Implementation": "0x27A8ca2aFa10B9Bc1E57FC4Ca610d9020Aab3739",
-    "MarketCapsRiskSteward_Proxy": "0x7831156A181288ce76B5952624Df6C842F4Cc0c1",
+    "IRMRiskSteward": "0x5675112bf79C66d8CEbe48C40f25e9Dd6576c4e6",
+    "IRMRiskSteward_Implementation": "0x1c993C0Da4fA4D9EBFA9C71752EFCC42f4b93bCA",
+    "IRMRiskSteward_Proxy": "0x5675112bf79C66d8CEbe48C40f25e9Dd6576c4e6",
+    "MarketCapsRiskSteward": "0x284d000665296515280a4fB066a887EFF6A3bD9E",
+    "MarketCapsRiskSteward_Implementation": "0xcb63B664b72d5c267617B1D0749Ae94be38E34FB",
+    "MarketCapsRiskSteward_Proxy": "0x284d000665296515280a4fB066a887EFF6A3bD9E",
     "NormalTimelock": "0xdDe31d7eEEAD7Cf9790F833C4FF4c6e61404402a",
     "OmnichainExecutorOwner": "0xE92E31df479BC1031B866063F65CF71B6bAC4FC6",
     "OmnichainExecutorOwner_Implementation": "0xE7441bF9a22FA1F9a81FcEA26d622a2A60F0f407",
     "OmnichainExecutorOwner_Proxy": "0xE92E31df479BC1031B866063F65CF71B6bAC4FC6",
-    "OmnichainGovernanceExecutor": "0xC7D6D33adcdBfccD416C3aAB1878360ea8b79ac6",
-    "RiskStewardReceiver": "0x4fCbfE445396f31005b3Fd2F6DE2A986d6E2dCB5",
-    "RiskStewardReceiver_Implementation": "0x6022165344bBD1DDF1E1F10F4736FD9fb58D5B71",
-    "RiskStewardReceiver_Proxy": "0x4fCbfE445396f31005b3Fd2F6DE2A986d6E2dCB5"
+    "OmnichainGovernanceExecutor": "0xC7D6D33adcdBfccD416C3aAB1878360ea8b79ac6"
   }
 }

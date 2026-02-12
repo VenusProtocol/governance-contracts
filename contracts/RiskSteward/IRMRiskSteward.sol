@@ -1,0 +1,186 @@
+// SPDX-License-Identifier: BSD-3-Clause
+pragma solidity 0.8.25;
+
+import { RiskParameterUpdate } from "./Interfaces/IRiskOracle.sol";
+import { ICorePoolVToken } from "../interfaces/ICorePoolVToken.sol";
+import { IIsolatedPoolVToken } from "../interfaces/IIsolatedPoolVToken.sol";
+import { InterestRateModel } from "@venusprotocol/isolated-pools/contracts/InterestRateModel.sol";
+import { InterestRateModelV8 } from "@venusprotocol/venus-protocol/contracts/InterestRateModels/InterestRateModelV8.sol";
+import { ICorePoolComptroller } from "../interfaces/ICorePoolComptroller.sol";
+import { IRiskStewardReceiver } from "./Interfaces/IRiskStewardReceiver.sol";
+import { BaseRiskSteward } from "./BaseRiskSteward.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
+
+/**
+ * @title IRMRiskSteward
+ * @author Venus
+ * @notice Contract that can update interest rate models updates received from RiskStewardReceiver.
+ * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
+ */
+contract IRMRiskSteward is BaseRiskSteward {
+    /**
+     * @notice The update type for interest rate model
+     */
+    string public constant INTEREST_RATE_MODEL = "interestRateModel";
+
+    /**
+     * @notice The update type key for interest rate model (keccak256 hash of INTEREST_RATE_MODEL)
+     */
+    bytes32 public constant INTEREST_RATE_MODEL_KEY = keccak256(bytes(INTEREST_RATE_MODEL));
+
+    /**
+     * @notice Address of the BNB Core Pool Comptroller.
+     * @dev This comptroller is specific to the BNB Core Pool, which uses a different ABI
+     *      than isolated pools. It is used solely to detect and handle BNB Core Pool
+     *      markets, and would not be used for remote-chain (isolated pool) deployments.
+     */
+    ICorePoolComptroller public immutable CORE_POOL_COMPTROLLER;
+
+    /**
+     * @notice Address of the RiskStewardReceiver used to validate incoming updates
+     */
+    IRiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
+
+    /**
+     * @dev This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     * See https://docs.openzeppelin.com/contracts/4.x/upgradeable#storage_gaps
+     */
+    uint256[49] private __gap;
+
+    /**
+     * @notice Emitted when an interest rate model is updated
+     */
+    event InterestRateModelUpdated(
+        uint256 indexed updateId,
+        address indexed market,
+        address indexed newInterestRateModel
+    );
+
+    /**
+     * @notice Thrown when an update type that is not supported is operated on
+     */
+    error UnsupportedUpdateType();
+
+    /**
+     * @notice Thrown when attempting to apply a redundant IRM value (no-op change).
+     */
+    error RedundantValue();
+
+    /**
+     * @notice Thrown when the update is not coming from the RiskStewardReceiver
+     */
+    error OnlyRiskStewardReceiver();
+
+    /**
+     * @notice Thrown when the address length is invalid
+     */
+    error InvalidAddressLength();
+
+    /**
+     * @notice Thrown when Core Pool VToken._setInterestRateModel fails.
+     */
+    error SetInterestRateModelFailed(uint256 errorCode);
+
+    /**
+     * @notice Sets the immutable CORE_POOL_COMPTROLLER and RISK_STEWARD_RECEIVER addresses and disables initializers
+     * @param corePoolComptroller_ The address of the Core Pool Comptroller
+     * @param riskStewardReceiver_ The address of the RiskStewardReceiver
+     * @custom:error Throws ZeroAddressNotAllowed if any of the addresses are zero
+     * @custom:oz-upgrades-unsafe-allow constructor
+     */
+    constructor(address corePoolComptroller_, address riskStewardReceiver_) {
+        ensureNonzeroAddress(riskStewardReceiver_);
+        CORE_POOL_COMPTROLLER = ICorePoolComptroller(corePoolComptroller_);
+        RISK_STEWARD_RECEIVER = IRiskStewardReceiver(riskStewardReceiver_);
+        _disableInitializers();
+    }
+
+    /**
+     * @notice Initializes the contract as ownable and access controlled.
+     * @param accessControlManager_ The address of the access control manager
+     */
+    function initialize(address accessControlManager_) external initializer {
+        __AccessControlled_init(accessControlManager_);
+    }
+
+    /**
+     * @notice Applies an interest rate model update from the RiskStewardReceiver.
+     * Directly updates the market interest rate model on the vToken.
+     * @param update RiskParameterUpdate update to apply
+     * @custom:error Throws OnlyRiskStewardReceiver if the sender is not the RiskStewardReceiver
+     * @custom:error Throws UnsupportedUpdateType if the update type is not supported
+     * @custom:event Emits InterestRateModelUpdated with the updateId, market and new IRM address
+     * @custom:access Only callable by the RiskStewardReceiver
+     */
+    function applyUpdate(RiskParameterUpdate calldata update) external {
+        if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
+            revert OnlyRiskStewardReceiver();
+        }
+
+        if (update.updateTypeKey == INTEREST_RATE_MODEL_KEY) {
+            address newIRM = _decodeAbiEncodedAddress(update.newValue);
+            _updateIRM(update.updateId, update.market, newIRM);
+        } else {
+            revert UnsupportedUpdateType();
+        }
+    }
+
+    /**
+     * @notice Checks if an update is safe for direct execution (no timelock required)
+     * @param update The update to check
+     * @return True if update is safe for direct execution, false if timelock is required
+     * @custom:error Throws UnsupportedUpdateType if the update type is not supported
+     * @custom:error Throws RedundantValue if the new IRM address is equal to the current IRM address
+     * @dev For IRM updates, always returns false as we cannot compare IRM values
+     */
+    function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
+        if (update.updateTypeKey != INTEREST_RATE_MODEL_KEY) {
+            revert UnsupportedUpdateType();
+        }
+
+        address newIRM = _decodeAbiEncodedAddress(update.newValue);
+        address currentIRM = address(ICorePoolVToken(update.market).interestRateModel());
+
+        // Revert on redundant updates
+        if (newIRM == currentIRM) {
+            revert RedundantValue();
+        }
+
+        // Always require timelock (not safe for direct execution)
+        return false;
+    }
+
+    /**
+     * @notice Updates the interest rate model for the given market.
+     * @param updateId The update ID from the Risk Oracle
+     * @param market The market to update the interest rate model for
+     * @param newIRM The new interest rate model address
+     * @custom:error Throws SetInterestRateModelFailed if the core pool vToken call to _setInterestRateModel returns a non-zero error code
+     * @custom:event Emits InterestRateModelUpdated with the updateId, market and new IRM address
+     */
+    function _updateIRM(uint256 updateId, address market, address newIRM) internal {
+        address comptroller = ICorePoolVToken(market).comptroller();
+
+        if (comptroller == address(CORE_POOL_COMPTROLLER)) {
+            uint256 errorCode = ICorePoolVToken(market)._setInterestRateModel(InterestRateModelV8(newIRM));
+            if (errorCode != 0) revert SetInterestRateModelFailed(errorCode);
+        } else {
+            IIsolatedPoolVToken(market).setInterestRateModel(InterestRateModel(newIRM));
+        }
+
+        emit InterestRateModelUpdated(updateId, market, newIRM);
+    }
+
+    /**
+     * @notice Decodes ABI-encoded bytes into an address.
+     * @dev Expects exactly 32 bytes as produced by abi.encode(address).
+     * @param data ABI-encoded address payload (32 bytes)
+     * @return The decoded address
+     * @custom:error Throws InvalidAddressLength if data length is not 32 bytes
+     */
+    function _decodeAbiEncodedAddress(bytes memory data) internal pure returns (address) {
+        if (data.length != 32) revert InvalidAddressLength();
+        return abi.decode(data, (address));
+    }
+}

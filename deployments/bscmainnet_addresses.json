@@ -4,6 +4,9 @@
   "addresses": {
     "ACMCommandsAggregator": "0x8b443Ea6726E56DF4C4F62f80F0556bB9B2a7c64",
     "AccessControlManager": "0x4788629abc6cfca10f9f969efdeaa1cf70c23555",
+    "CollateralFactorsRiskSteward": "0x1414ADf007E324ec1D0A77b9F1A8759Ad33d2879",
+    "CollateralFactorsRiskSteward_Implementation": "0x92352572478965A0377F57a4A2bebb4B369c22d4",
+    "CollateralFactorsRiskSteward_Proxy": "0x1414ADf007E324ec1D0A77b9F1A8759Ad33d2879",
     "CriticalTimelock": "0x213c446ec11e45b15a6E29C1C1b402B8897f606d",
     "FastTrackTimelock": "0x555ba73dB1b006F3f2C7dB7126d6e4343aDBce02",
     "GovernorAlpha": "0x406f48f47D25E9caa29f17e7Cfbd1dc6878F078f",
@@ -12,13 +15,19 @@
     "GovernorBravoDelegator": "0x2d56dC077072B53571b8252008C60e945108c75a",
     "GovernorBravoDelegator_Implementation": "0x360ac19648efc29d2b7b70bac227c35e909272fd",
     "GovernorBravoDelegator_Proxy": "0x2d56dC077072B53571b8252008C60e945108c75a",
-    "MarketCapsRiskSteward": "0xE7252dccd79F2A555E314B9cdd440745b697D562",
-    "MarketCapsRiskSteward_Implementation": "0xF22F2553958775f5DcC9E2e1C0fF3cEB0d920ff7",
-    "MarketCapsRiskSteward_Proxy": "0xE7252dccd79F2A555E314B9cdd440745b697D562",
+    "IRMRiskSteward": "0x8acaBc42Bb98E2e2b091902a7E23f60CcB730aaa",
+    "IRMRiskSteward_Implementation": "0x0548A031574221e432f21a96bd7D24C0463c9eA5",
+    "IRMRiskSteward_Proxy": "0x8acaBc42Bb98E2e2b091902a7E23f60CcB730aaa",
+    "MarketCapsRiskSteward": "0x816FfD00A274EDE0091421F77817ca260Db3a3E3",
+    "MarketCapsRiskSteward_Implementation": "0x6c4538b7e85b073099BFf08B43F7273E4792Bb43",
+    "MarketCapsRiskSteward_Proxy": "0x816FfD00A274EDE0091421F77817ca260Db3a3E3",
     "NormalTimelock": "0x939bD8d64c0A9583A7Dcea9933f7b21697ab6396",
     "OmnichainProposalSender": "0x36a69dE601381be7b0DcAc5D5dD058825505F8f6",
-    "RiskStewardReceiver": "0xBa2a43279a228cf9cD94d072777d8d98e7e0a229",
-    "RiskStewardReceiver_Implementation": "0x85bF1D781dFdD75720f3019A1cd446b6d8A1561d",
-    "RiskStewardReceiver_Proxy": "0xBa2a43279a228cf9cD94d072777d8d98e7e0a229"
+    "RiskOracle": "0x0E3E51958b0Daa8C57c949675975CBEDd7b5a1a1",
+    "RiskOracle_Implementation": "0x34045517284cB1Ac2806Fe3298a39886DA29De48",
+    "RiskOracle_Proxy": "0x0E3E51958b0Daa8C57c949675975CBEDd7b5a1a1",
+    "RiskStewardReceiver": "0x47856bFa74B71d24a5545c7506862B8FddE52baB",
+    "RiskStewardReceiver_Implementation": "0xC00Ec4149eCfB60378152e05C5B896c08EA49e6E",
+    "RiskStewardReceiver_Proxy": "0x47856bFa74B71d24a5545c7506862B8FddE52baB"
   }
 }
