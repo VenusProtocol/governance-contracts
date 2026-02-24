@@ -106,7 +106,7 @@ export const getLzV2Endpoint = async (networkName: SUPPORTED_NETWORKS): Promise<
     arbitrumone: "0x1a44076050125825900e736c501f859c50fE728c",
     sepolia: "0x6EDCE65403992e310A62460808c4b910D972f10f",
     bsctestnet: "0x6EDCE65403992e310A62460808c4b910D972f10f",
-    opbnbtestnet: "",
+    opbnbtestnet: "0x6EDCE65403992e310A62460808c4b910D972f10f",
     arbitrumsepolia: "0x6EDCE65403992e310A62460808c4b910D972f10f",
     zksyncsepolia: "0xe2Ef622A13e71D9Dd2BBd12cd4b27e1516FA8a09",
     zksyncmainnet: "0xd07C30aF3Ff30D96BDc9c6044958230Eb797DDBF",

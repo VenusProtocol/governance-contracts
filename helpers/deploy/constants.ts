@@ -49,6 +49,7 @@ export const LZ_V2_EID: Record<SUPPORTED_NETWORKS, number> = {
   zksyncmainnet: 30165,
   sepolia: 40161,
   bsctestnet: 40102,
+  opbnbtestnet: 40202,
   arbitrumsepolia: 40231,
   zksyncsepolia: 40305,
   opsepolia: 40232,
