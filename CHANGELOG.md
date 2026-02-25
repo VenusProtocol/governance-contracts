@@ -1,3 +1,9 @@
+## 2.14.0-dev.4 (2026-02-25)
+
+* Merge pull request #162 from VenusProtocol/fix/slim-package ([4d93d6f](https://github.com/VenusProtocol/governance-contracts/commit/4d93d6f)), closes [#162](https://github.com/VenusProtocol/governance-contracts/issues/162)
+* build: accommodate the Trusted Publisher way to release ([e4152f6](https://github.com/VenusProtocol/governance-contracts/commit/e4152f6))
+* fix: NPM token env var ([9fcaf7e](https://github.com/VenusProtocol/governance-contracts/commit/9fcaf7e))
+
 ## 2.14.0-dev.3 (2026-02-24)
 
 * fix [VRR-17] [VRR-18] Missing Redundancy Check ([f4d3fcb](https://github.com/VenusProtocol/governance-contracts/commit/f4d3fcb))
