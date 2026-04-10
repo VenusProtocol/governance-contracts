@@ -1,3 +1,8 @@
+## 2.14.0-dev.5 (2026-04-10)
+
+* Merge pull request #170 from VenusProtocol/feat/vpd-485-acm ([752235f](https://github.com/VenusProtocol/governance-contracts/commit/752235f)), closes [#170](https://github.com/VenusProtocol/governance-contracts/issues/170)
+* feat: pin ACM compiler version for deterministic builds ([53d5e23](https://github.com/VenusProtocol/governance-contracts/commit/53d5e23))
+
 ## 2.14.0-dev.4 (2026-02-25)
 
 * Merge pull request #162 from VenusProtocol/fix/slim-package ([4d93d6f](https://github.com/VenusProtocol/governance-contracts/commit/4d93d6f)), closes [#162](https://github.com/VenusProtocol/governance-contracts/issues/162)
