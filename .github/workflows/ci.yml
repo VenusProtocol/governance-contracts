@@ -21,7 +21,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
           cache: "yarn"
 
       - name: Install dependencies
@@ -42,7 +42,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: "yarn"
 
       - name: Install dependencies
@@ -61,7 +61,7 @@ jobs:
         uses: "actions/setup-node@v3"
         with:
           cache: "yarn"
-          node-version: "lts/*"
+          node-version: 18
 
       - name: "Install the dependencies"
         run: "yarn install --immutable"
@@ -69,7 +69,9 @@ jobs:
         run: "yarn typechain"
 
       - name: "Test the contracts and generate the coverage report"
-        run: "npx hardhat coverage"
+        run: |
+          yarn hardhat compile
+          yarn hardhat coverage
 
       - name: "Add test summary"
         run: |
@@ -87,7 +89,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: 16
+          node-version: 20
           cache: "yarn"
 
       - name: Install dependencies
@@ -112,7 +114,7 @@ jobs:
       - name: Setup Node.js environment
         uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 20
           cache: "yarn"
 
       - name: Install dependencies

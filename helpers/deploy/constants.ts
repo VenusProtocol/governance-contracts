@@ -38,5 +38,25 @@ export const LZ_CHAINID: Record<SUPPORTED_NETWORKS, number> = {
   hardhat: 10102,
 };
 
+export const LZ_V2_EID: Record<SUPPORTED_NETWORKS, number> = {
+  ethereum: 30101,
+  bscmainnet: 30102,
+  opbnbmainnet: 30202,
+  arbitrumone: 30110,
+  opmainnet: 30111,
+  basemainnet: 30184,
+  unichainmainnet: 30320,
+  zksyncmainnet: 30165,
+  sepolia: 40161,
+  bsctestnet: 40102,
+  opbnbtestnet: 40202,
+  arbitrumsepolia: 40231,
+  zksyncsepolia: 40305,
+  opsepolia: 40232,
+  basesepolia: 40245,
+  unichainsepolia: 40333,
+  hardhat: 10102,
+};
+
 // eslint-disable-next-line @typescript-eslint/no-empty-function
 export default () => {};
