@@ -1,0 +1,312 @@
+{
+  "address": "0x884E46c8639c8CaFcf249e34c22575f4dD09E87D",
+  "abi": [
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "BatchNotFound",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "batchIndex",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "callIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "CallFailed",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "EmptyCalls",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "BatchAdded",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "BatchExecuted",
+      "type": "event"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "target",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct AuxiliaryCommandsAggregator.Call[]",
+          "name": "calls",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "addBatch",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "batchCount",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        },
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "batches",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "target",
+          "type": "address"
+        },
+        {
+          "internalType": "bytes",
+          "name": "data",
+          "type": "bytes"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "executeBatch",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "uint256",
+          "name": "index",
+          "type": "uint256"
+        }
+      ],
+      "name": "getBatch",
+      "outputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "target",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "internalType": "struct AuxiliaryCommandsAggregator.Call[]",
+          "name": "calls",
+          "type": "tuple[]"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0xfeaeaead643124f5357586ff310072ee309ebb2073f2e4e9b2c0a14437f90aea",
+  "receipt": {
+    "to": null,
+    "from": "0xCab91EBcbf5d242758e22fd436AB568343463A9c",
+    "contractAddress": "0x884E46c8639c8CaFcf249e34c22575f4dD09E87D",
+    "transactionIndex": 134,
+    "gasUsed": "698598",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x1b2ddeb20a7eca596dbe29ede65ba0e4e169f51ef9b59417d1846efca1b4d8a7",
+    "transactionHash": "0xfeaeaead643124f5357586ff310072ee309ebb2073f2e4e9b2c0a14437f90aea",
+    "logs": [],
+    "blockNumber": 25085948,
+    "cumulativeGasUsed": "16213826",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "2f5e4ac2e3409d9bf518218c01778793",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.25+commit.b61c2a91\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"BatchNotFound\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"batchIndex\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"callIndex\",\"type\":\"uint256\"}],\"name\":\"CallFailed\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"EmptyCalls\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"BatchAdded\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"BatchExecuted\",\"type\":\"event\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"internalType\":\"struct AuxiliaryCommandsAggregator.Call[]\",\"name\":\"calls\",\"type\":\"tuple[]\"}],\"name\":\"addBatch\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"batchCount\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"name\":\"batches\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"executeBatch\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"index\",\"type\":\"uint256\"}],\"name\":\"getBatch\",\"outputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"target\",\"type\":\"address\"},{\"internalType\":\"bytes\",\"name\":\"data\",\"type\":\"bytes\"}],\"internalType\":\"struct AuxiliaryCommandsAggregator.Call[]\",\"name\":\"calls\",\"type\":\"tuple[]\"}],\"stateMutability\":\"view\",\"type\":\"function\"}],\"devdoc\":{\"author\":\"Venus\",\"kind\":\"dev\",\"methods\":{\"addBatch((address,bytes)[])\":{\"params\":{\"calls\":\"Non-empty array of (target, calldata) pairs to store.\"},\"returns\":{\"index\":\"The storage index of the newly added batch.\"}},\"executeBatch(uint256)\":{\"params\":{\"index\":\"Index of the batch to execute.\"}},\"getBatch(uint256)\":{\"params\":{\"index\":\"Index of the batch to retrieve.\"},\"returns\":{\"calls\":\"The full array of (target, data) pairs.\"}}},\"title\":\"AuxiliaryCommandsAggregator\",\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{\"addBatch((address,bytes)[])\":{\"notice\":\"Append a new batch of calls.\"},\"batchCount()\":{\"notice\":\"Returns the number of batches stored; the next addBatch() call will use this as its index.\"},\"batches(uint256,uint256)\":{\"notice\":\"2-D array of pre-seeded call batches; index 0 is the first batch added.\"},\"executeBatch(uint256)\":{\"notice\":\"Execute every call in batch `index` sequentially.\"},\"getBatch(uint256)\":{\"notice\":\"Return all calls stored in batch `index`.\"}},\"notice\":\"Stores pre-seeded batches of generic on-chain calls and executes them in one go,         reducing the calldata footprint of governance proposals that would otherwise exceed         GovernorBravo's gas limit when encoding many large-array parameters.\",\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/Utils/AuxiliaryCommandsAggregator.sol\":\"AuxiliaryCommandsAggregator\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":10000},\"remappings\":[]},\"sources\":{\"contracts/Utils/AuxiliaryCommandsAggregator.sol\":{\"content\":\"// SPDX-License-Identifier: BSD-3-Clause\\npragma solidity 0.8.25;\\n\\n/**\\n * @title AuxiliaryCommandsAggregator\\n * @author Venus\\n * @notice Stores pre-seeded batches of generic on-chain calls and executes them in one go,\\n *         reducing the calldata footprint of governance proposals that would otherwise exceed\\n *         GovernorBravo's gas limit when encoding many large-array parameters.\\n */\\ncontract AuxiliaryCommandsAggregator {\\n    struct Call {\\n        address target;\\n        bytes data;\\n    }\\n\\n    /// @notice 2-D array of pre-seeded call batches; index 0 is the first batch added.\\n    Call[][] public batches;\\n\\n    event BatchAdded(uint256 index);\\n    event BatchExecuted(uint256 index);\\n\\n    error EmptyCalls();\\n    error CallFailed(uint256 batchIndex, uint256 callIndex);\\n    error BatchNotFound(uint256 index);\\n\\n    /**\\n     * @notice Append a new batch of calls.\\n     * @param calls Non-empty array of (target, calldata) pairs to store.\\n     * @return index The storage index of the newly added batch.\\n     */\\n    function addBatch(Call[] calldata calls) external returns (uint256 index) {\\n        if (calls.length == 0) revert EmptyCalls();\\n        index = batches.length;\\n        batches.push();\\n        for (uint256 i; i < calls.length; ++i) {\\n            batches[index].push(calls[i]);\\n        }\\n        emit BatchAdded(index);\\n    }\\n\\n    /**\\n     * @notice Execute every call in batch `index` sequentially.\\n     * @param index Index of the batch to execute.\\n     */\\n    function executeBatch(uint256 index) external {\\n        if (index >= batches.length) revert BatchNotFound(index);\\n        uint256 length = batches[index].length;\\n        for (uint256 i; i < length; ++i) {\\n            Call memory c = batches[index][i];\\n            (bool success, ) = c.target.call(c.data);\\n            if (!success) revert CallFailed(index, i);\\n        }\\n        emit BatchExecuted(index);\\n    }\\n\\n    /// @notice Returns the number of batches stored; the next addBatch() call will use this as its index.\\n    function batchCount() external view returns (uint256) {\\n        return batches.length;\\n    }\\n\\n    /**\\n     * @notice Return all calls stored in batch `index`.\\n     * @param index Index of the batch to retrieve.\\n     * @return calls The full array of (target, data) pairs.\\n     */\\n    function getBatch(uint256 index) external view returns (Call[] memory calls) {\\n        if (index >= batches.length) revert BatchNotFound(index);\\n        return batches[index];\\n    }\\n}\\n\",\"keccak256\":\"0xe1db5988ba7b5a54ad477fc6d65e1e55d8be8c7025d3429c5f40e6c8dd888ec3\",\"license\":\"BSD-3-Clause\"}},\"version\":1}",
+  "bytecode": "0x6080604052348015600f57600080fd5b50610bb78061001f6000396000f3fe608060405234801561001057600080fd5b50600436106100675760003560e01c80635ac44282116100505780635ac44282146100965780635d47964b146100b6578063f8b94e9e146100d757600080fd5b806306f130561461006c578063410d59a514610083575b600080fd5b6000545b6040519081526020015b60405180910390f35b6100706100913660046106a2565b6100ec565b6100a96100a4366004610717565b6101e6565b60405161007a919061079e565b6100c96100c4366004610848565b61035a565b60405161007a92919061086a565b6100ea6100e5366004610717565b610443565b005b6000818103610127576040517fc85f6bec00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5060008054600181018255818052905b828110156101ac5760008281548110610152576101526108a1565b9060005260206000200184848381811061016e5761016e6108a1565b905060200281019061018091906108d0565b8154600181018355600092835260209092209091600202016101a282826109b2565b5050600101610137565b506040518181527f0278bcfa1a94f0a168289d029af7b7c13d59e41a96f6d3ce21a05eb0b0e1933c9060200160405180910390a192915050565b600054606090821061022c576040517f9de3becd000000000000000000000000000000000000000000000000000000008152600481018390526024015b60405180910390fd5b6000828154811061023f5761023f6108a1565b90600052602060002001805480602002602001604051908101604052809291908181526020016000905b8282101561034f5760008481526020908190206040805180820190915260028502909101805473ffffffffffffffffffffffffffffffffffffffff16825260018101805492939192918401916102be9061090e565b80601f01602080910402602001604051908101604052809291908181526020018280546102ea9061090e565b80156103375780601f1061030c57610100808354040283529160200191610337565b820191906000526020600020905b81548152906001019060200180831161031a57829003601f168201915b50505050508152505081526020019060010190610269565b505050509050919050565b6000828154811061036a57600080fd5b90600052602060002001818154811061038257600080fd5b60009182526020909120600290910201805460018201805473ffffffffffffffffffffffffffffffffffffffff90921694509192506103c09061090e565b80601f01602080910402602001604051908101604052809291908181526020018280546103ec9061090e565b80156104395780601f1061040e57610100808354040283529160200191610439565b820191906000526020600020905b81548152906001019060200180831161041c57829003601f168201915b5050505050905082565b6000548110610481576040517f9de3becd00000000000000000000000000000000000000000000000000000000815260048101829052602401610223565b6000808281548110610495576104956108a1565b600091825260208220015491505b8181101561066a5760008084815481106104bf576104bf6108a1565b9060005260206000200182815481106104da576104da6108a1565b600091825260209182902060408051808201909152600290920201805473ffffffffffffffffffffffffffffffffffffffff16825260018101805492939192918401916105269061090e565b80601f01602080910402602001604051908101604052809291908181526020018280546105529061090e565b801561059f5780601f106105745761010080835404028352916020019161059f565b820191906000526020600020905b81548152906001019060200180831161058257829003601f168201915b50505050508152505090506000816000015173ffffffffffffffffffffffffffffffffffffffff1682602001516040516105d99190610b6f565b6000604051808303816000865af19150503d8060008114610616576040519150601f19603f3d011682016040523d82523d6000602084013e61061b565b606091505b5050905080610660576040517f2da5c6610000000000000000000000000000000000000000000000000000000081526004810186905260248101849052604401610223565b50506001016104a3565b506040518281527fe9cc9bbe7de1cbb097a6357ca3182909488efe8d793e25665befc064a02d10a79060200160405180910390a15050565b600080602083850312156106b557600080fd5b823567ffffffffffffffff808211156106cd57600080fd5b818501915085601f8301126106e157600080fd5b8135818111156106f057600080fd5b8660208260051b850101111561070557600080fd5b60209290920196919550909350505050565b60006020828403121561072957600080fd5b5035919050565b60005b8381101561074b578181015183820152602001610733565b50506000910152565b6000815180845261076c816020860160208601610730565b601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0169290920160200192915050565b600060208083018184528085518083526040925060408601915060408160051b87010184880160005b8381101561083a578883037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc00185528151805173ffffffffffffffffffffffffffffffffffffffff16845287015187840187905261082787850182610754565b95880195935050908601906001016107c7565b509098975050505050505050565b6000806040838503121561085b57600080fd5b50508035926020909101359150565b73ffffffffffffffffffffffffffffffffffffffff831681526040602082015260006108996040830184610754565b949350505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b600082357fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc183360301811261090457600080fd5b9190910192915050565b600181811c9082168061092257607f821691505b60208210810361095b577f4e487b7100000000000000000000000000000000000000000000000000000000600052602260045260246000fd5b50919050565b601f8211156109ad576000816000526020600020601f850160051c8101602086101561098a5750805b601f850160051c820191505b818110156109a957828155600101610996565b5050505b505050565b813573ffffffffffffffffffffffffffffffffffffffff81168082146109d757600080fd5b82547fffffffffffffffffffffffff000000000000000000000000000000000000000016178255506001808201602084810135368690037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe1018112610a3b57600080fd5b8501803567ffffffffffffffff811115610a5457600080fd5b8036038383011315610a6557600080fd5b610a7981610a73865461090e565b86610961565b6000601f821160018114610acd5760008315610a9757508382018501355b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600385901b1c1916600184901b178655610b64565b6000868152602090207fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0841690835b82811015610b1b57868501880135825593870193908901908701610afc565b5084821015610b58577fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff60f88660031b161c198785880101351681555b505060018360011b0186555b505050505050505050565b6000825161090481846020870161073056fea2646970667358221220ff63622e955ef812bef9c90c28ad9aa331f413fb105967b8397072b2c40fbe7864736f6c63430008190033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b50600436106100675760003560e01c80635ac44282116100505780635ac44282146100965780635d47964b146100b6578063f8b94e9e146100d757600080fd5b806306f130561461006c578063410d59a514610083575b600080fd5b6000545b6040519081526020015b60405180910390f35b6100706100913660046106a2565b6100ec565b6100a96100a4366004610717565b6101e6565b60405161007a919061079e565b6100c96100c4366004610848565b61035a565b60405161007a92919061086a565b6100ea6100e5366004610717565b610443565b005b6000818103610127576040517fc85f6bec00000000000000000000000000000000000000000000000000000000815260040160405180910390fd5b5060008054600181018255818052905b828110156101ac5760008281548110610152576101526108a1565b9060005260206000200184848381811061016e5761016e6108a1565b905060200281019061018091906108d0565b8154600181018355600092835260209092209091600202016101a282826109b2565b5050600101610137565b506040518181527f0278bcfa1a94f0a168289d029af7b7c13d59e41a96f6d3ce21a05eb0b0e1933c9060200160405180910390a192915050565b600054606090821061022c576040517f9de3becd000000000000000000000000000000000000000000000000000000008152600481018390526024015b60405180910390fd5b6000828154811061023f5761023f6108a1565b90600052602060002001805480602002602001604051908101604052809291908181526020016000905b8282101561034f5760008481526020908190206040805180820190915260028502909101805473ffffffffffffffffffffffffffffffffffffffff16825260018101805492939192918401916102be9061090e565b80601f01602080910402602001604051908101604052809291908181526020018280546102ea9061090e565b80156103375780601f1061030c57610100808354040283529160200191610337565b820191906000526020600020905b81548152906001019060200180831161031a57829003601f168201915b50505050508152505081526020019060010190610269565b505050509050919050565b6000828154811061036a57600080fd5b90600052602060002001818154811061038257600080fd5b60009182526020909120600290910201805460018201805473ffffffffffffffffffffffffffffffffffffffff90921694509192506103c09061090e565b80601f01602080910402602001604051908101604052809291908181526020018280546103ec9061090e565b80156104395780601f1061040e57610100808354040283529160200191610439565b820191906000526020600020905b81548152906001019060200180831161041c57829003601f168201915b5050505050905082565b6000548110610481576040517f9de3becd00000000000000000000000000000000000000000000000000000000815260048101829052602401610223565b6000808281548110610495576104956108a1565b600091825260208220015491505b8181101561066a5760008084815481106104bf576104bf6108a1565b9060005260206000200182815481106104da576104da6108a1565b600091825260209182902060408051808201909152600290920201805473ffffffffffffffffffffffffffffffffffffffff16825260018101805492939192918401916105269061090e565b80601f01602080910402602001604051908101604052809291908181526020018280546105529061090e565b801561059f5780601f106105745761010080835404028352916020019161059f565b820191906000526020600020905b81548152906001019060200180831161058257829003601f168201915b50505050508152505090506000816000015173ffffffffffffffffffffffffffffffffffffffff1682602001516040516105d99190610b6f565b6000604051808303816000865af19150503d8060008114610616576040519150601f19603f3d011682016040523d82523d6000602084013e61061b565b606091505b5050905080610660576040517f2da5c6610000000000000000000000000000000000000000000000000000000081526004810186905260248101849052604401610223565b50506001016104a3565b506040518281527fe9cc9bbe7de1cbb097a6357ca3182909488efe8d793e25665befc064a02d10a79060200160405180910390a15050565b600080602083850312156106b557600080fd5b823567ffffffffffffffff808211156106cd57600080fd5b818501915085601f8301126106e157600080fd5b8135818111156106f057600080fd5b8660208260051b850101111561070557600080fd5b60209290920196919550909350505050565b60006020828403121561072957600080fd5b5035919050565b60005b8381101561074b578181015183820152602001610733565b50506000910152565b6000815180845261076c816020860160208601610730565b601f017fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0169290920160200192915050565b600060208083018184528085518083526040925060408601915060408160051b87010184880160005b8381101561083a578883037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc00185528151805173ffffffffffffffffffffffffffffffffffffffff16845287015187840187905261082787850182610754565b95880195935050908601906001016107c7565b509098975050505050505050565b6000806040838503121561085b57600080fd5b50508035926020909101359150565b73ffffffffffffffffffffffffffffffffffffffff831681526040602082015260006108996040830184610754565b949350505050565b7f4e487b7100000000000000000000000000000000000000000000000000000000600052603260045260246000fd5b600082357fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffc183360301811261090457600080fd5b9190910192915050565b600181811c9082168061092257607f821691505b60208210810361095b577f4e487b7100000000000000000000000000000000000000000000000000000000600052602260045260246000fd5b50919050565b601f8211156109ad576000816000526020600020601f850160051c8101602086101561098a5750805b601f850160051c820191505b818110156109a957828155600101610996565b5050505b505050565b813573ffffffffffffffffffffffffffffffffffffffff81168082146109d757600080fd5b82547fffffffffffffffffffffffff000000000000000000000000000000000000000016178255506001808201602084810135368690037fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe1018112610a3b57600080fd5b8501803567ffffffffffffffff811115610a5457600080fd5b8036038383011315610a6557600080fd5b610a7981610a73865461090e565b86610961565b6000601f821160018114610acd5760008315610a9757508382018501355b7fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff600385901b1c1916600184901b178655610b64565b6000868152602090207fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffe0841690835b82811015610b1b57868501880135825593870193908901908701610afc565b5084821015610b58577fffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff60f88660031b161c198785880101351681555b505060018360011b0186555b505050505050505050565b6000825161090481846020870161073056fea2646970667358221220ff63622e955ef812bef9c90c28ad9aa331f413fb105967b8397072b2c40fbe7864736f6c63430008190033",
+  "devdoc": {
+    "author": "Venus",
+    "kind": "dev",
+    "methods": {
+      "addBatch((address,bytes)[])": {
+        "params": {
+          "calls": "Non-empty array of (target, calldata) pairs to store."
+        },
+        "returns": {
+          "index": "The storage index of the newly added batch."
+        }
+      },
+      "executeBatch(uint256)": {
+        "params": {
+          "index": "Index of the batch to execute."
+        }
+      },
+      "getBatch(uint256)": {
+        "params": {
+          "index": "Index of the batch to retrieve."
+        },
+        "returns": {
+          "calls": "The full array of (target, data) pairs."
+        }
+      }
+    },
+    "title": "AuxiliaryCommandsAggregator",
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {
+      "addBatch((address,bytes)[])": {
+        "notice": "Append a new batch of calls."
+      },
+      "batchCount()": {
+        "notice": "Returns the number of batches stored; the next addBatch() call will use this as its index."
+      },
+      "batches(uint256,uint256)": {
+        "notice": "2-D array of pre-seeded call batches; index 0 is the first batch added."
+      },
+      "executeBatch(uint256)": {
+        "notice": "Execute every call in batch `index` sequentially."
+      },
+      "getBatch(uint256)": {
+        "notice": "Return all calls stored in batch `index`."
+      }
+    },
+    "notice": "Stores pre-seeded batches of generic on-chain calls and executes them in one go,         reducing the calldata footprint of governance proposals that would otherwise exceed         GovernorBravo's gas limit when encoding many large-array parameters.",
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 13,
+        "contract": "contracts/Utils/AuxiliaryCommandsAggregator.sol:AuxiliaryCommandsAggregator",
+        "label": "batches",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_array(t_array(t_struct(Call)7_storage)dyn_storage)dyn_storage"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_array(t_array(t_struct(Call)7_storage)dyn_storage)dyn_storage": {
+        "base": "t_array(t_struct(Call)7_storage)dyn_storage",
+        "encoding": "dynamic_array",
+        "label": "struct AuxiliaryCommandsAggregator.Call[][]",
+        "numberOfBytes": "32"
+      },
+      "t_array(t_struct(Call)7_storage)dyn_storage": {
+        "base": "t_struct(Call)7_storage",
+        "encoding": "dynamic_array",
+        "label": "struct AuxiliaryCommandsAggregator.Call[]",
+        "numberOfBytes": "32"
+      },
+      "t_bytes_storage": {
+        "encoding": "bytes",
+        "label": "bytes",
+        "numberOfBytes": "32"
+      },
+      "t_struct(Call)7_storage": {
+        "encoding": "inplace",
+        "label": "struct AuxiliaryCommandsAggregator.Call",
+        "members": [
+          {
+            "astId": 4,
+            "contract": "contracts/Utils/AuxiliaryCommandsAggregator.sol:AuxiliaryCommandsAggregator",
+            "label": "target",
+            "offset": 0,
+            "slot": "0",
+            "type": "t_address"
+          },
+          {
+            "astId": 6,
+            "contract": "contracts/Utils/AuxiliaryCommandsAggregator.sol:AuxiliaryCommandsAggregator",
+            "label": "data",
+            "offset": 0,
+            "slot": "1",
+            "type": "t_bytes_storage"
+          }
+        ],
+        "numberOfBytes": "64"
+      }
+    }
+  }
+}
