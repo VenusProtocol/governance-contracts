@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
 
-import { IAccessControlManagerV8 } from "../Governance/IAccessControlManagerV8.sol";
-import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
+import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
 
 /**
  * @title AuxiliaryCommandsAggregator
@@ -11,17 +10,20 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  *         reducing the calldata footprint of governance proposals that would otherwise exceed
  *         GovernorBravo's gas limit when encoding many large-array parameters.
  */
-contract AuxiliaryCommandsAggregator {
+contract AuxiliaryCommandsAggregator is AccessControlledV8 {
     struct Call {
         address target;
         bytes data;
     }
 
-    /// @notice Access control manager contract
-    IAccessControlManagerV8 public immutable ACM;
-
     /// @notice 2-D array of pre-seeded call batches; index 0 is the first batch added.
     Call[][] public batches;
+
+    /**
+     * @dev This empty reserved space is put in place to allow future versions to add new
+     * variables without shifting down storage in the inheritance chain.
+     */
+    uint256[49] private __gap;
 
     event BatchAdded(uint256 index);
     event BatchExecuted(uint256 index);
@@ -30,16 +32,17 @@ contract AuxiliaryCommandsAggregator {
     error CallFailed(uint256 batchIndex, uint256 callIndex);
     error BatchNotFound(uint256 index);
 
-    /// @notice Thrown when the caller is not permitted by the AccessControlManager.
-    error Unauthorized(address sender, string methodSignature);
+    /// @custom:oz-upgrades-unsafe-allow constructor
+    constructor() {
+        _disableInitializers();
+    }
 
     /**
-     * @notice Constructor to set the access control manager.
-     * @param _acm Address of the access control manager.
+     * @notice Initializes the contract with the AccessControlManager.
+     * @param accessControlManager_ Address of the access control manager.
      */
-    constructor(IAccessControlManagerV8 _acm) {
-        ensureNonzeroAddress(address(_acm));
-        ACM = _acm;
+    function initialize(address accessControlManager_) external initializer {
+        __AccessControlled_init(accessControlManager_);
     }
 
     /**
@@ -49,7 +52,7 @@ contract AuxiliaryCommandsAggregator {
      * @custom:access Controlled by AccessControlManager
      */
     function addBatch(Call[] calldata calls) external returns (uint256 index) {
-        _checkAccessAllowed("addBatch(Call[])");
+        _checkAccessAllowed("addBatch((address,bytes)[])");
         if (calls.length == 0) revert EmptyCalls();
         index = batches.length;
         batches.push();
@@ -89,15 +92,5 @@ contract AuxiliaryCommandsAggregator {
     function getBatch(uint256 index) external view returns (Call[] memory calls) {
         if (index >= batches.length) revert BatchNotFound(index);
         return batches[index];
-    }
-
-    /**
-     * @notice Reverts if the call is not allowed by the AccessControlManager.
-     * @param signature Method signature being guarded.
-     */
-    function _checkAccessAllowed(string memory signature) internal view {
-        if (!ACM.isAllowedToCall(msg.sender, signature)) {
-            revert Unauthorized(msg.sender, signature);
-        }
     }
 }
