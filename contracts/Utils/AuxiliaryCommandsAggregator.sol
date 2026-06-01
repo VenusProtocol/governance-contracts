@@ -1,6 +1,9 @@
 // SPDX-License-Identifier: BSD-3-Clause
 pragma solidity 0.8.25;
 
+import { IAccessControlManagerV8 } from "../Governance/IAccessControlManagerV8.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
+
 /**
  * @title AuxiliaryCommandsAggregator
  * @author Venus
@@ -14,6 +17,9 @@ contract AuxiliaryCommandsAggregator {
         bytes data;
     }
 
+    /// @notice Access control manager contract
+    IAccessControlManagerV8 public immutable ACM;
+
     /// @notice 2-D array of pre-seeded call batches; index 0 is the first batch added.
     Call[][] public batches;
 
@@ -24,12 +30,26 @@ contract AuxiliaryCommandsAggregator {
     error CallFailed(uint256 batchIndex, uint256 callIndex);
     error BatchNotFound(uint256 index);
 
+    /// @notice Thrown when the caller is not permitted by the AccessControlManager.
+    error Unauthorized(address sender, string methodSignature);
+
+    /**
+     * @notice Constructor to set the access control manager.
+     * @param _acm Address of the access control manager.
+     */
+    constructor(IAccessControlManagerV8 _acm) {
+        ensureNonzeroAddress(address(_acm));
+        ACM = _acm;
+    }
+
     /**
      * @notice Append a new batch of calls.
      * @param calls Non-empty array of (target, calldata) pairs to store.
      * @return index The storage index of the newly added batch.
+     * @custom:access Controlled by AccessControlManager
      */
     function addBatch(Call[] calldata calls) external returns (uint256 index) {
+        _checkAccessAllowed("addBatch(Call[])");
         if (calls.length == 0) revert EmptyCalls();
         index = batches.length;
         batches.push();
@@ -42,8 +62,10 @@ contract AuxiliaryCommandsAggregator {
     /**
      * @notice Execute every call in batch `index` sequentially.
      * @param index Index of the batch to execute.
+     * @custom:access Controlled by AccessControlManager
      */
     function executeBatch(uint256 index) external {
+        _checkAccessAllowed("executeBatch(uint256)");
         if (index >= batches.length) revert BatchNotFound(index);
         uint256 length = batches[index].length;
         for (uint256 i; i < length; ++i) {
@@ -67,5 +89,15 @@ contract AuxiliaryCommandsAggregator {
     function getBatch(uint256 index) external view returns (Call[] memory calls) {
         if (index >= batches.length) revert BatchNotFound(index);
         return batches[index];
+    }
+
+    /**
+     * @notice Reverts if the call is not allowed by the AccessControlManager.
+     * @param signature Method signature being guarded.
+     */
+    function _checkAccessAllowed(string memory signature) internal view {
+        if (!ACM.isAllowedToCall(msg.sender, signature)) {
+            revert Unauthorized(msg.sender, signature);
+        }
     }
 }
