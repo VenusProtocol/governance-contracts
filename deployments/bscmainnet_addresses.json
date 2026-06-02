@@ -4,6 +4,9 @@
   "addresses": {
     "ACMCommandsAggregator": "0x8b443Ea6726E56DF4C4F62f80F0556bB9B2a7c64",
     "AccessControlManager": "0x4788629abc6cfca10f9f969efdeaa1cf70c23555",
+    "AuxiliaryCommandsAggregator": "0x528A428748dfE73DFcc844176B401475D1831057",
+    "AuxiliaryCommandsAggregator_Implementation": "0x68C120C4b35874593EE494faf4Db6deFcEFf53b4",
+    "AuxiliaryCommandsAggregator_Proxy": "0x528A428748dfE73DFcc844176B401475D1831057",
     "CollateralFactorsRiskSteward": "0x1414ADf007E324ec1D0A77b9F1A8759Ad33d2879",
     "CollateralFactorsRiskSteward_Implementation": "0x92352572478965A0377F57a4A2bebb4B369c22d4",
     "CollateralFactorsRiskSteward_Proxy": "0x1414ADf007E324ec1D0A77b9F1A8759Ad33d2879",

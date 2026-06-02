@@ -4,6 +4,9 @@
   "addresses": {
     "ACMCommandsAggregator": "0xb78772bed6995551b64e54Cdb8e09800d86C73ee",
     "AccessControlManager": "0x230058da2D23eb8836EC5DB7037ef7250c56E25E",
+    "AuxiliaryCommandsAggregator": "0xc79Cb7efEBd121DC4B39eA141C214606595D665A",
+    "AuxiliaryCommandsAggregator_Implementation": "0x16691f500541ca35bd63DD878B6D78728C9518AE",
+    "AuxiliaryCommandsAggregator_Proxy": "0xc79Cb7efEBd121DC4B39eA141C214606595D665A",
     "CriticalTimelock": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
     "DefaultProxyAdmin": "0x567e4cc5e085d09f66f836fa8279f38b4e5866b9",
     "FastTrackTimelock": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
