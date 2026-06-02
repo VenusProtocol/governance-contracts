@@ -3,6 +3,7 @@ import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 const SUPPORTED_NETWORKS = [
+  "bscmainnet",
   "ethereum",
   "sepolia",
   "arbitrumone",
