@@ -2,6 +2,7 @@
 pragma solidity 0.8.25;
 
 import { AccessControlledV8 } from "../Governance/AccessControlledV8.sol";
+import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contracts/validators.sol";
 
 /**
  * @title AuxiliaryCommandsAggregator
@@ -19,6 +20,9 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
     /// @notice 2-D array of pre-seeded call batches; index 0 is the first batch added.
     Call[][] public batches;
 
+    /// @notice Addresses authorized to call addBatch.
+    mapping(address => bool) public authorizedBatchers;
+
     /**
      * @dev This empty reserved space is put in place to allow future versions to add new
      * variables without shifting down storage in the inheritance chain.
@@ -27,10 +31,21 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
 
     event BatchAdded(uint256 index);
     event BatchExecuted(uint256 index);
+    event AuthorizedBatcherUpdated(address indexed account, bool authorized);
 
     error EmptyCalls();
+    error InvalidArrayLength();
     error CallFailed(uint256 batchIndex, uint256 callIndex);
     error BatchNotFound(uint256 index);
+
+    /// @notice Thrown when an unauthorized account tries to add a batch.
+    error NotAllowedToBatchCommands(address sender);
+
+    /// @notice Restricts a function to addresses authorized to add batches.
+    modifier onlyAuthorizedBatcher() {
+        if (!authorizedBatchers[msg.sender]) revert NotAllowedToBatchCommands(msg.sender);
+        _;
+    }
 
     /// @custom:oz-upgrades-unsafe-allow constructor
     constructor() {
@@ -46,13 +61,41 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
     }
 
     /**
+     * @notice Authorize accounts to call addBatch.
+     * @param accounts Non-empty array of addresses to authorize as batchers.
+     * @custom:access Controlled by AccessControlManager
+     */
+    function addAuthorizedBatchers(address[] calldata accounts) external {
+        _checkAccessAllowed("addAuthorizedBatchers(address[])");
+        if (accounts.length == 0) revert InvalidArrayLength();
+        for (uint256 i; i < accounts.length; ++i) {
+            ensureNonzeroAddress(accounts[i]);
+            authorizedBatchers[accounts[i]] = true;
+            emit AuthorizedBatcherUpdated(accounts[i], true);
+        }
+    }
+
+    /**
+     * @notice Revoke accounts' authorization to call addBatch.
+     * @param accounts Non-empty array of batcher addresses to revoke.
+     * @custom:access Controlled by AccessControlManager
+     */
+    function removeAuthorizedBatchers(address[] calldata accounts) external {
+        _checkAccessAllowed("removeAuthorizedBatchers(address[])");
+        if (accounts.length == 0) revert InvalidArrayLength();
+        for (uint256 i; i < accounts.length; ++i) {
+            authorizedBatchers[accounts[i]] = false;
+            emit AuthorizedBatcherUpdated(accounts[i], false);
+        }
+    }
+
+    /**
      * @notice Append a new batch of calls.
      * @param calls Non-empty array of (target, calldata) pairs to store.
      * @return index The storage index of the newly added batch.
-     * @custom:access Controlled by AccessControlManager
+     * @custom:access Restricted to authorized batchers
      */
-    function addBatch(Call[] calldata calls) external returns (uint256 index) {
-        _checkAccessAllowed("addBatch((address,bytes)[])");
+    function addBatch(Call[] calldata calls) external onlyAuthorizedBatcher returns (uint256 index) {
         if (calls.length == 0) revert EmptyCalls();
         index = batches.length;
         batches.push();
