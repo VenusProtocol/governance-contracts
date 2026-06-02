@@ -38,6 +38,9 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
     error CallFailed(uint256 batchIndex, uint256 callIndex);
     error BatchNotFound(uint256 index);
 
+    /// @notice Thrown when the caller-provided index does not match the index the batch would be stored at.
+    error InvalidBatchIndex(uint256 expected, uint256 actual);
+
     /// @notice Thrown when an unauthorized account tries to add a batch.
     error NotAllowedToBatchCommands(address sender);
 
@@ -96,6 +99,32 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
      * @custom:access Restricted to authorized batchers
      */
     function addBatch(Call[] calldata calls) external onlyAuthorizedBatcher returns (uint256 index) {
+        return _addBatch(calls);
+    }
+
+    /**
+     * @notice Append a new batch of calls, asserting it is stored at `expectedIndex`.
+     * @dev Reverts if another batch was added in the meantime, so the
+     *      caller can rely on the returned index matching what it encoded into its proposal.
+     * @param calls Non-empty array of (target, calldata) pairs to store.
+     * @param expectedIndex The index the caller expects this batch to occupy.
+     * @return index The storage index of the newly added batch (equals `expectedIndex`).
+     * @custom:access Restricted to authorized batchers
+     */
+    function addBatch(
+        Call[] calldata calls,
+        uint256 expectedIndex
+    ) external onlyAuthorizedBatcher returns (uint256 index) {
+        if (expectedIndex != batches.length) revert InvalidBatchIndex(expectedIndex, batches.length);
+        return _addBatch(calls);
+    }
+
+    /**
+     * @dev Shared logic for storing a batch of calls.
+     * @param calls Non-empty array of (target, calldata) pairs to store.
+     * @return index The storage index of the newly added batch.
+     */
+    function _addBatch(Call[] calldata calls) internal returns (uint256 index) {
         if (calls.length == 0) revert EmptyCalls();
         index = batches.length;
         batches.push();
