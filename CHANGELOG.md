@@ -1,3 +1,17 @@
+## 2.15.0-dev.1 (2026-06-05)
+
+* Merge pull request #172 from VenusProtocol/main ([c1f040e](https://github.com/VenusProtocol/governance-contracts/commit/c1f040e)), closes [#172](https://github.com/VenusProtocol/governance-contracts/issues/172)
+* Merge pull request #174 from VenusProtocol/feat/command-aggregator ([5b6ab14](https://github.com/VenusProtocol/governance-contracts/commit/5b6ab14)), closes [#174](https://github.com/VenusProtocol/governance-contracts/issues/174)
+* feat: add acm in commands aggregator ([631b551](https://github.com/VenusProtocol/governance-contracts/commit/631b551))
+* feat: add addBatch overload with expected-index check to AuxiliaryCommandsAggregator ([3a11e8e](https://github.com/VenusProtocol/governance-contracts/commit/3a11e8e))
+* feat: add AuxiliaryCommandsAggregator contract ([18a2944](https://github.com/VenusProtocol/governance-contracts/commit/18a2944))
+* feat: add AuxiliaryCommandsAggregator deployments on bscmainnet, ethereum, arbitrumone, basemainnet  ([bd6a654](https://github.com/VenusProtocol/governance-contracts/commit/bd6a654))
+* feat: make AuxillaryCommandsAggregator upgradable ([e538838](https://github.com/VenusProtocol/governance-contracts/commit/e538838))
+* feat: update AuxiliaryCommandsAggregator with ACM-gated execution and batcher allowlist ([ecb5867](https://github.com/VenusProtocol/governance-contracts/commit/ecb5867))
+* feat: updating deployment files ([543bd51](https://github.com/VenusProtocol/governance-contracts/commit/543bd51))
+* feat: updating deployment files ([8ef2ee6](https://github.com/VenusProtocol/governance-contracts/commit/8ef2ee6))
+* fix: update gap length ([360873a](https://github.com/VenusProtocol/governance-contracts/commit/360873a))
+
 ## 2.14.0 (2026-04-10)
 
 * fix [VRR-17] [VRR-18] Missing Redundancy Check ([f4d3fcb](https://github.com/VenusProtocol/governance-contracts/commit/f4d3fcb))
