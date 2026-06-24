@@ -140,7 +140,7 @@ describe("Governor Bravo State Tests", () => {
     expect(await governorBravoDelegate.state(trivialProposal.id)).to.equal(ProposalState.Defeated);
   });
   it("Succeeded", async () => {
-    xvsVault.getPriorVotes.returns(convertToUnit("300000", 18));
+    xvsVault.getPriorVotes.returns(convertToUnit("1500000", 18));
     await governorBravoDelegate
       .connect(customer)
       .propose(targets, values, signatures, calldatas, "do nothing", ProposalType.CRITICAL);
@@ -152,7 +152,7 @@ describe("Governor Bravo State Tests", () => {
     expect(await governorBravoDelegate.state(newProposalId)).to.equal(ProposalState.Succeeded);
   });
   it("Expired", async () => {
-    xvsVault.getPriorVotes.returns(convertToUnit("300000", 18));
+    xvsVault.getPriorVotes.returns(convertToUnit("1500000", 18));
     await governorBravoDelegate
       .connect(customer)
       .propose(targets, values, signatures, calldatas, "do nothing", ProposalType.CRITICAL);
@@ -167,7 +167,7 @@ describe("Governor Bravo State Tests", () => {
   it("Queued", async () => {
     timelock.delay.returns(100);
     await mineBlock();
-    xvsVault.getPriorVotes.returns(convertToUnit("300000", 18));
+    xvsVault.getPriorVotes.returns(convertToUnit("1500000", 18));
     await governorBravoDelegate
       .connect(customer)
       .propose(targets, values, signatures, calldatas, "do nothing", ProposalType.CRITICAL);
@@ -181,7 +181,7 @@ describe("Governor Bravo State Tests", () => {
   });
 
   it("Executed", async () => {
-    xvsVault.getPriorVotes.returns(convertToUnit("300000", 18));
+    xvsVault.getPriorVotes.returns(convertToUnit("1500000", 18));
     timelock.delay.returns(100);
     await governorBravoDelegate
       .connect(customer)
