@@ -188,6 +188,10 @@ describe("Governor Bravo Configuration Setter Test", () => {
       expect(await governorBravoDelegate.MAX_PROPOSAL_THRESHOLD()).to.equal(ethers.utils.parseUnits("1000000", 18));
     });
 
+    it("should have quorumVotes set to 1,500,000 XVS", async () => {
+      expect(await governorBravoDelegate.quorumVotes()).to.equal(ethers.utils.parseUnits("1500000", 18));
+    });
+
     it("should accept proposalThreshold up to 1,000,000 XVS for all routes", async () => {
       const oneMillion = ethers.utils.parseUnits("1000000", 18).toString();
       const configs = updatedProposalConfigs.map(obj => ({ ...obj, proposalThreshold: oneMillion }));
