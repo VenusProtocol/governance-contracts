@@ -51,19 +51,19 @@ const proposalConfigs = {
   0: {
     votingDelay: 1,
     votingPeriod: 4,
-    proposalThreshold: convertToUnit("150000", 18),
+    proposalThreshold: convertToUnit("1000000", 18),
   },
   // ProposalType.FASTTRACK
   1: {
     votingDelay: 1,
     votingPeriod: 8,
-    proposalThreshold: convertToUnit("200000", 18),
+    proposalThreshold: convertToUnit("1000000", 18),
   },
   // ProposalType.CRITICAL
   2: {
     votingDelay: 1,
     votingPeriod: 16,
-    proposalThreshold: convertToUnit("250000", 18),
+    proposalThreshold: convertToUnit("1000000", 18),
   },
 };
 
