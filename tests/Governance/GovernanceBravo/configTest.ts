@@ -183,5 +183,29 @@ describe("Governor Bravo Configuration Setter Test", () => {
       expect(activeCriticalProposalConfig.votingDelay).to.be.equal(updatedProposalConfigs[2].votingDelay);
       expect(activeCriticalProposalConfig.proposalThreshold).to.be.equal(updatedProposalConfigs[2].proposalThreshold);
     });
+
+    it("should have MAX_PROPOSAL_THRESHOLD set to 1,000,000 XVS", async () => {
+      expect(await governorBravoDelegate.MAX_PROPOSAL_THRESHOLD()).to.equal(ethers.utils.parseUnits("1000000", 18));
+    });
+
+    it("should accept proposalThreshold up to 1,000,000 XVS for all routes", async () => {
+      const oneMillion = ethers.utils.parseUnits("1000000", 18).toString();
+      const configs = updatedProposalConfigs.map(obj => ({ ...obj, proposalThreshold: oneMillion }));
+
+      await governorBravoDelegate.setProposalConfigs(configs);
+
+      expect((await governorBravoDelegate.proposalConfigs(0)).proposalThreshold).to.equal(oneMillion);
+      expect((await governorBravoDelegate.proposalConfigs(1)).proposalThreshold).to.equal(oneMillion);
+      expect((await governorBravoDelegate.proposalConfigs(2)).proposalThreshold).to.equal(oneMillion);
+    });
+
+    it("should revert if proposalThreshold exceeds 1,000,000 XVS", async () => {
+      const aboveMax = ethers.utils.parseUnits("1000000", 18).add(1).toString();
+      const configs = updatedProposalConfigs.map(obj => ({ ...obj, proposalThreshold: aboveMax }));
+
+      await expect(governorBravoDelegate.setProposalConfigs(configs)).to.be.revertedWith(
+        "GovernorBravo::setProposalConfigs: invalid max proposal threshold",
+      );
+    });
   });
 });

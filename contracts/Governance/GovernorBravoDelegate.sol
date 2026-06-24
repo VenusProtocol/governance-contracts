@@ -78,7 +78,7 @@ contract GovernorBravoDelegate is GovernorBravoDelegateStorageV3, GovernorBravoE
     uint public constant MIN_PROPOSAL_THRESHOLD = 150000e18; // 150,000 Xvs
 
     /// @notice The maximum setable proposal threshold
-    uint public constant MAX_PROPOSAL_THRESHOLD = 300000e18; //300,000 Xvs
+    uint public constant MAX_PROPOSAL_THRESHOLD = 1000000e18; //1,000,000 Xvs
 
     /// @notice The number of votes in support of a proposal required in order for a quorum to be reached and for a vote to succeed
     uint public constant quorumVotes = 600000e18; // 600,000 = 2% of Xvs
