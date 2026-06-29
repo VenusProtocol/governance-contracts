@@ -1,3 +1,13 @@
+## 2.15.0-dev.2 (2026-06-29)
+
+* Merge pull request #175 from VenusProtocol/feat/increase-proposal-Threshold ([b35c8f0](https://github.com/VenusProtocol/governance-contracts/commit/b35c8f0)), closes [#175](https://github.com/VenusProtocol/governance-contracts/issues/175)
+* test(governance): align proposal threshold to 1M and voting power to 1.5M quorum ([dda8e7c](https://github.com/VenusProtocol/governance-contracts/commit/dda8e7c))
+* test(governance): raise mocked vote weight to clear 1.5M quorum ([3e794be](https://github.com/VenusProtocol/governance-contracts/commit/3e794be))
+* feat: updating deployment files ([99f12f0](https://github.com/VenusProtocol/governance-contracts/commit/99f12f0))
+* feat: updating deployment files ([ad2d364](https://github.com/VenusProtocol/governance-contracts/commit/ad2d364))
+* feat(governance): raise GovernorBravo max proposal threshold to 1M XVS ([730aa23](https://github.com/VenusProtocol/governance-contracts/commit/730aa23))
+* feat(governance): raise GovernorBravo quorum to 1.5M XVS ([3ffdb92](https://github.com/VenusProtocol/governance-contracts/commit/3ffdb92))
+
 ## 2.15.0-dev.1 (2026-06-05)
 
 * Merge pull request #172 from VenusProtocol/main ([c1f040e](https://github.com/VenusProtocol/governance-contracts/commit/c1f040e)), closes [#172](https://github.com/VenusProtocol/governance-contracts/issues/172)
