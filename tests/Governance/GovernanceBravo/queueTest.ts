@@ -51,19 +51,19 @@ const proposalConfigs = {
   0: {
     votingDelay: 1,
     votingPeriod: 4,
-    proposalThreshold: convertToUnit("150000", 18),
+    proposalThreshold: convertToUnit("1000000", 18),
   },
   // ProposalType.FASTTRACK
   1: {
     votingDelay: 1,
     votingPeriod: 8,
-    proposalThreshold: convertToUnit("200000", 18),
+    proposalThreshold: convertToUnit("1000000", 18),
   },
   // ProposalType.CRITICAL
   2: {
     votingDelay: 1,
     votingPeriod: 16,
-    proposalThreshold: convertToUnit("250000", 18),
+    proposalThreshold: convertToUnit("1000000", 18),
   },
 };
 
@@ -82,7 +82,7 @@ describe("Governor Bravo Queue Tests", () => {
     await governorBravoDelegate.setVariable("xvsVault", xvsVault.address);
     await governorBravoDelegate.setVariable("proposalMaxOperations", 10);
     xvsToken.balanceOf.returns(400001);
-    xvsVault.getPriorVotes.returns(convertToUnit("600000", 18));
+    xvsVault.getPriorVotes.returns(convertToUnit("1500000", 18));
     await governorBravoDelegate.setVariable("proposalConfigs", proposalConfigs);
     await governorBravoDelegate.setVariable("proposalTimelocks", {
       2: timelock.address,

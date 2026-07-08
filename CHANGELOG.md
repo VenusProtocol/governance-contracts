@@ -1,3 +1,27 @@
+## 2.15.0-dev.2 (2026-06-29)
+
+* Merge pull request #175 from VenusProtocol/feat/increase-proposal-Threshold ([b35c8f0](https://github.com/VenusProtocol/governance-contracts/commit/b35c8f0)), closes [#175](https://github.com/VenusProtocol/governance-contracts/issues/175)
+* test(governance): align proposal threshold to 1M and voting power to 1.5M quorum ([dda8e7c](https://github.com/VenusProtocol/governance-contracts/commit/dda8e7c))
+* test(governance): raise mocked vote weight to clear 1.5M quorum ([3e794be](https://github.com/VenusProtocol/governance-contracts/commit/3e794be))
+* feat: updating deployment files ([99f12f0](https://github.com/VenusProtocol/governance-contracts/commit/99f12f0))
+* feat: updating deployment files ([ad2d364](https://github.com/VenusProtocol/governance-contracts/commit/ad2d364))
+* feat(governance): raise GovernorBravo max proposal threshold to 1M XVS ([730aa23](https://github.com/VenusProtocol/governance-contracts/commit/730aa23))
+* feat(governance): raise GovernorBravo quorum to 1.5M XVS ([3ffdb92](https://github.com/VenusProtocol/governance-contracts/commit/3ffdb92))
+
+## 2.15.0-dev.1 (2026-06-05)
+
+* Merge pull request #172 from VenusProtocol/main ([c1f040e](https://github.com/VenusProtocol/governance-contracts/commit/c1f040e)), closes [#172](https://github.com/VenusProtocol/governance-contracts/issues/172)
+* Merge pull request #174 from VenusProtocol/feat/command-aggregator ([5b6ab14](https://github.com/VenusProtocol/governance-contracts/commit/5b6ab14)), closes [#174](https://github.com/VenusProtocol/governance-contracts/issues/174)
+* feat: add acm in commands aggregator ([631b551](https://github.com/VenusProtocol/governance-contracts/commit/631b551))
+* feat: add addBatch overload with expected-index check to AuxiliaryCommandsAggregator ([3a11e8e](https://github.com/VenusProtocol/governance-contracts/commit/3a11e8e))
+* feat: add AuxiliaryCommandsAggregator contract ([18a2944](https://github.com/VenusProtocol/governance-contracts/commit/18a2944))
+* feat: add AuxiliaryCommandsAggregator deployments on bscmainnet, ethereum, arbitrumone, basemainnet  ([bd6a654](https://github.com/VenusProtocol/governance-contracts/commit/bd6a654))
+* feat: make AuxillaryCommandsAggregator upgradable ([e538838](https://github.com/VenusProtocol/governance-contracts/commit/e538838))
+* feat: update AuxiliaryCommandsAggregator with ACM-gated execution and batcher allowlist ([ecb5867](https://github.com/VenusProtocol/governance-contracts/commit/ecb5867))
+* feat: updating deployment files ([543bd51](https://github.com/VenusProtocol/governance-contracts/commit/543bd51))
+* feat: updating deployment files ([8ef2ee6](https://github.com/VenusProtocol/governance-contracts/commit/8ef2ee6))
+* fix: update gap length ([360873a](https://github.com/VenusProtocol/governance-contracts/commit/360873a))
+
 ## 2.14.0 (2026-04-10)
 
 * fix [VRR-17] [VRR-18] Missing Redundancy Check ([f4d3fcb](https://github.com/VenusProtocol/governance-contracts/commit/f4d3fcb))

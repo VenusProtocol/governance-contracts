@@ -610,6 +610,1278 @@
         }
       ]
     },
+    "AuxiliaryCommandsAggregator": {
+      "address": "0x768FEf3a88ea92cCF9CAcDf0aB15C4B29B3C1379",
+      "abi": [
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "previousAdmin",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "newAdmin",
+              "type": "address"
+            }
+          ],
+          "name": "AdminChanged",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "beacon",
+              "type": "address"
+            }
+          ],
+          "name": "BeaconUpgraded",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "implementation",
+              "type": "address"
+            }
+          ],
+          "name": "Upgraded",
+          "type": "event"
+        },
+        {
+          "stateMutability": "payable",
+          "type": "fallback"
+        },
+        {
+          "inputs": [],
+          "name": "admin",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "admin_",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "implementation",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "implementation_",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newImplementation",
+              "type": "address"
+            }
+          ],
+          "name": "upgradeTo",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newImplementation",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "name": "upgradeToAndCall",
+          "outputs": [],
+          "stateMutability": "payable",
+          "type": "function"
+        },
+        {
+          "stateMutability": "payable",
+          "type": "receive"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "BatchNotFound",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "batchIndex",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "callIndex",
+              "type": "uint256"
+            }
+          ],
+          "name": "CallFailed",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "EmptyCalls",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "InvalidArrayLength",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "expected",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "actual",
+              "type": "uint256"
+            }
+          ],
+          "name": "InvalidBatchIndex",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "NotAllowedToBatchCommands",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "calledContract",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "methodSignature",
+              "type": "string"
+            }
+          ],
+          "name": "Unauthorized",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "ZeroAddressNotAllowed",
+          "type": "error"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "authorized",
+              "type": "bool"
+            }
+          ],
+          "name": "AuthorizedBatcherUpdated",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "BatchAdded",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "BatchExecuted",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint8",
+              "name": "version",
+              "type": "uint8"
+            }
+          ],
+          "name": "Initialized",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "oldAccessControlManager",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "newAccessControlManager",
+              "type": "address"
+            }
+          ],
+          "name": "NewAccessControlManager",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferStarted",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "inputs": [],
+          "name": "acceptOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "accessControlManager",
+          "outputs": [
+            {
+              "internalType": "contract IAccessControlManagerV8",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address[]",
+              "name": "accounts",
+              "type": "address[]"
+            }
+          ],
+          "name": "addAuthorizedBatchers",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "target",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct AuxiliaryCommandsAggregator.Call[]",
+              "name": "calls",
+              "type": "tuple[]"
+            }
+          ],
+          "name": "addBatch",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "target",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct AuxiliaryCommandsAggregator.Call[]",
+              "name": "calls",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "uint256",
+              "name": "expectedIndex",
+              "type": "uint256"
+            }
+          ],
+          "name": "addBatch",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "name": "authorizedBatchers",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "batchCount",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "name": "batches",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "target",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "executeBatch",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "getBatch",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "target",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct AuxiliaryCommandsAggregator.Call[]",
+              "name": "calls",
+              "type": "tuple[]"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "accessControlManager_",
+              "type": "address"
+            }
+          ],
+          "name": "initialize",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "pendingOwner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address[]",
+              "name": "accounts",
+              "type": "address[]"
+            }
+          ],
+          "name": "removeAuthorizedBatchers",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "renounceOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "accessControlManager_",
+              "type": "address"
+            }
+          ],
+          "name": "setAccessControlManager",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "transferOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_logic",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "admin_",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "_data",
+              "type": "bytes"
+            }
+          ],
+          "stateMutability": "payable",
+          "type": "constructor"
+        }
+      ]
+    },
+    "AuxiliaryCommandsAggregator_Implementation": {
+      "address": "0xc79Cb7efEBd121DC4B39eA141C214606595D665A",
+      "abi": [
+        {
+          "inputs": [],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "BatchNotFound",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "batchIndex",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "callIndex",
+              "type": "uint256"
+            }
+          ],
+          "name": "CallFailed",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "EmptyCalls",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "InvalidArrayLength",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "expected",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "actual",
+              "type": "uint256"
+            }
+          ],
+          "name": "InvalidBatchIndex",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "NotAllowedToBatchCommands",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "calledContract",
+              "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "methodSignature",
+              "type": "string"
+            }
+          ],
+          "name": "Unauthorized",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "ZeroAddressNotAllowed",
+          "type": "error"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "bool",
+              "name": "authorized",
+              "type": "bool"
+            }
+          ],
+          "name": "AuthorizedBatcherUpdated",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "BatchAdded",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "BatchExecuted",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "uint8",
+              "name": "version",
+              "type": "uint8"
+            }
+          ],
+          "name": "Initialized",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "oldAccessControlManager",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "newAccessControlManager",
+              "type": "address"
+            }
+          ],
+          "name": "NewAccessControlManager",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferStarted",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "inputs": [],
+          "name": "acceptOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "accessControlManager",
+          "outputs": [
+            {
+              "internalType": "contract IAccessControlManagerV8",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address[]",
+              "name": "accounts",
+              "type": "address[]"
+            }
+          ],
+          "name": "addAuthorizedBatchers",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "target",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct AuxiliaryCommandsAggregator.Call[]",
+              "name": "calls",
+              "type": "tuple[]"
+            }
+          ],
+          "name": "addBatch",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "target",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct AuxiliaryCommandsAggregator.Call[]",
+              "name": "calls",
+              "type": "tuple[]"
+            },
+            {
+              "internalType": "uint256",
+              "name": "expectedIndex",
+              "type": "uint256"
+            }
+          ],
+          "name": "addBatch",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "name": "authorizedBatchers",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "batchCount",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
+            }
+          ],
+          "name": "batches",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "target",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "executeBatch",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "getBatch",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "target",
+                  "type": "address"
+                },
+                {
+                  "internalType": "bytes",
+                  "name": "data",
+                  "type": "bytes"
+                }
+              ],
+              "internalType": "struct AuxiliaryCommandsAggregator.Call[]",
+              "name": "calls",
+              "type": "tuple[]"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "accessControlManager_",
+              "type": "address"
+            }
+          ],
+          "name": "initialize",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "pendingOwner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address[]",
+              "name": "accounts",
+              "type": "address[]"
+            }
+          ],
+          "name": "removeAuthorizedBatchers",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "renounceOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "accessControlManager_",
+              "type": "address"
+            }
+          ],
+          "name": "setAccessControlManager",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "transferOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ]
+    },
+    "AuxiliaryCommandsAggregator_Proxy": {
+      "address": "0x768FEf3a88ea92cCF9CAcDf0aB15C4B29B3C1379",
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "_logic",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "admin_",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "_data",
+              "type": "bytes"
+            }
+          ],
+          "stateMutability": "payable",
+          "type": "constructor"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "previousAdmin",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "newAdmin",
+              "type": "address"
+            }
+          ],
+          "name": "AdminChanged",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "beacon",
+              "type": "address"
+            }
+          ],
+          "name": "BeaconUpgraded",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "implementation",
+              "type": "address"
+            }
+          ],
+          "name": "Upgraded",
+          "type": "event"
+        },
+        {
+          "stateMutability": "payable",
+          "type": "fallback"
+        },
+        {
+          "inputs": [],
+          "name": "admin",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "admin_",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "implementation",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "implementation_",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newImplementation",
+              "type": "address"
+            }
+          ],
+          "name": "upgradeTo",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newImplementation",
+              "type": "address"
+            },
+            {
+              "internalType": "bytes",
+              "name": "data",
+              "type": "bytes"
+            }
+          ],
+          "name": "upgradeToAndCall",
+          "outputs": [],
+          "stateMutability": "payable",
+          "type": "function"
+        },
+        {
+          "stateMutability": "payable",
+          "type": "receive"
+        }
+      ]
+    },
     "CriticalTimelock": {
       "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
       "abi": [
