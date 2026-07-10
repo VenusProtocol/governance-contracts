@@ -1,0 +1,588 @@
+{
+  "signatures": [
+    {
+      "signature": "_reduceReserves(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "_setActionsPaused(address[],uint256[],bool)",
+      "origin": "missingRoleInfo.txt — typo'd grant (should be _setActionsPaused(address[],uint8[],bool)), role since revoked"
+    },
+    {
+      "signature": "_setActionsPaused(address[],uint8[],bool)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "_setCollateralFactor(address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "_setForcedLiquidation(address,bool)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "_setForcedLiquidationForUser(address,address,bool)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "_setInterestRateModel(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "_setLiquidationIncentive(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "_setMarketBorrowCaps(address[],uint256[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "_setMarketSupplyCaps(address[],uint256[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "_setProtocolPaused(bool)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "_setReserveFactor(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "_supportMarket(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "add(address,uint256,address,uint256,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "addMarket(AddMarketInput)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "addMarket(address,address,uint256,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "addMarket(address,uint256,uint256)",
+      "origin": "missingRoleInfo.txt — Wrong function signature, should be addMarket(address,address,uint256,uint256)"
+    },
+    {
+      "signature": "addOrUpdateDistributionConfigs(DistributionConfig[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "addPool(string,address,uint256,uint256,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "addPoolMarkets(uint96[],address[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "addToAllowlist(address,address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "addTokenConverter(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "burn(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "createPool(string)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "dropFailedMessage(uint16,bytes,uint64)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "enableOracle(address,uint8,bool)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "execute(uint16,bytes,bytes,address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "fallbackDeposit(address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "fallbackWithdraw(address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "forceResumeReceive(uint16,bytes)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "fundXVSVault(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "issue(bool,address[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "pause()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "pauseAuctions()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "pauseConversion()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "pauseForceVAILiquidate()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "pauseFundsTransfer()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "removeDistributionConfig(Schema,address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "removeFromAllowlist(address,address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "removeMarket(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "removeMarket(address,address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "removePoolMarket(uint96,address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "removeTokenConverter(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "removeTrustedRemote(uint16)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "restrictLiquidation(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "resume()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "resumeAuctions()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "resumeConversion()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "resumeForceVAILiquidate()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "resumeFundsTransfer()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "retryExecute(uint256,uint16,bytes,bytes,address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "seizeVenus(address[],address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "set(address,uint256,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setActionsPaused(address[],uint256[],bool)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setAllowCorePoolFallback(uint96,bool)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setBaseRate(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setCloseFactor(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setCollateralFactor(address,uint256,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setCollateralFactor(uint96,address,uint256,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setConfig(uint16,uint16,uint256,bytes)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setConversionConfig(address,address,ConversionConfig)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setConvertibleBaseAsset(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setDirectPrice(address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setFeeIn(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setFeeOut(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setFloatRate(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setForcedLiquidation(address,bool)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setGrowthRate(uint256,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setInterestRateModel(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setIsBorrowAllowed(uint96,address,bool)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setLastAccruingBlock(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setLastRewardingBlock(address[],uint32[],uint32[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setLastRewardingBlockTimestamps(address[],uint256[],uint256[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setLastRewardingBlocks(address[],uint32[],uint32[])",
+      "origin": "missingRoleInfo.txt — Function signature not exists in core pool repo"
+    },
+    {
+      "signature": "setLimit(uint256,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setLiquidationIncentive(address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setLiquidationIncentive(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setLiquidationIncentive(uint96,address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMarketBorrowCaps(address[],uint256[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMarketSupplyCaps(address[],uint256[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMaxDailyLimit(uint16,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMaxDailyReceiveLimit(uint16,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMaxDeltaBps(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMaxLoopsLimit(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMaxSingleReceiveTransactionLimit(uint16,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMaxSingleTransactionLimit(uint16,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMaxStalePeriod(string,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMaxTokensDistributionSpeed(address[],uint256[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMinAmountToConvert(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMinDstGas(uint16,uint16,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMinLiquidatableCollateral(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMinLiquidatableVAI(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setMintCap(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setOracle(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setOracle(address,address,uint8)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setPayloadSizeLimit(uint16,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setPendingRedeemChunkLength(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setPoolActive(uint96,bool)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setPoolLabel(uint96,string)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setPoolName(address,string)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setPoolsAssetsDirectTransfer(address[],address[][],bool[][])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setPrecrime(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setProtocolSeizeShare(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setReceiveVersion(uint16)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setReduceReservesBlockDelta(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setReserveFactor(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setRewardAmountPerBlock(address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setRewardAmountPerBlockOrSecond(address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setRewardRecipient(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setRewardTokenSpeeds(address[],uint256[],uint256[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setRiskParameterConfig(string,address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setSendVersion(uint16)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setSnapshot(uint256,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setSnapshotGap(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setStakedAt(address[],uint256[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setSymbolOverride(string,string)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setTokenConfig(TokenConfig)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setTokensDistributionSpeed(address[],uint256[])",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setTreasuryPercent(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setTrustedRemoteAddress(uint16,bytes)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setUnderlyingPrice(address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setUnderlyingPythOracle(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setVAIMintCap(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setValidateConfig(ValidateConfig)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setVenusTreasury(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setWhitelist(address,bool)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "setWithdrawalLockingPeriod(address,uint256,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "supportMarket(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "swapPoolsAssets(address[],uint256[],address[][],uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "sweepToken(address,address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "toggleConfigActive(string)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "toggleOnlyPrimeHolderMint()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "togglePause()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "transferBridgeOwnership(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "unpause()",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "unrestrictLiquidation(address)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "updateAlpha(uint128,uint128)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "updateIncentiveBps(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "updateJumpRateModel(uint256,uint256,uint256,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "updateMinimumPoolBadDebt(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "updateMultipliers(address,uint256,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "updateNextBidderBlockLimit(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "updatePoolMetadata(address,VenusPoolMetaData)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "updateSendAndCallEnabled(bool)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "updateWaitForFirstBidder(uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "withdrawBep20(address,address,uint256)",
+      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    }
+  ]
+}
