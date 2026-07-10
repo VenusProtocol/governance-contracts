@@ -198,5 +198,12 @@
   "0xd3c6bdeeadB2359F726aD4cF42EAa8B7102DAd9B": "XVSBridgeAdmin / XVSBridgeAdmin_Proxy",
   "0x46958617CeB3A1b61B5C69FecfFE7e54831430B4": "XVSBridgeAdmin_Implementation",
   "0xc340b7d3406502F43dC11a988E4EC5bbE536E642": "XVSProxyOFTDest",
+  "0x267D57825B19eDB6343970656f9D19445eDebF67": "DefaultProxyAdmin",
+  "0x3a22AA95998a6c5f57e86E24fEA1503452Bdfa39": "DeviationSentinel / DeviationSentinel_Proxy",
+  "0xd549FE682310B47b8FA879c1cE5fb7FB85D42606": "DeviationSentinel_Implementation",
+  "0x44784FBa07b5199a7a21C8A8E4a50c45137227BC": "EBrake / EBrake_Proxy",
+  "0xcFf74896eA14cA3bf308A6A7243fd5BA48dd886d": "EBrake_Implementation",
+  "0xb5A87b6738C1cB2f1a1Acae8c49DbE32f8034CA5": "SentinelOracle / SentinelOracle_Proxy",
+  "0xC99f5544fe6452E0c635EA2F80E09F9484e05114": "SentinelOracle_Implementation",
   "0x94fa6078b6b8a26F0B6EDFFBE6501B22A10470fB": "Guardian"
 }

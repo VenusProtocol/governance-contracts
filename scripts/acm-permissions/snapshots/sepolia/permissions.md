@@ -1,6 +1,6 @@
 # ACM Permissions — sepolia
 
-Snapshot block: 11244278 · Updated: 2026-07-10 · Contracts: 36 · Permissions: 242 · Verification: ✅ verified on-chain
+Snapshot block: 11244278 · Updated: 2026-07-10 · Contracts: 36 · Permissions: 242 · Verification: ⚠️ not verified this run
 
 ## 0x0E33024CD69530126586186C282573D8BD6783ea (`0x0E33024CD69530126586186C282573D8BD6783ea`)
 
@@ -34,24 +34,6 @@ Snapshot block: 11244278 · Updated: 2026-07-10 · Contracts: 36 · Permissions:
 | `togglePause()` | Guardian |
 | `updateAlpha(uint128,uint128)` | Guardian |
 | `updateMultipliers(address,uint256,uint256)` | Guardian |
-
-## 0x3a22AA95998a6c5f57e86E24fEA1503452Bdfa39 (`0x3a22AA95998a6c5f57e86E24fEA1503452Bdfa39`)
-
-| Function | Grantees |
-| --- | --- |
-| `setTokenConfig(address,(uint8,bool))` | NormalTimelock |
-| `setTrustedKeeper(address,bool)` | NormalTimelock |
-
-## 0x44784FBa07b5199a7a21C8A8E4a50c45137227BC (`0x44784FBa07b5199a7a21C8A8E4a50c45137227BC`)
-
-| Function | Grantees |
-| --- | --- |
-| `decreaseCF(address,uint256)` | 0x3a22AA95998a6c5f57e86E24fEA1503452Bdfa39 |
-| `pauseBorrow(address)` | 0x3a22AA95998a6c5f57e86E24fEA1503452Bdfa39 |
-| `pauseSupply(address)` | 0x3a22AA95998a6c5f57e86E24fEA1503452Bdfa39 |
-| `resetBorrowCapSnapshot(address)` | 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C |
-| `resetCFSnapshot(address)` | 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C |
-| `resetSupplyCapSnapshot(address)` | 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C |
 
 ## 0x4A4a5f6Ecc4DB4ad199E8f1Db388FFFb707fad52 (`0x4A4a5f6Ecc4DB4ad199E8f1Db388FFFb707fad52`)
 
@@ -87,12 +69,6 @@ Snapshot block: 11244278 · Updated: 2026-07-10 · Contracts: 36 · Permissions:
 | `setMaxLoopsLimit(uint256)` | Guardian |
 | `setMaxTokensDistributionSpeed(address[],uint256[])` | Guardian |
 | `setTokensDistributionSpeed(address[],uint256[])` | Guardian |
-
-## 0xb5A87b6738C1cB2f1a1Acae8c49DbE32f8034CA5 (`0xb5A87b6738C1cB2f1a1Acae8c49DbE32f8034CA5`)
-
-| Function | Grantees |
-| --- | --- |
-| `setDirectPrice(address,uint256)` | 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C |
 
 ## 0xbf76e9429BA565220d77831A9eC3606434e2106e (`0xbf76e9429BA565220d77831A9eC3606434e2106e`)
 
@@ -166,10 +142,10 @@ Snapshot block: 11244278 · Updated: 2026-07-10 · Contracts: 36 · Permissions:
 
 | Function | Grantees |
 | --- | --- |
-| `setActionsPaused(address[],uint256[],bool)` | 0x44784FBa07b5199a7a21C8A8E4a50c45137227BC, 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C |
-| `setCollateralFactor(address,uint256,uint256)` | 0x44784FBa07b5199a7a21C8A8E4a50c45137227BC, 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C, CollateralFactorsRiskSteward / CollateralFactorsRiskSteward_Proxy |
-| `setMarketBorrowCaps(address[],uint256[])` | 0x44784FBa07b5199a7a21C8A8E4a50c45137227BC, MarketCapsRiskSteward / MarketCapsRiskSteward_Proxy |
-| `setMarketSupplyCaps(address[],uint256[])` | 0x44784FBa07b5199a7a21C8A8E4a50c45137227BC, MarketCapsRiskSteward / MarketCapsRiskSteward_Proxy |
+| `setActionsPaused(address[],uint256[],bool)` | 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C, EBrake / EBrake_Proxy |
+| `setCollateralFactor(address,uint256,uint256)` | 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C, CollateralFactorsRiskSteward / CollateralFactorsRiskSteward_Proxy, EBrake / EBrake_Proxy |
+| `setMarketBorrowCaps(address[],uint256[])` | EBrake / EBrake_Proxy, MarketCapsRiskSteward / MarketCapsRiskSteward_Proxy |
+| `setMarketSupplyCaps(address[],uint256[])` | EBrake / EBrake_Proxy, MarketCapsRiskSteward / MarketCapsRiskSteward_Proxy |
 
 ## ConverterNetwork / ConverterNetwork_Proxy (`0xB5A4208bFC4cC2C4670744849B8fC35B21A690Fa`)
 
@@ -186,6 +162,24 @@ Snapshot block: 11244278 · Updated: 2026-07-10 · Contracts: 36 · Permissions:
 | `setRemoteDelay(uint256)` | FastTrackTimelock, Guardian, NormalTimelock |
 | `setRiskParameterConfig(string,address,uint256)` | FastTrackTimelock, Guardian, NormalTimelock |
 | `setWhitelistedExecutor(address,bool)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## DeviationSentinel / DeviationSentinel_Proxy (`0x3a22AA95998a6c5f57e86E24fEA1503452Bdfa39`)
+
+| Function | Grantees |
+| --- | --- |
+| `setTokenConfig(address,(uint8,bool))` | NormalTimelock |
+| `setTrustedKeeper(address,bool)` | NormalTimelock |
+
+## EBrake / EBrake_Proxy (`0x44784FBa07b5199a7a21C8A8E4a50c45137227BC`)
+
+| Function | Grantees |
+| --- | --- |
+| `decreaseCF(address,uint256)` | DeviationSentinel / DeviationSentinel_Proxy |
+| `pauseBorrow(address)` | DeviationSentinel / DeviationSentinel_Proxy |
+| `pauseSupply(address)` | DeviationSentinel / DeviationSentinel_Proxy |
+| `resetBorrowCapSnapshot(address)` | 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C |
+| `resetCFSnapshot(address)` | 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C |
+| `resetSupplyCapSnapshot(address)` | 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C |
 
 ## Guardian (`0x94fa6078b6b8a26F0B6EDFFBE6501B22A10470fB`)
 
@@ -286,6 +280,12 @@ Snapshot block: 11244278 · Updated: 2026-07-10 · Contracts: 36 · Permissions:
 | `setOracle(address,address,uint8)` | NormalTimelock |
 | `setTokenConfig(TokenConfig)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `unpause()` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+
+## SentinelOracle / SentinelOracle_Proxy (`0xb5A87b6738C1cB2f1a1Acae8c49DbE32f8034CA5`)
+
+| Function | Grantees |
+| --- | --- |
+| `setDirectPrice(address,uint256)` | 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C |
 
 ## SFrxETHOracle / SFrxETHOracle_Proxy (`0x61EB836afA467677e6b403D504fe69D6940e7996`)
 

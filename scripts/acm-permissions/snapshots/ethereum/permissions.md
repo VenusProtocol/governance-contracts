@@ -1,6 +1,6 @@
 # ACM Permissions — ethereum
 
-Snapshot block: 25503255 · Updated: 2026-07-10 · Contracts: 66 · Permissions: 186 · Verification: ✅ verified on-chain
+Snapshot block: 25503255 · Updated: 2026-07-10 · Contracts: 66 · Permissions: 186 · Verification: ⚠️ not verified this run
 
 ## 0x39cb747453Be3416E659dAeA169540b6F000c885 (`0x39cb747453Be3416E659dAeA169540b6F000c885`)
 
@@ -8,49 +8,6 @@ Snapshot block: 25503255 · Updated: 2026-07-10 · Contracts: 66 · Permissions:
 | --- | --- |
 | `setMaxLoopsLimit(uint256)` | NormalTimelock |
 | `setRewardRecipient(address)` | NormalTimelock |
-
-## 0x444C53E194B40c272fAd683210e2cB1c16Ab132e (`0x444C53E194B40c272fAd683210e2cB1c16Ab132e`)
-
-| Function | Grantees |
-| --- | --- |
-| `setDirectPrice(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setTokenOracleConfig(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-
-## 0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c (`0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c`)
-
-| Function | Grantees |
-| --- | --- |
-| `setTokenConfig(address,(uint8,bool))` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setTokenMonitoringEnabled(address,bool)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setTrustedKeeper(address,bool)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-
-## 0x873993F8f5f5Ddbae0952e939ab3005Af363Af00 (`0x873993F8f5f5Ddbae0952e939ab3005Af363Af00`)
-
-| Function | Grantees |
-| --- | --- |
-| `setPoolConfig(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-
-## 0x9F508F3146cb03276282f9237c6eE64f76E3261D (`0x9F508F3146cb03276282f9237c6eE64f76E3261D`)
-
-| Function | Grantees |
-| --- | --- |
-| `setPoolConfig(address,address,uint8,uint8,address,uint8)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-
-## 0xCD09042c5DFFed762998Df9a058ec5944e39949B (`0xCD09042c5DFFed762998Df9a058ec5944e39949B`)
-
-| Function | Grantees |
-| --- | --- |
-| `decreaseCF(address,uint256)` | 0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c, 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseActions(address[],uint8[])` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseBorrow(address)` | 0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c, 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseRedeem(address)` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseSupply(address)` | 0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c, 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseTransfer(address)` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `resetBorrowCapSnapshot(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `resetCFSnapshot(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `resetSupplyCapSnapshot(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setMarketBorrowCaps(address[],uint256[])` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setMarketSupplyCaps(address[],uint256[])` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 
 ## AuxiliaryCommandsAggregator / AuxiliaryCommandsAggregator_Proxy (`0xc79Cb7efEBd121DC4B39eA141C214606595D665A`)
 
@@ -77,10 +34,10 @@ Snapshot block: 25503255 · Updated: 2026-07-10 · Contracts: 66 · Permissions:
 
 | Function | Grantees |
 | --- | --- |
-| `setActionsPaused(address[],uint256[],bool)` | 0xCD09042c5DFFed762998Df9a058ec5944e39949B |
-| `setCollateralFactor(address,uint256,uint256)` | 0xCD09042c5DFFed762998Df9a058ec5944e39949B |
-| `setMarketBorrowCaps(address[],uint256[])` | 0xCD09042c5DFFed762998Df9a058ec5944e39949B |
-| `setMarketSupplyCaps(address[],uint256[])` | 0xCD09042c5DFFed762998Df9a058ec5944e39949B |
+| `setActionsPaused(address[],uint256[],bool)` | EBrake / EBrake_Proxy |
+| `setCollateralFactor(address,uint256,uint256)` | EBrake / EBrake_Proxy |
+| `setMarketBorrowCaps(address[],uint256[])` | EBrake / EBrake_Proxy |
+| `setMarketSupplyCaps(address[],uint256[])` | EBrake / EBrake_Proxy |
 
 ## ConverterNetwork / ConverterNetwork_Proxy (`0x232CC47AECCC55C2CAcE4372f5B268b27ef7cac8`)
 
@@ -88,6 +45,36 @@ Snapshot block: 25503255 · Updated: 2026-07-10 · Contracts: 66 · Permissions:
 | --- | --- |
 | `addTokenConverter(address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `removeTokenConverter(address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+
+## CurveOracle / CurveOracle_Proxy (`0x9F508F3146cb03276282f9237c6eE64f76E3261D`)
+
+| Function | Grantees |
+| --- | --- |
+| `setPoolConfig(address,address,uint8,uint8,address,uint8)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## DeviationSentinel / DeviationSentinel_Proxy (`0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c`)
+
+| Function | Grantees |
+| --- | --- |
+| `setTokenConfig(address,(uint8,bool))` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setTokenMonitoringEnabled(address,bool)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setTrustedKeeper(address,bool)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## EBrake / EBrake_Proxy (`0xCD09042c5DFFed762998Df9a058ec5944e39949B`)
+
+| Function | Grantees |
+| --- | --- |
+| `decreaseCF(address,uint256)` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, DeviationSentinel / DeviationSentinel_Proxy, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseActions(address[],uint8[])` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseBorrow(address)` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, DeviationSentinel / DeviationSentinel_Proxy, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseRedeem(address)` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseSupply(address)` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, DeviationSentinel / DeviationSentinel_Proxy, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseTransfer(address)` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `resetBorrowCapSnapshot(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `resetCFSnapshot(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `resetSupplyCapSnapshot(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setMarketBorrowCaps(address[],uint256[])` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setMarketSupplyCaps(address[],uint256[])` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 
 ## OmnichainExecutorOwner / OmnichainExecutorOwner_Proxy (`0x87Ed3Fd3a25d157637b955991fb1B41B566916Ba`)
 
@@ -168,11 +155,24 @@ Snapshot block: 25503255 · Updated: 2026-07-10 · Contracts: 66 · Permissions:
 | `setTokenConfig(TokenConfig)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `unpause()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 
+## SentinelOracle / SentinelOracle_Proxy (`0x444C53E194B40c272fAd683210e2cB1c16Ab132e`)
+
+| Function | Grantees |
+| --- | --- |
+| `setDirectPrice(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setTokenOracleConfig(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
 ## SFrxETHOracle / SFrxETHOracle_Proxy (`0x5E06A5f48692E4Fff376fDfCA9E4C0183AAADCD1`)
 
 | Function | Grantees |
 | --- | --- |
 | `setMaxAllowedPriceDifference(uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+
+## UniswapOracle / UniswapOracle_Proxy (`0x873993F8f5f5Ddbae0952e939ab3005Af363Af00`)
+
+| Function | Grantees |
+| --- | --- |
+| `setPoolConfig(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 
 ## USDCPrimeConverter (`0xcEB9503f10B781E30213c0b320bCf3b3cE54216E`)
 

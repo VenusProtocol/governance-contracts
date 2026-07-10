@@ -1,6 +1,6 @@
 # ACM Permissions — opbnbtestnet
 
-Snapshot block: 179560074 · Updated: 2026-07-10 · Contracts: 12 · Permissions: 123 · Verification: ✅ verified on-chain
+Snapshot block: 179560074 · Updated: 2026-07-10 · Contracts: 12 · Permissions: 123 · Verification: ⚠️ not verified this run
 
 ## 0x22E504FaD56cc14B0Cf258C374C44384772c8A40 (`0x22E504FaD56cc14B0Cf258C374C44384772c8A40`)
 

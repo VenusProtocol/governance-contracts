@@ -1,6 +1,6 @@
 # ACM Permissions — unichainsepolia
 
-Snapshot block: 56853273 · Updated: 2026-07-10 · Contracts: 16 · Permissions: 112 · Verification: ✅ verified on-chain
+Snapshot block: 56853273 · Updated: 2026-07-10 · Contracts: 16 · Permissions: 112 · Verification: ⚠️ not verified this run
 
 ## 0x1365820B9ba3B1b5601208437a5A24192a12C1fB (`0x1365820B9ba3B1b5601208437a5A24192a12C1fB`)
 

@@ -600,19 +600,15 @@
       ]
     },
     {
-      "address": "0x444C53E194B40c272fAd683210e2cB1c16Ab132e",
-      "name": "0x444C53E194B40c272fAd683210e2cB1c16Ab132e",
+      "address": "0xc79Cb7efEBd121DC4B39eA141C214606595D665A",
+      "name": "AuxiliaryCommandsAggregator / AuxiliaryCommandsAggregator_Proxy",
       "scope": "contract",
       "permissions": [
         {
-          "functionSig": "setDirectPrice(address,uint256)",
-          "roleHash": "0x822b110daba579b3df1aafcf77579376fae89dbef354ea199bcb89efd0aafdc1",
+          "functionSig": "addAuthorizedBatchers(address[])",
+          "roleHash": "0xcbcd87eb12d9598442990cd75cc6f38ec91aad5249c5bc96f9dce3badde6cbad",
           "decoded": true,
           "grantees": [
-            {
-              "address": "0x285960C5B22fD66A736C7136967A3eB15e93CC67",
-              "name": "Guardian"
-            },
             {
               "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
               "name": "NormalTimelock"
@@ -627,12 +623,267 @@
             }
           ],
           "transactions": [
-            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60"
+            "0x65e09b9bb4545b4cf369d6307de616e31d6c7ed940326e0e238545c99bb2cb4a"
           ]
         },
         {
-          "functionSig": "setTokenOracleConfig(address,address)",
-          "roleHash": "0x0d5c698810f8971e5bdca5dd2459530132edab6249cf579d024842a391314e44",
+          "functionSig": "executeBatch(uint256)",
+          "roleHash": "0xab224c98e0286a292c99c069d9991579c93a07cdadab083a0ba8f79ef8553022",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
+              "name": "FastTrackTimelock"
+            },
+            {
+              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
+              "name": "CriticalTimelock"
+            }
+          ],
+          "transactions": [
+            "0x65e09b9bb4545b4cf369d6307de616e31d6c7ed940326e0e238545c99bb2cb4a"
+          ]
+        },
+        {
+          "functionSig": "removeAuthorizedBatchers(address[])",
+          "roleHash": "0x9bda39307b5fec8f9cdaaa9dfe5433018705d67cd152644795282f8afe73996a",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
+              "name": "FastTrackTimelock"
+            },
+            {
+              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
+              "name": "CriticalTimelock"
+            }
+          ],
+          "transactions": [
+            "0x65e09b9bb4545b4cf369d6307de616e31d6c7ed940326e0e238545c99bb2cb4a"
+          ]
+        }
+      ]
+    },
+    {
+      "address": "0x1Cd5f336A1d28Dff445619CC63d3A0329B4d8a58",
+      "name": "BoundValidator / BoundValidator_Proxy",
+      "scope": "contract",
+      "permissions": [
+        {
+          "functionSig": "setValidateConfig(ValidateConfig)",
+          "roleHash": "0xbbc429b700c774922c7ae653ed48f628b59bbbfa05311ad342a6b9ba4f2e01e2",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
+              "name": "NormalTimelock"
+            }
+          ],
+          "transactions": [
+            "0xb3006a9fe98c6f618a44af3de6fb3531b10f65cedc06dcdef57cb1951cf8be30",
+            "0x954d01fcdbc78ac5849aac3f0db29eb275969ecb6f33e0acc5051b3258e12ac3",
+            "0x65e09b9bb4545b4cf369d6307de616e31d6c7ed940326e0e238545c99bb2cb4a"
+          ]
+        }
+      ]
+    },
+    {
+      "address": "0x94c3A2d6B7B2c051aDa041282aec5B0752F8A1F2",
+      "name": "ChainlinkOracle / ChainlinkOracle_Proxy",
+      "scope": "contract",
+      "permissions": [
+        {
+          "functionSig": "setDirectPrice(address,uint256)",
+          "roleHash": "0x826668265e85f3e165a4eb8b621dfea61dd3191cbd80ae7eded2b08889fad11b",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x285960C5B22fD66A736C7136967A3eB15e93CC67",
+              "name": "Guardian"
+            },
+            {
+              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
+              "name": "CriticalTimelock"
+            },
+            {
+              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
+              "name": "FastTrackTimelock"
+            }
+          ],
+          "transactions": [
+            "0xb3006a9fe98c6f618a44af3de6fb3531b10f65cedc06dcdef57cb1951cf8be30",
+            "0x954d01fcdbc78ac5849aac3f0db29eb275969ecb6f33e0acc5051b3258e12ac3"
+          ]
+        },
+        {
+          "functionSig": "setTokenConfig(TokenConfig)",
+          "roleHash": "0xa6f4e7ebde84519317d7bf4cb91c5936a7e08518e1474ee544b55c188e982f43",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x285960C5B22fD66A736C7136967A3eB15e93CC67",
+              "name": "Guardian"
+            },
+            {
+              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
+              "name": "CriticalTimelock"
+            },
+            {
+              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
+              "name": "FastTrackTimelock"
+            }
+          ],
+          "transactions": [
+            "0xb3006a9fe98c6f618a44af3de6fb3531b10f65cedc06dcdef57cb1951cf8be30",
+            "0x954d01fcdbc78ac5849aac3f0db29eb275969ecb6f33e0acc5051b3258e12ac3"
+          ]
+        }
+      ]
+    },
+    {
+      "address": "0x687a01ecF6d3907658f7A7c714749fAC32336D1B",
+      "name": "Comptroller_Core",
+      "scope": "contract",
+      "permissions": [
+        {
+          "functionSig": "setActionsPaused(address[],uint256[],bool)",
+          "roleHash": "0xc11c8ce129366d179ec889edb8351798515949a1e7cd202624823b669609b8b8",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xCD09042c5DFFed762998Df9a058ec5944e39949B",
+              "name": "EBrake / EBrake_Proxy"
+            }
+          ],
+          "transactions": [
+            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60",
+            "0x84485899960708b852bc3023caa24c0d437cca03cadac13087ed2deeb3e830d3"
+          ]
+        },
+        {
+          "functionSig": "setCollateralFactor(address,uint256,uint256)",
+          "roleHash": "0xb266f3850eddec5fdc2293f2b86b738f7b84d2e45c4b7029ae646ffe9902227a",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xCD09042c5DFFed762998Df9a058ec5944e39949B",
+              "name": "EBrake / EBrake_Proxy"
+            }
+          ],
+          "transactions": [
+            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60",
+            "0x84485899960708b852bc3023caa24c0d437cca03cadac13087ed2deeb3e830d3"
+          ]
+        },
+        {
+          "functionSig": "setMarketBorrowCaps(address[],uint256[])",
+          "roleHash": "0x38144429c125851213c0deb05753660e66ddff47d5e247483a7bd35dadbe5207",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xCD09042c5DFFed762998Df9a058ec5944e39949B",
+              "name": "EBrake / EBrake_Proxy"
+            }
+          ],
+          "transactions": [
+            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60",
+            "0x84485899960708b852bc3023caa24c0d437cca03cadac13087ed2deeb3e830d3"
+          ]
+        },
+        {
+          "functionSig": "setMarketSupplyCaps(address[],uint256[])",
+          "roleHash": "0x1e8ed0d448d8581e116c372c3892f1d49f0b4fad733d26576fc12caf579a1d6e",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xCD09042c5DFFed762998Df9a058ec5944e39949B",
+              "name": "EBrake / EBrake_Proxy"
+            }
+          ],
+          "transactions": [
+            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60",
+            "0x84485899960708b852bc3023caa24c0d437cca03cadac13087ed2deeb3e830d3"
+          ]
+        }
+      ]
+    },
+    {
+      "address": "0x232CC47AECCC55C2CAcE4372f5B268b27ef7cac8",
+      "name": "ConverterNetwork / ConverterNetwork_Proxy",
+      "scope": "contract",
+      "permissions": [
+        {
+          "functionSig": "addTokenConverter(address)",
+          "roleHash": "0x5e913c89ba553ad8601aea93a6a91751c07b63f8631bb64d3b77293fef72d03b",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
+              "name": "CriticalTimelock"
+            },
+            {
+              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
+              "name": "FastTrackTimelock"
+            }
+          ],
+          "transactions": [
+            "0x18403d7b4f6b6a1943cb7c112d79f2b1cd169bf627d5145b190d51354240ee53",
+            "0x954d01fcdbc78ac5849aac3f0db29eb275969ecb6f33e0acc5051b3258e12ac3"
+          ]
+        },
+        {
+          "functionSig": "removeTokenConverter(address)",
+          "roleHash": "0xbe1895ecf2aada8012cfe7ff3cff5979cd3315bf781ebf354dbefe7008e0e6d8",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
+              "name": "CriticalTimelock"
+            },
+            {
+              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
+              "name": "FastTrackTimelock"
+            }
+          ],
+          "transactions": [
+            "0x18403d7b4f6b6a1943cb7c112d79f2b1cd169bf627d5145b190d51354240ee53",
+            "0x954d01fcdbc78ac5849aac3f0db29eb275969ecb6f33e0acc5051b3258e12ac3"
+          ]
+        }
+      ]
+    },
+    {
+      "address": "0x9F508F3146cb03276282f9237c6eE64f76E3261D",
+      "name": "CurveOracle / CurveOracle_Proxy",
+      "scope": "contract",
+      "permissions": [
+        {
+          "functionSig": "setPoolConfig(address,address,uint8,uint8,address,uint8)",
+          "roleHash": "0x8a784f99ec1ce2199cf00e9b1cc99c980d57c53453e52a59d288eb615536ade3",
           "decoded": true,
           "grantees": [
             {
@@ -660,7 +911,7 @@
     },
     {
       "address": "0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c",
-      "name": "0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c",
+      "name": "DeviationSentinel / DeviationSentinel_Proxy",
       "scope": "contract",
       "permissions": [
         {
@@ -744,74 +995,8 @@
       ]
     },
     {
-      "address": "0x873993F8f5f5Ddbae0952e939ab3005Af363Af00",
-      "name": "0x873993F8f5f5Ddbae0952e939ab3005Af363Af00",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "setPoolConfig(address,address)",
-          "roleHash": "0x6beffe29ded8af167c1d0d46f1b5cdbe5bbc1d33f719be9671cdfe588141e185",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x285960C5B22fD66A736C7136967A3eB15e93CC67",
-              "name": "Guardian"
-            },
-            {
-              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
-              "name": "NormalTimelock"
-            },
-            {
-              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
-              "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
-              "name": "CriticalTimelock"
-            }
-          ],
-          "transactions": [
-            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x9F508F3146cb03276282f9237c6eE64f76E3261D",
-      "name": "0x9F508F3146cb03276282f9237c6eE64f76E3261D",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "setPoolConfig(address,address,uint8,uint8,address,uint8)",
-          "roleHash": "0x8a784f99ec1ce2199cf00e9b1cc99c980d57c53453e52a59d288eb615536ade3",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x285960C5B22fD66A736C7136967A3eB15e93CC67",
-              "name": "Guardian"
-            },
-            {
-              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
-              "name": "NormalTimelock"
-            },
-            {
-              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
-              "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
-              "name": "CriticalTimelock"
-            }
-          ],
-          "transactions": [
-            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60"
-          ]
-        }
-      ]
-    },
-    {
       "address": "0xCD09042c5DFFed762998Df9a058ec5944e39949B",
-      "name": "0xCD09042c5DFFed762998Df9a058ec5944e39949B",
+      "name": "EBrake / EBrake_Proxy",
       "scope": "contract",
       "permissions": [
         {
@@ -821,7 +1006,7 @@
           "grantees": [
             {
               "address": "0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c",
-              "name": "0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c"
+              "name": "DeviationSentinel / DeviationSentinel_Proxy"
             },
             {
               "address": "0xCCa5a587eBDBe80f23c8610F2e53B03158e62948",
@@ -885,7 +1070,7 @@
           "grantees": [
             {
               "address": "0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c",
-              "name": "0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c"
+              "name": "DeviationSentinel / DeviationSentinel_Proxy"
             },
             {
               "address": "0xCCa5a587eBDBe80f23c8610F2e53B03158e62948",
@@ -949,7 +1134,7 @@
           "grantees": [
             {
               "address": "0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c",
-              "name": "0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c"
+              "name": "DeviationSentinel / DeviationSentinel_Proxy"
             },
             {
               "address": "0xCCa5a587eBDBe80f23c8610F2e53B03158e62948",
@@ -1142,283 +1327,6 @@
           ],
           "transactions": [
             "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0xc79Cb7efEBd121DC4B39eA141C214606595D665A",
-      "name": "AuxiliaryCommandsAggregator / AuxiliaryCommandsAggregator_Proxy",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "addAuthorizedBatchers(address[])",
-          "roleHash": "0xcbcd87eb12d9598442990cd75cc6f38ec91aad5249c5bc96f9dce3badde6cbad",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
-              "name": "NormalTimelock"
-            },
-            {
-              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
-              "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
-              "name": "CriticalTimelock"
-            }
-          ],
-          "transactions": [
-            "0x65e09b9bb4545b4cf369d6307de616e31d6c7ed940326e0e238545c99bb2cb4a"
-          ]
-        },
-        {
-          "functionSig": "executeBatch(uint256)",
-          "roleHash": "0xab224c98e0286a292c99c069d9991579c93a07cdadab083a0ba8f79ef8553022",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
-              "name": "NormalTimelock"
-            },
-            {
-              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
-              "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
-              "name": "CriticalTimelock"
-            }
-          ],
-          "transactions": [
-            "0x65e09b9bb4545b4cf369d6307de616e31d6c7ed940326e0e238545c99bb2cb4a"
-          ]
-        },
-        {
-          "functionSig": "removeAuthorizedBatchers(address[])",
-          "roleHash": "0x9bda39307b5fec8f9cdaaa9dfe5433018705d67cd152644795282f8afe73996a",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
-              "name": "NormalTimelock"
-            },
-            {
-              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
-              "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
-              "name": "CriticalTimelock"
-            }
-          ],
-          "transactions": [
-            "0x65e09b9bb4545b4cf369d6307de616e31d6c7ed940326e0e238545c99bb2cb4a"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x1Cd5f336A1d28Dff445619CC63d3A0329B4d8a58",
-      "name": "BoundValidator / BoundValidator_Proxy",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "setValidateConfig(ValidateConfig)",
-          "roleHash": "0xbbc429b700c774922c7ae653ed48f628b59bbbfa05311ad342a6b9ba4f2e01e2",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0xb3006a9fe98c6f618a44af3de6fb3531b10f65cedc06dcdef57cb1951cf8be30",
-            "0x954d01fcdbc78ac5849aac3f0db29eb275969ecb6f33e0acc5051b3258e12ac3",
-            "0x65e09b9bb4545b4cf369d6307de616e31d6c7ed940326e0e238545c99bb2cb4a"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x94c3A2d6B7B2c051aDa041282aec5B0752F8A1F2",
-      "name": "ChainlinkOracle / ChainlinkOracle_Proxy",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "setDirectPrice(address,uint256)",
-          "roleHash": "0x826668265e85f3e165a4eb8b621dfea61dd3191cbd80ae7eded2b08889fad11b",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x285960C5B22fD66A736C7136967A3eB15e93CC67",
-              "name": "Guardian"
-            },
-            {
-              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
-              "name": "NormalTimelock"
-            },
-            {
-              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
-              "name": "CriticalTimelock"
-            },
-            {
-              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
-              "name": "FastTrackTimelock"
-            }
-          ],
-          "transactions": [
-            "0xb3006a9fe98c6f618a44af3de6fb3531b10f65cedc06dcdef57cb1951cf8be30",
-            "0x954d01fcdbc78ac5849aac3f0db29eb275969ecb6f33e0acc5051b3258e12ac3"
-          ]
-        },
-        {
-          "functionSig": "setTokenConfig(TokenConfig)",
-          "roleHash": "0xa6f4e7ebde84519317d7bf4cb91c5936a7e08518e1474ee544b55c188e982f43",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x285960C5B22fD66A736C7136967A3eB15e93CC67",
-              "name": "Guardian"
-            },
-            {
-              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
-              "name": "NormalTimelock"
-            },
-            {
-              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
-              "name": "CriticalTimelock"
-            },
-            {
-              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
-              "name": "FastTrackTimelock"
-            }
-          ],
-          "transactions": [
-            "0xb3006a9fe98c6f618a44af3de6fb3531b10f65cedc06dcdef57cb1951cf8be30",
-            "0x954d01fcdbc78ac5849aac3f0db29eb275969ecb6f33e0acc5051b3258e12ac3"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x687a01ecF6d3907658f7A7c714749fAC32336D1B",
-      "name": "Comptroller_Core",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "setActionsPaused(address[],uint256[],bool)",
-          "roleHash": "0xc11c8ce129366d179ec889edb8351798515949a1e7cd202624823b669609b8b8",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0xCD09042c5DFFed762998Df9a058ec5944e39949B",
-              "name": "0xCD09042c5DFFed762998Df9a058ec5944e39949B"
-            }
-          ],
-          "transactions": [
-            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60",
-            "0x84485899960708b852bc3023caa24c0d437cca03cadac13087ed2deeb3e830d3"
-          ]
-        },
-        {
-          "functionSig": "setCollateralFactor(address,uint256,uint256)",
-          "roleHash": "0xb266f3850eddec5fdc2293f2b86b738f7b84d2e45c4b7029ae646ffe9902227a",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0xCD09042c5DFFed762998Df9a058ec5944e39949B",
-              "name": "0xCD09042c5DFFed762998Df9a058ec5944e39949B"
-            }
-          ],
-          "transactions": [
-            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60",
-            "0x84485899960708b852bc3023caa24c0d437cca03cadac13087ed2deeb3e830d3"
-          ]
-        },
-        {
-          "functionSig": "setMarketBorrowCaps(address[],uint256[])",
-          "roleHash": "0x38144429c125851213c0deb05753660e66ddff47d5e247483a7bd35dadbe5207",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0xCD09042c5DFFed762998Df9a058ec5944e39949B",
-              "name": "0xCD09042c5DFFed762998Df9a058ec5944e39949B"
-            }
-          ],
-          "transactions": [
-            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60",
-            "0x84485899960708b852bc3023caa24c0d437cca03cadac13087ed2deeb3e830d3"
-          ]
-        },
-        {
-          "functionSig": "setMarketSupplyCaps(address[],uint256[])",
-          "roleHash": "0x1e8ed0d448d8581e116c372c3892f1d49f0b4fad733d26576fc12caf579a1d6e",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0xCD09042c5DFFed762998Df9a058ec5944e39949B",
-              "name": "0xCD09042c5DFFed762998Df9a058ec5944e39949B"
-            }
-          ],
-          "transactions": [
-            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60",
-            "0x84485899960708b852bc3023caa24c0d437cca03cadac13087ed2deeb3e830d3"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x232CC47AECCC55C2CAcE4372f5B268b27ef7cac8",
-      "name": "ConverterNetwork / ConverterNetwork_Proxy",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "addTokenConverter(address)",
-          "roleHash": "0x5e913c89ba553ad8601aea93a6a91751c07b63f8631bb64d3b77293fef72d03b",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
-              "name": "NormalTimelock"
-            },
-            {
-              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
-              "name": "CriticalTimelock"
-            },
-            {
-              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
-              "name": "FastTrackTimelock"
-            }
-          ],
-          "transactions": [
-            "0x18403d7b4f6b6a1943cb7c112d79f2b1cd169bf627d5145b190d51354240ee53",
-            "0x954d01fcdbc78ac5849aac3f0db29eb275969ecb6f33e0acc5051b3258e12ac3"
-          ]
-        },
-        {
-          "functionSig": "removeTokenConverter(address)",
-          "roleHash": "0xbe1895ecf2aada8012cfe7ff3cff5979cd3315bf781ebf354dbefe7008e0e6d8",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
-              "name": "NormalTimelock"
-            },
-            {
-              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
-              "name": "CriticalTimelock"
-            },
-            {
-              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
-              "name": "FastTrackTimelock"
-            }
-          ],
-          "transactions": [
-            "0x18403d7b4f6b6a1943cb7c112d79f2b1cd169bf627d5145b190d51354240ee53",
-            "0x954d01fcdbc78ac5849aac3f0db29eb275969ecb6f33e0acc5051b3258e12ac3"
           ]
         }
       ]
@@ -2432,6 +2340,65 @@
       ]
     },
     {
+      "address": "0x444C53E194B40c272fAd683210e2cB1c16Ab132e",
+      "name": "SentinelOracle / SentinelOracle_Proxy",
+      "scope": "contract",
+      "permissions": [
+        {
+          "functionSig": "setDirectPrice(address,uint256)",
+          "roleHash": "0x822b110daba579b3df1aafcf77579376fae89dbef354ea199bcb89efd0aafdc1",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x285960C5B22fD66A736C7136967A3eB15e93CC67",
+              "name": "Guardian"
+            },
+            {
+              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
+              "name": "FastTrackTimelock"
+            },
+            {
+              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
+              "name": "CriticalTimelock"
+            }
+          ],
+          "transactions": [
+            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60"
+          ]
+        },
+        {
+          "functionSig": "setTokenOracleConfig(address,address)",
+          "roleHash": "0x0d5c698810f8971e5bdca5dd2459530132edab6249cf579d024842a391314e44",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x285960C5B22fD66A736C7136967A3eB15e93CC67",
+              "name": "Guardian"
+            },
+            {
+              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
+              "name": "FastTrackTimelock"
+            },
+            {
+              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
+              "name": "CriticalTimelock"
+            }
+          ],
+          "transactions": [
+            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60"
+          ]
+        }
+      ]
+    },
+    {
       "address": "0x5E06A5f48692E4Fff376fDfCA9E4C0183AAADCD1",
       "name": "SFrxETHOracle / SFrxETHOracle_Proxy",
       "scope": "contract",
@@ -2457,6 +2424,39 @@
           "transactions": [
             "0x8dfd2bf80e8485f5c8a98f908f6e0d47594ed99bea487d362317f45ea0442133",
             "0x954d01fcdbc78ac5849aac3f0db29eb275969ecb6f33e0acc5051b3258e12ac3"
+          ]
+        }
+      ]
+    },
+    {
+      "address": "0x873993F8f5f5Ddbae0952e939ab3005Af363Af00",
+      "name": "UniswapOracle / UniswapOracle_Proxy",
+      "scope": "contract",
+      "permissions": [
+        {
+          "functionSig": "setPoolConfig(address,address)",
+          "roleHash": "0x6beffe29ded8af167c1d0d46f1b5cdbe5bbc1d33f719be9671cdfe588141e185",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x285960C5B22fD66A736C7136967A3eB15e93CC67",
+              "name": "Guardian"
+            },
+            {
+              "address": "0xd969E79406c35E80750aAae061D402Aab9325714",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0x8764F50616B62a99A997876C2DEAaa04554C5B2E",
+              "name": "FastTrackTimelock"
+            },
+            {
+              "address": "0xeB9b85342c34F65af734C7bd4a149c86c472bC00",
+              "name": "CriticalTimelock"
+            }
+          ],
+          "transactions": [
+            "0xd54f47eb29fc7543905e4b301adcd5a913282bc1f3782136fa24b7a5d5d4cf60"
           ]
         }
       ]

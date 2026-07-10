@@ -1,6 +1,6 @@
 # ACM Permissions — basesepolia
 
-Snapshot block: 43965561 · Updated: 2026-07-10 · Contracts: 19 · Permissions: 121 · Verification: ✅ verified on-chain
+Snapshot block: 43965561 · Updated: 2026-07-10 · Contracts: 19 · Permissions: 121 · Verification: ⚠️ not verified this run
 
 ## 0x976f69F651De9A23195a1B2224B9319f2C48fd81 (`0x976f69F651De9A23195a1B2224B9319f2C48fd81`)
 

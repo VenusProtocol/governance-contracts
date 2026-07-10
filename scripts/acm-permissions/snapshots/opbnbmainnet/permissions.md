@@ -1,6 +1,6 @@
 # ACM Permissions — opbnbmainnet
 
-Snapshot block: 162329654 · Updated: 2026-07-10 · Contracts: 15 · Permissions: 94 · Verification: ✅ verified on-chain
+Snapshot block: 162329654 · Updated: 2026-07-10 · Contracts: 15 · Permissions: 94 · Verification: ⚠️ not verified this run
 
 ## 0x89A5Ce0A6db7e66E53F148B50D879b700dEB81C8 (`0x89A5Ce0A6db7e66E53F148B50D879b700dEB81C8`)
 

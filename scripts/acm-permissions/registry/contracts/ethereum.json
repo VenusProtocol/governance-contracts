@@ -168,5 +168,18 @@
   "0x9C6C95632A8FB3A74f2fB4B7FfC50B003c992b96": "XVSBridgeAdmin / XVSBridgeAdmin_Proxy",
   "0x83aBB808bb291FED8593e953c6489d29aFa0c5Ca": "XVSBridgeAdmin_Implementation",
   "0x888E317606b4c590BBAD88653863e8B345702633": "XVSProxyOFTDest",
+  "0x9F508F3146cb03276282f9237c6eE64f76E3261D": "CurveOracle / CurveOracle_Proxy",
+  "0x8c30d8d659E7dF0F39f0f0AdF7589dB79449F404": "CurveOracle_Implementation",
+  "0xA6a4E5196Fa108008b68fE6D6629D508C902D61c": "DefaultProxyAdmin",
+  "0x7D0EFA41eBF1aF242A37174E1E047bD6ea1b1B9c": "DeviationSentinel / DeviationSentinel_Proxy",
+  "0x98a0b21Ac3544F968fF212CC381B0311376278b3": "DeviationSentinel_Implementation",
+  "0xCD09042c5DFFed762998Df9a058ec5944e39949B": "EBrake / EBrake_Proxy",
+  "0x511a559a699cBd665546a1F75908f7E9454Bfc67": "EBrake_Implementation",
+  "0xCCB08e5107b406E67Ad8356023dd489CEbc79B40": "PancakeSwapOracle / PancakeSwapOracle_Proxy",
+  "0xCFcC918275c35b21227405ec41fcD2D2643DF534": "PancakeSwapOracle_Implementation",
+  "0x444C53E194B40c272fAd683210e2cB1c16Ab132e": "SentinelOracle / SentinelOracle_Proxy",
+  "0x5822Ba5f3f71C590c8e6CB131fB779CE5B8A3653": "SentinelOracle_Implementation",
+  "0x873993F8f5f5Ddbae0952e939ab3005Af363Af00": "UniswapOracle / UniswapOracle_Proxy",
+  "0xC6642B61293ffe794C2376f50bE521361E36cdd6": "UniswapOracle_Implementation",
   "0x285960C5B22fD66A736C7136967A3eB15e93CC67": "Guardian"
 }
