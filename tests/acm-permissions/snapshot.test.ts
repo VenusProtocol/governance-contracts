@@ -1,14 +1,18 @@
 import { expect } from "chai";
 import * as fs from "fs";
+import * as os from "os";
+import * as path from "path";
 
-import { WILDCARD, snapshotDir } from "../../scripts/acm-permissions/config";
+import { WILDCARD } from "../../scripts/acm-permissions/config";
+import { HashTable } from "../../scripts/acm-permissions/core/decoder";
 import {
   fileToState,
   loadSnapshotFile,
+  reannotateUndecoded,
   saveSnapshotFile,
   stateToFile,
 } from "../../scripts/acm-permissions/core/snapshot";
-import { SnapshotFile, SnapshotMeta, SnapshotState } from "../../scripts/acm-permissions/types";
+import { RoleState, SnapshotFile, SnapshotMeta, SnapshotState } from "../../scripts/acm-permissions/types";
 
 const meta: SnapshotMeta = {
   network: "bscmainnet",
@@ -82,36 +86,78 @@ describe("snapshot store", () => {
   });
 });
 
-describe("snapshot file store (load/save)", () => {
-  // Use "sepolia" as a scratch network dir; clean up before/after so no fixtures are left behind.
-  const dir = snapshotDir("sepolia");
+describe("reannotateUndecoded", () => {
+  const undecodedRole: RoleState = {
+    roleHash: "0xr3",
+    contractAddress: null,
+    functionSig: null,
+    decoded: false,
+    grantees: [A],
+    transactions: ["0xt3"],
+  };
 
-  beforeEach(() => fs.rmSync(dir, { recursive: true, force: true }));
-  afterEach(() => fs.rmSync(dir, { recursive: true, force: true }));
+  it("fills in contractAddress/functionSig when the hash table now has a hit", () => {
+    const s: SnapshotState = { r3: { ...undecodedRole } };
+    const table: HashTable = { "0xr3": { contractAddress: C, functionSig: "pause()" } };
+    reannotateUndecoded(s, table);
+    expect(s.r3).to.deep.equal({ ...undecodedRole, contractAddress: C, functionSig: "pause()", decoded: true });
+  });
+
+  it("leaves already-decoded roles untouched", () => {
+    const s: SnapshotState = { r1: { ...state["0xr1"] } };
+    const table: HashTable = { "0xr1": { contractAddress: A, functionSig: "somethingElse()" } };
+    reannotateUndecoded(s, table);
+    expect(s.r1).to.deep.equal(state["0xr1"]);
+  });
+
+  it("leaves undecoded roles untouched when there is no hash-table hit", () => {
+    const s: SnapshotState = { r3: { ...undecodedRole } };
+    reannotateUndecoded(s, {});
+    expect(s.r3).to.deep.equal(undecodedRole);
+  });
+
+  it("is a no-op when table is null (non-legacy networks)", () => {
+    const s: SnapshotState = { r3: { ...undecodedRole } };
+    reannotateUndecoded(s, null);
+    expect(s.r3).to.deep.equal(undecodedRole);
+  });
+});
+
+describe("snapshot file store (load/save)", () => {
+  // Scratch base dir under os.tmpdir() so tests NEVER touch the real snapshots/<network>/ tree
+  // (a live fetch may have written real data there).
+  let baseDir: string;
+  let dir: string;
+
+  beforeEach(() => {
+    baseDir = fs.mkdtempSync(path.join(os.tmpdir(), "acm-snapshot-test-"));
+    dir = path.join(baseDir, "sepolia");
+  });
+  afterEach(() => fs.rmSync(baseDir, { recursive: true, force: true }));
 
   it("returns null when no snapshot exists yet", () => {
-    expect(loadSnapshotFile("sepolia")).to.equal(null);
+    expect(loadSnapshotFile("sepolia", baseDir)).to.equal(null);
   });
 
   it("saves atomically (no leftover .tmp) and loads back the same file", () => {
     const f = stateToFile(state, { ...meta, network: "sepolia" }, {});
-    saveSnapshotFile("sepolia", f);
+    saveSnapshotFile("sepolia", f, baseDir);
     expect(fs.existsSync(`${dir}/permissions.json.tmp`)).to.equal(false);
-    expect(loadSnapshotFile("sepolia")).to.deep.equal(f);
+    expect(loadSnapshotFile("sepolia", baseDir)).to.deep.equal(f);
   });
 
   it("throws a descriptive error for a corrupt/invalid snapshot file", () => {
     fs.mkdirSync(dir, { recursive: true });
     fs.writeFileSync(`${dir}/permissions.json`, "{ not json");
-    expect(() => loadSnapshotFile("sepolia")).to.throw(/corrupt snapshot for sepolia/);
+    expect(() => loadSnapshotFile("sepolia", baseDir)).to.throw(/corrupt snapshot for sepolia/);
 
     fs.writeFileSync(`${dir}/permissions.json`, JSON.stringify({ schemaVersion: 2, height: 1, contracts: [] }));
-    expect(() => loadSnapshotFile("sepolia")).to.throw(/corrupt snapshot for sepolia/);
+    expect(() => loadSnapshotFile("sepolia", baseDir)).to.throw(/corrupt snapshot for sepolia/);
 
     fs.writeFileSync(
       `${dir}/permissions.json`,
       JSON.stringify({ schemaVersion: 1, height: "not-a-number", contracts: [] } as unknown as SnapshotFile),
     );
-    expect(() => loadSnapshotFile("sepolia")).to.throw(/corrupt snapshot for sepolia/);
+    expect(() => loadSnapshotFile("sepolia", baseDir)).to.throw(/corrupt snapshot for sepolia/);
   });
 });

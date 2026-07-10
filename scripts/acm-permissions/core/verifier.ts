@@ -6,7 +6,7 @@ export const ACM_ABI = [
   "function hasRole(bytes32 role, address account) view returns (bool)",
 ];
 
-interface AcmLike {
+export interface AcmLike {
   hasPermission: (account: string, contractAddress: string, functionSig: string) => Promise<boolean>;
   hasRole: (role: string, account: string) => Promise<boolean>;
 }

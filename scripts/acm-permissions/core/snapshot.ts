@@ -1,8 +1,9 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import { WILDCARD, snapshotDir } from "../config";
+import { SNAPSHOTS_DIR, WILDCARD } from "../config";
 import { Network, RoleState, SnapshotContract, SnapshotFile, SnapshotMeta, SnapshotState } from "../types";
+import { HashTable } from "./decoder";
 import { nameFor } from "./registry";
 
 const UNRESOLVED_KEY = "__UNRESOLVED__";
@@ -77,12 +78,30 @@ export function fileToState(file: SnapshotFile): SnapshotState {
   return state;
 }
 
-function permissionsFile(network: Network): string {
-  return path.join(snapshotDir(network), "permissions.json");
+// Re-annotates previously undecoded roles in a loaded state using a legacy hash table that may
+// have grown since the last run (e.g. new signatures/contracts registered). Mutates `state` in
+// place and must be called BEFORE any deep copy is taken for diffing, so re-annotation alone
+// never shows up as an added/removed diff entry.
+export function reannotateUndecoded(state: SnapshotState, table: HashTable | null): void {
+  if (!table) return;
+  for (const role of Object.values(state)) {
+    if (role.decoded) continue;
+    const hit = table[role.roleHash];
+    if (!hit) continue;
+    role.contractAddress = hit.contractAddress;
+    role.functionSig = hit.functionSig;
+    role.decoded = true;
+  }
 }
 
-export function loadSnapshotFile(network: Network): SnapshotFile | null {
-  const file = permissionsFile(network);
+function permissionsFile(network: Network, baseDir: string): string {
+  return path.join(baseDir, network, "permissions.json");
+}
+
+// `baseDir` exists so tests can point load/save at a scratch directory instead of the real
+// snapshots/ tree; production callers omit it and get SNAPSHOTS_DIR.
+export function loadSnapshotFile(network: Network, baseDir: string = SNAPSHOTS_DIR): SnapshotFile | null {
+  const file = permissionsFile(network, baseDir);
   if (!fs.existsSync(file)) return null;
 
   let parsed: unknown;
@@ -100,10 +119,10 @@ export function loadSnapshotFile(network: Network): SnapshotFile | null {
   return f as SnapshotFile;
 }
 
-export function saveSnapshotFile(network: Network, file: SnapshotFile): void {
-  const dir = snapshotDir(network);
+export function saveSnapshotFile(network: Network, file: SnapshotFile, baseDir: string = SNAPSHOTS_DIR): void {
+  const dir = path.join(baseDir, network);
   fs.mkdirSync(dir, { recursive: true });
-  const target = permissionsFile(network);
+  const target = permissionsFile(network, baseDir);
   const tmp = `${target}.tmp`;
   fs.writeFileSync(tmp, JSON.stringify(file, null, 2) + "\n");
   fs.renameSync(tmp, target);

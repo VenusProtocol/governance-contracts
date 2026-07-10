@@ -1,8 +1,8 @@
 import { expect } from "chai";
 import * as fs from "fs";
+import * as os from "os";
 import * as path from "path";
 
-import { snapshotDir } from "../../scripts/acm-permissions/config";
 import {
   changesJson,
   renderChangesMd,
@@ -154,14 +154,19 @@ describe("output renderers (golden files)", () => {
 });
 
 describe("writeRunOutputs", () => {
-  // Use "sepolia" as a scratch network dir; clean up before/after so no fixtures are left behind.
-  const dir = snapshotDir("sepolia");
+  // Scratch base dir under os.tmpdir() so tests NEVER touch the real snapshots/<network>/ tree
+  // (a live fetch may have written real data there).
+  let baseDir: string;
+  let dir: string;
 
-  beforeEach(() => fs.rmSync(dir, { recursive: true, force: true }));
-  afterEach(() => fs.rmSync(dir, { recursive: true, force: true }));
+  beforeEach(() => {
+    baseDir = fs.mkdtempSync(path.join(os.tmpdir(), "acm-output-test-"));
+    dir = path.join(baseDir, "sepolia");
+  });
+  afterEach(() => fs.rmSync(baseDir, { recursive: true, force: true }));
 
   it("writes permissions.md, changes.md, changes.json and unresolved-roles.json atomically", () => {
-    writeRunOutputs("sepolia", file, diff, corrections, meta, names);
+    writeRunOutputs("sepolia", file, diff, corrections, meta, names, baseDir);
 
     for (const f of ["permissions.md", "changes.md", "changes.json", "unresolved-roles.json"]) {
       expect(fs.existsSync(path.join(dir, f)), `${f} should exist`).to.equal(true);
@@ -180,7 +185,7 @@ describe("writeRunOutputs", () => {
 
   it("skips unresolved-roles.json when there is no unresolved bucket with entries", () => {
     const noUnresolved: SnapshotFile = { ...file, contracts: file.contracts.filter(c => c.scope !== "unresolved") };
-    writeRunOutputs("sepolia", noUnresolved, diff, corrections, meta, names);
+    writeRunOutputs("sepolia", noUnresolved, diff, corrections, meta, names, baseDir);
     expect(fs.existsSync(path.join(dir, "unresolved-roles.json"))).to.equal(false);
   });
 });

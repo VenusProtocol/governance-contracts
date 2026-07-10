@@ -1,7 +1,7 @@
 import * as fs from "fs";
 import * as path from "path";
 
-import { snapshotDir } from "../config";
+import { SNAPSHOTS_DIR } from "../config";
 import {
   Correction,
   DiffEntry,
@@ -135,6 +135,8 @@ function atomicWrite(target: string, content: string): void {
   fs.renameSync(tmp, target);
 }
 
+// `baseDir` exists so tests can write to a scratch directory instead of the real snapshots/
+// tree; production callers omit it and get SNAPSHOTS_DIR.
 export function writeRunOutputs(
   network: Network,
   file: SnapshotFile,
@@ -142,8 +144,9 @@ export function writeRunOutputs(
   corrections: Correction[],
   meta: RunMeta,
   names: Record<string, string>,
+  baseDir: string = SNAPSHOTS_DIR,
 ): void {
-  const dir = snapshotDir(network);
+  const dir = path.join(baseDir, network);
   fs.mkdirSync(dir, { recursive: true });
 
   const verified = corrections.length === 0;
