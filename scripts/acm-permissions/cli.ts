@@ -4,7 +4,7 @@ import * as fs from "fs";
 import { parseArgs } from "node:util";
 import * as path from "path";
 
-import { REGISTRY_DIR, STARTING_BLOCKS, acmAddress, isLegacyAcm, rpcUrl, snapshotDir } from "./config";
+import { GUARDIANS, REGISTRY_DIR, STARTING_BLOCKS, acmAddress, isLegacyAcm, rpcUrl, snapshotDir } from "./config";
 import { buildHashTable } from "./core/decoder";
 import { diffSnapshots } from "./core/diff";
 import { scanRange } from "./core/fetcher";
@@ -16,7 +16,7 @@ import { ACM_ABI, AcmLike, verifyAll, verifyDiff } from "./core/verifier";
 import { buildContractRegistry } from "./registry-builder/contracts";
 import { buildSignatures } from "./registry-builder/signatures";
 import { loadManifest, resolveSource } from "./registry-builder/sources";
-import { DiffEntry, NETWORKS, Network } from "./types";
+import { DiffEntry, NETWORKS, Network, SnapshotFile } from "./types";
 
 const writeAtomic = (file: string, data: string) => {
   fs.mkdirSync(path.dirname(file), { recursive: true });
@@ -171,6 +171,96 @@ function resolveNetworks(arg: string): Network[] {
   return requested as Network[];
 }
 
+export type FilterResult = Record<string, Array<{ contract: string; functionSig: string | null; roleHash: string }>>;
+
+// Resolves a requested grantee label to the address(es) it stands for:
+//   - a raw `0x…` address resolves to itself (checksummed)
+//   - the literal "Guardian" resolves to ALL guardian multisigs on the network
+//   - anything else is looked up in the name map (address whose mapped name matches the label;
+//     registries join conflicting deployments as "A / B" — e.g. "X / X_Proxy" — so each
+//     " / "-separated part matches on its own)
+// Throws a clear error when a label resolves to nothing, rather than silently matching zero
+// permissions (which would look identical to "this grantee legitimately holds nothing").
+function resolveLabel(label: string, network: Network, nameMap: Record<string, string>): string[] {
+  if (label.startsWith("0x")) return [ethers.utils.getAddress(label)];
+  if (label === "Guardian") return GUARDIANS[network];
+  const addresses = Object.keys(nameMap).filter(addr => nameMap[addr].split(" / ").includes(label));
+  if (addresses.length === 0) {
+    throw new Error(
+      `unknown grantee label "${label}" — expected a 0x… address, "Guardian", or a name present in the ` +
+        `${network} contract registry`,
+    );
+  }
+  return addresses;
+}
+
+export function filterPermissions(
+  file: SnapshotFile,
+  grantees: string[],
+  network: Network,
+  nameMap: Record<string, string> = loadNameMap(network),
+): FilterResult {
+  const result: FilterResult = {};
+
+  for (const label of grantees) {
+    const targets = new Set(resolveLabel(label, network, nameMap).map(a => ethers.utils.getAddress(a)));
+    const matches: FilterResult[string] = [];
+    for (const contract of file.contracts) {
+      for (const permission of contract.permissions) {
+        const isGrantedToLabel = permission.grantees.some(g => targets.has(ethers.utils.getAddress(g.address)));
+        if (isGrantedToLabel) {
+          matches.push({ contract: contract.name, functionSig: permission.functionSig, roleHash: permission.roleHash });
+        }
+      }
+    }
+    result[label] = matches;
+  }
+
+  return result;
+}
+
+function resolveSingleNetwork(arg: string): Network {
+  if (arg === "all" || arg.includes(",")) {
+    throw new Error(`filter requires exactly one --network (got "${arg}") — "all" and lists are not supported`);
+  }
+  if (!(NETWORKS as readonly string[]).includes(arg)) {
+    throw new Error(`unknown network: ${arg} — expected one of ${NETWORKS.join(", ")}`);
+  }
+  return arg as Network;
+}
+
+function filterCommand(values: { network?: string; grantees?: string; out?: string }): void {
+  let network: Network;
+  try {
+    network = resolveSingleNetwork(values.network ?? "all");
+  } catch (e) {
+    console.error((e as Error).message);
+    process.exit(2);
+  }
+
+  if (!values.grantees) {
+    console.error("filter requires --grantees <label1,label2,...>");
+    process.exit(2);
+  }
+  const grantees = values.grantees.split(",").map(s => s.trim());
+
+  const file = loadSnapshotFile(network);
+  if (!file) {
+    console.error(`no snapshot for ${network} — run \`yarn acm:fetch --network ${network}\` first`);
+    process.exit(1);
+  }
+
+  const result = filterPermissions(file, grantees, network);
+
+  for (const label of grantees) {
+    const matches = result[label];
+    console.log(`### ${label} — ${matches.length} permissions`);
+    for (const m of matches) console.log(`${m.contract} ${m.functionSig ?? m.roleHash}`);
+  }
+
+  if (values.out) writeAtomic(values.out, JSON.stringify(result, null, 2) + "\n");
+}
+
 async function fetchCommand(values: {
   network?: string;
   "chunk-size"?: string;
@@ -208,28 +298,32 @@ async function fetchCommand(values: {
   if (anyFailed) process.exit(1);
 }
 
-(async () => {
-  const { positionals, values } = parseArgs({
-    allowPositionals: true,
-    options: {
-      network: { type: "string", default: "all" },
-      "chunk-size": { type: "string", default: "40000" },
-      rebuild: { type: "boolean", default: false },
-      to: { type: "string" },
-      grantees: { type: "string" },
-      out: { type: "string" },
-    },
+// Guarded so importing this module (e.g. from tests, for `filterPermissions`) never triggers
+// the CLI dispatch below — only running `cli.ts` directly does.
+if (require.main === module) {
+  (async () => {
+    const { positionals, values } = parseArgs({
+      allowPositionals: true,
+      options: {
+        network: { type: "string", default: "all" },
+        "chunk-size": { type: "string", default: "40000" },
+        rebuild: { type: "boolean", default: false },
+        to: { type: "string" },
+        grantees: { type: "string" },
+        out: { type: "string" },
+      },
+    });
+    const cmd = positionals[0];
+    if (cmd === "build-registry") await buildRegistry();
+    else if (cmd === "fetch") await fetchCommand(values);
+    else if (cmd === "verify") await verifyCommand(values);
+    else if (cmd === "filter") filterCommand(values);
+    else {
+      console.error("usage: cli.ts <build-registry|fetch|verify|filter> [--network all]");
+      process.exit(2);
+    }
+  })().catch(e => {
+    console.error(e);
+    process.exit(1);
   });
-  const cmd = positionals[0];
-  if (cmd === "build-registry") await buildRegistry();
-  else if (cmd === "fetch") await fetchCommand(values);
-  else if (cmd === "verify") await verifyCommand(values);
-  else if (cmd === "filter") throw new Error(`${cmd}: implemented in a later task`);
-  else {
-    console.error("usage: cli.ts <build-registry|fetch|verify|filter> [--network all]");
-    process.exit(2);
-  }
-})().catch(e => {
-  console.error(e);
-  process.exit(1);
-});
+}
