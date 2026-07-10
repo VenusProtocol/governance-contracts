@@ -1648,6 +1648,36 @@ git commit -m "chore(acm): first full permission snapshots for all 16 networks"
 
 ---
 
+### Task 18: `refresh` command — offline re-annotation and re-render (user-requested addition)
+
+**Rationale (user request, 2026-07-10):** several Venus contract families (venus-protocol-periphery,
+fixed-rate vaults, XVS-rewards contracts) are not yet in `sources.json`, so their bscmainnet role
+hashes sit in `unresolved-roles.json` and their addresses render unnamed on all networks. Since the
+indexer stores every event (keyed by role hash on bscmainnet), NO rescan is ever needed — only an
+offline re-annotation + re-render after the registry is updated.
+
+**Files:**
+
+- Modify: `scripts/acm-permissions/cli.ts` (new `refresh` command)
+- Modify: `scripts/acm-permissions/registry/sources.json` (add `@venusprotocol/venus-protocol-periphery` npm source, pinned)
+- Test: `tests/acm-permissions/refresh.test.ts`
+
+**Interfaces:**
+
+- Consumes: `loadSnapshotFile`, `fileToState`, `stateToFile`, `saveSnapshotFile`, `reannotateUndecoded` (core/snapshot); `buildHashTable` (core/decoder); `loadNameMap`, `loadSignatures`, `loadKnownAddresses` (core/registry); config/types.
+- Produces: `refreshNetwork(network, opts?): { newlyDecoded: number; total: number; unresolved: number }` exported from cli.ts for tests.
+
+**Behavior:**
+
+- `yarn acm:refresh [--network all|csv]` — NO RPC calls, NO height change, NO changes.md rewrite.
+- Per network: load snapshot → `fileToState` → (bscmainnet) `reannotateUndecoded` against a freshly built hash table → `stateToFile` with the current name map → `saveSnapshotFile` + rewrite `permissions.md` and `unresolved-roles.json` (delete the file if no unresolved entries remain).
+- Print per network: `<network>: <N> roles, <K> newly decoded, <U> still unresolved` (K>0 only possible on bscmainnet).
+- Missing snapshot → warn + skip. Exit 0 unless a network errored.
+
+**Steps:** TDD (failing test with a stub snapshot in a tmp baseDir containing one undecoded role whose hash matches a stub table → refresh decodes it and rewrites files); implement; run `yarn acm:build-registry` after adding the periphery source; run `yarn acm:refresh --network all` for real and report newly-decoded counts; commit 1: `feat(acm): add offline refresh command for registry-driven re-annotation`; commit 2 (if registries/snapshots changed from the real run): `chore(acm): refresh snapshots with periphery registry`.
+
+---
+
 ## Self-review checklist (run after all tasks)
 
 - Every spec section maps to a task: §2→T1, §4→T2, §5.1→T4/T6, §5.2→T5/T6, §5.3→T3, §6.1/6.2→T7/T8, §6.3→T7/T12/T16 items, §7→T10/T14, §8.1→T12/T14, §8.2→T15, §9→T9/T13, §10→T16, §11→T3/T9/T10/T14, §12→all test steps, §13 phases→task order.
