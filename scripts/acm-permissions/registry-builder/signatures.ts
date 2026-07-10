@@ -54,6 +54,7 @@ const unique = (a: string[]) => [...new Set(a)];
 function walk(dir: string, ext: string): string[] {
   if (!fs.existsSync(dir)) return [];
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap(e => {
+    if (e.isDirectory() && e.name === "solcInputs") return [];
     const p = path.join(dir, e.name);
     return e.isDirectory() ? walk(p, ext) : e.name.endsWith(ext) ? [p] : [];
   });
