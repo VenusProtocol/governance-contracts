@@ -45,7 +45,8 @@
     "acm:fetch": "ts-node scripts/acm-permissions/cli.ts fetch",
     "acm:verify": "ts-node scripts/acm-permissions/cli.ts verify",
     "acm:filter": "ts-node scripts/acm-permissions/cli.ts filter",
-    "acm:build-registry": "ts-node scripts/acm-permissions/cli.ts build-registry"
+    "acm:build-registry": "ts-node scripts/acm-permissions/cli.ts build-registry",
+    "acm:refresh": "ts-node scripts/acm-permissions/cli.ts refresh"
   },
   "dependencies": {
     "@venusprotocol/solidity-utilities": "2.0.0",

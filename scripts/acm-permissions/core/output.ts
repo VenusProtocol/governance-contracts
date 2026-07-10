@@ -135,6 +135,35 @@ function atomicWrite(target: string, content: string): void {
   fs.renameSync(tmp, target);
 }
 
+// Writes just the permissions view (permissions.md + unresolved-roles.json) — the subset of
+// writeRunOutputs' outputs that a pure re-render (e.g. `refresh`, which never touches
+// changes.md/changes.json since it makes no chain calls and produces no diff) needs to rewrite.
+// Deletes unresolved-roles.json when the unresolved bucket is empty, so a role that becomes
+// decodable doesn't leave a stale (now-empty-of-that-entry, but not deleted) file behind.
+//
+// `baseDir` exists so tests can write to a scratch directory instead of the real snapshots/
+// tree; production callers omit it and get SNAPSHOTS_DIR.
+export function writePermissionsOutputs(
+  network: Network,
+  file: SnapshotFile,
+  names: Record<string, string>,
+  verified: boolean,
+  baseDir: string = SNAPSHOTS_DIR,
+): void {
+  const dir = path.join(baseDir, network);
+  fs.mkdirSync(dir, { recursive: true });
+
+  atomicWrite(path.join(dir, "permissions.md"), renderPermissionsMd(file, verified));
+
+  const unresolvedFile = path.join(dir, "unresolved-roles.json");
+  const unresolved = file.contracts.find((c: SnapshotContract) => c.scope === "unresolved");
+  if (unresolved && unresolved.permissions.length > 0) {
+    atomicWrite(unresolvedFile, JSON.stringify(unresolved.permissions, null, 2) + "\n");
+  } else if (fs.existsSync(unresolvedFile)) {
+    fs.rmSync(unresolvedFile);
+  }
+}
+
 // `baseDir` exists so tests can write to a scratch directory instead of the real snapshots/
 // tree; production callers omit it and get SNAPSHOTS_DIR.
 export function writeRunOutputs(
@@ -149,13 +178,7 @@ export function writeRunOutputs(
   const dir = path.join(baseDir, network);
   fs.mkdirSync(dir, { recursive: true });
 
-  const verified = corrections.length === 0;
-  atomicWrite(path.join(dir, "permissions.md"), renderPermissionsMd(file, verified));
+  writePermissionsOutputs(network, file, names, corrections.length === 0, baseDir);
   atomicWrite(path.join(dir, "changes.md"), renderChangesMd(diff, corrections, meta, names));
   atomicWrite(path.join(dir, "changes.json"), JSON.stringify(changesJson(diff, corrections, meta), null, 2) + "\n");
-
-  const unresolved = file.contracts.find((c: SnapshotContract) => c.scope === "unresolved");
-  if (unresolved && unresolved.permissions.length > 0) {
-    atomicWrite(path.join(dir, "unresolved-roles.json"), JSON.stringify(unresolved.permissions, null, 2) + "\n");
-  }
 }

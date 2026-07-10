@@ -8,7 +8,7 @@ import { GUARDIANS, REGISTRY_DIR, STARTING_BLOCKS, acmAddress, isLegacyAcm, rpcU
 import { buildHashTable } from "./core/decoder";
 import { diffSnapshots } from "./core/diff";
 import { scanRange } from "./core/fetcher";
-import { writeRunOutputs } from "./core/output";
+import { writePermissionsOutputs, writeRunOutputs } from "./core/output";
 import { applyEvents } from "./core/reducer";
 import { loadKnownAddresses, loadNameMap, loadSignatures, nameFor, requireSignaturesForLegacy } from "./core/registry";
 import { fileToState, loadSnapshotFile, reannotateUndecoded, saveSnapshotFile, stateToFile } from "./core/snapshot";
@@ -298,6 +298,71 @@ async function fetchCommand(values: {
   if (anyFailed) process.exit(1);
 }
 
+export interface RefreshResult {
+  newlyDecoded: number;
+  total: number;
+  unresolved: number;
+}
+
+// Offline re-annotation + re-render of a committed snapshot — no RPC calls, no height change,
+// no changes.md/changes.json rewrite (there is no diff: nothing was scanned this run). Only
+// bscmainnet can ever produce newlyDecoded > 0, since only its roles are ever undecoded (legacy
+// hash-based roles awaiting registry growth); other networks decode fully at fetch time.
+// Returns null (after warning) when there is no snapshot to refresh for `network`.
+export function refreshNetwork(network: Network, opts: { baseDir?: string } = {}): RefreshResult | null {
+  const { baseDir } = opts;
+  const file = loadSnapshotFile(network, baseDir);
+  if (!file) {
+    console.warn(`[${network}] no snapshot — skipping`);
+    return null;
+  }
+
+  const state = fileToState(file);
+  const table = isLegacyAcm(network) ? buildHashTable(loadKnownAddresses(network), loadSignatures()) : null;
+  const before = Object.values(state).filter(r => !r.decoded).length;
+  reannotateUndecoded(state, table);
+  const after = Object.values(state).filter(r => !r.decoded).length;
+
+  const names = loadNameMap(network);
+  const newFile = stateToFile(
+    state,
+    { network: file.network, acmAddress: file.acmAddress, height: file.height, updatedAt: file.updatedAt },
+    names,
+  );
+  saveSnapshotFile(network, newFile, baseDir);
+  writePermissionsOutputs(network, newFile, names, false, baseDir);
+
+  return { newlyDecoded: before - after, total: Object.keys(state).length, unresolved: after };
+}
+
+function refreshCommand(values: { network?: string }): void {
+  let selected: Network[];
+  try {
+    selected = resolveNetworks(values.network ?? "all");
+  } catch (e) {
+    console.error((e as Error).message);
+    process.exit(2);
+  }
+
+  console.log("\n=== refresh summary ===");
+  let anyFailed = false;
+  for (const network of selected) {
+    try {
+      const result = refreshNetwork(network);
+      if (result)
+        console.log(
+          `${network}: ${result.total} roles, ${result.newlyDecoded} newly decoded, ${result.unresolved} still unresolved`,
+        );
+    } catch (e) {
+      anyFailed = true;
+      const message = e instanceof Error ? e.message : String(e);
+      console.log(`${network}: FAILED: ${message}`);
+    }
+  }
+
+  if (anyFailed) process.exit(1);
+}
+
 // Guarded so importing this module (e.g. from tests, for `filterPermissions`) never triggers
 // the CLI dispatch below — only running `cli.ts` directly does.
 if (require.main === module) {
@@ -318,8 +383,9 @@ if (require.main === module) {
     else if (cmd === "fetch") await fetchCommand(values);
     else if (cmd === "verify") await verifyCommand(values);
     else if (cmd === "filter") filterCommand(values);
+    else if (cmd === "refresh") refreshCommand(values);
     else {
-      console.error("usage: cli.ts <build-registry|fetch|verify|filter> [--network all]");
+      console.error("usage: cli.ts <build-registry|fetch|verify|filter|refresh> [--network all]");
       process.exit(2);
     }
   })().catch(e => {

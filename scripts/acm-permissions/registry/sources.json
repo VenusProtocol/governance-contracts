@@ -5,6 +5,7 @@
     { "type": "npm", "package": "@venusprotocol/isolated-pools", "version": "4.4.0" },
     { "type": "npm", "package": "@venusprotocol/oracle", "version": "2.16.0" },
     { "type": "npm", "package": "@venusprotocol/protocol-reserve", "version": "3.5.0" },
-    { "type": "npm", "package": "@venusprotocol/token-bridge", "version": "2.7.0" }
+    { "type": "npm", "package": "@venusprotocol/token-bridge", "version": "2.7.0" },
+    { "type": "npm", "package": "@venusprotocol/venus-periphery", "version": "1.2.0" }
   ]
 }
