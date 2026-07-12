@@ -20,7 +20,7 @@ export function nameFor(map: Record<string, string>, address: string): string {
   const key = ethers.utils.getAddress(address);
   return map[key] || key;
 }
-export function loadSignatures(): string[] {
+function loadGeneratedSignatures(): Set<string> {
   const fresh = path.join(REGISTRY_DIR, "signatures.json");
   const sigs = new Set<string>();
   if (fs.existsSync(fresh)) {
@@ -30,8 +30,52 @@ export function loadSignatures(): string[] {
     for (const c of data.contracts ?? []) for (const s of c.signatures) sigs.add(s);
     for (const s of data.signatures ?? []) sigs.add(s);
   }
+  return sigs;
+}
+
+export function loadSignatures(): string[] {
+  const sigs = loadGeneratedSignatures();
   for (const e of readJson(path.join(REGISTRY_DIR, "legacy-signatures.json")).signatures) sigs.add(e.signature);
   return [...sigs].sort();
+}
+
+// Signatures that ONLY the manual legacy file proves — i.e. no current package source
+// contains them. Permissions using these strings are the ones the packages cannot explain.
+export function loadLegacyOnlySignatures(): string[] {
+  const generated = loadGeneratedSignatures();
+  const legacy: string[] = readJson(path.join(REGISTRY_DIR, "legacy-signatures.json")).signatures.map(
+    (e: { signature: string }) => e.signature,
+  );
+  return [...new Set(legacy.filter(s => !generated.has(s)))].sort();
+}
+
+// Appends signatures that a registry rebuild dropped from signatures.json (string removed
+// from the source contracts) to the legacy file, so the record of every string ever used
+// for decoding is never lost. Skips signatures already present. Returns how many were added.
+export function recordDroppedSignatures(
+  dropped: string[],
+  filePath: string = path.join(REGISTRY_DIR, "legacy-signatures.json"),
+): number {
+  if (dropped.length === 0) return 0;
+  const data = readJson(filePath);
+  const present = new Set(data.signatures.map((e: { signature: string }) => e.signature));
+  const additions = [...new Set(dropped)].filter(s => !present.has(s));
+  for (const s of additions) {
+    data.signatures.push({
+      signature: s,
+      origin: `dropped from generated signatures.json on ${new Date()
+        .toISOString()
+        .slice(0, 10)} — string no longer found in any source package`,
+    });
+  }
+  if (additions.length) {
+    data.signatures.sort((a: { signature: string }, b: { signature: string }) =>
+      a.signature < b.signature ? -1 : a.signature > b.signature ? 1 : 0,
+    );
+    fs.writeFileSync(filePath + ".tmp", JSON.stringify(data, null, 2) + "\n");
+    fs.renameSync(filePath + ".tmp", filePath);
+  }
+  return additions.length;
 }
 // Deliberately does NOT include the zero address: the deployed bscmainnet ACM derives its
 // wildcard role from 32 zero bytes (handled directly in buildHashTable), never from the

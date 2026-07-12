@@ -19,7 +19,15 @@ import { diffSnapshots } from "./core/diff";
 import { scanRange } from "./core/fetcher";
 import { writePermissionsOutputs, writeRunOutputs } from "./core/output";
 import { applyEvents } from "./core/reducer";
-import { loadKnownAddresses, loadNameMap, loadSignatures, nameFor, requireSignaturesForLegacy } from "./core/registry";
+import {
+  loadKnownAddresses,
+  loadLegacyOnlySignatures,
+  loadNameMap,
+  loadSignatures,
+  nameFor,
+  recordDroppedSignatures,
+  requireSignaturesForLegacy,
+} from "./core/registry";
 import { fileToState, loadSnapshotFile, reannotateUndecoded, saveSnapshotFile, stateToFile } from "./core/snapshot";
 import { ACM_ABI, AcmLike, verifyAll, verifyDiff } from "./core/verifier";
 import { buildContractRegistry } from "./registry-builder/contracts";
@@ -52,6 +60,11 @@ async function buildRegistry() {
     `signatures: ${signatures.length} unique across ${contracts.length} contracts (+${appeared.length} / -${disappeared.length})`,
   );
   disappeared.forEach(s => console.log(`  disappeared: ${s}`));
+  // A string removed from the sources vanishes from the regenerated file, but roles hashed
+  // from it may still be granted on-chain — archive it in the manual legacy file so the full
+  // record of every string ever used for decoding survives rebuilds.
+  const archived = recordDroppedSignatures(disappeared);
+  if (archived) console.log(`  recorded ${archived} dropped signature(s) in legacy-signatures.json`);
   if (dynamicCallsites.length) {
     console.log(`⚠ dynamic checkAccessAllowed callsites (manual review):`);
     dynamicCallsites.forEach(d => console.log("  " + d));
@@ -242,6 +255,7 @@ export function filterPermissions(
   network: Network,
   nameMap: Record<string, string> = loadNameMap(network),
   exclude: string[] = [],
+  onlySigs: Set<string> | null = null,
 ): FilterResult {
   const result: FilterResult = {};
   // Set difference on the exact permission entry (same contract + roleHash): a permission is
@@ -256,6 +270,7 @@ export function filterPermissions(
     const matches: FilterResult[string] = [];
     for (const contract of file.contracts) {
       for (const permission of contract.permissions) {
+        if (onlySigs && (permission.functionSig === null || !onlySigs.has(permission.functionSig))) continue;
         const isGrantedToLabel = permission.grantees.some(g => targets.has(ethers.utils.getAddress(g.address)));
         const isAlsoExcluded = permission.grantees.some(g => excluded.has(ethers.utils.getAddress(g.address)));
         if (isGrantedToLabel && !isAlsoExcluded) {
@@ -283,7 +298,14 @@ function resolveSingleNetwork(arg: string): Network {
 const slugify = (labels: string[]) => labels.map(l => l.replace(/[^A-Za-z0-9_.-]+/g, "-")).join("+");
 
 function renderFilterMd(
-  meta: { network: Network; height: number; updatedAt: string; grantees: string[]; exclude: string[] },
+  meta: {
+    network: Network;
+    height: number;
+    updatedAt: string;
+    grantees: string[];
+    exclude: string[];
+    legacyOnly?: boolean;
+  },
   result: FilterResult,
 ): string {
   const lines: string[] = [
@@ -291,6 +313,9 @@ function renderFilterMd(
     "",
     `- Grantees: ${meta.grantees.join(", ")}`,
     ...(meta.exclude.length ? [`- Excluding permissions also held by: ${meta.exclude.join(", ")}`] : []),
+    ...(meta.legacyOnly
+      ? ["- Only permissions whose signature exists solely in legacy-signatures.json (no package source proves it)"]
+      : []),
     `- Snapshot height: ${meta.height} (updated ${meta.updatedAt})`,
     "",
   ];
@@ -306,7 +331,13 @@ function renderFilterMd(
   return lines.join("\n");
 }
 
-function filterCommand(values: { network?: string; grantees?: string; exclude?: string; out?: string }): void {
+function filterCommand(values: {
+  network?: string;
+  grantees?: string;
+  exclude?: string;
+  "legacy-only"?: boolean;
+  out?: string;
+}): void {
   let network: Network;
   try {
     network = resolveSingleNetwork(values.network ?? "all");
@@ -321,6 +352,8 @@ function filterCommand(values: { network?: string; grantees?: string; exclude?: 
   }
   const grantees = values.grantees.split(",").map(s => s.trim());
   const exclude = values.exclude ? values.exclude.split(",").map(s => s.trim()) : [];
+  const legacyOnly = values["legacy-only"] ?? false;
+  const onlySigs = legacyOnly ? new Set(loadLegacyOnlySignatures()) : null;
 
   const file = loadSnapshotFile(network);
   if (!file) {
@@ -328,7 +361,7 @@ function filterCommand(values: { network?: string; grantees?: string; exclude?: 
     process.exit(1);
   }
 
-  const result = filterPermissions(file, grantees, network, loadNameMap(network), exclude);
+  const result = filterPermissions(file, grantees, network, loadNameMap(network), exclude, onlySigs);
 
   for (const label of grantees) {
     const matches = result[label];
@@ -336,9 +369,10 @@ function filterCommand(values: { network?: string; grantees?: string; exclude?: 
     for (const m of matches) console.log(`${m.contract} ${m.functionSig ?? m.roleHash}`);
   }
 
-  const meta = { network, height: file.height, updatedAt: file.updatedAt, grantees, exclude };
+  const meta = { network, height: file.height, updatedAt: file.updatedAt, grantees, exclude, legacyOnly };
   const report = { ...meta, generatedAt: new Date().toISOString(), results: result };
-  const slug = slugify(grantees) + (exclude.length ? `-minus-${slugify(exclude)}` : "");
+  const slug =
+    slugify(grantees) + (exclude.length ? `-minus-${slugify(exclude)}` : "") + (legacyOnly ? "-legacy-only" : "");
   const jsonPath = values.out ?? path.join(filtersDir(network), `${slug}.json`);
   writeAtomic(jsonPath, JSON.stringify(report, null, 2) + "\n");
   const mdPath = path.join(filtersDir(network), `${slug}.md`);
@@ -482,6 +516,7 @@ if (require.main === module) {
         to: { type: "string" },
         grantees: { type: "string" },
         exclude: { type: "string" },
+        "legacy-only": { type: "boolean" },
         out: { type: "string" },
       },
     });

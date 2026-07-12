@@ -130,6 +130,16 @@ describe("filterPermissions", () => {
     });
   });
 
+  it("onlySigs restricts matches to the given signatures and drops undecoded entries", () => {
+    const onlySigs = new Set(["unpause()"]);
+    const result = filterPermissions(file, ["NormalTimelock", "Guardian"], "bscmainnet", nameMap, [], onlySigs);
+    expect(result.NormalTimelock).to.deep.equal([
+      { contract: "SharedTarget", functionSig: "unpause()", roleHash: "0xr4" },
+    ]);
+    // Guardian's undecoded 0xr3 (functionSig null) must not slip through an onlySigs filter
+    expect(result.Guardian).to.deep.equal([{ contract: "SharedTarget", functionSig: "unpause()", roleHash: "0xr4" }]);
+  });
+
   it("throws for an exclude label that resolves to nothing", () => {
     expect(() => filterPermissions(file, ["Guardian"], "bscmainnet", nameMap, ["NotARealLabel"])).to.throw(
       /NotARealLabel/,

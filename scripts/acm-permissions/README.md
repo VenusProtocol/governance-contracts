@@ -85,8 +85,18 @@ on that exact role (same contract + role hash). The main use is
 yarn acm:filter --network bscmainnet --grantees NormalTimelock,FastTrackTimelock,CriticalTimelock --exclude Guardian
 ```
 
+`--legacy-only` keeps only permissions whose signature exists solely in
+`registry/legacy-signatures.json` — i.e. no current package source proves the string.
+These are grants the published contracts can no longer explain (removed/renamed
+functions, strings recovered from governance history), so they are the first things
+to review for revocation:
+
+```bash
+yarn acm:filter --network bscmainnet --grantees NormalTimelock,FastTrackTimelock,CriticalTimelock,Guardian --legacy-only
+```
+
 Every run writes an on-demand report (JSON + Markdown) to
-`scripts/acm-permissions/filters/<network>/<grantees>[-minus-<exclude>].{json,md}` —
+`scripts/acm-permissions/filters/<network>/<grantees>[-minus-<exclude>][-legacy-only].{json,md}` —
 kept apart from `snapshots/` because these are ad-hoc views regenerated at will, not
 fetch-maintained state. `--out <path>` redirects the JSON copy.
 
