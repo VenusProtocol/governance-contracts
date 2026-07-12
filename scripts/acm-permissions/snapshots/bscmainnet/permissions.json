@@ -380,7 +380,7 @@
             },
             {
               "address": "0xE7252dccd79F2A555E314B9cdd440745b697D562",
-              "name": "Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6))"
+              "name": "Legacy (old BNBPermissions.json)"
             }
           ],
           "transactions": [
@@ -415,7 +415,7 @@
             },
             {
               "address": "0xE7252dccd79F2A555E314B9cdd440745b697D562",
-              "name": "Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6))"
+              "name": "Legacy (old BNBPermissions.json)"
             }
           ],
           "transactions": [
@@ -2942,7 +2942,7 @@
     },
     {
       "address": "0xea2f042e1A4f057EF8A5220e57733AD747ea8867",
-      "name": "Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6))",
+      "name": "Legacy (old BNBPermissions.json)",
       "scope": "contract",
       "permissions": [
         {
@@ -2975,7 +2975,7 @@
     },
     {
       "address": "0xBa2a43279a228cf9cD94d072777d8d98e7e0a229",
-      "name": "Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6))",
+      "name": "Legacy (old BNBPermissions.json)",
       "scope": "contract",
       "permissions": [
         {
@@ -3070,7 +3070,7 @@
     },
     {
       "address": "0xE7252dccd79F2A555E314B9cdd440745b697D562",
-      "name": "Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6))",
+      "name": "Legacy (old BNBPermissions.json)",
       "scope": "contract",
       "permissions": [
         {

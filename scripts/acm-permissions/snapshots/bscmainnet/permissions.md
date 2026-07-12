@@ -200,13 +200,13 @@ Snapshot block: 109200201 · Updated: 2026-07-10 · Contracts: 72 · Permissions
 | `sweep(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian 1, NormalTimelock |
 | `unpauseVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian 1, NormalTimelock |
 
-## Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6)) (`0xea2f042e1A4f057EF8A5220e57733AD747ea8867`)
+## Legacy (old BNBPermissions.json) (`0xea2f042e1A4f057EF8A5220e57733AD747ea8867`)
 
 | Function | Grantees |
 | --- | --- |
 | `setTokenConfig(TokenConfig)` | CriticalTimelock, FastTrackTimelock, Guardian 3, NormalTimelock |
 
-## Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6)) (`0xBa2a43279a228cf9cD94d072777d8d98e7e0a229`)
+## Legacy (old BNBPermissions.json) (`0xBa2a43279a228cf9cD94d072777d8d98e7e0a229`)
 
 | Function | Grantees |
 | --- | --- |
@@ -215,7 +215,7 @@ Snapshot block: 109200201 · Updated: 2026-07-10 · Contracts: 72 · Permissions
 | `toggleConfigActive(string)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `unpause()` | CriticalTimelock, FastTrackTimelock, Guardian 2, NormalTimelock |
 
-## Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6)) (`0xE7252dccd79F2A555E314B9cdd440745b697D562`)
+## Legacy (old BNBPermissions.json) (`0xE7252dccd79F2A555E314B9cdd440745b697D562`)
 
 | Function | Grantees |
 | --- | --- |
@@ -701,8 +701,8 @@ Snapshot block: 109200201 · Updated: 2026-07-10 · Contracts: 72 · Permissions
 | `setLastRewardingBlock(address[],uint32[],uint32[])` | NormalTimelock |
 | `setLastRewardingBlocks(address[],uint32[],uint32[])` | NormalTimelock |
 | `setLiquidationIncentive(uint256)` | NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
-| `setMarketBorrowCaps(address[],uint256[])` | CriticalTimelock, FastTrackTimelock, Guardian 1, Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6)), NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
-| `setMarketSupplyCaps(address[],uint256[])` | CriticalTimelock, FastTrackTimelock, Guardian 1, Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6)), NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
+| `setMarketBorrowCaps(address[],uint256[])` | CriticalTimelock, FastTrackTimelock, Guardian 1, Legacy (old BNBPermissions.json), NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
+| `setMarketSupplyCaps(address[],uint256[])` | CriticalTimelock, FastTrackTimelock, Guardian 1, Legacy (old BNBPermissions.json), NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
 | `setMaxLoopsLimit(uint256)` | NormalTimelock |
 | `setMinLiquidatableCollateral(uint256)` | NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
 | `setPoolName(address,string)` | NormalTimelock |

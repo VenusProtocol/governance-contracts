@@ -618,7 +618,7 @@
   "0x7B1AE5Ea599bC56734624b95589e7E8E64C351c9": "Guardian 1",
   "0x1C2CAc6ec528c20800B2fe734820D87b581eAA6B": "Guardian 2",
   "0x3a3284dC0FaFfb0b5F0d074c4C704D14326C98cF": "Guardian 3",
-  "0xBa2a43279a228cf9cD94d072777d8d98e7e0a229": "Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6))",
-  "0xE7252dccd79F2A555E314B9cdd440745b697D562": "Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6))",
-  "0xea2f042e1A4f057EF8A5220e57733AD747ea8867": "Legacy (old BNBPermissions.json (pending fresh-extraction diff, Task 6))"
+  "0xBa2a43279a228cf9cD94d072777d8d98e7e0a229": "Legacy (old BNBPermissions.json)",
+  "0xE7252dccd79F2A555E314B9cdd440745b697D562": "Legacy (old BNBPermissions.json)",
+  "0xea2f042e1A4f057EF8A5220e57733AD747ea8867": "Legacy (old BNBPermissions.json)"
 }
