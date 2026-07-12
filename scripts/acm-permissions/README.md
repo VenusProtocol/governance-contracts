@@ -91,6 +91,37 @@ Any dynamically-built `checkAccessAllowed` string (i.e. not a plain literal) is 
 for manual review — it cannot be statically extracted and may need a
 `registry/legacy-signatures.json` entry.
 
+### `yarn acm:refresh`
+
+Offline re-annotation and re-render of the **already-committed** snapshots — no RPC
+calls, no height change, no `changes.md`/`changes.json` rewrite (there is nothing to
+diff: no scanning happened). It exists because the snapshot already stores every event
+it has ever seen (keyed by role hash on bscmainnet), so growing the registry (a new
+source added to `sources.json`, newly resolved contract names, newly discovered
+signatures) never requires a rescan — only a re-decode/re-render of what's already on
+disk.
+
+```bash
+yarn acm:refresh                       # every network
+yarn acm:refresh --network bscmainnet  # one network
+```
+
+Per network: loads the snapshot, re-applies `reannotateUndecoded` against a freshly
+built hash table (bscmainnet only — this is the only network with roles that can ever
+be undecoded), re-resolves every contract/grantee name from the **current**
+`registry/contracts/<network>.json`, and rewrites `permissions.json`/`permissions.md`
+(and deletes `unresolved-roles.json` once nothing remains unresolved). Prints
+`<network>: <N> roles, <K> newly decoded, <U> still unresolved` per network; missing
+snapshot → warn + skip.
+
+Typical workflow after adding a new source repo:
+
+```bash
+# edit registry/sources.json to add the new source
+yarn acm:build-registry     # regenerate signatures.json / contracts/<network>.json
+yarn acm:refresh            # re-decode/re-render existing snapshots against the new registry
+```
+
 ## Decoding bscmainnet
 
 Every network except bscmainnet runs a modern ACM that emits self-describing
@@ -117,9 +148,10 @@ so a `RoleRevoked` always removes the grantee correctly even when the role can't
 decoded (the old tool's silent-staleness bug is gone). Roles the table can't decode
 stay in `permissions.json` with `"decoded": false` and the raw hash — nothing is ever
 dropped — and are additionally extracted into `unresolved-roles.json` with their
-grant/revoke tx hashes for later investigation. If a later `build-registry` run adds a
-matching signature or address, the very next `fetch` re-annotates those entries
-automatically (re-decode is applied to loaded state before any diff is computed).
+grant tx hashes for later investigation (revoke transactions are not recorded). If a
+later `build-registry` run adds a matching signature or address, the very next `fetch`
+re-annotates those entries automatically (re-decode is applied to loaded state before
+any diff is computed).
 
 Full details, including the complete bscmainnet-only behavior checklist, are in
 [`DESIGN.md` §6.2/§6.3](./DESIGN.md#62-bscmainnet-legacy-role-hash-acm).
@@ -186,7 +218,7 @@ flaky public RPC rejecting one chunk only costs that chunk, not the whole scan.
 | ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `permissions.json`            | Source of truth. Current permission state: header (schema version, network, ACM address, `height`, `updatedAt`), then every contract with at least one active permission — grouped by resolved contract name/address, each guarded function signature with its role hash, `decoded` flag, and full grantee list (address + resolved name). Wildcard permissions (`contractAddress == address(0)`, "may call this function on any contract") appear under `"scope": "wildcard"`; bscmainnet's undecoded role hashes appear under `"scope": "unresolved"`. Entries with zero remaining grantees are omitted. |
 | `permissions.md`              | Pure render of `permissions.json` for human review — one table per contract, a summary header (block, date, contract/permission counts, last verification status), a wildcard section, and (bscmainnet) an "Unresolved roles" section. Regenerated every run, never hand-edited.                                                                                                                                                                                                                                                                                                                           |
-| `changes.md` / `changes.json` | Only the delta from the **latest run** (not cumulative — history lives in git): run metadata (date, block range scanned), `Added`, `Removed`, and `Corrections (on-chain authoritative)` sections. If nothing changed, still written with "No changes" so a reviewer has positive confirmation the run completed. `changes.json` mirrors `changes.md` with added tx hash/block/log-index detail.                                                                                                                                                                                                           |
+| `changes.md` / `changes.json` | Only the delta from the **latest run** (not cumulative — history lives in git): run metadata (date, block range scanned), `Added`, `Removed`, and `Corrections (on-chain authoritative)` sections. Written with "No changes" whenever a scan ran this run but found nothing, so a reviewer has positive confirmation the run completed; an already-up-to-date no-op run (nothing left to scan) writes neither file at all. `changes.json` mirrors `changes.md`, adding each entry's tx hash.                                                                                                               |
 | `unresolved-roles.json`       | bscmainnet only (omitted when there is nothing to report). Extract of every undecoded role hash from `permissions.json`, with grantees and first-seen grant tx hashes, for later investigation.                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 ## Live smoke test (manual)

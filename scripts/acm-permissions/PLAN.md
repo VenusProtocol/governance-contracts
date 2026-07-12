@@ -1659,7 +1659,9 @@ offline re-annotation + re-render after the registry is updated.
 **Files:**
 
 - Modify: `scripts/acm-permissions/cli.ts` (new `refresh` command)
-- Modify: `scripts/acm-permissions/registry/sources.json` (add `@venusprotocol/venus-protocol-periphery` npm source, pinned)
+- Modify: `scripts/acm-permissions/registry/sources.json` (add a periphery npm source, pinned —
+  note: `@venusprotocol/venus-protocol-periphery` named above does not exist on npm; the real
+  published package is `@venusprotocol/venus-periphery`, which is what was actually added)
 - Test: `tests/acm-permissions/refresh.test.ts`
 
 **Interfaces:**

@@ -157,8 +157,8 @@ sources, merged and deduplicated:
   only what the current sources actually prove, and is never hand-edited.
 - On every rebuild, `acm:build-registry` diffs the fresh result against the previous
   committed version and prints which strings appeared / disappeared.
-- Strings the *old system* knew (the function strings inside the old
-  `BNBPermissions.json`) that fresh extraction does **not** re-find are *not* mixed
+- Strings the _old system_ knew (the function strings inside the old
+  `BNBPermissions.json`) that fresh extraction does **not** re-find are _not_ mixed
   into `signatures.json` — they go into `registry/legacy-signatures.json`. This keeps
   provenance clear: `signatures.json` = provable from sources today;
   `legacy-signatures.json` = inherited/manual knowledge.
@@ -205,7 +205,7 @@ Which repos/packages get scanned is driven by the source manifest (§5.3).
    `Unitroller`. Both target contracts and grantee accounts resolve through this
    registry.
 2. **bscmainnet role-hash decoding:** the hash table (§6.2) needs every candidate
-   *address* just as it needs every candidate string — a missing address makes all of
+   _address_ just as it needs every candidate string — a missing address makes all of
    that contract's roles undecodable.
 
 **How the current system gets it:** two disconnected hand-maintained lists — the
@@ -352,7 +352,7 @@ annotation, not the key. Consequences:
 - A `RoleRevoked` always removes the grantee correctly **even for roles we cannot
   decode** — fixing the old tool's silent-staleness bug.
 - Undecoded roles appear in `permissions.json` with `"decoded": false` and the raw
-  hash — the fact that *something* is granted is never lost.
+  hash — the fact that _something_ is granted is never lost.
 - `unresolved-roles.json` is a filtered extract of those entries (with the grant/revoke
   tx hashes for later investigation).
 - If a later registry rebuild adds a matching signature, the next run re-annotates the
@@ -362,17 +362,17 @@ annotation, not the key. Consequences:
 
 Everything that applies **only** to bscmainnet, in one place:
 
-| # | bscmainnet-only behavior | Where |
-| --- | --- | --- |
-| 1 | Listens to `RoleGranted`/`RoleRevoked` (role-hash events) instead of `PermissionGranted`/`PermissionRevoked` | §6.2 |
-| 2 | Precomputed hash table (all registry addresses × all registry signatures, plus `address(0)` wildcard) to decode role hashes | §6.2 |
-| 3 | Snapshot state keyed by **role hash**, not (contract, signature) | §6.2 |
-| 4 | Undecoded roles kept in `permissions.json` (`"decoded": false`) and extracted to `unresolved-roles.json` with their tx hashes | §6.2, §9 |
-| 5 | Manual registry inputs: `legacy-signatures.json` (typo'd historical strings) and `legacy-contracts.json` (retired addresses) | §5.1, §5.2 |
-| 6 | The all-zero role maps to `DEFAULT_ADMIN_ROLE` on the ACM itself | §6.2 |
-| 7 | Verification uses `hasRole(roleHash, account)` instead of `hasPermission(account, contract, sig)` | §8 |
-| 8 | Three Guardian multisigs (`Guardian 1/2/3`); the filter value `Guardian` matches all three | §5.2, §10 |
-| 9 | Fetch aborts if `signatures.json` is missing (decoding impossible without it) | §5.2 |
+| #   | bscmainnet-only behavior                                                                                                      | Where      |
+| --- | ----------------------------------------------------------------------------------------------------------------------------- | ---------- |
+| 1   | Listens to `RoleGranted`/`RoleRevoked` (role-hash events) instead of `PermissionGranted`/`PermissionRevoked`                  | §6.2       |
+| 2   | Precomputed hash table (all registry addresses × all registry signatures, plus `address(0)` wildcard) to decode role hashes   | §6.2       |
+| 3   | Snapshot state keyed by **role hash**, not (contract, signature)                                                              | §6.2       |
+| 4   | Undecoded roles kept in `permissions.json` (`"decoded": false`) and extracted to `unresolved-roles.json` with their tx hashes | §6.2, §9   |
+| 5   | Manual registry inputs: `legacy-signatures.json` (typo'd historical strings) and `legacy-contracts.json` (retired addresses)  | §5.1, §5.2 |
+| 6   | The all-zero role maps to `DEFAULT_ADMIN_ROLE` on the ACM itself                                                              | §6.2       |
+| 7   | Verification uses `hasRole(roleHash, account)` instead of `hasPermission(account, contract, sig)`                             | §8         |
+| 8   | Three Guardian multisigs (`Guardian 1/2/3`); the filter value `Guardian` matches all three                                    | §5.2, §10  |
+| 9   | Fetch aborts if `signatures.json` is missing (decoding impossible without it)                                                 | §5.2       |
 
 All other behavior — chunked scanning, checkpointing, resumability, diff, outputs,
 parallelism — is identical across all networks.
@@ -385,9 +385,8 @@ parallelism — is identical across all networks.
   **atomically after every chunk** (write `permissions.json.tmp`, then rename).
 - Killing the process at any point loses at most the in-flight chunk; the next run
   continues from `height + 1`.
-- `--from` / `--to` block overrides exist for debugging, but `--from` below the stored
-  height is ignored (state is already inclusive of those blocks) unless `--rebuild` is
-  passed, which deletes the network's snapshot and starts from the ACM deployment block.
+- `--to` overrides where scanning stops, for debugging; `--rebuild` deletes the
+  network's snapshot and starts from the ACM deployment block.
 
 ---
 
@@ -396,7 +395,13 @@ parallelism — is identical across all networks.
 ### 8.1 Per-run diff verification (automatic)
 
 After a fetch produces a diff, each changed entry is checked against the ACM at the
-snapshot block:
+**current chain head** (a plain `eth_call` with no `blockTag` — not the snapshot's
+`height`). This leaves a small race window between the block the scan stopped at and
+the block the verification call actually lands on: a permission changed in that gap
+could be read as confirming or contradicting a stale state. The window is at most a
+few blocks and is closed by the next `fetch`, which resumes scanning from `height + 1`.
+
+The check itself:
 
 - modern networks: `hasPermission(account, contract, functionSig)` — added entries must
   return `true`, removed entries `false`.
@@ -405,8 +410,8 @@ snapshot block:
 **On discrepancy, the on-chain state is authoritative.** The snapshot entry is
 corrected to match the chain before outputs are written:
 
-- diff said *added* but chain says not granted → grantee removed from the snapshot;
-- diff said *removed* but chain says still granted → grantee restored in the snapshot.
+- diff said _added_ but chain says not granted → grantee removed from the snapshot;
+- diff said _removed_ but chain says still granted → grantee restored in the snapshot.
 
 Every correction is recorded in a dedicated **`## Corrections (on-chain authoritative)`**
 section of `changes.md` / `changes.json` — stating what event replay produced, what the
@@ -418,11 +423,11 @@ so they are impossible to miss but never block the run.
 ### 8.2 Full verification (manual command)
 
 `yarn acm:verify --network <n|all>` re-checks **every** entry in the snapshot against
-the ACM (same view calls, batched via multicall where available). Use whenever a
-dual-check is wanted.
+the ACM (same view calls as §8.1, batched view calls — `Promise.all` groups of 20).
+Use whenever a dual-check is wanted.
 
 Honest limitation, documented in the README: full verify proves everything in the
-snapshot is real on-chain; it cannot *discover* a permission the scan never saw an
+snapshot is real on-chain; it cannot _discover_ a permission the scan never saw an
 event for. Checkpointed sequential scanning is what guarantees no events are missed;
 `--rebuild` exists as the ultimate re-derivation.
 
@@ -509,14 +514,14 @@ Verification: ✅ last diff verified on-chain
 
 ## Unitroller (`0xfD36…8384`)
 
-| Function | Grantees |
-| --- | --- |
+| Function                                | Grantees                   |
+| --------------------------------------- | -------------------------- |
 | `_setCollateralFactor(address,uint256)` | NormalTimelock, Guardian 1 |
 
 ## ⚠️ Unresolved roles (bscmainnet only)
 
 | Role hash | Grantees | First seen tx |
-| --- | --- | --- |
+| --------- | -------- | ------------- |
 ```
 
 ### 9.3 `changes.md` / `changes.json` (per-run diff)
@@ -542,12 +547,13 @@ log index) per entry.
 # Changes — bscmainnet (run 2026-07-10, blocks 66,323,915 → 68,100,000)
 
 ## Added (5)
-- ✅ Unitroller `_setActionsPaused(...)` → FastTrackTimelock   (verified on-chain)
+
+- ✅ Unitroller `_setActionsPaused(...)` → FastTrackTimelock (verified on-chain)
 
 ## Removed (3)
-- ✅ VAIController `setBaseRate(uint256)` ⇸ Guardian 2         (verified revoked)
-```
 
+- ✅ VAIController `setBaseRate(uint256)` ⇸ Guardian 2 (verified revoked)
+```
 
 ---
 
@@ -580,8 +586,8 @@ yarn acm:filter --network bscmainnet --grantees NormalTimelock,Guardian
 - **Atomic writes** for every output file (tmp + rename).
 - **Retry:** `getLogs` and view calls retry 5× with exponential backoff (5s → 60s cap);
   a chunk that still fails halts that network at the last good checkpoint (resumable).
-- **Address hygiene:** every address checksummed at ingestion; registry keys validated
-  as checksummed at load.
+- **Address hygiene:** every address checksummed at ingestion; registry lookups are
+  checksummed at read time (`nameFor` re-checksums its input on every call).
 - **Schema validation:** snapshot files validated on load (schemaVersion + shape);
   corrupt files abort with a clear message instead of silently starting from scratch.
 - **Deterministic:** events sorted by `(blockNumber, logIndex)` before reduction.
@@ -608,14 +614,14 @@ fine for unit tests — no network needed).
 
 ## 13. Implementation phases
 
-| Phase | Deliverable | Commit boundary |
-| --- | --- | --- |
-| 0 | Delete `scripts/ACMPermissions/` (first preserving `missingRoleInfo.txt` facts into a `legacy-signatures.json` draft and the old `BNBPermissions.json` addresses into a `legacy-contracts.json` draft) | 1 commit |
-| 1 | `build-registry`: sources manifest, signature extractor + contract-name registry; finalize `legacy-signatures.json` / `legacy-contracts.json` by diffing fresh extraction against the old system's lists (from git history); committed registries | 1 commit |
-| 2 | Core fetch pipeline: config, fetcher, decoder, reducer, snapshots, resumability, JSON+MD outputs, parallel `--network all` | 1–2 commits |
-| 3 | Diff engine + per-run diff verification + `acm:verify` full-check command | 1 commit |
-| 4 | `acm:filter` command | 1 commit |
-| 5 | Tests, README, first full snapshot build for all 16 networks committed | 1–2 commits |
+| Phase | Deliverable                                                                                                                                                                                                                                       | Commit boundary |
+| ----- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------- |
+| 0     | Delete `scripts/ACMPermissions/` (first preserving `missingRoleInfo.txt` facts into a `legacy-signatures.json` draft and the old `BNBPermissions.json` addresses into a `legacy-contracts.json` draft)                                            | 1 commit        |
+| 1     | `build-registry`: sources manifest, signature extractor + contract-name registry; finalize `legacy-signatures.json` / `legacy-contracts.json` by diffing fresh extraction against the old system's lists (from git history); committed registries | 1 commit        |
+| 2     | Core fetch pipeline: config, fetcher, decoder, reducer, snapshots, resumability, JSON+MD outputs, parallel `--network all`                                                                                                                        | 1–2 commits     |
+| 3     | Diff engine + per-run diff verification + `acm:verify` full-check command                                                                                                                                                                         | 1 commit        |
+| 4     | `acm:filter` command                                                                                                                                                                                                                              | 1 commit        |
+| 5     | Tests, README, first full snapshot build for all 16 networks committed                                                                                                                                                                            | 1–2 commits     |
 
 Each phase is independently reviewable; the tool is usable from Phase 2 onward.
 
