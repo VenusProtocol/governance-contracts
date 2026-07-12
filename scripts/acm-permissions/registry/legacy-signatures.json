@@ -1,32 +1,20 @@
 {
   "signatures": [
     {
-      "signature": "_setActionsPaused(address[],uint256[],bool)",
-      "origin": "missingRoleInfo.txt \u2014 typo'd grant (should be _setActionsPaused(address[],uint8[],bool)), role since revoked"
-    },
-    {
       "signature": "_setCollateralFactor(address,uint256)",
-      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
-    },
-    {
-      "signature": "_setLiquidationIncentive(uint256)",
-      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+      "origin": "old BNBPermissions.json \u2014 decodes a permission still granted on bscmainnet; function absent from current package sources"
     },
     {
       "signature": "createVault(VaultConfig,InstitutionalConfig,RiskConfig,string,string,string)",
       "origin": "not found in contract packages \u2014 granted via VIP-640 on InstitutionalVaultControllerProxy (0x6D9e91cB766259af42619c14c994E694E57e6E85) to the timelocks and Guardian; struct-named string not derivable from the published fixed-rate-vaults ABI"
     },
     {
-      "signature": "removeMarket(address,address)",
-      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
-    },
-    {
       "signature": "setMaxDeltaBps(uint256)",
-      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+      "origin": "old BNBPermissions.json \u2014 decodes a permission still granted on bscmainnet; function absent from current package sources"
     },
     {
       "signature": "setRewardRecipient(address)",
-      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+      "origin": "old BNBPermissions.json \u2014 decodes a permission still granted on bscmainnet; function absent from current package sources"
     },
     {
       "signature": "sweepTokenFromPool(address,address,address,uint256)",
@@ -34,7 +22,7 @@
     },
     {
       "signature": "toggleConfigActive(string)",
-      "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+      "origin": "old BNBPermissions.json \u2014 decodes a permission still granted on bscmainnet; function absent from current package sources"
     }
   ]
 }
