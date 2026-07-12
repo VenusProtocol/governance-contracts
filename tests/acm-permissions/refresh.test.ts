@@ -91,6 +91,8 @@ describe("refreshNetwork", () => {
       height: 42,
       updatedAt: "2026-07-01T00:00:00Z",
       schemaVersion: 1,
+      verified: true,
+      verifiedAt: "2026-07-01T00:00:00Z",
       contracts: [
         {
           address,
@@ -117,6 +119,12 @@ describe("refreshNetwork", () => {
     expect(reloaded.contracts[0].name).to.equal(currentName);
     expect(reloaded.contracts[0].permissions[0].grantees[0].name).to.equal(currentName);
     expect(reloaded.height).to.equal(42); // non-legacy network, no table — height still untouched
+    // refresh makes no chain calls — verified/verifiedAt must carry forward unchanged.
+    expect(reloaded.verified).to.equal(true);
+    expect(reloaded.verifiedAt).to.equal("2026-07-01T00:00:00Z");
+    expect(fs.readFileSync(path.join(dir, "permissions.md"), "utf8")).to.contain(
+      "✅ verified on-chain (as of 2026-07-01)",
+    );
   });
 
   it("warns and returns null when no snapshot exists for the network", () => {

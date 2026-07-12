@@ -125,16 +125,27 @@ const meta = { network: "bscmainnet", fromBlock: 66323915, toBlock: 68100000, da
 
 const golden = (name: string) => fs.readFileSync(path.join(__dirname, "fixtures", name), "utf8");
 
+// A copy of `file` stamped as verified — the base `file` fixture is deliberately left
+// un-stamped (verified/verifiedAt absent) so it can also exercise the "not verified" render
+// path (see the writeRunOutputs tests below, where corrections are non-empty but that no
+// longer determines the header — only the persistent verified/verifiedAt fields do).
+const verifiedFile: SnapshotFile = { ...file, verified: true, verifiedAt: "2026-07-10T00:00:00Z" };
+
 describe("output renderers (golden files)", () => {
   it("renderPermissionsMd matches the golden permissions.md byte-for-byte", () => {
-    const rendered = renderPermissionsMd(file, true);
+    const rendered = renderPermissionsMd(verifiedFile);
     expect(rendered).to.equal(golden("golden-permissions.md"));
   });
 
+  it("renders the un-verified header when verified/verifiedAt are absent", () => {
+    const rendered = renderPermissionsMd(file);
+    expect(rendered).to.contain("Verification: ⚠️ not verified");
+  });
+
   it("does not mutate the input file's grantee (chronological) order while rendering", () => {
-    const before = JSON.parse(JSON.stringify(file));
-    renderPermissionsMd(file, true);
-    expect(file).to.deep.equal(before);
+    const before = JSON.parse(JSON.stringify(verifiedFile));
+    renderPermissionsMd(verifiedFile);
+    expect(verifiedFile).to.deep.equal(before);
   });
 
   it("renderChangesMd matches the golden changes.md byte-for-byte", () => {
@@ -173,13 +184,22 @@ describe("writeRunOutputs", () => {
       expect(fs.existsSync(path.join(dir, `${f}.tmp`)), `${f}.tmp should not be left behind`).to.equal(false);
     }
 
-    // corrections are non-empty for this fixture → verified should be false in permissions.md
-    expect(fs.readFileSync(path.join(dir, "permissions.md"), "utf8")).to.contain("⚠️ not verified this run");
+    // `file` carries no verified/verifiedAt → permissions.md renders the un-verified header,
+    // regardless of `corrections` being non-empty (the caller, not corrections.length, decides
+    // verified status — see cli.ts's fetchNetwork).
+    expect(fs.readFileSync(path.join(dir, "permissions.md"), "utf8")).to.contain("⚠️ not verified");
     expect(JSON.parse(fs.readFileSync(path.join(dir, "changes.json"), "utf8"))).to.deep.equal(
       changesJson(diff, corrections, meta),
     );
     expect(JSON.parse(fs.readFileSync(path.join(dir, "unresolved-roles.json"), "utf8"))).to.deep.equal(
       file.contracts.find(c => c.scope === "unresolved")!.permissions,
+    );
+  });
+
+  it("renders the verified header when the file carries verified/verifiedAt, even with non-empty corrections", () => {
+    writeRunOutputs("sepolia", verifiedFile, diff, corrections, meta, names, baseDir);
+    expect(fs.readFileSync(path.join(dir, "permissions.md"), "utf8")).to.contain(
+      "✅ verified on-chain (as of 2026-07-10)",
     );
   });
 

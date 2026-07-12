@@ -18,9 +18,13 @@ import { buildSignatures } from "./registry-builder/signatures";
 import { loadManifest, resolveSource } from "./registry-builder/sources";
 import { DiffEntry, NETWORKS, Network, SnapshotFile } from "./types";
 
+// Ensures exactly one trailing newline (idempotent — callers that already append "\n"
+// themselves are unaffected) so every generated file matches prettier's EOF convention.
+// Mirrors core/output.ts's atomicWrite so both writers produce identical EOF behavior.
 const writeAtomic = (file: string, data: string) => {
   fs.mkdirSync(path.dirname(file), { recursive: true });
-  fs.writeFileSync(file + ".tmp", data);
+  const content = data.endsWith("\n") ? data : data + "\n";
+  fs.writeFileSync(file + ".tmp", content);
   fs.renameSync(file + ".tmp", file);
 };
 
@@ -81,11 +85,19 @@ async function fetchNetwork(
       saveSnapshotFile(network, stateToFile(state, { ...meta(), height: end }, names));
     },
   }); // checkpoint
+  // Up to date: the re-annotation applied to `state` above is discarded unsaved here (no
+  // rewrite on a no-op run) — that's fine, `yarn acm:refresh` exists precisely to persist
+  // re-annotation without a rescan.
   if (scan.upToDate) return { network, status: "up-to-date" as const };
   const diff = diffSnapshots(prevState, state);
   const acm = new ethers.Contract(acmAddr, ACM_ABI, provider) as unknown as AcmLike;
   const corrections = await verifyDiff(acm, network, diff, state);
-  const file = stateToFile(state, { ...meta(), height: scan.toBlock }, names);
+  // Diff-verify always runs when there were changes (above) and, having completed without
+  // throwing, has reconciled `state` against the chain (applying `corrections` where replay
+  // disagreed) — so the snapshot this run produces is verified on-chain as of right now,
+  // regardless of whether any corrections were needed.
+  const verifiedAt = new Date().toISOString();
+  const file = stateToFile(state, { ...meta(), height: scan.toBlock, verified: true, verifiedAt }, names);
   saveSnapshotFile(network, file);
   writeRunOutputs(
     network,
@@ -125,6 +137,14 @@ async function verifyNetwork(network: Network): Promise<VerifyResult> {
     const sig = entry.functionSig ?? entry.roleHash;
     const grantee = nameFor(names, entry.account);
     console.log(`MISMATCH ${network} ${contract}.${sig} grantee ${grantee} — in snapshot but not on-chain`);
+  }
+  // A clean full verify (0 mismatches) is a stronger, independent confirmation than a fetch's
+  // diff-verify — stamp the snapshot as verified and re-render permissions.md to reflect it.
+  // Never touches changes.*/height: this is a re-render of the existing snapshot, not a rescan.
+  if (mismatches.length === 0) {
+    const verifiedFile: SnapshotFile = { ...file, verified: true, verifiedAt: new Date().toISOString() };
+    saveSnapshotFile(network, verifiedFile);
+    writePermissionsOutputs(network, verifiedFile, names);
   }
   return { network, status: "ok" as const, verified: total, mismatches };
 }
@@ -168,7 +188,9 @@ function resolveNetworks(arg: string): Network[] {
   if (unknown.length > 0) {
     throw new Error(`unknown network(s): ${unknown.join(", ")} — expected one of ${NETWORKS.join(", ")} or "all"`);
   }
-  return requested as Network[];
+  // Dedupe so a repeated name (e.g. `--network bscmainnet,bscmainnet`) doesn't spawn two
+  // concurrent tasks racing on the same snapshot directory.
+  return [...new Set(requested)] as Network[];
 }
 
 export type FilterResult = Record<string, Array<{ contract: string; functionSig: string | null; roleHash: string }>>;
@@ -275,7 +297,18 @@ async function fetchCommand(values: {
     process.exit(2);
   }
   const chunkSize = parseInt(values["chunk-size"] ?? "40000", 10);
-  const toBlock = values.to !== undefined ? parseInt(values.to, 10) : undefined;
+  if (!Number.isFinite(chunkSize) || chunkSize <= 0) {
+    console.error(`invalid --chunk-size: ${values["chunk-size"]} — expected a positive integer`);
+    process.exit(2);
+  }
+  let toBlock: number | undefined;
+  if (values.to !== undefined) {
+    toBlock = parseInt(values.to, 10);
+    if (!Number.isFinite(toBlock)) {
+      console.error(`invalid --to: ${values.to} — expected an integer block number`);
+      process.exit(2);
+    }
+  }
   const rebuild = !!values.rebuild;
 
   const results = await Promise.allSettled(selected.map(n => fetchNetwork(n, { chunkSize, toBlock, rebuild })));
@@ -326,11 +359,20 @@ export function refreshNetwork(network: Network, opts: { baseDir?: string } = {}
   const names = loadNameMap(network);
   const newFile = stateToFile(
     state,
-    { network: file.network, acmAddress: file.acmAddress, height: file.height, updatedAt: file.updatedAt },
+    {
+      network: file.network,
+      acmAddress: file.acmAddress,
+      height: file.height,
+      updatedAt: file.updatedAt,
+      // refresh makes no chain calls, so it cannot change the verification status — carry the
+      // loaded file's verified/verifiedAt through unchanged.
+      verified: file.verified,
+      verifiedAt: file.verifiedAt,
+    },
     names,
   );
   saveSnapshotFile(network, newFile, baseDir);
-  writePermissionsOutputs(network, newFile, names, false, baseDir);
+  writePermissionsOutputs(network, newFile, names, baseDir);
 
   return { newlyDecoded: before - after, total: Object.keys(state).length, unresolved: after };
 }

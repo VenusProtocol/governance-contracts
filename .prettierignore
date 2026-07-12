@@ -24,3 +24,9 @@ yarn-debug.log*
 yarn-error.log*
 CHANGELOG.md
 tests/acm-permissions/fixtures/golden-*.md
+# Snapshot writers use JSON.stringify/hand-rolled MD rendering, not prettier — their only
+# guaranteed convention is a single trailing EOF newline (enforced by the writers themselves),
+# not prettier's short-array/table-column formatting.
+scripts/acm-permissions/snapshots/
+# Git-ignored download cache of third-party npm tarballs (registry build input) — not our code.
+scripts/acm-permissions/.sources-cache/

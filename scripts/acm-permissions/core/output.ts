@@ -34,14 +34,22 @@ function pushTrimmed(lines: string[]): string {
   return lines.join("\n") + "\n";
 }
 
-export function renderPermissionsMd(file: SnapshotFile, verified: boolean): string {
+export function renderPermissionsMd(file: SnapshotFile): string {
   const lines: string[] = [`# ACM Permissions — ${file.network}`, ""];
 
   const contractBuckets = file.contracts.filter(c => c.scope === "contract");
   const wildcardPerms = file.contracts.filter(c => c.scope === "wildcard").flatMap(c => c.permissions);
   const unresolvedPerms = file.contracts.filter(c => c.scope === "unresolved").flatMap(c => c.permissions);
   const permissionCount = file.contracts.reduce((sum, c) => sum + c.permissions.length, 0);
-  const verification = verified ? "✅ verified on-chain" : "⚠️ not verified this run";
+  // Derived from the persistent verified/verifiedAt fields on the snapshot itself (set by
+  // `fetch`'s diff-verify or a full `acm:verify` run, carried forward unchanged by `refresh`)
+  // rather than a per-call boolean, so the header always reflects the last time this exact
+  // snapshot was actually checked against the chain — not just whether this render call was
+  // triggered by a run that happened to verify something.
+  const verification =
+    file.verified && file.verifiedAt
+      ? `✅ verified on-chain (as of ${file.verifiedAt.slice(0, 10)})`
+      : "⚠️ not verified";
 
   lines.push(
     `Snapshot block: ${file.height} · Updated: ${file.updatedAt.slice(0, 10)} · ` +
@@ -129,9 +137,13 @@ export function changesJson(diff: SnapshotDiff, corrections: Correction[], meta:
   return { ...meta, added: diff.added, removed: diff.removed, corrections };
 }
 
+// Ensures exactly one trailing newline (idempotent — callers that already append "\n"
+// themselves are unaffected) so every generated file matches prettier's EOF convention.
+// Mirrors cli.ts's writeAtomic so both writers produce identical EOF behavior.
 function atomicWrite(target: string, content: string): void {
   const tmp = `${target}.tmp`;
-  fs.writeFileSync(tmp, content);
+  const withNewline = content.endsWith("\n") ? content : content + "\n";
+  fs.writeFileSync(tmp, withNewline);
   fs.renameSync(tmp, target);
 }
 
@@ -147,13 +159,12 @@ export function writePermissionsOutputs(
   network: Network,
   file: SnapshotFile,
   names: Record<string, string>,
-  verified: boolean,
   baseDir: string = SNAPSHOTS_DIR,
 ): void {
   const dir = path.join(baseDir, network);
   fs.mkdirSync(dir, { recursive: true });
 
-  atomicWrite(path.join(dir, "permissions.md"), renderPermissionsMd(file, verified));
+  atomicWrite(path.join(dir, "permissions.md"), renderPermissionsMd(file));
 
   const unresolvedFile = path.join(dir, "unresolved-roles.json");
   const unresolved = file.contracts.find((c: SnapshotContract) => c.scope === "unresolved");
@@ -178,7 +189,9 @@ export function writeRunOutputs(
   const dir = path.join(baseDir, network);
   fs.mkdirSync(dir, { recursive: true });
 
-  writePermissionsOutputs(network, file, names, corrections.length === 0, baseDir);
+  // `file.verified`/`verifiedAt` are the persistent verification stamp — the caller (cli.ts)
+  // sets them once diff-verify has run, regardless of whether it found corrections to apply.
+  writePermissionsOutputs(network, file, names, baseDir);
   atomicWrite(path.join(dir, "changes.md"), renderChangesMd(diff, corrections, meta, names));
   atomicWrite(path.join(dir, "changes.json"), JSON.stringify(changesJson(diff, corrections, meta), null, 2) + "\n");
 }

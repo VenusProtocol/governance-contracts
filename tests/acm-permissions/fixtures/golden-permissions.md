@@ -1,6 +1,6 @@
 # ACM Permissions — bscmainnet
 
-Snapshot block: 66323914 · Updated: 2026-07-10 · Contracts: 1 · Permissions: 3 · Verification: ✅ verified on-chain
+Snapshot block: 66323914 · Updated: 2026-07-10 · Contracts: 1 · Permissions: 3 · Verification: ✅ verified on-chain (as of 2026-07-10)
 
 ## Unitroller (`0xfD36E2c2a6789Db23113685031d7F16329158384`)
 
