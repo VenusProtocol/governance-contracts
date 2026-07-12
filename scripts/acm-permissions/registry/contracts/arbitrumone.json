@@ -89,5 +89,8 @@
   "0x105bE25abd5D3d940690F7c4524Dd88e876294aa": "SentinelOracle_Implementation",
   "0xB6CFbfe6834EF519f002DBc1a8B81Ea437Ca647D": "UniswapOracle / UniswapOracle_Proxy",
   "0x59f7a0F122B94a4282f2E374B6D4e15d5123E9dB": "UniswapOracle_Implementation",
+  "0xC1422B928cb6FC9BA52880892078578a93aa5Cc7": "VenusERC4626Factory / VenusERC4626Factory_Proxy",
+  "0x9AA5Fe1ca84a0e2354F1533e5060aAfbE6F4A1f1": "VenusERC4626Factory_Implementation",
+  "0xff2C112F0FC927E89eA1f7ec56D0c76263708Bcb": "VenusERC4626Implementation",
   "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0": "Guardian"
 }

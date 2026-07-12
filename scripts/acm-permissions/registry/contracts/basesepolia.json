@@ -63,5 +63,8 @@
   "0xE431E82d8fFfd81E7c082BeC7Fe2C306f5c988aD": "XVSBridgeAdmin / XVSBridgeAdmin_Proxy",
   "0xec90c30b0C6ebdd1Fb6A64f40cf550cD207A3CAf": "XVSBridgeAdmin_Implementation",
   "0xD5Cd1fD17B724a391C1bce55Eb9d88E3205eED60": "XVSProxyOFTDest",
+  "0xD13c5527d1a2a8c2cC9c9eb260AC4D9D811a02a4": "VenusERC4626Factory / VenusERC4626Factory_Proxy",
+  "0xCf2E2266e3e12917D95EC7bFaBCdc984FCFA4017": "VenusERC4626Factory_Implementation",
+  "0x66A2cC7c0ca012DfBfd7BDC5DC06A315A0269b20": "VenusERC4626Implementation",
   "0xdf3b635d2b535f906BB02abb22AED71346E36a00": "Guardian"
 }
