@@ -9,8 +9,6 @@
     { "type": "npm", "package": "@venusprotocol/venus-periphery", "version": "1.2.0" },
     { "type": "npm", "package": "@venusprotocol/fixed-rate-vaults", "version": "1.0.0" },
     { "type": "npm", "package": "@venusprotocol/erc-4626", "version": "1.0.0" },
-    { "type": "npm", "package": "@venusprotocol/keeper-bot-contracts", "version": "1.3.0" },
-    { "type": "npm", "package": "@venusprotocol/guardian", "version": "1.0.0" },
-    { "type": "npm", "package": "@venusprotocol/solidity-utilities", "version": "2.1.0" }
+    { "type": "npm", "package": "@venusprotocol/guardian", "version": "1.0.0" }
   ]
 }

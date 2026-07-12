@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-12T17:34:17.352Z",
+  "generatedAt": "2026-07-12T21:05:54.972Z",
   "contracts": [
     {
       "name": "AAVE",
@@ -11672,24 +11672,6 @@
       ]
     },
     {
-      "name": "LiquidationOperator",
-      "addresses": {
-        "bscmainnet": [
-          "0x35C7c3A10407BdC5b611587b2D28fAdcd9F6a947"
-        ],
-        "bsctestnet": [
-          "0x08b057C034aBd74734aa3035Fb3E4Dd046eFEbA3"
-        ]
-      },
-      "signatures": [
-        "DEPLOYER()",
-        "SWAP_ROUTER()",
-        "liquidate(tuple,uint256)",
-        "pancakeV3FlashCallback(uint256,uint256,bytes)",
-        "pancakeV3SwapCallback(int256,int256,bytes)"
-      ]
-    },
-    {
       "name": "Liquidator",
       "addresses": {
         "bscmainnet": [
@@ -23298,32 +23280,6 @@
         "forwardBaseAsset(address,uint256)",
         "setDailyCapUsd(uint256)",
         "setSlippageEventUsd(uint256)"
-      ]
-    },
-    {
-      "name": "TokenConverterOperator",
-      "addresses": {
-        "bscmainnet": [
-          "0xa0EC2A2489D57CD8385A565F38168cC539586B07"
-        ],
-        "bsctestnet": [
-          "0x1ec832E897D47aEAD32f1D030A6AAA5dE025a196"
-        ],
-        "ethereum": [
-          "0x6eF49b4e0772Fe78128F981d42D54172b55eCF9F"
-        ],
-        "sepolia": [
-          "0xD5c00F011F95E36631F3a99cc94274888E76755C"
-        ]
-      },
-      "signatures": [
-        "PCS_DEPLOYER()",
-        "PCS_ROUTER()",
-        "UNISWAP_FACTORY()",
-        "UNISWAP_ROUTER()",
-        "convert(tuple)",
-        "pancakeV3SwapCallback(int256,int256,bytes)",
-        "uniswapV3SwapCallback(int256,int256,bytes)"
       ]
     },
     {
