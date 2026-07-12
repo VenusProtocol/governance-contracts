@@ -53,7 +53,11 @@ yarn acm:verify --network bscmainnet
 ```
 
 Exits non-zero (and prints every `MISMATCH` line) if any snapshot entry is not
-actually held on-chain.
+actually held on-chain. Note that `verify` is not read-only: it stamps the outcome
+onto the snapshot — a clean network gets `verified`/`verifiedAt` written into
+`permissions.json` and the `permissions.md` header re-rendered to
+`✅ verified on-chain (as of <date>)`, while any mismatch clears a previous stamp back
+to `⚠️ not verified` (heights and `changes.*` are never touched).
 
 ### `yarn acm:filter`
 

@@ -138,14 +138,20 @@ async function verifyNetwork(network: Network): Promise<VerifyResult> {
     const grantee = nameFor(names, entry.account);
     console.log(`MISMATCH ${network} ${contract}.${sig} grantee ${grantee} — in snapshot but not on-chain`);
   }
-  // A clean full verify (0 mismatches) is a stronger, independent confirmation than a fetch's
-  // diff-verify — stamp the snapshot as verified and re-render permissions.md to reflect it.
+  // Stamp the outcome either way. A clean full verify (0 mismatches) is a stronger,
+  // independent confirmation than a fetch's diff-verify — record it as verified/verifiedAt.
+  // Any mismatch means the snapshot no longer matches the chain, so a previous ✅ stamp is
+  // cleared (verified: false, verifiedAt dropped — JSON.stringify omits undefined) and the
+  // permissions.md header flips back to "⚠️ not verified" instead of staying stale.
   // Never touches changes.*/height: this is a re-render of the existing snapshot, not a rescan.
-  if (mismatches.length === 0) {
-    const verifiedFile: SnapshotFile = { ...file, verified: true, verifiedAt: new Date().toISOString() };
-    saveSnapshotFile(network, verifiedFile);
-    writePermissionsOutputs(network, verifiedFile, names);
-  }
+  const clean = mismatches.length === 0;
+  const stampedFile: SnapshotFile = {
+    ...file,
+    verified: clean,
+    verifiedAt: clean ? new Date().toISOString() : undefined,
+  };
+  saveSnapshotFile(network, stampedFile);
+  writePermissionsOutputs(network, stampedFile, names);
   return { network, status: "ok" as const, verified: total, mismatches };
 }
 

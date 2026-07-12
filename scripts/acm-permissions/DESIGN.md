@@ -424,7 +424,10 @@ so they are impossible to miss but never block the run.
 
 `yarn acm:verify --network <n|all>` re-checks **every** entry in the snapshot against
 the ACM (same view calls as §8.1, batched view calls — `Promise.all` groups of 20).
-Use whenever a dual-check is wanted.
+Use whenever a dual-check is wanted. It is not read-only: a network completing with
+0 mismatches has its snapshot re-stamped (`verified`/`verifiedAt` in
+`permissions.json` plus the `permissions.md` header), and any mismatch clears a
+previous stamp — `height` and `changes.*` are never touched.
 
 Honest limitation, documented in the README: full verify proves everything in the
 snapshot is real on-chain; it cannot _discover_ a permission the scan never saw an
@@ -439,7 +442,10 @@ event for. Checkpointed sequential scanning is what guarantees no events are mis
 
 **What it stores** — the complete current permission state of one network:
 
-- header: schema version, network, ACM address, snapshot block (`height`), timestamp;
+- header: schema version, network, ACM address, snapshot block (`height`), timestamp,
+  plus the optional `verified`/`verifiedAt` fields — the persistent stamp of the last
+  successful on-chain verification (§8), carried forward by `refresh` and cleared by a
+  `verify` run that finds mismatches;
 - every contract that has at least one active permission: address + resolved name;
 - per contract: each guarded function signature with its role hash and `decoded` flag;
 - per function: the full grantee list, every grantee as address + resolved name;
