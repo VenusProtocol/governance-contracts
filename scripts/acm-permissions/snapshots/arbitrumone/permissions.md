@@ -2,13 +2,6 @@
 
 Snapshot block: 482433317 · Updated: 2026-07-10 · Contracts: 36 · Permissions: 162 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
-## 0xC1422B928cb6FC9BA52880892078578a93aa5Cc7 (`0xC1422B928cb6FC9BA52880892078578a93aa5Cc7`)
-
-| Function | Grantees |
-| --- | --- |
-| `setMaxLoopsLimit(uint256)` | NormalTimelock |
-| `setRewardRecipient(address)` | NormalTimelock |
-
 ## AuxiliaryCommandsAggregator / AuxiliaryCommandsAggregator_Proxy (`0x768FEf3a88ea92cCF9CAcDf0aB15C4B29B3C1379`)
 
 | Function | Grantees |
@@ -179,6 +172,13 @@ Snapshot block: 482433317 · Updated: 2026-07-10 · Contracts: 36 · Permissions
 | `resumeConversion()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `setConversionConfig(address,address,ConversionConfig)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setMinAmountToConvert(uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+
+## VenusERC4626Factory / VenusERC4626Factory_Proxy (`0xC1422B928cb6FC9BA52880892078578a93aa5Cc7`)
+
+| Function | Grantees |
+| --- | --- |
+| `setMaxLoopsLimit(uint256)` | NormalTimelock |
+| `setRewardRecipient(address)` | NormalTimelock |
 
 ## VToken_vARB_Core (`0xAeB0FEd69354f34831fe1D16475D9A83ddaCaDA6`)
 

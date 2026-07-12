@@ -8,13 +8,6 @@ Snapshot block: 286082172 · Updated: 2026-07-10 · Contracts: 25 · Permissions
 | --- | --- |
 | `addMarket(AddMarketInput)` | Guardian |
 
-## 0xC6C8249a0B44973673f3Af673e530B85038a0480 (`0xC6C8249a0B44973673f3Af673e530B85038a0480`)
-
-| Function | Grantees |
-| --- | --- |
-| `setMaxLoopsLimit(uint256)` | NormalTimelock |
-| `setRewardRecipient(address)` | NormalTimelock |
-
 ## BoundValidator / BoundValidator_Proxy (`0xfe6bc1545Cc14C131bacA97476D6035ffcC0b889`)
 
 | Function | Grantees |
@@ -160,6 +153,13 @@ Snapshot block: 286082172 · Updated: 2026-07-10 · Contracts: 25 · Permissions
 | `resumeConversion()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `setConversionConfig(address,address,ConversionConfig)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setMinAmountToConvert(uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+
+## VenusERC4626Factory / VenusERC4626Factory_Proxy (`0xC6C8249a0B44973673f3Af673e530B85038a0480`)
+
+| Function | Grantees |
+| --- | --- |
+| `setMaxLoopsLimit(uint256)` | NormalTimelock |
+| `setRewardRecipient(address)` | NormalTimelock |
 
 ## WBTCPrimeConverter (`0x3089F46caf6611806caA39Ffaf672097156b893a`)
 

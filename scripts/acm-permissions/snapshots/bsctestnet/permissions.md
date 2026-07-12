@@ -19,13 +19,6 @@ Snapshot block: 118343183 · Updated: 2026-07-10 · Contracts: 108 · Permission
 | `setMinAmountToConvert(uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setPoolsAssetsDirectTransfer(address[],address[][],bool[][])` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 
-## 0x07fcd489aef6a3EEAA9e8adE4361Fe5CC5BF30f7 (`0x07fcd489aef6a3EEAA9e8adE4361Fe5CC5BF30f7`)
-
-| Function | Grantees |
-| --- | --- |
-| `setMaxLoopsLimit(uint256)` | NormalTimelock |
-| `setRewardRecipient(address)` | NormalTimelock |
-
 ## 0x18F2543DCCD09dEb0e28575008CD24c0700e964B (`0x18F2543DCCD09dEb0e28575008CD24c0700e964B`)
 
 | Function | Grantees |
@@ -180,16 +173,6 @@ Snapshot block: 118343183 · Updated: 2026-07-10 · Contracts: 108 · Permission
 | Function | Grantees |
 | --- | --- |
 | `setMaxStalePeriod(string,uint256)` | NormalTimelock |
-
-## 0x4b302b56315Ca16A0A4565108e62404496916491 (`0x4b302b56315Ca16A0A4565108e62404496916491`)
-
-| Function | Grantees |
-| --- | --- |
-| `setCloseFactor(uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setLiquidatorWhitelist(address,bool)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setProtocolLiquidationShare(uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setSettlerWhitelist(address,bool)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `sweepProtocolShareToReserve(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 
 ## 0x4B8b963324dB0D40f64539032AB49CB07c88e312 (`0x4B8b963324dB0D40f64539032AB49CB07c88e312`)
 
@@ -468,33 +451,6 @@ Snapshot block: 118343183 · Updated: 2026-07-10 · Contracts: 108 · Permission
 | `addPool(string,address,uint256,uint256,uint256)` | Guardian |
 | `createRegistryPool(string,address,uint256,uint256,uint256,address,uint256,address)` | Guardian |
 
-## 0xf77dED2A00F94e33C392126238360D4642c16Ba2 (`0xf77dED2A00F94e33C392126238360D4642c16Ba2`)
-
-| Function | Grantees |
-| --- | --- |
-| `acceptPositionTokenOwnership()` | NormalTimelock |
-| `approvePositionTransfer(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `cancelVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `closeVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `completePauseVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `createVault(VaultConfig,InstitutionalConfig,RiskConfig,string,string,string)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `openVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `partialPauseVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `revokePositionTransfer(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setComptroller(address)` | Guardian, NormalTimelock |
-| `setInstitutionName(address,string)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setInstitutionNameOverride(address,string)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setLatePenaltyRate(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setLiquidationAdapter(address)` | Guardian, NormalTimelock |
-| `setLiquidationIncentive(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setLiquidationThreshold(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setOracle(address)` | Guardian, NormalTimelock |
-| `setProtocolShareReserve(address)` | Guardian, NormalTimelock |
-| `setTreasury(address)` | Guardian, NormalTimelock |
-| `setVaultImplementation(address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
-| `sweep(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `unpauseVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-
 ## 0xfc4e26B7fD56610E84d33372435F0275A359E8eF (`0xfc4e26B7fD56610E84d33372435F0275A359E8eF`)
 
 | Function | Grantees |
@@ -686,6 +642,43 @@ Snapshot block: 118343183 · Updated: 2026-07-10 · Contracts: 108 · Permission
 | `handleLTVAdjust(address,uint256)` | 0x61859C84E0C6aB7B5A9801A962C660477f31a2D3 |
 | `handleSupplyCapExceeding(address)` | 0x61859C84E0C6aB7B5A9801A962C660477f31a2D3 |
 | `setMarketConfig(address,(uint256,uint256,bool))` | 0x61859C84E0C6aB7B5A9801A962C660477f31a2D3, Guardian, NormalTimelock |
+
+## InstitutionalVaultControllerProxy (`0xf77dED2A00F94e33C392126238360D4642c16Ba2`)
+
+| Function | Grantees |
+| --- | --- |
+| `acceptPositionTokenOwnership()` | NormalTimelock |
+| `approvePositionTransfer(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `cancelVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `closeVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `completePauseVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `createVault(VaultConfig,InstitutionalConfig,RiskConfig,string,string,string)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `openVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `partialPauseVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `revokePositionTransfer(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setComptroller(address)` | Guardian, NormalTimelock |
+| `setInstitutionName(address,string)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setInstitutionNameOverride(address,string)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setLatePenaltyRate(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setLiquidationAdapter(address)` | Guardian, NormalTimelock |
+| `setLiquidationIncentive(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setLiquidationThreshold(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setOracle(address)` | Guardian, NormalTimelock |
+| `setProtocolShareReserve(address)` | Guardian, NormalTimelock |
+| `setTreasury(address)` | Guardian, NormalTimelock |
+| `setVaultImplementation(address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+| `sweep(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `unpauseVault(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## LiquidationAdapterProxy (`0x4b302b56315Ca16A0A4565108e62404496916491`)
+
+| Function | Grantees |
+| --- | --- |
+| `setCloseFactor(uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setLiquidatorWhitelist(address,bool)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setProtocolLiquidationShare(uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setSettlerWhitelist(address,bool)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `sweepProtocolShareToReserve(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 
 ## Liquidator / Liquidator_Proxy (`0x55AEABa76ecf144031Ef64E222166eb28Cb4865F`)
 
@@ -1024,6 +1017,13 @@ Snapshot block: 118343183 · Updated: 2026-07-10 · Contracts: 108 · Permission
 | Function | Grantees |
 | --- | --- |
 | `setInterestRateModel(address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+
+## VenusERC4626Factory / VenusERC4626Factory_Proxy (`0x07fcd489aef6a3EEAA9e8adE4361Fe5CC5BF30f7`)
+
+| Function | Grantees |
+| --- | --- |
+| `setMaxLoopsLimit(uint256)` | NormalTimelock |
+| `setRewardRecipient(address)` | NormalTimelock |
 
 ## VRTVaultProxy / VRTVaultProxy_Proxy (`0x1ffD1b8B67A1AE0C189c734B0F58B0954522FF71`)
 

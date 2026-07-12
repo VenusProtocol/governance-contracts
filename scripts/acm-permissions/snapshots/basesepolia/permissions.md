@@ -11,13 +11,6 @@ Snapshot block: 43965561 · Updated: 2026-07-10 · Contracts: 19 · Permissions:
 | `setTokenMonitoringEnabled(address,bool)` | 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C |
 | `setTrustedKeeper(address,bool)` | 0xFEA1c651A47FE29dB9b1bf3cC1f224d8D9CFF68C |
 
-## 0xD13c5527d1a2a8c2cC9c9eb260AC4D9D811a02a4 (`0xD13c5527d1a2a8c2cC9c9eb260AC4D9D811a02a4`)
-
-| Function | Grantees |
-| --- | --- |
-| `setMaxLoopsLimit(uint256)` | NormalTimelock |
-| `setRewardRecipient(address)` | NormalTimelock |
-
 ## 0xDe3FDA7F567d4fA82273cc898bEC85B99992E111 (`0xDe3FDA7F567d4fA82273cc898bEC85B99992E111`)
 
 | Function | Grantees |
@@ -146,6 +139,13 @@ Snapshot block: 43965561 · Updated: 2026-07-10 · Contracts: 19 · Permissions:
 | `setOracle(address,address,uint8)` | NormalTimelock |
 | `setTokenConfig(TokenConfig)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `unpause()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## VenusERC4626Factory / VenusERC4626Factory_Proxy (`0xD13c5527d1a2a8c2cC9c9eb260AC4D9D811a02a4`)
+
+| Function | Grantees |
+| --- | --- |
+| `setMaxLoopsLimit(uint256)` | NormalTimelock |
+| `setRewardRecipient(address)` | NormalTimelock |
 
 ## XVS (`0xE657EDb5579B82135a274E85187927C42E38C021`)
 

@@ -2,13 +2,6 @@
 
 Snapshot block: 48454999 · Updated: 2026-07-10 · Contracts: 25 · Permissions: 135 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
-## 0x1A430825B31DdA074751D6731Ce7Dca38D012D13 (`0x1A430825B31DdA074751D6731Ce7Dca38D012D13`)
-
-| Function | Grantees |
-| --- | --- |
-| `setMaxLoopsLimit(uint256)` | NormalTimelock |
-| `setRewardRecipient(address)` | NormalTimelock |
-
 ## AerodromeSlipstreamOracle / AerodromeSlipstreamOracle_Proxy (`0x5DE0B322A74088fD64CDD01042BE2fBc47FE82EC`)
 
 | Function | Grantees |
@@ -160,6 +153,13 @@ Snapshot block: 48454999 · Updated: 2026-07-10 · Contracts: 25 · Permissions:
 | Function | Grantees |
 | --- | --- |
 | `setPoolConfig(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## VenusERC4626Factory / VenusERC4626Factory_Proxy (`0x1A430825B31DdA074751D6731Ce7Dca38D012D13`)
+
+| Function | Grantees |
+| --- | --- |
+| `setMaxLoopsLimit(uint256)` | NormalTimelock |
+| `setRewardRecipient(address)` | NormalTimelock |
 
 ## VToken_vcbBTC_Core (`0x7bBd1005bB24Ec84705b04e1f2DfcCad533b6D72`)
 

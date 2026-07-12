@@ -40,13 +40,6 @@ Snapshot block: 179560074 · Updated: 2026-07-10 · Contracts: 12 · Permissions
 | `setTrustedRemoteAddress(uint16,bytes)` | Guardian |
 | `unpause()` | Guardian |
 
-## 0x3dEDBD90EFC6E2257887FF36842337dF0739B8A1 (`0x3dEDBD90EFC6E2257887FF36842337dF0739B8A1`)
-
-| Function | Grantees |
-| --- | --- |
-| `setMaxLoopsLimit(uint256)` | NormalTimelock |
-| `setRewardRecipient(address)` | NormalTimelock |
-
 ## BinanceOracle / BinanceOracle_Proxy (`0x496B6b03469472572C47bdB407d5549b244a74F2`)
 
 | Function | Grantees |
@@ -112,6 +105,13 @@ Snapshot block: 179560074 · Updated: 2026-07-10 · Contracts: 12 · Permissions
 | `setOracle(address,address,uint8)` | NormalTimelock |
 | `setTokenConfig(TokenConfig)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `unpause()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## VenusERC4626Factory / VenusERC4626Factory_Proxy (`0x3dEDBD90EFC6E2257887FF36842337dF0739B8A1`)
+
+| Function | Grantees |
+| --- | --- |
+| `setMaxLoopsLimit(uint256)` | NormalTimelock |
+| `setRewardRecipient(address)` | NormalTimelock |
 
 ## XVS (`0xc2931B1fEa69b6D6dA65a50363A8D75d285e4da9`)
 

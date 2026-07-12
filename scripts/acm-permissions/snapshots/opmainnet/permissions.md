@@ -2,13 +2,6 @@
 
 Snapshot block: 154050284 · Updated: 2026-07-10 · Contracts: 18 · Permissions: 110 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
-## 0xc801B471F00Dc22B9a7d7b839CBE87E46d70946F (`0xc801B471F00Dc22B9a7d7b839CBE87E46d70946F`)
-
-| Function | Grantees |
-| --- | --- |
-| `setMaxLoopsLimit(uint256)` | NormalTimelock |
-| `setRewardRecipient(address)` | NormalTimelock |
-
 ## BoundValidator / BoundValidator_Proxy (`0x37A04a1eF784448377a19F2b1b67cD40c09eA505`)
 
 | Function | Grantees |
@@ -100,6 +93,13 @@ Snapshot block: 154050284 · Updated: 2026-07-10 · Contracts: 18 · Permissions
 | --- | --- |
 | `setDirectPrice(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `setTokenConfig(TokenConfig)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## VenusERC4626Factory / VenusERC4626Factory_Proxy (`0xc801B471F00Dc22B9a7d7b839CBE87E46d70946F`)
+
+| Function | Grantees |
+| --- | --- |
+| `setMaxLoopsLimit(uint256)` | NormalTimelock |
+| `setRewardRecipient(address)` | NormalTimelock |
 
 ## VToken_vOP_Core (`0x6b846E3418455804C1920fA4CC7a31A51C659A2D`)
 

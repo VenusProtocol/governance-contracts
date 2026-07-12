@@ -70,13 +70,6 @@ Snapshot block: 11244278 · Updated: 2026-07-10 · Contracts: 36 · Permissions:
 | `setMaxTokensDistributionSpeed(address[],uint256[])` | Guardian |
 | `setTokensDistributionSpeed(address[],uint256[])` | Guardian |
 
-## 0xbf76e9429BA565220d77831A9eC3606434e2106e (`0xbf76e9429BA565220d77831A9eC3606434e2106e`)
-
-| Function | Grantees |
-| --- | --- |
-| `setMaxLoopsLimit(uint256)` | NormalTimelock |
-| `setRewardRecipient(address)` | NormalTimelock |
-
 ## 0xDb633C11D3F9E6B8D17aC2c972C9e3B05DA59bF9 (`0xDb633C11D3F9E6B8D17aC2c972C9e3B05DA59bF9`)
 
 | Function | Grantees |
@@ -306,6 +299,13 @@ Snapshot block: 11244278 · Updated: 2026-07-10 · Contracts: 36 · Permissions:
 | --- | --- |
 | `pauseConversion()` | Guardian |
 | `resumeConversion()` | Guardian |
+
+## VenusERC4626Factory / VenusERC4626Factory_Proxy (`0xbf76e9429BA565220d77831A9eC3606434e2106e`)
+
+| Function | Grantees |
+| --- | --- |
+| `setMaxLoopsLimit(uint256)` | NormalTimelock |
+| `setRewardRecipient(address)` | NormalTimelock |
 
 ## WBTCPrimeConverter (`0x8a3937F27921e859db3FDA05729CbCea8cfd82AE`)
 

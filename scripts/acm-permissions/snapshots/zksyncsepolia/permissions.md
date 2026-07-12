@@ -2,13 +2,6 @@
 
 Snapshot block: 7845631 · Updated: 2026-07-10 · Contracts: 17 · Permissions: 114 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
-## 0xa30dcc21B8393A4031cD6364829CDfE2b6D7B283 (`0xa30dcc21B8393A4031cD6364829CDfE2b6D7B283`)
-
-| Function | Grantees |
-| --- | --- |
-| `setMaxLoopsLimit(uint256)` | NormalTimelock |
-| `setRewardRecipient(address)` | NormalTimelock |
-
 ## BoundValidator / BoundValidator_Proxy (`0x0A4daBeF41C83Af7e30FfC33feC56ba769f3D24b`)
 
 | Function | Grantees |
@@ -129,6 +122,13 @@ Snapshot block: 7845631 · Updated: 2026-07-10 · Contracts: 17 · Permissions: 
 | `setOracle(address,address,uint8)` | NormalTimelock |
 | `setTokenConfig(TokenConfig)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `unpause()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## VenusERC4626Factory / VenusERC4626Factory_Proxy (`0xa30dcc21B8393A4031cD6364829CDfE2b6D7B283`)
+
+| Function | Grantees |
+| --- | --- |
+| `setMaxLoopsLimit(uint256)` | NormalTimelock |
+| `setRewardRecipient(address)` | NormalTimelock |
 
 ## XVS (`0x3AeCac43A2ebe5D8184e650403bf9F656F9D1cfA`)
 

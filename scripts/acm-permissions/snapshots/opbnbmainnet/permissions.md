@@ -2,13 +2,6 @@
 
 Snapshot block: 162329654 · Updated: 2026-07-10 · Contracts: 15 · Permissions: 94 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
-## 0x89A5Ce0A6db7e66E53F148B50D879b700dEB81C8 (`0x89A5Ce0A6db7e66E53F148B50D879b700dEB81C8`)
-
-| Function | Grantees |
-| --- | --- |
-| `setMaxLoopsLimit(uint256)` | NormalTimelock |
-| `setRewardRecipient(address)` | NormalTimelock |
-
 ## BinanceOracle / BinanceOracle_Proxy (`0xB09EC9B628d04E1287216Aa3e2432291f50F9588`)
 
 | Function | Grantees |
@@ -69,6 +62,13 @@ Snapshot block: 162329654 · Updated: 2026-07-10 · Contracts: 15 · Permissions
 | `setOracle(address,address,uint8)` | NormalTimelock |
 | `setTokenConfig(TokenConfig)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `unpause()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## VenusERC4626Factory / VenusERC4626Factory_Proxy (`0x89A5Ce0A6db7e66E53F148B50D879b700dEB81C8`)
+
+| Function | Grantees |
+| --- | --- |
+| `setMaxLoopsLimit(uint256)` | NormalTimelock |
+| `setRewardRecipient(address)` | NormalTimelock |
 
 ## VToken_vBTCB_Core (`0xED827b80Bd838192EA95002C01B5c6dA8354219a`)
 
