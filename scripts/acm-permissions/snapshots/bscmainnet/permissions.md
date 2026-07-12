@@ -1,6 +1,6 @@
 # ACM Permissions — bscmainnet
 
-Snapshot block: 109200201 · Updated: 2026-07-10 · Contracts: 70 · Permissions: 351 · Verification: ⚠️ not verified this run
+Snapshot block: 109200201 · Updated: 2026-07-10 · Contracts: 70 · Permissions: 351 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
 ## AccessControlManager (`0x4788629ABc6cFCA10F9f969efdEAa1cF70c23555`)
 

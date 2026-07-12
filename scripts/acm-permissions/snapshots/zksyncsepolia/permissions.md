@@ -1,6 +1,6 @@
 # ACM Permissions — zksyncsepolia
 
-Snapshot block: 7845631 · Updated: 2026-07-10 · Contracts: 17 · Permissions: 114 · Verification: ⚠️ not verified this run
+Snapshot block: 7845631 · Updated: 2026-07-10 · Contracts: 17 · Permissions: 114 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
 ## 0xa30dcc21B8393A4031cD6364829CDfE2b6D7B283 (`0xa30dcc21B8393A4031cD6364829CDfE2b6D7B283`)
 

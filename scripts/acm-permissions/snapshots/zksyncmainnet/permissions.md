@@ -1,6 +1,6 @@
 # ACM Permissions — zksyncmainnet
 
-Snapshot block: 71126981 · Updated: 2026-07-10 · Contracts: 23 · Permissions: 118 · Verification: ⚠️ not verified this run
+Snapshot block: 71126981 · Updated: 2026-07-10 · Contracts: 23 · Permissions: 118 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
 ## 0xDC59Dd76Dd7A64d743C764a9aa8C96Ff2Ea8BAc3 (`0xDC59Dd76Dd7A64d743C764a9aa8C96Ff2Ea8BAc3`)
 

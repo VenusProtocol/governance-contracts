@@ -1,6 +1,6 @@
 # ACM Permissions — opmainnet
 
-Snapshot block: 154050284 · Updated: 2026-07-10 · Contracts: 18 · Permissions: 110 · Verification: ⚠️ not verified this run
+Snapshot block: 154050284 · Updated: 2026-07-10 · Contracts: 18 · Permissions: 110 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
 ## 0xc801B471F00Dc22B9a7d7b839CBE87E46d70946F (`0xc801B471F00Dc22B9a7d7b839CBE87E46d70946F`)
 

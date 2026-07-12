@@ -1,6 +1,6 @@
 # ACM Permissions — arbitrumone
 
-Snapshot block: 482433317 · Updated: 2026-07-10 · Contracts: 36 · Permissions: 162 · Verification: ⚠️ not verified this run
+Snapshot block: 482433317 · Updated: 2026-07-10 · Contracts: 36 · Permissions: 162 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
 ## 0xC1422B928cb6FC9BA52880892078578a93aa5Cc7 (`0xC1422B928cb6FC9BA52880892078578a93aa5Cc7`)
 

@@ -1,6 +1,6 @@
 # ACM Permissions — ethereum
 
-Snapshot block: 25503255 · Updated: 2026-07-10 · Contracts: 66 · Permissions: 186 · Verification: ⚠️ not verified this run
+Snapshot block: 25503255 · Updated: 2026-07-10 · Contracts: 66 · Permissions: 186 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
 ## 0x39cb747453Be3416E659dAeA169540b6F000c885 (`0x39cb747453Be3416E659dAeA169540b6F000c885`)
 

@@ -1,6 +1,6 @@
 # ACM Permissions — bsctestnet
 
-Snapshot block: 118343183 · Updated: 2026-07-10 · Contracts: 108 · Permissions: 622 · Verification: ⚠️ not verified this run
+Snapshot block: 118343183 · Updated: 2026-07-10 · Contracts: 108 · Permissions: 622 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
 ## 0x05968239d978601146D3e50eE1F29e8571249fB0 (`0x05968239d978601146D3e50eE1F29e8571249fB0`)
 

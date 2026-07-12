@@ -1,6 +1,6 @@
 # ACM Permissions — unichainmainnet
 
-Snapshot block: 52957343 · Updated: 2026-07-10 · Contracts: 19 · Permissions: 110 · Verification: ⚠️ not verified this run
+Snapshot block: 52957343 · Updated: 2026-07-10 · Contracts: 19 · Permissions: 110 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
 ## 0x102fEb723C25c67dbdfDccCa3B1c1a6e1a662D2f (`0x102fEb723C25c67dbdfDccCa3B1c1a6e1a662D2f`)
 

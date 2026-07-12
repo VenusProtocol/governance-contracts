@@ -1,6 +1,6 @@
 # ACM Permissions — basemainnet
 
-Snapshot block: 48454999 · Updated: 2026-07-10 · Contracts: 25 · Permissions: 135 · Verification: ⚠️ not verified this run
+Snapshot block: 48454999 · Updated: 2026-07-10 · Contracts: 25 · Permissions: 135 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
 ## 0x1A430825B31DdA074751D6731Ce7Dca38D012D13 (`0x1A430825B31DdA074751D6731Ce7Dca38D012D13`)
 

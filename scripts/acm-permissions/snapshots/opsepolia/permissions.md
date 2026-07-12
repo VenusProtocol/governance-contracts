@@ -1,6 +1,6 @@
 # ACM Permissions — opsepolia
 
-Snapshot block: 45948402 · Updated: 2026-07-10 · Contracts: 16 · Permissions: 112 · Verification: ⚠️ not verified this run
+Snapshot block: 45948402 · Updated: 2026-07-10 · Contracts: 16 · Permissions: 112 · Verification: ✅ verified on-chain (as of 2026-07-12)
 
 ## 0xc66c4058A8524253C22a9461Df6769CE09F7d61e (`0xc66c4058A8524253C22a9461Df6769CE09F7d61e`)
 
