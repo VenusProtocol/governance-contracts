@@ -3,6 +3,8 @@
   "acmAddress": "0x1f12014c497a9d905155eB9BfDD9FaC6885e61d0",
   "height": 52957343,
   "updatedAt": "2026-07-10T17:48:36.626Z",
+  "verified": true,
+  "verifiedAt": "2026-07-12T14:24:53.535Z",
   "schemaVersion": 1,
   "contracts": [
     {
@@ -474,41 +476,6 @@
           "transactions": [
             "0x0a024133f98b3fae61d30327cae919246b56bf22a12843e0a0b218345aa5c58b",
             "0x9086ee040d507dd4eed57c0fda4d8c3c8c06ca3a998d9c980d310b35f7b0c2b8"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x102fEb723C25c67dbdfDccCa3B1c1a6e1a662D2f",
-      "name": "0x102fEb723C25c67dbdfDccCa3B1c1a6e1a662D2f",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "setMaxLoopsLimit(uint256)",
-          "roleHash": "0x32ba30f62fe99354a2ddc9ecaa2786ae708fbac2602d53760ba3a1cb8158b5be",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x918532A78d22419Da4091930d472bDdf532BE89a",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0x33768cb7402b1de21673faacde3ba4219d20d5877dc1f7a3483ee9d5091c9ca1"
-          ]
-        },
-        {
-          "functionSig": "setRewardRecipient(address)",
-          "roleHash": "0xd4e0b10d1cc256f348f4daada74be3cc0ac7c1f1079c289f280d929f49f96e57",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x918532A78d22419Da4091930d472bDdf532BE89a",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0x33768cb7402b1de21673faacde3ba4219d20d5877dc1f7a3483ee9d5091c9ca1"
           ]
         }
       ]
@@ -1524,6 +1491,41 @@
       ]
     },
     {
+      "address": "0x102fEb723C25c67dbdfDccCa3B1c1a6e1a662D2f",
+      "name": "VenusERC4626Factory / VenusERC4626Factory_Proxy",
+      "scope": "contract",
+      "permissions": [
+        {
+          "functionSig": "setMaxLoopsLimit(uint256)",
+          "roleHash": "0x32ba30f62fe99354a2ddc9ecaa2786ae708fbac2602d53760ba3a1cb8158b5be",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x918532A78d22419Da4091930d472bDdf532BE89a",
+              "name": "NormalTimelock"
+            }
+          ],
+          "transactions": [
+            "0x33768cb7402b1de21673faacde3ba4219d20d5877dc1f7a3483ee9d5091c9ca1"
+          ]
+        },
+        {
+          "functionSig": "setRewardRecipient(address)",
+          "roleHash": "0xd4e0b10d1cc256f348f4daada74be3cc0ac7c1f1079c289f280d929f49f96e57",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x918532A78d22419Da4091930d472bDdf532BE89a",
+              "name": "NormalTimelock"
+            }
+          ],
+          "transactions": [
+            "0x33768cb7402b1de21673faacde3ba4219d20d5877dc1f7a3483ee9d5091c9ca1"
+          ]
+        }
+      ]
+    },
+    {
       "address": "0x67716D6Bf76170Af816F5735e14c4d44D0B05eD2",
       "name": "VToken_vUNI_Core",
       "scope": "contract",
@@ -2443,7 +2445,5 @@
         }
       ]
     }
-  ],
-  "verified": true,
-  "verifiedAt": "2026-07-12T14:24:53.535Z"
+  ]
 }
