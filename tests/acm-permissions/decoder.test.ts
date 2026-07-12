@@ -1,7 +1,13 @@
 import { expect } from "chai";
 import { ethers } from "ethers";
 
-import { TOPICS, buildHashTable, decodeLog, roleHash } from "../../scripts/acm-permissions/core/decoder";
+import {
+  TOPICS,
+  buildHashTable,
+  decodeLog,
+  legacyWildcardRoleHash,
+  roleHash,
+} from "../../scripts/acm-permissions/core/decoder";
 
 const ACM = "0x4788629ABc6cFCA10F9f969efdEAa1cF70c23555";
 const T = "0x939bD8d64c0A9583A7Dcea9933f7b21697ab6396"; // account
@@ -39,6 +45,18 @@ describe("decoder", () => {
     );
     expect(unknown).to.include({ decoded: false, contractAddress: null, functionSig: null });
     expect(unknown.roleHash).to.equal("0x" + "11".repeat(32));
+  });
+  it("decodes the deployed bsc ACM's bytes32(0) wildcard roles alongside the 20-byte form", () => {
+    const WILDCARD = "0x0000000000000000000000000000000000000000";
+    const table = buildHashTable([C, WILDCARD], ["pause()"]);
+    const topics = (role: string) => [TOPICS.legacy.granted, role, ethers.utils.hexZeroPad(T, 32)];
+    // deployed bsc ACM wildcard derivation: keccak256(bytes32(0) ++ sig), NOT the 20-byte address(0)
+    const legacyWildcard = legacyWildcardRoleHash("pause()");
+    expect(legacyWildcard).to.not.equal(roleHash(WILDCARD, "pause()"));
+    for (const role of [legacyWildcard, roleHash(WILDCARD, "pause()")]) {
+      const ev = decodeLog({ ...base, topics: topics(role), data: "0x" }, "bscmainnet", ACM, table);
+      expect(ev).to.include({ decoded: true, contractAddress: WILDCARD, functionSig: "pause()" });
+    }
   });
   it("maps the all-zero role to DEFAULT_ADMIN_ROLE on the ACM", () => {
     const ev = decodeLog(

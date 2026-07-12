@@ -1,6 +1,6 @@
 import { ethers } from "ethers";
 
-import { DEFAULT_ADMIN_ROLE, isLegacyAcm } from "../config";
+import { DEFAULT_ADMIN_ROLE, WILDCARD, isLegacyAcm } from "../config";
 import { Network, PermissionEvent } from "../types";
 
 export const TOPICS = {
@@ -17,6 +17,12 @@ export const TOPICS = {
 export const roleHash = (contract: string, sig: string) =>
   ethers.utils.solidityKeccak256(["address", "string"], [contract, sig]);
 
+// The ACM deployed on bscmainnet derives its wildcard ("any contract") role from a 32-byte
+// zero constant — keccak256(bytes32(0) ++ functionSig) — unlike the modern ACM in this repo,
+// which packs the 20-byte zero address. Contract-scoped roles pack the 20-byte address on both.
+export const legacyWildcardRoleHash = (sig: string) =>
+  ethers.utils.keccak256(ethers.utils.concat([ethers.utils.hexZeroPad(WILDCARD, 32), ethers.utils.toUtf8Bytes(sig)]));
+
 export type HashTable = Record<string, { contractAddress: string; functionSig: string }>;
 
 export function buildHashTable(addresses: string[], signatures: string[]): HashTable {
@@ -25,6 +31,9 @@ export function buildHashTable(addresses: string[], signatures: string[]): HashT
     const cs = ethers.utils.getAddress(a);
     for (const s of signatures) t[roleHash(cs, s)] = { contractAddress: cs, functionSig: s };
   }
+  // Both wildcard forms decode to the wildcard scope: the 20-byte form for completeness, the
+  // 32-byte form because that is what the deployed bscmainnet ACM actually grants and checks.
+  for (const s of signatures) t[legacyWildcardRoleHash(s)] = { contractAddress: WILDCARD, functionSig: s };
   return t;
 }
 

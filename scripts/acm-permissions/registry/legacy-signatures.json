@@ -2,7 +2,7 @@
   "signatures": [
     {
       "signature": "_setActionsPaused(address[],uint256[],bool)",
-      "origin": "missingRoleInfo.txt — typo'd grant (should be _setActionsPaused(address[],uint8[],bool)), role since revoked"
+      "origin": "missingRoleInfo.txt \u2014 typo'd grant (should be _setActionsPaused(address[],uint8[],bool)), role since revoked"
     },
     {
       "signature": "_setCollateralFactor(address,uint256)",
@@ -11,6 +11,10 @@
     {
       "signature": "_setLiquidationIncentive(uint256)",
       "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "createVault(VaultConfig,InstitutionalConfig,RiskConfig,string,string,string)",
+      "origin": "not found in contract packages \u2014 granted via VIP-640 on InstitutionalVaultControllerProxy (0x6D9e91cB766259af42619c14c994E694E57e6E85) to the timelocks and Guardian; struct-named string not derivable from the published fixed-rate-vaults ABI"
     },
     {
       "signature": "removeMarket(address,address)",
@@ -23,6 +27,10 @@
     {
       "signature": "setRewardRecipient(address)",
       "origin": "old BNBPermissions.json (pending fresh-extraction diff, Task 6)"
+    },
+    {
+      "signature": "sweepTokenFromPool(address,address,address,uint256)",
+      "origin": "not found in contract packages \u2014 granted via VIP-357 on RiskFundV2 (0xdF31a28D68A2AB381D42b380649Ead7ae2A76E42) to the timelocks; current protocol-reserve sources no longer contain this string"
     },
     {
       "signature": "toggleConfigActive(string)",

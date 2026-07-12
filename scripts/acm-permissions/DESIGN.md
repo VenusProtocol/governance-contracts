@@ -351,11 +351,21 @@ Decoding via a precomputed hash table, built at startup:
 for every address A in (contracts registry ∪ address(0)):
     for every signature S in (signatures.json ∪ legacy-signatures.json):
         table[keccak256(A, S)] = { contract: A, signature: S }
+for every signature S:
+    table[keccak256(bytes32(0) ++ S)] = { contract: address(0), signature: S }
 table[0x00…00] = DEFAULT_ADMIN_ROLE (ACM admin)
 ```
 
 (~all addresses × ~all signatures ≈ a few hundred thousand hashes; computed once,
 in-memory, seconds.)
+
+**Wildcard role derivation on the deployed contract.** The ACM deployed on bscmainnet
+(not a proxy; never upgraded) derives contract-scoped roles from the packed 20-byte
+address — `keccak256(abi.encodePacked(A, S))` — but derives its wildcard role from a
+32-byte zero constant: `keccak256(bytes32(0) ++ S)`. The modern ACM source in this
+repo packs the 20-byte `address(0)` instead, which is why the table carries both
+wildcard forms; every wildcard grant observed on bscmainnet uses the 32-byte form
+(confirmed live via `isAllowedToCall`). Both forms decode to the wildcard scope.
 
 **State key: the role hash itself.** Decoded metadata (contract, signature) is an
 annotation, not the key. Consequences:
