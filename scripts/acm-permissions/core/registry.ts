@@ -22,7 +22,14 @@ export function nameFor(map: Record<string, string>, address: string): string {
 }
 export function loadSignatures(): string[] {
   const fresh = path.join(REGISTRY_DIR, "signatures.json");
-  const sigs = new Set<string>(fs.existsSync(fresh) ? readJson(fresh).signatures : []);
+  const sigs = new Set<string>();
+  if (fs.existsSync(fresh)) {
+    const data = readJson(fresh);
+    // Current format groups signatures per contract; the flat `signatures` array is the
+    // pre-grouping format, still accepted so an older checkout of the file keeps working.
+    for (const c of data.contracts ?? []) for (const s of c.signatures) sigs.add(s);
+    for (const s of data.signatures ?? []) sigs.add(s);
+  }
   for (const e of readJson(path.join(REGISTRY_DIR, "legacy-signatures.json")).signatures) sigs.add(e.signature);
   return [...sigs].sort();
 }

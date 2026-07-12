@@ -15,10 +15,15 @@ export function buildContractRegistry(network: Network, roots: string[]): Record
     } else if (!reg[key]) reg[key] = name;
   };
   for (const root of roots) {
-    const f = path.join(root, "deployments", `${network}_addresses.json`);
-    if (!fs.existsSync(f)) continue;
-    const { addresses } = JSON.parse(fs.readFileSync(f, "utf8"));
-    for (const [name, addr] of Object.entries(addresses || {})) put(addr as string, name);
+    const depDir = path.join(root, "deployments");
+    if (!fs.existsSync(depDir)) continue;
+    for (const f of fs.readdirSync(depDir)) {
+      if (!f.endsWith("_addresses.json")) continue;
+      // Some repos name aggregates with underscores (fixed-rate-vaults: bsc_mainnet_addresses.json).
+      if (f.slice(0, -"_addresses.json".length).replace(/_/g, "") !== network) continue;
+      const { addresses } = JSON.parse(fs.readFileSync(path.join(depDir, f), "utf8"));
+      for (const [name, addr] of Object.entries(addresses || {})) put(addr as string, name);
+    }
   }
   GUARDIANS[network].forEach((g, i, all) => put(g, all.length > 1 ? `Guardian ${i + 1}` : "Guardian"));
   if (network === "bscmainnet") {

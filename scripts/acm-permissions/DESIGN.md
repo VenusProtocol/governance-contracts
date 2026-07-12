@@ -144,12 +144,23 @@ sources, merged and deduplicated:
    catalog (~217 strings). Parsed statically (regex over string literals), not executed.
 2. **Source scan** — grep all Solidity sources for string literals passed to
    `_checkAccessAllowed("...")` / `checkAccessAllowed(..., "...")`. Scanned roots:
-   `contracts/` in this repo and `node_modules/@venusprotocol/*/contracts/`.
+   `contracts/` in every source listed in `registry/sources.json` (this repo plus
+   the pinned npm tarballs under `.sources-cache/`).
    This source is essential because Venus permission strings use **struct names**
    (e.g. `setTokenConfig(TokenConfig)`), which cannot be derived from ABIs.
    Dynamically-built strings (not plain literals) are logged for manual review.
 3. **ABI supplement** — canonical function signatures from deployment-artifact ABIs,
    covering any externally-guarded functions missed by (1)/(2).
+
+**File format:** grouped per contract for human review — an array of
+`{ "name": …, "addresses": { "<network>": ["0x…"] }, "signatures": […] }` entries.
+`name` is the Solidity file / deployment-artifact name the signatures were extracted
+from; `addresses` is filled when a deployment artifact under a recognized network
+directory carries an address (empty for source-only or raw-ABI extractions). The
+grouping is presentation only: every consumer (hash-table build, verification)
+flattens all groups into a single deduplicated signature set before matching, so
+grouping cannot change decoding behavior — the same string appearing under several
+contracts is expected and harmless.
 
 **Freshness & provenance rules:**
 

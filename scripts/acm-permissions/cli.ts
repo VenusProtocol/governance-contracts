@@ -14,7 +14,7 @@ import { loadKnownAddresses, loadNameMap, loadSignatures, nameFor, requireSignat
 import { fileToState, loadSnapshotFile, reannotateUndecoded, saveSnapshotFile, stateToFile } from "./core/snapshot";
 import { ACM_ABI, AcmLike, verifyAll, verifyDiff } from "./core/verifier";
 import { buildContractRegistry } from "./registry-builder/contracts";
-import { buildSignatures } from "./registry-builder/signatures";
+import { buildSignatures, flattenSignatures } from "./registry-builder/signatures";
 import { loadManifest, resolveSource } from "./registry-builder/sources";
 import { DiffEntry, NETWORKS, Network, SnapshotFile } from "./types";
 
@@ -30,13 +30,18 @@ const writeAtomic = (file: string, data: string) => {
 
 async function buildRegistry() {
   const roots = loadManifest().map(resolveSource);
-  const { signatures, dynamicCallsites } = buildSignatures(roots);
+  const { contracts, dynamicCallsites } = buildSignatures(roots);
+  const signatures = flattenSignatures(contracts);
   const prevFile = path.join(REGISTRY_DIR, "signatures.json");
-  const prev: string[] = fs.existsSync(prevFile) ? JSON.parse(fs.readFileSync(prevFile, "utf8")).signatures : [];
+  const prevRaw = fs.existsSync(prevFile) ? JSON.parse(fs.readFileSync(prevFile, "utf8")) : null;
+  // Diff against either format: grouped (current) or the flat pre-grouping array.
+  const prev: string[] = prevRaw ? prevRaw.signatures ?? flattenSignatures(prevRaw.contracts ?? []) : [];
   const appeared = signatures.filter(s => !prev.includes(s)),
     disappeared = prev.filter(s => !signatures.includes(s));
-  writeAtomic(prevFile, JSON.stringify({ generatedAt: new Date().toISOString(), signatures }, null, 2));
-  console.log(`signatures: ${signatures.length} (+${appeared.length} / -${disappeared.length})`);
+  writeAtomic(prevFile, JSON.stringify({ generatedAt: new Date().toISOString(), contracts }, null, 2));
+  console.log(
+    `signatures: ${signatures.length} unique across ${contracts.length} contracts (+${appeared.length} / -${disappeared.length})`,
+  );
   disappeared.forEach(s => console.log(`  disappeared: ${s}`));
   if (dynamicCallsites.length) {
     console.log(`⚠ dynamic checkAccessAllowed callsites (manual review):`);

@@ -26,6 +26,18 @@ describe("contract registry", () => {
     const key = ethers.utils.getAddress(addr);
     expect(reg[key]).to.equal("Timelock / NormalTimelock");
   });
+  it("matches underscored aggregate names (bsc_mainnet_addresses.json -> bscmainnet)", () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), "srcU-"));
+    const addr = "0xc25b2b657d24380edd1a1cff5296385541e85204";
+    fs.mkdirSync(path.join(root, "deployments"), { recursive: true });
+    fs.writeFileSync(
+      path.join(root, "deployments", "bsc_mainnet_addresses.json"),
+      JSON.stringify({ addresses: { InstitutionalLoanVault: addr } }),
+    );
+    const reg = buildContractRegistry("bscmainnet", [root]);
+    expect(reg[ethers.utils.getAddress(addr)]).to.equal("InstitutionalLoanVault");
+    expect(buildContractRegistry("bsctestnet", [root])).to.not.have.property(ethers.utils.getAddress(addr));
+  });
   it("nameFor falls back to the raw address and is case-insensitive", () => {
     const key = ethers.utils.getAddress("0x939bd8d64c0a9583a7dcea9933f7b21697ab6396");
     const map = { [key]: "NormalTimelock" };

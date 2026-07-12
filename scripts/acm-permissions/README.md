@@ -79,8 +79,10 @@ comma lists) since the output is grouped per grantee for one network at a time.
 ### `yarn acm:build-registry`
 
 Rebuilds the two **generated** registries that `fetch`/`verify`/`filter` read from —
-`registry/signatures.json` (every permission string provable from current sources) and
-`registry/contracts/<network>.json` (address → name, per network). Run this whenever
+`registry/signatures.json` (every permission string provable from current sources,
+grouped per contract as `{ name, addresses: { network: [addr…] }, signatures: […] }`
+for reviewability — consumers flatten all groups into one deduplicated set before
+matching) and `registry/contracts/<network>.json` (address → name, per network). Run this whenever
 a new Venus repo/version is added to the source manifest (see
 [Adding a network or source repo](#adding-a-network-or-source-repo)), or periodically
 to pick up newly deployed contracts/newly added guarded functions.
