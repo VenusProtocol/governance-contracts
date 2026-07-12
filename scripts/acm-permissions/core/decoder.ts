@@ -31,8 +31,8 @@ export function buildHashTable(addresses: string[], signatures: string[]): HashT
     const cs = ethers.utils.getAddress(a);
     for (const s of signatures) t[roleHash(cs, s)] = { contractAddress: cs, functionSig: s };
   }
-  // Both wildcard forms decode to the wildcard scope: the 20-byte form for completeness, the
-  // 32-byte form because that is what the deployed bscmainnet ACM actually grants and checks.
+  // Wildcard roles: only the 32-byte-zero form — the one the deployed bscmainnet ACM actually
+  // grants and checks. The 20-byte address(0) form is intentionally absent (see loadKnownAddresses).
   for (const s of signatures) t[legacyWildcardRoleHash(s)] = { contractAddress: WILDCARD, functionSig: s };
   return t;
 }

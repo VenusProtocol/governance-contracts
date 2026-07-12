@@ -46,17 +46,26 @@ describe("decoder", () => {
     expect(unknown).to.include({ decoded: false, contractAddress: null, functionSig: null });
     expect(unknown.roleHash).to.equal("0x" + "11".repeat(32));
   });
-  it("decodes the deployed bsc ACM's bytes32(0) wildcard roles alongside the 20-byte form", () => {
+  it("decodes wildcard roles only via the deployed bsc ACM's bytes32(0) form", () => {
     const WILDCARD = "0x0000000000000000000000000000000000000000";
-    const table = buildHashTable([C, WILDCARD], ["pause()"]);
+    const table = buildHashTable([C], ["pause()"]);
     const topics = (role: string) => [TOPICS.legacy.granted, role, ethers.utils.hexZeroPad(T, 32)];
     // deployed bsc ACM wildcard derivation: keccak256(bytes32(0) ++ sig), NOT the 20-byte address(0)
-    const legacyWildcard = legacyWildcardRoleHash("pause()");
-    expect(legacyWildcard).to.not.equal(roleHash(WILDCARD, "pause()"));
-    for (const role of [legacyWildcard, roleHash(WILDCARD, "pause()")]) {
-      const ev = decodeLog({ ...base, topics: topics(role), data: "0x" }, "bscmainnet", ACM, table);
-      expect(ev).to.include({ decoded: true, contractAddress: WILDCARD, functionSig: "pause()" });
-    }
+    const ev = decodeLog(
+      { ...base, topics: topics(legacyWildcardRoleHash("pause()")), data: "0x" },
+      "bscmainnet",
+      ACM,
+      table,
+    );
+    expect(ev).to.include({ decoded: true, contractAddress: WILDCARD, functionSig: "pause()" });
+    // the 20-byte-zero form is a grant the ACM would never honor — it must stay unresolved
+    const broken = decodeLog(
+      { ...base, topics: topics(roleHash(WILDCARD, "pause()")), data: "0x" },
+      "bscmainnet",
+      ACM,
+      table,
+    );
+    expect(broken).to.include({ decoded: false, contractAddress: null, functionSig: null });
   });
   it("maps the all-zero role to DEFAULT_ADMIN_ROLE on the ACM", () => {
     const ev = decodeLog(

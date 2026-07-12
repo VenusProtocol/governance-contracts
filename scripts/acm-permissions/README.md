@@ -155,7 +155,7 @@ Decoding it requires already knowing every candidate `(address, signature)` pair
 `fetch` builds an in-memory hash table at startup:
 
 ```
-for every address A in (contracts registry ∪ address(0)):
+for every address A in the contracts registry:
   for every signature S in (signatures.json ∪ legacy-signatures.json):
     table[keccak256(A, S)] = { contract: A, signature: S }
 for every signature S: table[keccak256(bytes32(0) ++ S)] = { contract: address(0), signature: S }
@@ -164,12 +164,14 @@ table[0x00…00] = DEFAULT_ADMIN_ROLE
 
 (a few hundred thousand hashes, computed once, in memory, in seconds).
 
-The extra wildcard row exists because the ACM actually deployed on bscmainnet derives
-its wildcard ("may call this on any contract") role from a **32-byte zero constant** —
-`keccak256(bytes32(0) ++ functionSig)` — unlike the modern ACM source in this repo,
-which packs the 20-byte `address(0)`. Contract-scoped roles pack the 20-byte address
-on both. All of bscmainnet's wildcard grants use the 32-byte form and are live —
-verified via `isAllowedToCall` — and both forms decode into the wildcard section.
+The wildcard row hashes a **32-byte zero constant** because that is how the ACM
+actually deployed on bscmainnet derives its wildcard ("may call this on any
+contract") role — `keccak256(bytes32(0) ++ functionSig)` — unlike the modern ACM
+source in this repo, which packs the 20-byte `address(0)`. All of bscmainnet's
+wildcard grants use the 32-byte form and are live (verified via `isAllowedToCall`).
+The 20-byte `address(0)` form is deliberately **not** in the table: the deployed ACM
+never derives it, so a role that only matched that form would be a broken grant the
+ACM ignores — better surfaced as unresolved than decoded as a working wildcard.
 
 The snapshot is keyed by the **role hash itself**, not by `(contract, signature)` —
 so a `RoleRevoked` always removes the grantee correctly even when the role can't be

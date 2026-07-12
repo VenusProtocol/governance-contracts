@@ -2,7 +2,7 @@ import { ethers } from "ethers";
 import * as fs from "fs";
 import * as path from "path";
 
-import { REGISTRY_DIR, WILDCARD, isLegacyAcm } from "../config";
+import { REGISTRY_DIR, isLegacyAcm } from "../config";
 import { Network } from "../types";
 
 const readJson = (f: string) => JSON.parse(fs.readFileSync(f, "utf8"));
@@ -33,8 +33,12 @@ export function loadSignatures(): string[] {
   for (const e of readJson(path.join(REGISTRY_DIR, "legacy-signatures.json")).signatures) sigs.add(e.signature);
   return [...sigs].sort();
 }
+// Deliberately does NOT include the zero address: the deployed bscmainnet ACM derives its
+// wildcard role from 32 zero bytes (handled directly in buildHashTable), never from the
+// 20-byte address(0) — a role that somehow matched that form would be a broken grant the
+// ACM ignores, and it should surface as unresolved rather than decode as a wildcard.
 export function loadKnownAddresses(network: Network): string[] {
-  const set = new Set<string>([WILDCARD, ...Object.keys(loadNameMap(network))]);
+  const set = new Set<string>(Object.keys(loadNameMap(network)));
   if (network === "bscmainnet")
     for (const c of readJson(path.join(REGISTRY_DIR, "legacy-contracts.json")).contracts)
       set.add(ethers.utils.getAddress(c.address));
