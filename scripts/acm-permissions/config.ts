@@ -8,6 +8,9 @@ export const TOOL_DIR = __dirname;
 export const REGISTRY_DIR = path.join(TOOL_DIR, "registry");
 export const SNAPSHOTS_DIR = path.join(TOOL_DIR, "snapshots");
 export const snapshotDir = (n: Network) => path.join(SNAPSHOTS_DIR, n);
+// On-demand `acm:filter` reports live apart from the fetch-maintained snapshots.
+export const FILTERS_DIR = path.join(TOOL_DIR, "filters");
+export const filtersDir = (n: Network) => path.join(FILTERS_DIR, n);
 export const WILDCARD = "0x0000000000000000000000000000000000000000";
 export const DEFAULT_ADMIN_ROLE = "0x" + "0".repeat(64);
 export const TIMELOCK_NAMES = ["NormalTimelock", "FastTrackTimelock", "CriticalTimelock"];

@@ -64,6 +64,23 @@ const file: SnapshotFile = {
         },
       ],
     },
+    {
+      address: "0x0000000000000000000000000000000000000002",
+      name: "SharedTarget",
+      scope: "contract",
+      permissions: [
+        {
+          functionSig: "unpause()",
+          roleHash: "0xr4",
+          decoded: true,
+          grantees: [
+            { address: NORMAL_TIMELOCK, name: "NormalTimelock" },
+            { address: GUARDIAN_2, name: "Guardian 2" },
+          ],
+          transactions: ["0xt4"],
+        },
+      ],
+    },
   ],
 };
 
@@ -75,21 +92,48 @@ describe("filterPermissions", () => {
 
   it("resolves a timelock name via reverse name-map lookup", () => {
     const result = filterPermissions(file, ["NormalTimelock"], "bscmainnet", nameMap);
-    expect(result.NormalTimelock).to.deep.equal([{ contract: "Unitroller", functionSig: "pause()", roleHash: "0xr1" }]);
+    expect(result.NormalTimelock).to.deep.equal([
+      { contract: "Unitroller", functionSig: "pause()", roleHash: "0xr1" },
+      { contract: "SharedTarget", functionSig: "unpause()", roleHash: "0xr4" },
+    ]);
   });
 
   it('"Guardian" matches ALL bscmainnet guardian addresses, including the decoded and unresolved permissions', () => {
     const result = filterPermissions(file, ["Guardian"], "bscmainnet", nameMap);
-    expect(result.Guardian).to.have.length(2);
+    expect(result.Guardian).to.have.length(3);
     expect(result.Guardian).to.deep.include({ contract: "VBNB", functionSig: "mint()", roleHash: "0xr2" });
     expect(result.Guardian).to.deep.include({ contract: "UNRESOLVED", functionSig: null, roleHash: "0xr3" });
+    expect(result.Guardian).to.deep.include({ contract: "SharedTarget", functionSig: "unpause()", roleHash: "0xr4" });
   });
 
   it("a raw 0x… address label matches directly, same as its resolved name", () => {
     const result = filterPermissions(file, [NORMAL_TIMELOCK], "bscmainnet", nameMap);
     expect(result[NORMAL_TIMELOCK]).to.deep.equal([
       { contract: "Unitroller", functionSig: "pause()", roleHash: "0xr1" },
+      { contract: "SharedTarget", functionSig: "unpause()", roleHash: "0xr4" },
     ]);
+  });
+
+  it("--exclude drops only permissions the excluded grantee also holds (set difference)", () => {
+    const result = filterPermissions(file, ["NormalTimelock"], "bscmainnet", nameMap, ["Guardian"]);
+    // 0xr4 is shared with Guardian 2 and dropped; 0xr1 is exclusive to the timelock and kept.
+    expect(result.NormalTimelock).to.deep.equal([{ contract: "Unitroller", functionSig: "pause()", roleHash: "0xr1" }]);
+  });
+
+  it("exclusion works with any label kind, including a raw address", () => {
+    const result = filterPermissions(file, ["Guardian"], "bscmainnet", nameMap, [NORMAL_TIMELOCK]);
+    expect(result.Guardian).to.have.length(2);
+    expect(result.Guardian).to.not.deep.include({
+      contract: "SharedTarget",
+      functionSig: "unpause()",
+      roleHash: "0xr4",
+    });
+  });
+
+  it("throws for an exclude label that resolves to nothing", () => {
+    expect(() => filterPermissions(file, ["Guardian"], "bscmainnet", nameMap, ["NotARealLabel"])).to.throw(
+      /NotARealLabel/,
+    );
   });
 
   it("throws a clear error for a label that resolves to nothing", () => {
@@ -99,7 +143,10 @@ describe("filterPermissions", () => {
   it('matches each part of a joined "A / B" registry name individually', () => {
     // Generated registries join conflicting deployments as "X / X_Proxy" — either part must resolve.
     const joinedMap: Record<string, string> = { ...nameMap, [NORMAL_TIMELOCK]: "NormalTimelock / LegacyAlias" };
-    const expected = [{ contract: "Unitroller", functionSig: "pause()", roleHash: "0xr1" }];
+    const expected = [
+      { contract: "Unitroller", functionSig: "pause()", roleHash: "0xr1" },
+      { contract: "SharedTarget", functionSig: "unpause()", roleHash: "0xr4" },
+    ];
     expect(filterPermissions(file, ["NormalTimelock"], "bscmainnet", joinedMap).NormalTimelock).to.deep.equal(expected);
     expect(filterPermissions(file, ["LegacyAlias"], "bscmainnet", joinedMap).LegacyAlias).to.deep.equal(expected);
   });

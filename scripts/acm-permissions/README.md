@@ -76,6 +76,20 @@ network — bscmainnet has three), any other resolvable name in the network's co
 registry, or a raw `0x…` address. Requires exactly one `--network` (no `all`, no
 comma lists) since the output is grouped per grantee for one network at a time.
 
+`--exclude` takes the same label kinds and turns the listing into a set difference:
+only permissions the grantee holds that **none** of the excluded grantees also hold
+on that exact role (same contract + role hash). The main use is
+"what can a timelock do that Guardian cannot":
+
+```bash
+yarn acm:filter --network bscmainnet --grantees NormalTimelock,FastTrackTimelock,CriticalTimelock --exclude Guardian
+```
+
+Every run writes an on-demand report (JSON + Markdown) to
+`scripts/acm-permissions/filters/<network>/<grantees>[-minus-<exclude>].{json,md}` —
+kept apart from `snapshots/` because these are ad-hoc views regenerated at will, not
+fetch-maintained state. `--out <path>` redirects the JSON copy.
+
 ### `yarn acm:build-registry`
 
 Rebuilds the two **generated** registries that `fetch`/`verify`/`filter` read from —

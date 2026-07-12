@@ -4,7 +4,16 @@ import * as fs from "fs";
 import { parseArgs } from "node:util";
 import * as path from "path";
 
-import { GUARDIANS, REGISTRY_DIR, STARTING_BLOCKS, acmAddress, isLegacyAcm, rpcUrl, snapshotDir } from "./config";
+import {
+  GUARDIANS,
+  REGISTRY_DIR,
+  STARTING_BLOCKS,
+  acmAddress,
+  filtersDir,
+  isLegacyAcm,
+  rpcUrl,
+  snapshotDir,
+} from "./config";
 import { buildHashTable } from "./core/decoder";
 import { diffSnapshots } from "./core/diff";
 import { scanRange } from "./core/fetcher";
@@ -232,8 +241,15 @@ export function filterPermissions(
   grantees: string[],
   network: Network,
   nameMap: Record<string, string> = loadNameMap(network),
+  exclude: string[] = [],
 ): FilterResult {
   const result: FilterResult = {};
+  // Set difference on the exact permission entry (same contract + roleHash): a permission is
+  // dropped only when an excluded grantee holds that very role, not merely the same function
+  // signature on a different contract.
+  const excluded = new Set(
+    exclude.flatMap(label => resolveLabel(label, network, nameMap)).map(a => ethers.utils.getAddress(a)),
+  );
 
   for (const label of grantees) {
     const targets = new Set(resolveLabel(label, network, nameMap).map(a => ethers.utils.getAddress(a)));
@@ -241,7 +257,8 @@ export function filterPermissions(
     for (const contract of file.contracts) {
       for (const permission of contract.permissions) {
         const isGrantedToLabel = permission.grantees.some(g => targets.has(ethers.utils.getAddress(g.address)));
-        if (isGrantedToLabel) {
+        const isAlsoExcluded = permission.grantees.some(g => excluded.has(ethers.utils.getAddress(g.address)));
+        if (isGrantedToLabel && !isAlsoExcluded) {
           matches.push({ contract: contract.name, functionSig: permission.functionSig, roleHash: permission.roleHash });
         }
       }
@@ -262,7 +279,34 @@ function resolveSingleNetwork(arg: string): Network {
   return arg as Network;
 }
 
-function filterCommand(values: { network?: string; grantees?: string; out?: string }): void {
+// "NormalTimelock, 0xAbC…" -> "NormalTimelock+0xAbC…" with anything path-hostile replaced.
+const slugify = (labels: string[]) => labels.map(l => l.replace(/[^A-Za-z0-9_.-]+/g, "-")).join("+");
+
+function renderFilterMd(
+  meta: { network: Network; height: number; updatedAt: string; grantees: string[]; exclude: string[] },
+  result: FilterResult,
+): string {
+  const lines: string[] = [
+    `# Permission filter — ${meta.network}`,
+    "",
+    `- Grantees: ${meta.grantees.join(", ")}`,
+    ...(meta.exclude.length ? [`- Excluding permissions also held by: ${meta.exclude.join(", ")}`] : []),
+    `- Snapshot height: ${meta.height} (updated ${meta.updatedAt})`,
+    "",
+  ];
+  for (const label of meta.grantees) {
+    const matches = result[label];
+    lines.push(`## ${label} — ${matches.length} permission${matches.length === 1 ? "" : "s"}`, "");
+    if (matches.length) {
+      lines.push("| Contract | Function | Role hash |", "| --- | --- | --- |");
+      for (const m of matches) lines.push(`| ${m.contract} | ${m.functionSig ?? "(undecoded)"} | ${m.roleHash} |`);
+      lines.push("");
+    }
+  }
+  return lines.join("\n");
+}
+
+function filterCommand(values: { network?: string; grantees?: string; exclude?: string; out?: string }): void {
   let network: Network;
   try {
     network = resolveSingleNetwork(values.network ?? "all");
@@ -276,6 +320,7 @@ function filterCommand(values: { network?: string; grantees?: string; out?: stri
     process.exit(2);
   }
   const grantees = values.grantees.split(",").map(s => s.trim());
+  const exclude = values.exclude ? values.exclude.split(",").map(s => s.trim()) : [];
 
   const file = loadSnapshotFile(network);
   if (!file) {
@@ -283,7 +328,7 @@ function filterCommand(values: { network?: string; grantees?: string; out?: stri
     process.exit(1);
   }
 
-  const result = filterPermissions(file, grantees, network);
+  const result = filterPermissions(file, grantees, network, loadNameMap(network), exclude);
 
   for (const label of grantees) {
     const matches = result[label];
@@ -291,7 +336,15 @@ function filterCommand(values: { network?: string; grantees?: string; out?: stri
     for (const m of matches) console.log(`${m.contract} ${m.functionSig ?? m.roleHash}`);
   }
 
-  if (values.out) writeAtomic(values.out, JSON.stringify(result, null, 2) + "\n");
+  const meta = { network, height: file.height, updatedAt: file.updatedAt, grantees, exclude };
+  const report = { ...meta, generatedAt: new Date().toISOString(), results: result };
+  const slug = slugify(grantees) + (exclude.length ? `-minus-${slugify(exclude)}` : "");
+  const jsonPath = values.out ?? path.join(filtersDir(network), `${slug}.json`);
+  writeAtomic(jsonPath, JSON.stringify(report, null, 2) + "\n");
+  const mdPath = path.join(filtersDir(network), `${slug}.md`);
+  writeAtomic(mdPath, renderFilterMd(meta, result));
+  console.log(`\nwrote ${jsonPath}`);
+  console.log(`wrote ${mdPath}`);
 }
 
 async function fetchCommand(values: {
@@ -428,6 +481,7 @@ if (require.main === module) {
         rebuild: { type: "boolean", default: false },
         to: { type: "string" },
         grantees: { type: "string" },
+        exclude: { type: "string" },
         out: { type: "string" },
       },
     });
