@@ -8,6 +8,7 @@ import {
   GUARDIANS,
   REGISTRY_DIR,
   STARTING_BLOCKS,
+  TIMELOCK_NAMES,
   acmAddress,
   filtersDir,
   isLegacyAcm,
@@ -244,6 +245,19 @@ function resolveNetworks(arg: string): Network[] {
 
 export type FilterResult = Record<string, Array<{ contract: string; functionSig: string | null; roleHash: string }>>;
 
+// Expands grantee aliases BEFORE resolution, so the report keeps one section per real grantee
+// (per-timelock / per-guardian attribution survives); the output filename is built from the
+// short alias the user typed, not the expansion.
+//   - "Timelocks" → the three timelock labels
+//   - "Guardian" on a multi-guardian network → "Guardian 1".."Guardian N" (matching the
+//     registry's naming); on a single-guardian network it stays "Guardian" (the registry name)
+export const expandAliases = (labels: string[], network: Network): string[] =>
+  labels.flatMap(l => {
+    if (l === "Timelocks") return TIMELOCK_NAMES;
+    if (l === "Guardian" && GUARDIANS[network].length > 1) return GUARDIANS[network].map((_, i) => `Guardian ${i + 1}`);
+    return [l];
+  });
+
 // Resolves a requested grantee label to the address(es) it stands for:
 //   - a raw `0x…` address resolves to itself (checksummed)
 //   - the literal "Guardian" resolves to ALL guardian multisigs on the network
@@ -258,8 +272,8 @@ function resolveLabel(label: string, network: Network, nameMap: Record<string, s
   const addresses = Object.keys(nameMap).filter(addr => nameMap[addr].split(" / ").includes(label));
   if (addresses.length === 0) {
     throw new Error(
-      `unknown grantee label "${label}" — expected a 0x… address, "Guardian", or a name present in the ` +
-        `${network} contract registry`,
+      `unknown grantee label "${label}" — expected a 0x… address, "Guardian", "Timelocks", or a name ` +
+        `present in the ${network} contract registry`,
     );
   }
   return addresses;
@@ -366,8 +380,10 @@ function filterCommand(values: {
     console.error("filter requires --grantees <label1,label2,...>");
     process.exit(2);
   }
-  const grantees = values.grantees.split(",").map(s => s.trim());
-  const exclude = values.exclude ? values.exclude.split(",").map(s => s.trim()) : [];
+  const rawGrantees = values.grantees.split(",").map(s => s.trim());
+  const rawExclude = values.exclude ? values.exclude.split(",").map(s => s.trim()) : [];
+  const grantees = expandAliases(rawGrantees, network);
+  const exclude = expandAliases(rawExclude, network);
   const legacyOnly = values["legacy-only"] ?? false;
   const onlySigs = legacyOnly ? new Set(loadLegacyOnlySignatures()) : null;
 
@@ -388,7 +404,9 @@ function filterCommand(values: {
   const meta = { network, height: file.height, updatedAt: file.updatedAt, grantees, exclude, legacyOnly };
   const report = { ...meta, generatedAt: new Date().toISOString(), results: result };
   const slug =
-    slugify(grantees) + (exclude.length ? `-minus-${slugify(exclude)}` : "") + (legacyOnly ? "-legacy-only" : "");
+    slugify(rawGrantees) +
+    (rawExclude.length ? `-minus-${slugify(rawExclude)}` : "") +
+    (legacyOnly ? "-legacy-only" : "");
   const jsonPath = values.out ?? path.join(filtersDir(network), `${slug}.json`);
   writeAtomic(jsonPath, JSON.stringify(report, null, 2) + "\n");
   const mdPath = path.join(filtersDir(network), `${slug}.md`);

@@ -6,11 +6,13 @@
     "NormalTimelock",
     "FastTrackTimelock",
     "CriticalTimelock",
-    "Guardian"
+    "Guardian 1",
+    "Guardian 2",
+    "Guardian 3"
   ],
   "exclude": [],
   "legacyOnly": true,
-  "generatedAt": "2026-07-13T07:59:31.099Z",
+  "generatedAt": "2026-07-13T08:04:10.338Z",
   "results": {
     "NormalTimelock": [
       {
@@ -78,7 +80,7 @@
         "roleHash": "0x9022c522bb4fd3dcc160058b746c6a15fe416ba099f3658ecef34c307a8222d4"
       }
     ],
-    "Guardian": [
+    "Guardian 1": [
       {
         "contract": "InstitutionalVaultControllerProxy",
         "functionSig": "createVault(VaultConfig,InstitutionalConfig,RiskConfig,string,string,string)",
@@ -89,6 +91,8 @@
         "functionSig": "_setCollateralFactor(address,uint256)",
         "roleHash": "0x1b1290727d46b476ad4d9739b3a51f0d0eb69415ba69048cbb28ad5464a82c20"
       }
-    ]
+    ],
+    "Guardian 2": [],
+    "Guardian 3": []
   }
 }

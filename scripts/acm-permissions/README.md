@@ -81,10 +81,14 @@ yarn acm:filter --network ethereum --grantees 0xAbC...123 --out /tmp/out.json
 ```
 
 `--grantees` accepts timelock names (`NormalTimelock`, `FastTrackTimelock`,
-`CriticalTimelock`), the literal `Guardian` (matches all guardian multisigs on that
-network — bscmainnet has three), any other resolvable name in the network's contract
-registry, or a raw `0x…` address. Requires exactly one `--network` (no `all`, no
-comma lists) since the output is grouped per grantee for one network at a time.
+`CriticalTimelock`), the alias `Timelocks` (expands to all three, each with its own
+section), the literal `Guardian` (expands to every guardian multisig on that network —
+one section per guardian on bscmainnet's three, so per-guardian attribution survives),
+a specific `Guardian 2`, any other resolvable name in the network's contract
+registry, or a raw `0x…` address. Aliases expand in the report sections but the
+output filename keeps the short label you typed. Requires exactly one `--network`
+(no `all`, no comma lists) since the output is grouped per grantee for one network
+at a time.
 
 `--exclude` takes the same label kinds and turns the listing into a set difference:
 only permissions the grantee holds that **none** of the excluded grantees also hold
@@ -92,7 +96,7 @@ on that exact role (same contract + role hash). The main use is
 "what can a timelock do that Guardian cannot":
 
 ```bash
-yarn acm:filter --network bscmainnet --grantees NormalTimelock,FastTrackTimelock,CriticalTimelock --exclude Guardian
+yarn acm:filter --network bscmainnet --grantees Timelocks --exclude Guardian
 ```
 
 `--legacy-only` keeps only permissions whose signature exists solely in
@@ -102,7 +106,7 @@ functions, strings recovered from governance history), so they are the first thi
 to review for revocation:
 
 ```bash
-yarn acm:filter --network bscmainnet --grantees NormalTimelock,FastTrackTimelock,CriticalTimelock,Guardian --legacy-only
+yarn acm:filter --network bscmainnet --grantees Timelocks,Guardian --legacy-only
 ```
 
 Every run writes an on-demand report (JSON + Markdown) to

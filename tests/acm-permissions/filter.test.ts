@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { filterPermissions } from "../../scripts/acm-permissions/cli";
+import { expandAliases, filterPermissions } from "../../scripts/acm-permissions/cli";
 import { GUARDIANS } from "../../scripts/acm-permissions/config";
 import { SnapshotFile } from "../../scripts/acm-permissions/types";
 
@@ -83,6 +83,26 @@ const file: SnapshotFile = {
     },
   ],
 };
+
+describe("expandAliases", () => {
+  it('"Timelocks" expands to the three timelock labels, preserving surrounding labels', () => {
+    expect(expandAliases(["Timelocks", "Guardian 2"], "bscmainnet")).to.deep.equal([
+      "NormalTimelock",
+      "FastTrackTimelock",
+      "CriticalTimelock",
+      "Guardian 2",
+    ]);
+  });
+
+  it('"Guardian" expands per-guardian on multi-guardian networks, stays as-is on single-guardian ones', () => {
+    expect(expandAliases(["Guardian"], "bscmainnet")).to.deep.equal(["Guardian 1", "Guardian 2", "Guardian 3"]);
+    expect(expandAliases(["Guardian"], "ethereum")).to.deep.equal(["Guardian"]);
+  });
+
+  it("leaves plain labels and addresses untouched", () => {
+    expect(expandAliases(["NormalTimelock", "0xAbC"], "bscmainnet")).to.deep.equal(["NormalTimelock", "0xAbC"]);
+  });
+});
 
 describe("filterPermissions", () => {
   it("keys results by the requested label verbatim", () => {

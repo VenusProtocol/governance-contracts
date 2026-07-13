@@ -578,13 +578,15 @@ yarn acm:filter --network bscmainnet --grantees NormalTimelock,Guardian
 ```
 
 - `--grantees` accepts one or more of: `NormalTimelock`, `FastTrackTimelock`,
-  `CriticalTimelock`, `Guardian` (bscmainnet's three guardians all match `Guardian`),
-  or a raw address.
+  `CriticalTimelock`, the alias `Timelocks` (expands to all three), `Guardian`
+  (expands to one section per guardian multisig on multi-guardian networks — only
+  bscmainnet today), a specific `Guardian 2`, any registry name, or a raw address.
+  Aliases expand into per-grantee sections; the output filename keeps the short label.
 - For **each** selected grantee, lists all permissions it holds (per-grantee sections).
 - Prints a table to the console; `--out <path>` additionally writes JSON.
 - Reads only the snapshot file — no RPC calls.
-- Future condition presets (e.g. "timelocks but not guardian") will be added as named
-  flags later; out of scope now.
+- Condition presets compose via flags: `--exclude` (set difference, e.g.
+  `--grantees Timelocks --exclude Guardian`) and `--legacy-only` (§5.1 signatures).
 
 ---
 
