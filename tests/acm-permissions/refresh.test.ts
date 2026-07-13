@@ -77,7 +77,7 @@ describe("refreshNetwork", () => {
     expect(md).to.contain(sig);
     expect(md).to.not.contain("Unresolved roles");
 
-    // refresh must never touch changes.md/changes.json.
+    // changes.md/changes.json were removed from the tool entirely — nothing may recreate them.
     expect(fs.existsSync(path.join(dir, "changes.md"))).to.equal(false);
     expect(fs.existsSync(path.join(dir, "changes.json"))).to.equal(false);
   });

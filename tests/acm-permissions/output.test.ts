@@ -3,13 +3,8 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 
-import {
-  changesJson,
-  renderChangesMd,
-  renderPermissionsMd,
-  writeRunOutputs,
-} from "../../scripts/acm-permissions/core/output";
-import { Correction, DiffEntry, SnapshotDiff, SnapshotFile } from "../../scripts/acm-permissions/types";
+import { renderPermissionsMd, writePermissionsOutputs } from "../../scripts/acm-permissions/core/output";
+import { SnapshotFile } from "../../scripts/acm-permissions/types";
 
 const UNITROLLER = "0xfD36E2c2a6789Db23113685031d7F16329158384";
 const VAI_CONTROLLER = "0x939bD8d64c0A9583A7Dcea9933f7b21697ab6396";
@@ -86,49 +81,12 @@ const names: Record<string, string> = {
   [GUARDIAN3]: "Guardian 3",
 };
 
-const added: DiffEntry[] = [
-  {
-    roleHash: "0xr3",
-    contractAddress: UNITROLLER,
-    functionSig: "_setActionsPaused(bool[],bool)",
-    decoded: true,
-    account: FAST_TRACK,
-    txHash: "0xaddtx",
-  },
-];
-const removed: DiffEntry[] = [
-  {
-    roleHash: "0xr4",
-    contractAddress: VAI_CONTROLLER,
-    functionSig: "setBaseRate(uint256)",
-    decoded: true,
-    account: GUARDIAN2,
-    txHash: "0xremtx",
-  },
-];
-const diff: SnapshotDiff = { added, removed };
-const corrections: Correction[] = [
-  {
-    entry: {
-      roleHash: "0xr6",
-      contractAddress: UNITROLLER,
-      functionSig: "_setLiquidationIncentive(uint256)",
-      decoded: true,
-      account: GUARDIAN3,
-      txHash: "0xcortx",
-    },
-    replaySaid: "removed",
-    chainSays: "granted",
-  },
-];
-const meta = { network: "bscmainnet", fromBlock: 66323915, toBlock: 68100000, date: "2026-07-10" };
-
 const golden = (name: string) => fs.readFileSync(path.join(__dirname, "fixtures", name), "utf8");
 
 // A copy of `file` stamped as verified — the base `file` fixture is deliberately left
 // un-stamped (verified/verifiedAt absent) so it can also exercise the "not verified" render
-// path (see the writeRunOutputs tests below, where corrections are non-empty but that no
-// longer determines the header — only the persistent verified/verifiedAt fields do).
+// path (see the writePermissionsOutputs tests below — only the persistent verified/verifiedAt
+// fields determine the header).
 const verifiedFile: SnapshotFile = { ...file, verified: true, verifiedAt: "2026-07-10T00:00:00Z" };
 
 describe("output renderers (golden files)", () => {
@@ -147,24 +105,9 @@ describe("output renderers (golden files)", () => {
     renderPermissionsMd(verifiedFile);
     expect(verifiedFile).to.deep.equal(before);
   });
-
-  it("renderChangesMd matches the golden changes.md byte-for-byte", () => {
-    const rendered = renderChangesMd(diff, corrections, meta, names);
-    expect(rendered).to.equal(golden("golden-changes.md"));
-  });
-
-  it("renderChangesMd renders 'No changes.' when diff and corrections are empty", () => {
-    const rendered = renderChangesMd({ added: [], removed: [] }, [], meta, names);
-    expect(rendered).to.contain("No changes.");
-  });
-
-  it("changesJson mirrors the meta plus added/removed/corrections", () => {
-    const json = changesJson(diff, corrections, meta);
-    expect(json).to.deep.equal({ ...meta, added, removed, corrections });
-  });
 });
 
-describe("writeRunOutputs", () => {
+describe("writePermissionsOutputs", () => {
   // Scratch base dir under os.tmpdir() so tests NEVER touch the real snapshots/<network>/ tree
   // (a live fetch may have written real data there).
   let baseDir: string;
@@ -176,28 +119,26 @@ describe("writeRunOutputs", () => {
   });
   afterEach(() => fs.rmSync(baseDir, { recursive: true, force: true }));
 
-  it("writes permissions.md, changes.md, changes.json and unresolved-roles.json atomically", () => {
-    writeRunOutputs("sepolia", file, diff, corrections, meta, names, baseDir);
+  it("writes permissions.md and unresolved-roles.json atomically, and nothing else", () => {
+    writePermissionsOutputs("sepolia", file, names, baseDir);
 
-    for (const f of ["permissions.md", "changes.md", "changes.json", "unresolved-roles.json"]) {
+    for (const f of ["permissions.md", "unresolved-roles.json"]) {
       expect(fs.existsSync(path.join(dir, f)), `${f} should exist`).to.equal(true);
       expect(fs.existsSync(path.join(dir, `${f}.tmp`)), `${f}.tmp should not be left behind`).to.equal(false);
     }
+    // Run deltas live in git diff / console only — no changes.* files may reappear.
+    expect(fs.readdirSync(dir).sort()).to.deep.equal(["permissions.md", "unresolved-roles.json"]);
 
-    // `file` carries no verified/verifiedAt → permissions.md renders the un-verified header,
-    // regardless of `corrections` being non-empty (the caller, not corrections.length, decides
-    // verified status — see cli.ts's fetchNetwork).
+    // `file` carries no verified/verifiedAt → permissions.md renders the un-verified header
+    // (the caller decides verified status — see cli.ts's fetchNetwork/verifyNetwork).
     expect(fs.readFileSync(path.join(dir, "permissions.md"), "utf8")).to.contain("⚠️ not verified");
-    expect(JSON.parse(fs.readFileSync(path.join(dir, "changes.json"), "utf8"))).to.deep.equal(
-      changesJson(diff, corrections, meta),
-    );
     expect(JSON.parse(fs.readFileSync(path.join(dir, "unresolved-roles.json"), "utf8"))).to.deep.equal(
       file.contracts.find(c => c.scope === "unresolved")!.permissions,
     );
   });
 
-  it("renders the verified header when the file carries verified/verifiedAt, even with non-empty corrections", () => {
-    writeRunOutputs("sepolia", verifiedFile, diff, corrections, meta, names, baseDir);
+  it("renders the verified header when the file carries verified/verifiedAt", () => {
+    writePermissionsOutputs("sepolia", verifiedFile, names, baseDir);
     expect(fs.readFileSync(path.join(dir, "permissions.md"), "utf8")).to.contain(
       "✅ verified on-chain (as of 2026-07-10)",
     );
@@ -205,7 +146,7 @@ describe("writeRunOutputs", () => {
 
   it("skips unresolved-roles.json when there is no unresolved bucket with entries", () => {
     const noUnresolved: SnapshotFile = { ...file, contracts: file.contracts.filter(c => c.scope !== "unresolved") };
-    writeRunOutputs("sepolia", noUnresolved, diff, corrections, meta, names, baseDir);
+    writePermissionsOutputs("sepolia", noUnresolved, names, baseDir);
     expect(fs.existsSync(path.join(dir, "unresolved-roles.json"))).to.equal(false);
   });
 });

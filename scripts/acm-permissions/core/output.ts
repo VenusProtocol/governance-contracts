@@ -2,23 +2,7 @@ import * as fs from "fs";
 import * as path from "path";
 
 import { SNAPSHOTS_DIR } from "../config";
-import {
-  Correction,
-  DiffEntry,
-  Network,
-  SnapshotContract,
-  SnapshotDiff,
-  SnapshotFile,
-  SnapshotPermission,
-} from "../types";
-import { nameFor } from "./registry";
-
-interface RunMeta {
-  network: string;
-  fromBlock: number;
-  toBlock: number;
-  date: string;
-}
+import { Network, SnapshotContract, SnapshotFile, SnapshotPermission } from "../types";
 
 // Sorts a DISPLAY COPY of a permission's grantees by name; never mutates the input
 // (grantee arrays in SnapshotFile are chronological and must round-trip losslessly).
@@ -84,59 +68,6 @@ export function renderPermissionsMd(file: SnapshotFile): string {
   return pushTrimmed(lines);
 }
 
-// "<ContractName or roleHash> `<functionSig>`" — falls back to the roleHash for entries whose
-// contract/function could not be resolved (undecoded / unresolved roles).
-function entryLabel(entry: DiffEntry, names: Record<string, string>): string {
-  const name = entry.contractAddress ? nameFor(names, entry.contractAddress) : entry.roleHash;
-  const sig = entry.functionSig ?? entry.roleHash;
-  return `${name} \`${sig}\``;
-}
-
-export function renderChangesMd(
-  diff: SnapshotDiff,
-  corrections: Correction[],
-  meta: RunMeta,
-  names: Record<string, string>,
-): string {
-  const lines: string[] = [
-    `# Changes — ${meta.network} (run ${meta.date}, blocks ${meta.fromBlock} → ${meta.toBlock})`,
-    "",
-  ];
-
-  if (diff.added.length === 0 && diff.removed.length === 0 && corrections.length === 0) {
-    lines.push("No changes.");
-    return pushTrimmed(lines);
-  }
-
-  lines.push(`## Added (${diff.added.length})`, "");
-  for (const entry of diff.added) lines.push(`- ${entryLabel(entry, names)} → ${nameFor(names, entry.account)}`);
-  lines.push("");
-
-  lines.push(`## Removed (${diff.removed.length})`, "");
-  for (const entry of diff.removed) lines.push(`- ${entryLabel(entry, names)} ⇸ ${nameFor(names, entry.account)}`);
-  lines.push("");
-
-  if (corrections.length > 0) {
-    lines.push("## Corrections (on-chain authoritative)", "");
-    for (const c of corrections) {
-      // Arrow reflects the chain-authoritative outcome, not what replay said: a grantee the
-      // chain confirms holds the permission gets →, one the chain confirms does not gets ⇸.
-      const arrow = c.chainSays === "granted" ? "→" : "⇸";
-      lines.push(
-        `- ${entryLabel(c.entry, names)} ${arrow} ${nameFor(names, c.entry.account)} — replay said ` +
-          `**${c.replaySaid}**, chain says **${c.chainSays}**; snapshot reverted to chain.`,
-      );
-    }
-    lines.push("");
-  }
-
-  return pushTrimmed(lines);
-}
-
-export function changesJson(diff: SnapshotDiff, corrections: Correction[], meta: RunMeta): object {
-  return { ...meta, added: diff.added, removed: diff.removed, corrections };
-}
-
 // Ensures exactly one trailing newline (idempotent — callers that already append "\n"
 // themselves are unaffected) so every generated file matches prettier's EOF convention.
 // Mirrors cli.ts's writeAtomic so both writers produce identical EOF behavior.
@@ -147,9 +78,9 @@ function atomicWrite(target: string, content: string): void {
   fs.renameSync(tmp, target);
 }
 
-// Writes just the permissions view (permissions.md + unresolved-roles.json) — the subset of
-// writeRunOutputs' outputs that a pure re-render (e.g. `refresh`, which never touches
-// changes.md/changes.json since it makes no chain calls and produces no diff) needs to rewrite.
+// Writes the rendered permissions view (permissions.md + unresolved-roles.json). Run deltas are
+// deliberately NOT written to files — permissions.json/md are committed, so `git diff` on them
+// IS the change log; the fetch/verify console summaries cover the current run.
 // Deletes unresolved-roles.json when the unresolved bucket is empty, so a role that becomes
 // decodable doesn't leave a stale (now-empty-of-that-entry, but not deleted) file behind.
 //
@@ -173,25 +104,4 @@ export function writePermissionsOutputs(
   } else if (fs.existsSync(unresolvedFile)) {
     fs.rmSync(unresolvedFile);
   }
-}
-
-// `baseDir` exists so tests can write to a scratch directory instead of the real snapshots/
-// tree; production callers omit it and get SNAPSHOTS_DIR.
-export function writeRunOutputs(
-  network: Network,
-  file: SnapshotFile,
-  diff: SnapshotDiff,
-  corrections: Correction[],
-  meta: RunMeta,
-  names: Record<string, string>,
-  baseDir: string = SNAPSHOTS_DIR,
-): void {
-  const dir = path.join(baseDir, network);
-  fs.mkdirSync(dir, { recursive: true });
-
-  // `file.verified`/`verifiedAt` are the persistent verification stamp — the caller (cli.ts)
-  // sets them once diff-verify has run, regardless of whether it found corrections to apply.
-  writePermissionsOutputs(network, file, names, baseDir);
-  atomicWrite(path.join(dir, "changes.md"), renderChangesMd(diff, corrections, meta, names));
-  atomicWrite(path.join(dir, "changes.json"), JSON.stringify(changesJson(diff, corrections, meta), null, 2) + "\n");
 }
