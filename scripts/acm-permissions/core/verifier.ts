@@ -1,5 +1,6 @@
 import { isLegacyAcm } from "../config";
 import { Correction, DiffEntry, Network, SnapshotDiff, SnapshotState } from "../types";
+import { withRetry } from "./retry";
 
 export const ACM_ABI = [
   "function hasPermission(address account, address contractAddress, string functionSig) view returns (bool)",
@@ -27,7 +28,13 @@ async function checkInBatches(
   const results: boolean[] = [];
   for (let i = 0; i < entries.length; i += batchSize) {
     const batch = entries.slice(i, i + batchSize);
-    const batchResults = await Promise.all(batch.map(entry => checkOnChain(acm, network, entry)));
+    // Each eth_call retried individually: verification runs unattended at the end of every
+    // fetch, so a transient RPC blip must not fail the whole network's run.
+    const batchResults = await Promise.all(
+      batch.map(entry =>
+        withRetry(() => checkOnChain(acm, network, entry), `${network} verify ${entry.roleHash}/${entry.account}`),
+      ),
+    );
     results.push(...batchResults);
   }
   return results;
@@ -105,4 +112,19 @@ export async function verifyAll(
 
   const results = await checkInBatches(acm, network, entries, batchSize);
   return entries.filter((_, i) => !results[i]);
+}
+
+// Full verify with chain-authoritative fixes: every snapshot entry the chain denies is removed
+// from `state` (the same correction verifyDiff applies to false adds) and returned. The reverse
+// direction — a grant the chain has but the snapshot lacks — is undetectable without event
+// enumeration; the next fetch's scan picks those up.
+export async function verifyAllAndFix(
+  acm: AcmLike,
+  network: Network,
+  state: SnapshotState,
+  batchSize = 20,
+): Promise<DiffEntry[]> {
+  const mismatches = await verifyAll(acm, network, state, batchSize);
+  for (const entry of mismatches) removeGrantee(state, entry);
+  return mismatches;
 }

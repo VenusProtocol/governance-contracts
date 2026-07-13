@@ -22,7 +22,14 @@ Scans ACM `PermissionGranted`/`PermissionRevoked` events (or, on bscmainnet,
 from the last checkpointed block (or the ACM deployment block, on a first run) up to
 the current chain head, replays them into a snapshot, diffs against the previously
 committed snapshot, verifies the diff on-chain, and writes:
-`snapshots/<network>/{permissions.json,permissions.md,changes.md,changes.json,unresolved-roles.json}`.
+`snapshots/<network>/{permissions.json,permissions.md,unresolved-roles.json}`.
+The diff-verification is mandatory and runs on every fetch; pass `--verify` to also
+run the full self-correcting sweep of the final list once indexing finishes (the same
+thing `yarn acm:verify` does explicitly — see below).
+There is no separate change-log file: the snapshots are committed, so `git diff`
+on `permissions.json`/`permissions.md` is the record of what a run added or removed;
+the run's own delta (added/removed/corrections counts, plus every correction in full)
+is printed to the console.
 
 ```bash
 yarn acm:fetch                                   # every network, in parallel
@@ -31,6 +38,7 @@ yarn acm:fetch --network bscmainnet,ethereum     # a subset
 yarn acm:fetch --network ethereum --chunk-size 20000   # smaller getLogs chunks (default 40000)
 yarn acm:fetch --network sepolia --to 5000000          # stop scanning at a specific block (debugging)
 yarn acm:fetch --network bscmainnet --rebuild          # wipe the snapshot, rescan from the ACM deployment block
+yarn acm:fetch --network bscmainnet --verify           # also run the full on-chain sweep after indexing
 ```
 
 Networks run independently (`Promise.allSettled`) — one network failing (e.g. an RPC
@@ -43,21 +51,23 @@ command resumes only the failed/incomplete networks from their last checkpoint (
 
 Re-checks **every** entry in a network's committed snapshot directly against the ACM
 (`hasPermission` on modern networks, `hasRole` on bscmainnet) — a full, independent
-audit of the snapshot, as opposed to the incremental diff-check that `fetch` already
-does automatically on every run. See [Verification model](#verification-model) for
-what this can and cannot prove.
+audit of the snapshot, as opposed to the incremental diff-check that `fetch` always
+does. Run it explicitly whenever you want to re-audit the committed list, or tack it
+onto a fetch with `acm:fetch --verify`. See [Verification model](#verification-model)
+for what this can and cannot prove.
 
 ```bash
 yarn acm:verify --network all
 yarn acm:verify --network bscmainnet
 ```
 
-Exits non-zero (and prints every `MISMATCH` line) if any snapshot entry is not
-actually held on-chain. Note that `verify` is not read-only: it stamps the outcome
-onto the snapshot — a clean network gets `verified`/`verifiedAt` written into
-`permissions.json` and the `permissions.md` header re-rendered to
-`✅ verified on-chain (as of <date>)`, while any mismatch clears a previous stamp back
-to `⚠️ not verified` (heights and `changes.*` are never touched).
+Verification is chain-authoritative and self-correcting: any snapshot entry the chain
+denies is printed as a `FIXED` line and **removed from the snapshot** (the same
+correction `fetch`'s diff-verify applies to false adds), then the fixed snapshot is
+saved with `verified`/`verifiedAt` stamped and `permissions.md` re-rendered to
+`✅ verified on-chain (as of <date>)`. Heights are never touched — fixes are
+chain-state corrections, not a rescan. The command exits non-zero only when an
+RPC/IO error prevented verification, not for mismatches (those are fixed).
 
 ### `yarn acm:filter`
 
@@ -124,8 +134,7 @@ for manual review — it cannot be statically extracted and may need a
 ### `yarn acm:refresh`
 
 Offline re-annotation and re-render of the **already-committed** snapshots — no RPC
-calls, no height change, no `changes.md`/`changes.json` rewrite (there is nothing to
-diff: no scanning happened). It exists because the snapshot already stores every event
+calls, no height change. It exists because the snapshot already stores every event
 it has ever seen (keyed by role hash on bscmainnet), so growing the registry (a new
 source added to `sources.json`, newly resolved contract names, newly discovered
 signatures) never requires a rescan — only a re-decode/re-render of what's already on
@@ -198,19 +207,22 @@ Full details, including the complete bscmainnet-only behavior checklist, are in
 
 ## Verification model
 
-Two tiers, both automatic-or-cheap, deliberately not the same check twice:
+Two tiers, deliberately not the same check twice:
 
-1. **Per-run diff verification (automatic, every `fetch`)** — only the entries that
+1. **Per-run diff verification (mandatory, every `fetch`)** — only the entries that
    _changed_ in this run (added/removed) are checked against the chain
    (`hasPermission`/`hasRole`, per §6.2). On any discrepancy, **on-chain state wins**:
    the snapshot entry is corrected to match the chain before any output is written, and
-   the correction is recorded in a `## Corrections (on-chain authoritative)` section of
-   `changes.md`/`changes.json` and printed prominently. The run still exits 0 —
+   each correction is printed in full. The run still exits 0 —
    corrections are a signal of a decoder/registry gap worth investigating, not a
-   failure.
-2. **Full verification (manual, `acm:verify`)** — re-checks _every_ entry currently in
-   the snapshot against the chain. Use this as an independent, whole-snapshot audit —
-   it does not rely on trusting the diff logic that produced the snapshot.
+   failure. This tier is the only one that can catch a **false removal** (a grant the
+   replay dropped but the chain still has), so it stays even though tier 2 follows it.
+2. **Full verification (opt-in: `acm:fetch --verify`, or explicit `acm:verify`)** —
+   re-checks _every_ entry currently in the snapshot against the chain and removes
+   anything the chain denies (printed as `FIXED` lines). Not needed routinely — tier 1
+   already chain-checks everything that changed — but run it whenever you want an
+   independent, whole-snapshot audit that does not rely on trusting the diff logic
+   that produced the snapshot.
 
 **Documented limitation (DESIGN.md §8.2):** full verify proves that everything
 _already in_ the snapshot is real on-chain. It **cannot discover** a permission the
@@ -254,12 +266,11 @@ flaky public RPC rejecting one chunk only costs that chunk, not the whole scan.
 
 ## Output files (per network, under `snapshots/<network>/`)
 
-| File                          | Contents                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `permissions.json`            | Source of truth. Current permission state: header (schema version, network, ACM address, `height`, `updatedAt`), then every contract with at least one active permission — grouped by resolved contract name/address, each guarded function signature with its role hash, `decoded` flag, and full grantee list (address + resolved name). Wildcard permissions (`contractAddress == address(0)`, "may call this function on any contract") appear under `"scope": "wildcard"`; bscmainnet's undecoded role hashes appear under `"scope": "unresolved"`. Entries with zero remaining grantees are omitted. |
-| `permissions.md`              | Pure render of `permissions.json` for human review — one table per contract, a summary header (block, date, contract/permission counts, last verification status), a wildcard section, and (bscmainnet) an "Unresolved roles" section. Regenerated every run, never hand-edited.                                                                                                                                                                                                                                                                                                                           |
-| `changes.md` / `changes.json` | Only the delta from the **latest run** (not cumulative — history lives in git): run metadata (date, block range scanned), `Added`, `Removed`, and `Corrections (on-chain authoritative)` sections. Written with "No changes" whenever a scan ran this run but found nothing, so a reviewer has positive confirmation the run completed; an already-up-to-date no-op run (nothing left to scan) writes neither file at all. `changes.json` mirrors `changes.md`, adding each entry's tx hash.                                                                                                               |
-| `unresolved-roles.json`       | bscmainnet only (omitted when there is nothing to report). Extract of every undecoded role hash from `permissions.json`, with grantees and first-seen grant tx hashes, for later investigation.                                                                                                                                                                                                                                                                                                                                                                                                            |
+| File                    | Contents                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `permissions.json`      | Source of truth. Current permission state: header (schema version, network, ACM address, `height`, `updatedAt`), then every contract with at least one active permission — grouped by resolved contract name/address, each guarded function signature with its role hash, `decoded` flag, and full grantee list (address + resolved name). Wildcard permissions (`contractAddress == address(0)`, "may call this function on any contract") appear under `"scope": "wildcard"`; bscmainnet's undecoded role hashes appear under `"scope": "unresolved"`. Entries with zero remaining grantees are omitted. |
+| `permissions.md`        | Pure render of `permissions.json` for human review — one table per contract, a summary header (block, date, contract/permission counts, last verification status), a wildcard section, and (bscmainnet) an "Unresolved roles" section. Regenerated every run, never hand-edited.                                                                                                                                                                                                                                                                                                                           |
+| `unresolved-roles.json` | bscmainnet only (omitted when there is nothing to report). Extract of every undecoded role hash from `permissions.json`, with grantees and first-seen grant tx hashes, for later investigation.                                                                                                                                                                                                                                                                                                                                                                                                            |
 
 ## Live smoke test (manual)
 

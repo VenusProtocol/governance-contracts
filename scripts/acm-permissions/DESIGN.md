@@ -84,8 +84,6 @@ scripts/acm-permissions/
 └── snapshots/<network>/
     ├── permissions.json            — machine-readable snapshot (source of truth)
     ├── permissions.md              — human-readable view
-    ├── changes.md                  — diff report of the latest run (overwritten per run)
-    ├── changes.json                — same diff, machine-readable
     └── unresolved-roles.json       — bscmainnet only: extract of undecoded entries
 ```
 
@@ -317,7 +315,8 @@ for each chunk [start, start+chunkSize-1] up to latest block:
 after last chunk:
     diff = compare(previous committed snapshot, new snapshot)
     verify diff on-chain (Section 8.1)
-    write permissions.md, changes.md/json, unresolved-roles.json
+    write permissions.md, unresolved-roles.json
+    with --verify: full self-correcting sweep of the final list (Section 8.2)
 ```
 
 If the stored height is already at (or newer than) the chain head, the run is a clean
@@ -436,21 +435,24 @@ corrected to match the chain before outputs are written:
 - diff said _added_ but chain says not granted → grantee removed from the snapshot;
 - diff said _removed_ but chain says still granted → grantee restored in the snapshot.
 
-Every correction is recorded in a dedicated **`## Corrections (on-chain authoritative)`**
-section of `changes.md` / `changes.json` — stating what event replay produced, what the
-chain returned, and that the snapshot was reverted to the on-chain value — and printed
-prominently in the console summary. The run still exits 0 (the output is correct by
-construction); corrections are a signal of a decoder/registry gap worth investigating,
-so they are impossible to miss but never block the run.
+Every correction is printed in full — at fix time and again in the final console
+summary — stating what event replay produced, what the chain returned, and that the
+snapshot was reverted to the on-chain value. The run still exits 0 (the output is
+correct by construction); corrections are a signal of a decoder/registry gap worth
+investigating, so they are impossible to miss but never block the run.
 
-### 8.2 Full verification (manual command)
+### 8.2 Full verification (opt-in: `acm:fetch --verify`, or explicit `acm:verify`)
 
 `yarn acm:verify --network <n|all>` re-checks **every** entry in the snapshot against
-the ACM (same view calls as §8.1, batched view calls — `Promise.all` groups of 20).
-Use whenever a dual-check is wanted. It is not read-only: a network completing with
-0 mismatches has its snapshot re-stamped (`verified`/`verifiedAt` in
-`permissions.json` plus the `permissions.md` header), and any mismatch clears a
-previous stamp — `height` and `changes.*` are never touched.
+the ACM (same view calls as §8.1, batched `Promise.all` groups of 20, each call
+retried). It is chain-authoritative and self-correcting: any entry the chain denies
+is printed as a `FIXED` line (at fix time and in the summary) and removed from the
+snapshot, then the result is re-stamped (`verified`/`verifiedAt` in `permissions.json`
+plus the `permissions.md` header). `height` is never touched — fixes are chain-state
+corrections, not a rescan — and the command exits non-zero only when an RPC/IO error
+prevented verification. Not a routine step (§8.1 already chain-checks every change);
+run it whenever an independent whole-snapshot audit is wanted, or append it to a
+fetch with `acm:fetch --verify`.
 
 Honest limitation, documented in the README: full verify proves everything in the
 snapshot is real on-chain; it cannot _discover_ a permission the scan never saw an
@@ -553,36 +555,17 @@ Verification: ✅ last diff verified on-chain
 | --------- | -------- | ------------- |
 ```
 
-### 9.3 `changes.md` / `changes.json` (per-run diff)
+### 9.3 Per-run diff (console + git, no files)
 
-**What they store** — only the delta produced by the latest run (not cumulative
-history; history lives in git):
+`changes.md` / `changes.json` originally existed here as per-run diff reports, and
+were removed once the pipeline was validated end-to-end: the snapshots are committed,
+so `git diff` on `permissions.json` / `permissions.md` already IS the record of what a
+run added or removed, and duplicating it in per-run files only churned the repo. What
+remains of the delta:
 
-- run metadata: date and the block range that was scanned;
-- **Added**: every newly granted (contract, function, grantee), with its on-chain
-  verification result;
-- **Removed**: every revoked (contract, function, grantee), with its on-chain
-  verification result;
-- **Corrections (on-chain authoritative)**: any entry where event replay disagreed
-  with the chain — what replay said, what the chain returned, and that the snapshot
-  was reverted to the on-chain value (§8.1);
-- if nothing changed, the files still get written with "No changes" so a reviewer has
-  positive confirmation the run completed.
-
-`changes.json` mirrors `changes.md` exactly, adding tx-level detail (tx hash, block,
-log index) per entry.
-
-```md
-# Changes — bscmainnet (run 2026-07-10, blocks 66,323,915 → 68,100,000)
-
-## Added (5)
-
-- ✅ Unitroller `_setActionsPaused(...)` → FastTrackTimelock (verified on-chain)
-
-## Removed (3)
-
-- ✅ VAIController `setBaseRate(uint256)` ⇸ Guardian 2 (verified revoked)
-```
+- the console prints per-network `added / removed / corrections` counts in the fetch
+  summary, plus every correction (§8.1) and every `FIXED` entry (§8.2) in full;
+- history and review happen in git, where they always effectively lived.
 
 ---
 
@@ -632,7 +615,7 @@ yarn acm:filter --network bscmainnet --grantees NormalTimelock,Guardian
 - **Unit — diff:** added / removed / unchanged / re-annotated (decoded-later) cases.
 - **Unit — registry generation:** signature extraction from fixture sources (incl.
   struct-name signatures); checksum validation.
-- **Golden files:** one fixture snapshot → expected `permissions.md` and `changes.md`.
+- **Golden files:** one fixture snapshot → expected `permissions.md`.
 - **Live smoke test (manual, documented in README):** short block range on bscmainnet
   (legacy model) and ethereum (modern model), plus `acm:verify` on the result.
 

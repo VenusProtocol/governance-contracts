@@ -17,7 +17,7 @@ import {
 import { buildHashTable } from "./core/decoder";
 import { diffSnapshots } from "./core/diff";
 import { scanRange } from "./core/fetcher";
-import { writePermissionsOutputs, writeRunOutputs } from "./core/output";
+import { writePermissionsOutputs } from "./core/output";
 import { applyEvents } from "./core/reducer";
 import {
   loadKnownAddresses,
@@ -29,11 +29,11 @@ import {
   requireSignaturesForLegacy,
 } from "./core/registry";
 import { fileToState, loadSnapshotFile, reannotateUndecoded, saveSnapshotFile, stateToFile } from "./core/snapshot";
-import { ACM_ABI, AcmLike, verifyAll, verifyDiff } from "./core/verifier";
+import { ACM_ABI, AcmLike, verifyAllAndFix, verifyDiff } from "./core/verifier";
 import { buildContractRegistry } from "./registry-builder/contracts";
 import { buildSignatures, flattenSignatures } from "./registry-builder/signatures";
 import { loadManifest, resolveSource } from "./registry-builder/sources";
-import { DiffEntry, NETWORKS, Network, SnapshotFile } from "./types";
+import { NETWORKS, Network, SnapshotFile } from "./types";
 
 // Ensures exactly one trailing newline (idempotent — callers that already append "\n"
 // themselves are unaffected) so every generated file matches prettier's EOF convention.
@@ -119,6 +119,16 @@ async function fetchNetwork(
   const diff = diffSnapshots(prevState, state);
   const acm = new ethers.Contract(acmAddr, ACM_ABI, provider) as unknown as AcmLike;
   const corrections = await verifyDiff(acm, network, diff, state);
+  // Corrections only live in the console now (changes.md/json are gone — `git diff` on the
+  // committed permissions.json/md is the change log), so print each one in full.
+  for (const c of corrections) {
+    const contract = c.entry.contractAddress === null ? c.entry.roleHash : nameFor(names, c.entry.contractAddress);
+    console.log(
+      `[${network}] correction: ${contract} ${c.entry.functionSig ?? ""} grantee ` +
+        `${nameFor(names, c.entry.account)} — replay said ${c.replaySaid}, chain says ${c.chainSays}; ` +
+        `snapshot follows chain`,
+    );
+  }
   // Diff-verify always runs when there were changes (above) and, having completed without
   // throwing, has reconciled `state` against the chain (applying `corrections` where replay
   // disagreed) — so the snapshot this run produces is verified on-chain as of right now,
@@ -126,14 +136,7 @@ async function fetchNetwork(
   const verifiedAt = new Date().toISOString();
   const file = stateToFile(state, { ...meta(), height: scan.toBlock, verified: true, verifiedAt }, names);
   saveSnapshotFile(network, file);
-  writeRunOutputs(
-    network,
-    file,
-    diff,
-    corrections,
-    { network, fromBlock, toBlock: scan.toBlock, date: new Date().toISOString() },
-    names,
-  );
+  writePermissionsOutputs(network, file, names);
   return {
     network,
     status: "ok" as const,
@@ -145,8 +148,17 @@ async function fetchNetwork(
 
 type VerifyResult =
   | { network: Network; status: "skipped" }
-  | { network: Network; status: "ok"; verified: number; mismatches: DiffEntry[] };
+  | { network: Network; status: "ok"; verified: number; fixed: string[] };
 
+// Full on-chain verification, chain-authoritative: every snapshot entry the chain denies is
+// dropped from the snapshot (the same correction fetch's diff-verify applies to false adds),
+// the fixed snapshot is saved and re-rendered, and verified/verifiedAt is stamped — after the
+// fixes the snapshot matches the chain for everything checkable. The reverse direction (a
+// grant the chain has but the snapshot lacks) is undetectable without an event scan; the next
+// fetch picks those up. Never touches height: fixes are chain-state corrections, not a rescan.
+// Opt-in: runs after a fetch only with `--verify`, or explicitly via `yarn acm:verify` — the
+// mandatory diff-verify inside fetchNetwork already checks every entry that changed, so the
+// full sweep is an independent audit, not a routine requirement.
 async function verifyNetwork(network: Network): Promise<VerifyResult> {
   const file = loadSnapshotFile(network);
   if (!file) {
@@ -158,28 +170,30 @@ async function verifyNetwork(network: Network): Promise<VerifyResult> {
   const state = fileToState(file);
   const names = loadNameMap(network);
   const total = Object.values(state).reduce((sum, role) => sum + role.grantees.length, 0);
-  const mismatches = await verifyAll(acm, network, state);
-  for (const entry of mismatches) {
+  // Human-readable labels for the fixed entries: logged here at fix time, and returned so the
+  // final summary block can repeat them (in a parallel multi-network run, lines printed here
+  // scroll away among the per-chunk logs).
+  const fixed = (await verifyAllAndFix(acm, network, state)).map(entry => {
     const contract = entry.contractAddress === null ? "UNRESOLVED" : nameFor(names, entry.contractAddress);
     const sig = entry.functionSig ?? entry.roleHash;
-    const grantee = nameFor(names, entry.account);
-    console.log(`MISMATCH ${network} ${contract}.${sig} grantee ${grantee} — in snapshot but not on-chain`);
-  }
-  // Stamp the outcome either way. A clean full verify (0 mismatches) is a stronger,
-  // independent confirmation than a fetch's diff-verify — record it as verified/verifiedAt.
-  // Any mismatch means the snapshot no longer matches the chain, so a previous ✅ stamp is
-  // cleared (verified: false, verifiedAt dropped — JSON.stringify omits undefined) and the
-  // permissions.md header flips back to "⚠️ not verified" instead of staying stale.
-  // Never touches changes.*/height: this is a re-render of the existing snapshot, not a rescan.
-  const clean = mismatches.length === 0;
-  const stampedFile: SnapshotFile = {
-    ...file,
-    verified: clean,
-    verifiedAt: clean ? new Date().toISOString() : undefined,
-  };
+    return `${contract}.${sig} grantee ${nameFor(names, entry.account)}`;
+  });
+  for (const label of fixed) console.log(`FIXED ${network} ${label} — in snapshot but not on-chain; removed`);
+  const stampedFile: SnapshotFile = stateToFile(
+    state,
+    {
+      network: file.network,
+      acmAddress: file.acmAddress,
+      height: file.height,
+      updatedAt: file.updatedAt,
+      verified: true,
+      verifiedAt: new Date().toISOString(),
+    },
+    names,
+  );
   saveSnapshotFile(network, stampedFile);
   writePermissionsOutputs(network, stampedFile, names);
-  return { network, status: "ok" as const, verified: total, mismatches };
+  return { network, status: "ok" as const, verified: total, fixed };
 }
 
 async function verifyCommand(values: { network?: string }): Promise<void> {
@@ -200,9 +214,11 @@ async function verifyCommand(values: { network?: string }): Promise<void> {
     if (result.status === "fulfilled") {
       const r = result.value;
       if (r.status === "skipped") console.log(`${network}: skipped (no snapshot)`);
+      // Mismatches are fixed in place (chain-authoritative), so they don't fail the run —
+      // only an RPC/IO error that prevented verification does.
       else {
-        if (r.mismatches.length > 0) anyFailed = true;
-        console.log(`${network}: ${r.verified} entries verified, ${r.mismatches.length} mismatches`);
+        console.log(`${network}: ${r.verified} entries verified, ${r.fixed.length} fixed`);
+        for (const label of r.fixed) console.log(`  fixed: ${label} — was in snapshot but not on-chain; removed`);
       }
     } else {
       anyFailed = true;
@@ -386,6 +402,7 @@ async function fetchCommand(values: {
   "chunk-size"?: string;
   to?: string;
   rebuild?: boolean;
+  verify?: boolean;
 }): Promise<void> {
   let selected: Network[];
   try {
@@ -409,16 +426,36 @@ async function fetchCommand(values: {
   }
   const rebuild = !!values.rebuild;
 
-  const results = await Promise.allSettled(selected.map(n => fetchNetwork(n, { chunkSize, toBlock, rebuild })));
+  const results = await Promise.allSettled(
+    selected.map(async n => {
+      const fetch = await fetchNetwork(n, { chunkSize, toBlock, rebuild });
+      // The diff-verify inside fetchNetwork is mandatory and already ran. The full sweep of
+      // the final list is opt-in (`--verify`) — replay is exact, so it exists as an
+      // independent audit, not a routine step.
+      const verify = values.verify ? await verifyNetwork(n) : null;
+      return { fetch, verify };
+    }),
+  );
 
   console.log("\n=== fetch summary ===");
   let anyFailed = false;
   results.forEach((result, i) => {
     const network = selected[i];
     if (result.status === "fulfilled") {
-      const r = result.value;
-      if (r.status === "up-to-date") console.log(`${network}: up-to-date`);
-      else console.log(`${network}: ok (added ${r.added} removed ${r.removed} corrections ${r.corrections})`);
+      const { fetch, verify } = result.value;
+      const fetchPart =
+        fetch.status === "up-to-date"
+          ? "up-to-date"
+          : `ok (added ${fetch.added} removed ${fetch.removed} corrections ${fetch.corrections})`;
+      const verifyPart =
+        verify === null
+          ? ""
+          : verify.status === "skipped"
+          ? " · verify skipped (no snapshot)"
+          : ` · verified ${verify.verified} entries, ${verify.fixed.length} fixed`;
+      console.log(`${network}: ${fetchPart}${verifyPart}`);
+      if (verify?.status === "ok")
+        for (const label of verify.fixed) console.log(`  fixed: ${label} — was in snapshot but not on-chain; removed`);
     } else {
       anyFailed = true;
       const message = result.reason instanceof Error ? result.reason.message : String(result.reason);
@@ -435,8 +472,7 @@ export interface RefreshResult {
   unresolved: number;
 }
 
-// Offline re-annotation + re-render of a committed snapshot — no RPC calls, no height change,
-// no changes.md/changes.json rewrite (there is no diff: nothing was scanned this run). Only
+// Offline re-annotation + re-render of a committed snapshot — no RPC calls, no height change. Only
 // bscmainnet can ever produce newlyDecoded > 0, since only its roles are ever undecoded (legacy
 // hash-based roles awaiting registry growth); other networks decode fully at fetch time.
 // Returns null (after warning) when there is no snapshot to refresh for `network`.
@@ -513,6 +549,7 @@ if (require.main === module) {
         network: { type: "string", default: "all" },
         "chunk-size": { type: "string", default: "40000" },
         rebuild: { type: "boolean", default: false },
+        verify: { type: "boolean", default: false },
         to: { type: "string" },
         grantees: { type: "string" },
         exclude: { type: "string" },

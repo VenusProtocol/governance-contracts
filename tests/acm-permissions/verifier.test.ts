@@ -1,6 +1,6 @@
 import { expect } from "chai";
 
-import { checkOnChain, verifyAll, verifyDiff } from "../../scripts/acm-permissions/core/verifier";
+import { checkOnChain, verifyAll, verifyAllAndFix, verifyDiff } from "../../scripts/acm-permissions/core/verifier";
 import { DiffEntry, SnapshotDiff, SnapshotState } from "../../scripts/acm-permissions/types";
 
 const entry = (o: Partial<DiffEntry>): DiffEntry => ({
@@ -76,5 +76,31 @@ describe("verifier", () => {
     const bad = await verifyAll(acm, "ethereum", state);
     expect(bad).to.have.length(1);
     expect(bad[0].account).to.equal("0xA");
+  });
+  it("verifyAllAndFix removes chain-denied grantees from state and keeps confirmed ones", async () => {
+    // chain confirms only 0xB; 0xA must be dropped, and the role survives with 0xB alone
+    const acm = fakeAcm(new Set(["0xB|0xC|pause()"]));
+    const state: SnapshotState = {
+      "0xr1": {
+        roleHash: "0xr1",
+        contractAddress: "0xC",
+        functionSig: "pause()",
+        decoded: true,
+        grantees: ["0xA", "0xB"],
+        transactions: [],
+      },
+      "0xr2": {
+        roleHash: "0xr2",
+        contractAddress: "0xC",
+        functionSig: "unpause()",
+        decoded: true,
+        grantees: ["0xA"],
+        transactions: [],
+      },
+    };
+    const fixed = await verifyAllAndFix(acm, "ethereum", state);
+    expect(fixed.map(e => `${e.roleHash}|${e.account}`).sort()).to.deep.equal(["0xr1|0xA", "0xr2|0xA"]);
+    expect(state["0xr1"].grantees).to.deep.equal(["0xB"]);
+    expect(state["0xr2"]).to.equal(undefined); // last grantee removed → role deleted
   });
 });
