@@ -13,10 +13,6 @@
       "origin": "old BNBPermissions.json \u2014 decodes a permission still granted on bscmainnet; function absent from current package sources"
     },
     {
-      "signature": "setRewardRecipient(address)",
-      "origin": "old BNBPermissions.json \u2014 decodes a permission still granted on bscmainnet; function absent from current package sources"
-    },
-    {
       "signature": "sweepTokenFromPool(address,address,address,uint256)",
       "origin": "not found in contract packages \u2014 granted via VIP-357 on RiskFundV2 (0xdF31a28D68A2AB381D42b380649Ead7ae2A76E42) to the timelocks; current protocol-reserve sources no longer contain this string"
     },
