@@ -119,7 +119,7 @@ async function fetchNetwork(
   if (scan.upToDate) return { network, status: "up-to-date" as const };
   const diff = diffSnapshots(prevState, state);
   const acm = new ethers.Contract(acmAddr, ACM_ABI, provider) as unknown as AcmLike;
-  const corrections = await verifyDiff(acm, network, diff, state);
+  const corrections = await verifyDiff(acm, network, diff, state, { blockTag: scan.toBlock });
   // Corrections only live in the console now (changes.md/json are gone — `git diff` on the
   // committed permissions.json/md is the change log), so print each one in full.
   for (const c of corrections) {
