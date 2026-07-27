@@ -15,10 +15,18 @@ import {
 const fx = (f: string) => fs.readFileSync(path.join(__dirname, "fixtures", f), "utf8");
 
 describe("signature extraction", () => {
-  it("extracts literals from _checkAccessAllowed and checkAccessAllowed", () => {
+  it("extracts literals from _checkAccessAllowed, checkAccessAllowed and ensureAllowed", () => {
     const { signatures, dynamicCallsites } = extractFromSol(fx("Sample.sol"));
-    expect(signatures).to.have.members(["setTokenConfig(TokenConfig)", "pause()"]);
+    expect(signatures).to.have.members([
+      "setTokenConfig(TokenConfig)",
+      "pause()",
+      "_setCollateralFactor(address,uint256)",
+    ]);
     expect(dynamicCallsites).to.have.length(1); // the `sig` variable call
+  });
+  it("ignores a gate's own declaration, so its revert string is not scraped as a signature", () => {
+    const { signatures } = extractFromSol(fx("Sample.sol"));
+    expect(signatures).to.not.include("access denied");
   });
   it("extracts signature-shaped strings from the TS permissions helper", () => {
     expect(extractFromTsHelper(fx("sample-permissions-helper.ts"))).to.have.members([

@@ -19,7 +19,7 @@ export function extractFromTsHelper(content: string): string[] {
 export function extractFromSol(content: string): { signatures: string[]; dynamicCallsites: string[] } {
   const signatures: string[] = [],
     dynamicCallsites: string[] = [];
-  const CALL_RE = /(_checkAccessAllowed|checkAccessAllowed)\s*\(([^;]*?)\)\s*;/g;
+  const CALL_RE = /(_checkAccessAllowed|checkAccessAllowed|ensureAllowed)\s*\(([^;{}]*?)\)\s*;/g;
   for (const m of content.matchAll(CALL_RE)) {
     const lit = m[2].match(/"([^"]+)"/);
     if (lit) signatures.push(lit[1]);
