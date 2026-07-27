@@ -1,0 +1,20 @@
+{
+  "signatures": [
+    {
+      "signature": "createVault(VaultConfig,InstitutionalConfig,RiskConfig,string,string,string)",
+      "origin": "VIP-640 grant on InstitutionalVaultControllerProxy (0x6D9e91cB766259af42619c14c994E694E57e6E85); fixed-rate-vaults is absent from sources.json and extractFromAbi emits `tuple` for struct params, so this string is not derivable"
+    },
+    {
+      "signature": "setMaxDeltaBps(uint256)",
+      "origin": "old BNBPermissions.json; absent from package sources. Decodes nothing live as of bscmainnet 112465173 — kept so the role hash stays decodable if re-granted"
+    },
+    {
+      "signature": "sweepTokenFromPool(address,address,address,uint256)",
+      "origin": "VIP-357 grant on RiskFundV2 (0xdF31a28D68A2AB381D42b380649Ead7ae2A76E42); absent from protocol-reserve sources. bscmainnet grant now revoked; decodes the bsctestnet grant"
+    },
+    {
+      "signature": "toggleConfigActive(string)",
+      "origin": "old BNBPermissions.json; absent from package sources. bscmainnet grants now revoked; sole decoder for 3 live bsctestnet permissions"
+    }
+  ]
+}

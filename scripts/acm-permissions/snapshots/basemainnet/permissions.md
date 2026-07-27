@@ -1,0 +1,238 @@
+# ACM Permissions — basemainnet
+
+Snapshot block: 49190050 · Updated: 2026-07-27 · Contracts: 20 · Permissions: 130 · Verification: ✅ verified on-chain (as of 2026-07-27)
+
+## AerodromeSlipstreamOracle / AerodromeSlipstreamOracle_Proxy (`0x5DE0B322A74088fD64CDD01042BE2fBc47FE82EC`)
+
+| Function | Grantees |
+| --- | --- |
+| `setPoolConfig(address,address)` | FastTrackTimelock, Guardian, NormalTimelock |
+
+## AuxiliaryCommandsAggregator / AuxiliaryCommandsAggregator_Proxy (`0x768FEf3a88ea92cCF9CAcDf0aB15C4B29B3C1379`)
+
+| Function | Grantees |
+| --- | --- |
+| `addAuthorizedBatchers(address[])` | FastTrackTimelock, NormalTimelock |
+| `executeBatch(uint256)` | FastTrackTimelock, NormalTimelock |
+| `removeAuthorizedBatchers(address[])` | FastTrackTimelock, NormalTimelock |
+
+## BoundValidator / BoundValidator_Proxy (`0x66dDE062D3DC1BB5223A0096EbB89395d1f11DB0`)
+
+| Function | Grantees |
+| --- | --- |
+| `setValidateConfig(ValidateConfig)` | NormalTimelock |
+
+## ChainlinkOracle / ChainlinkOracle_Proxy (`0x6F2eA73597955DB37d7C06e1319F0dC7C7455dEb`)
+
+| Function | Grantees |
+| --- | --- |
+| `setDirectPrice(address,uint256)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setTokenConfig(TokenConfig)` | FastTrackTimelock, Guardian, NormalTimelock |
+
+## Comptroller_Core (`0x0C7973F9598AA62f9e03B94E92C967fD5437426C`)
+
+| Function | Grantees |
+| --- | --- |
+| `setActionsPaused(address[],uint256[],bool)` | EBrake / EBrake_Proxy |
+| `setCollateralFactor(address,uint256,uint256)` | EBrake / EBrake_Proxy |
+| `setMarketBorrowCaps(address[],uint256[])` | EBrake / EBrake_Proxy |
+| `setMarketSupplyCaps(address[],uint256[])` | EBrake / EBrake_Proxy |
+
+## DeviationSentinel / DeviationSentinel_Proxy (`0x12D09d5b13A673269cdB624D17A42f45a5233076`)
+
+| Function | Grantees |
+| --- | --- |
+| `setTokenConfig(address,(uint8,bool))` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setTokenMonitoringEnabled(address,bool)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setTrustedKeeper(address,bool)` | FastTrackTimelock, Guardian, NormalTimelock |
+
+## EBrake / EBrake_Proxy (`0x062C68Af7B9Fb059DCB7FA4B6b92E633350fb7c2`)
+
+| Function | Grantees |
+| --- | --- |
+| `decreaseCF(address,uint256)` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, DeviationSentinel / DeviationSentinel_Proxy, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseActions(address[],uint8[])` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseBorrow(address)` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, DeviationSentinel / DeviationSentinel_Proxy, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseRedeem(address)` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseSupply(address)` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, DeviationSentinel / DeviationSentinel_Proxy, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseTransfer(address)` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, FastTrackTimelock, Guardian, NormalTimelock |
+| `resetBorrowCapSnapshot(address)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `resetCFSnapshot(address)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `resetSupplyCapSnapshot(address)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setMarketBorrowCaps(address[],uint256[])` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, FastTrackTimelock, Guardian, NormalTimelock |
+| `setMarketSupplyCaps(address[],uint256[])` | 0xCCa5a587eBDBe80f23c8610F2e53B03158e62948, FastTrackTimelock, Guardian, NormalTimelock |
+
+## OmnichainExecutorOwner / OmnichainExecutorOwner_Proxy (`0x8BA591f72a90fb379b9a82087b190d51b226F0a9`)
+
+| Function | Grantees |
+| --- | --- |
+| `addTimelocks(address[])` | FastTrackTimelock, Guardian, NormalTimelock |
+| `forceResumeReceive(uint16,bytes)` | Guardian |
+| `pause()` | FastTrackTimelock, Guardian, NormalTimelock |
+| `retryMessage(uint16,bytes,uint64,bytes)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setConfig(uint16,uint16,uint256,bytes)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setGuardian(address)` | NormalTimelock |
+| `setMaxDailyReceiveLimit(uint256)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setMinDstGas(uint16,uint16,uint256)` | NormalTimelock |
+| `setPayloadSizeLimit(uint16,uint256)` | NormalTimelock |
+| `setPrecrime(address)` | NormalTimelock |
+| `setReceiveVersion(uint16)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setSendVersion(uint16)` | NormalTimelock |
+| `setSrcChainId(uint16)` | Guardian, NormalTimelock |
+| `setTimelockPendingAdmin(address,uint8)` | Guardian, NormalTimelock |
+| `setTrustedRemoteAddress(uint16,bytes)` | Guardian, NormalTimelock |
+| `transferBridgeOwnership(address)` | Guardian, NormalTimelock |
+| `unpause()` | Guardian |
+
+## PoolRegistry / PoolRegistry_Proxy (`0xeef902918DdeCD773D4B422aa1C6e1673EB9136F`)
+
+| Function | Grantees |
+| --- | --- |
+| `addMarket(AddMarketInput)` | NormalTimelock |
+| `addPool(string,address,uint256,uint256,uint256)` | NormalTimelock |
+| `setPoolName(address,string)` | NormalTimelock |
+| `updatePoolMetadata(address,VenusPoolMetaData)` | NormalTimelock |
+
+## Prime / Prime_Proxy (`0xD2e84244f1e9Fca03Ff024af35b8f9612D5d7a30`)
+
+| Function | Grantees |
+| --- | --- |
+| `addMarket(address,address,uint256,uint256)` | FastTrackTimelock, NormalTimelock |
+| `burn(address)` | FastTrackTimelock, NormalTimelock |
+| `issue(bool,address[])` | FastTrackTimelock, NormalTimelock |
+| `setLimit(uint256,uint256)` | FastTrackTimelock, NormalTimelock |
+| `setMaxLoopsLimit(uint256)` | FastTrackTimelock |
+| `setStakedAt(address[],uint256[])` | FastTrackTimelock, NormalTimelock |
+| `togglePause()` | FastTrackTimelock, Guardian, NormalTimelock |
+| `updateAlpha(uint128,uint128)` | FastTrackTimelock, NormalTimelock |
+| `updateMultipliers(address,uint256,uint256)` | FastTrackTimelock, NormalTimelock |
+
+## PrimeLiquidityProvider / PrimeLiquidityProvider_Proxy (`0xcB293EB385dEFF2CdeDa4E7060974BB90ee0B208`)
+
+| Function | Grantees |
+| --- | --- |
+| `pauseFundsTransfer()` | FastTrackTimelock, Guardian, NormalTimelock |
+| `resumeFundsTransfer()` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setMaxLoopsLimit(uint256)` | FastTrackTimelock |
+| `setMaxTokensDistributionSpeed(address[],uint256[])` | FastTrackTimelock, NormalTimelock |
+| `setTokensDistributionSpeed(address[],uint256[])` | FastTrackTimelock, NormalTimelock |
+
+## ProtocolShareReserve / ProtocolShareReserve_Proxy (`0x3565001d57c91062367C3792B74458e3c6eD910a`)
+
+| Function | Grantees |
+| --- | --- |
+| `addOrUpdateDistributionConfigs(DistributionConfig[])` | FastTrackTimelock, Guardian, NormalTimelock |
+| `removeDistributionConfig(Schema,address)` | FastTrackTimelock, Guardian, NormalTimelock |
+
+## RedStoneOracle / RedStoneOracle_Proxy (`0xd101Bf51937A6718F402dA944CbfdcD12bB6a6eb`)
+
+| Function | Grantees |
+| --- | --- |
+| `setDirectPrice(address,uint256)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setTokenConfig(TokenConfig)` | FastTrackTimelock, Guardian, NormalTimelock |
+
+## ResilientOracle / ResilientOracle_Proxy (`0xcBBf58bD5bAdE357b634419B70b215D5E9d6FbeD`)
+
+| Function | Grantees |
+| --- | --- |
+| `enableOracle(address,uint8,bool)` | NormalTimelock |
+| `pause()` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setOracle(address,address,uint8)` | NormalTimelock |
+| `setTokenConfig(TokenConfig)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `unpause()` | FastTrackTimelock, Guardian, NormalTimelock |
+
+## SentinelOracle / SentinelOracle_Proxy (`0xCdD6D79Fd313C21967CED04C1b8bE70BDc27574D`)
+
+| Function | Grantees |
+| --- | --- |
+| `setDirectPrice(address,uint256)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setTokenOracleConfig(address,address)` | FastTrackTimelock, Guardian, NormalTimelock |
+
+## UniswapOracle / UniswapOracle_Proxy (`0xc3b5169a7d5f6341403c74187Db3C4Fe6d447762`)
+
+| Function | Grantees |
+| --- | --- |
+| `setPoolConfig(address,address)` | FastTrackTimelock, Guardian, NormalTimelock |
+
+## VenusERC4626Factory / VenusERC4626Factory_Proxy (`0x1A430825B31DdA074751D6731Ce7Dca38D012D13`)
+
+| Function | Grantees |
+| --- | --- |
+| `setRewardRecipient(address)` | NormalTimelock |
+
+## XVS (`0xebB7873213c8d1d9913D8eA39Aa12d74cB107995`)
+
+| Function | Grantees |
+| --- | --- |
+| `burn(address,uint256)` | XVSProxyOFTDest |
+| `migrateMinterTokens(address,address)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `mint(address,uint256)` | XVSProxyOFTDest |
+| `pause()` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setMintCap(address,uint256)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `unpause()` | FastTrackTimelock, Guardian, NormalTimelock |
+| `updateBlacklist(address,bool)` | FastTrackTimelock, Guardian, NormalTimelock |
+
+## XVSBridgeAdmin / XVSBridgeAdmin_Proxy (`0x6303FEcee7161bF959d65df4Afb9e1ba5701f78e`)
+
+| Function | Grantees |
+| --- | --- |
+| `dropFailedMessage(uint16,bytes,uint64)` | FastTrackTimelock, NormalTimelock |
+| `forceResumeReceive(uint16,bytes)` | FastTrackTimelock, NormalTimelock |
+| `pause()` | FastTrackTimelock, Guardian, NormalTimelock |
+| `removeTrustedRemote(uint16)` | FastTrackTimelock, NormalTimelock |
+| `setConfig(uint16,uint16,uint256,bytes)` | FastTrackTimelock, NormalTimelock |
+| `setMaxDailyLimit(uint16,uint256)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setMaxDailyReceiveLimit(uint16,uint256)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setMaxSingleReceiveTransactionLimit(uint16,uint256)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setMaxSingleTransactionLimit(uint16,uint256)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setMinDstGas(uint16,uint16,uint256)` | FastTrackTimelock, NormalTimelock |
+| `setOracle(address)` | NormalTimelock |
+| `setPayloadSizeLimit(uint16,uint256)` | FastTrackTimelock, NormalTimelock |
+| `setPrecrime(address)` | NormalTimelock |
+| `setReceiveVersion(uint16)` | FastTrackTimelock, NormalTimelock |
+| `setSendVersion(uint16)` | FastTrackTimelock, NormalTimelock |
+| `setTrustedRemoteAddress(uint16,bytes)` | NormalTimelock |
+| `setWhitelist(address,bool)` | FastTrackTimelock, NormalTimelock |
+| `sweepToken(address,address,uint256)` | NormalTimelock |
+| `transferBridgeOwnership(address)` | NormalTimelock |
+| `unpause()` | FastTrackTimelock, Guardian, NormalTimelock |
+| `updateSendAndCallEnabled(bool)` | FastTrackTimelock, NormalTimelock |
+
+## XVSVaultProxy (`0x708B54F2C3f3606ea48a8d94dab88D9Ab22D7fCd`)
+
+| Function | Grantees |
+| --- | --- |
+| `add(address,uint256,address,uint256,uint256)` | NormalTimelock |
+| `pause()` | FastTrackTimelock, Guardian, NormalTimelock |
+| `resume()` | FastTrackTimelock, Guardian, NormalTimelock |
+| `set(address,uint256,uint256)` | NormalTimelock |
+| `setRewardAmountPerBlockOrSecond(address,uint256)` | FastTrackTimelock, NormalTimelock |
+| `setWithdrawalLockingPeriod(address,uint256,uint256)` | NormalTimelock |
+
+## 🃏 Wildcard permissions
+
+| Function | Grantees |
+| --- | --- |
+| `setActionsPaused(address[],uint256[],bool)` | FastTrackTimelock, Guardian, NormalTimelock |
+| `setCloseFactor(uint256)` | NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
+| `setCollateralFactor(address,uint256,uint256)` | FastTrackTimelock, Guardian, NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
+| `setForcedLiquidation(address,bool)` | FastTrackTimelock, NormalTimelock |
+| `setGrowthRate(uint256,uint256)` | FastTrackTimelock, NormalTimelock |
+| `setInterestRateModel(address)` | FastTrackTimelock, NormalTimelock |
+| `setLastRewardingBlockTimestamps(address[],uint256[],uint256[])` | NormalTimelock |
+| `setLiquidationIncentive(uint256)` | NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
+| `setMarketBorrowCaps(address[],uint256[])` | FastTrackTimelock, Guardian, NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
+| `setMarketSupplyCaps(address[],uint256[])` | FastTrackTimelock, Guardian, NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
+| `setMaxLoopsLimit(uint256)` | NormalTimelock |
+| `setMinLiquidatableCollateral(uint256)` | NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
+| `setProtocolSeizeShare(uint256)` | NormalTimelock |
+| `setReduceReservesBlockDelta(uint256)` | FastTrackTimelock, NormalTimelock |
+| `setReserveFactor(uint256)` | FastTrackTimelock, NormalTimelock |
+| `setRewardRecipient(address)` | NormalTimelock |
+| `setRewardTokenSpeeds(address[],uint256[],uint256[])` | NormalTimelock |
+| `setSnapshot(uint256,uint256)` | FastTrackTimelock, NormalTimelock |
+| `setSnapshotGap(uint256)` | FastTrackTimelock, NormalTimelock |
+| `supportMarket(address)` | PoolRegistry / PoolRegistry_Proxy |
+| `syncCash()` | NormalTimelock |
+| `unlistMarket(address)` | FastTrackTimelock, NormalTimelock |
+| `updateJumpRateModel(uint256,uint256,uint256,uint256)` | NormalTimelock |
