@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-12T21:05:54.972Z",
+  "generatedAt": "2026-07-27T16:18:59.880Z",
   "contracts": [
     {
       "name": "AAVE",
@@ -786,6 +786,15 @@
         "transfer(address,uint256)",
         "transferFrom(address,address,uint256)",
         "transferOwnership(address)"
+      ]
+    },
+    {
+      "name": "BaseOmnichainControllerSrc",
+      "addresses": {},
+      "signatures": [
+        "pause()",
+        "setMaxDailyLimit(uint16,uint256)",
+        "unpause()"
       ]
     },
     {
@@ -12041,6 +12050,14 @@
       ]
     },
     {
+      "name": "MarketFacetR1",
+      "addresses": {},
+      "signatures": [
+        "_supportMarket(address)",
+        "unlistMarket(address)"
+      ]
+    },
+    {
       "name": "MockALPACA",
       "addresses": {
         "bsctestnet": [
@@ -18277,6 +18294,13 @@
       ]
     },
     {
+      "name": "RewardFacetR1",
+      "addresses": {},
+      "signatures": [
+        "seizeVenus(address[],address)"
+      ]
+    },
+    {
       "name": "RewardsDistributor",
       "addresses": {},
       "signatures": [
@@ -21603,6 +21627,20 @@
       ]
     },
     {
+      "name": "SetterFacetR1",
+      "addresses": {},
+      "signatures": [
+        "_setActionsPaused(address[],uint8[],bool)",
+        "_setCollateralFactor(address,uint256)",
+        "_setForcedLiquidation(address,bool)",
+        "_setForcedLiquidationForUser(address,address,bool)",
+        "_setLiquidationIncentive(uint256)",
+        "_setMarketBorrowCaps(address[],uint256[])",
+        "_setMarketSupplyCaps(address[],uint256[])",
+        "_setProtocolPaused(bool)"
+      ]
+    },
+    {
       "name": "Shortfall",
       "addresses": {
         "bscmainnet": [
@@ -23280,6 +23318,17 @@
         "forwardBaseAsset(address,uint256)",
         "setDailyCapUsd(uint256)",
         "setSlippageEventUsd(uint256)"
+      ]
+    },
+    {
+      "name": "TokenController",
+      "addresses": {},
+      "signatures": [
+        "migrateMinterTokens(address,address)",
+        "pause()",
+        "setMintCap(address,uint256)",
+        "unpause()",
+        "updateBlacklist(address,bool)"
       ]
     },
     {
@@ -25017,6 +25066,16 @@
       ]
     },
     {
+      "name": "VAIController",
+      "addresses": {},
+      "signatures": [
+        "setBaseRate(uint256)",
+        "setFloatRate(uint256)",
+        "setMintCap(uint256)",
+        "toggleOnlyPrimeHolderMint()"
+      ]
+    },
+    {
       "name": "VAIVault",
       "addresses": {
         "bscmainnet": [
@@ -25622,6 +25681,11 @@
       "name": "VToken",
       "addresses": {},
       "signatures": [
+        "_reduceReserves(uint256)",
+        "_setInterestRateModel(address)",
+        "_setReserveFactor(uint256)",
+        "setFlashLoanEnabled(bool)",
+        "setFlashLoanFeeMantissa(uint256,uint256)",
         "setInterestRateModel(address)",
         "setProtocolSeizeShare(uint256)",
         "setReduceReservesBlockDelta(uint256)",
@@ -25817,6 +25881,16 @@
         "transferFrom(address,address,uint256)",
         "transferOwnership(address)",
         "underlying()"
+      ]
+    },
+    {
+      "name": "VTokenR1",
+      "addresses": {},
+      "signatures": [
+        "_reduceReserves(uint256)",
+        "_setInterestRateModel(address)",
+        "_setReserveFactor(uint256)",
+        "setReduceReservesBlockDelta(uint256)"
       ]
     },
     {
