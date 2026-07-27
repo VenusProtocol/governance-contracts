@@ -1,7 +1,7 @@
 import { expect } from "chai";
 
-import { expandAliases, filterPermissions } from "../../scripts/acm-permissions/cli";
 import { GUARDIANS } from "../../scripts/acm-permissions/config";
+import { expandAliases, filterPermissions } from "../../scripts/acm-permissions/core/filter";
 import { SnapshotFile } from "../../scripts/acm-permissions/types";
 
 const NORMAL_TIMELOCK = "0x939bD8d64c0A9583A7Dcea9933f7b21697ab6396";

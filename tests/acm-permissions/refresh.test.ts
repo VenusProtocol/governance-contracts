@@ -3,9 +3,9 @@ import * as fs from "fs";
 import * as os from "os";
 import * as path from "path";
 
-import { refreshNetwork } from "../../scripts/acm-permissions/cli";
 import { GUARDIANS } from "../../scripts/acm-permissions/config";
 import { roleHash } from "../../scripts/acm-permissions/core/decoder";
+import { refreshNetwork } from "../../scripts/acm-permissions/core/refresh";
 import { loadKnownAddresses, loadNameMap, loadSignatures } from "../../scripts/acm-permissions/core/registry";
 import { saveSnapshotFile } from "../../scripts/acm-permissions/core/snapshot";
 import { SnapshotFile } from "../../scripts/acm-permissions/types";
