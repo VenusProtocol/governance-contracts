@@ -1,10 +1,10 @@
 {
   "network": "unichainsepolia",
   "acmAddress": "0x854C064EA6b503A97980F481FA3B7279012fdeDd",
-  "height": 56853273,
-  "updatedAt": "2026-07-10T17:54:27.245Z",
+  "height": 58317017,
+  "updatedAt": "2026-07-27T16:25:25.630Z",
   "verified": true,
-  "verifiedAt": "2026-07-12T14:24:55.256Z",
+  "verifiedAt": "2026-07-27T16:40:59.099Z",
   "schemaVersion": 1,
   "contracts": [
     {

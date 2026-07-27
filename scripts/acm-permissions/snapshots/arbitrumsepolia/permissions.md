@@ -1,6 +1,6 @@
 # ACM Permissions — arbitrumsepolia
 
-Snapshot block: 286082172 · Updated: 2026-07-10 · Contracts: 25 · Permissions: 138 · Verification: ✅ verified on-chain (as of 2026-07-12)
+Snapshot block: 291936187 · Updated: 2026-07-27 · Contracts: 25 · Permissions: 138 · Verification: ✅ verified on-chain (as of 2026-07-27)
 
 ## 0x6866b2BDaaEf6648ddd5b678B3e9f3352bF3d2A5 (`0x6866b2BDaaEf6648ddd5b678B3e9f3352bF3d2A5`)
 

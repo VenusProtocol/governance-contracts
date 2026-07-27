@@ -1,6 +1,6 @@
 # ACM Permissions — opsepolia
 
-Snapshot block: 46063015 · Updated: 2026-07-13 · Contracts: 16 · Permissions: 112 · Verification: ✅ verified on-chain (as of 2026-07-13)
+Snapshot block: 46683454 · Updated: 2026-07-27 · Contracts: 16 · Permissions: 112 · Verification: ✅ verified on-chain (as of 2026-07-27)
 
 ## BoundValidator / BoundValidator_Proxy (`0x482469F1DA6Ec736cacF6361Ec41621f811A6800`)
 

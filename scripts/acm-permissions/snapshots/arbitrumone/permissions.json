@@ -1,10 +1,10 @@
 {
   "network": "arbitrumone",
   "acmAddress": "0xD9dD18EB0cf10CbA837677f28A8F9Bda4bc2b157",
-  "height": 482433317,
-  "updatedAt": "2026-07-10T16:02:36.761Z",
+  "height": 488311020,
+  "updatedAt": "2026-07-27T16:22:55.860Z",
   "verified": true,
-  "verifiedAt": "2026-07-12T14:25:18.469Z",
+  "verifiedAt": "2026-07-27T16:41:47.955Z",
   "schemaVersion": 1,
   "contracts": [
     {
@@ -24,10 +24,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -76,10 +72,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -97,10 +89,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -122,10 +110,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -142,10 +126,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -209,10 +189,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -238,10 +214,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -311,10 +283,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -332,10 +300,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -387,10 +351,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -407,10 +367,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -436,6 +392,20 @@
           ]
         },
         {
+          "functionSig": "syncCash()",
+          "roleHash": "0x8d979f7b827bf26070e61a50a4dc2980a8e7c82cec397163454f190ce3abfb41",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
+              "name": "NormalTimelock"
+            }
+          ],
+          "transactions": [
+            "0x1ae9a75008bb2a82334de607056bddbf7496e0938f990ede562f4a71c5431f00"
+          ]
+        },
+        {
           "functionSig": "unlistMarket(address)",
           "roleHash": "0xac045c11698291147db7c7f3edcb0e0a413a81c391c3e132446ca587ca600de0",
           "decoded": true,
@@ -447,10 +417,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -496,10 +462,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -518,10 +480,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -540,10 +498,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -659,10 +613,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -681,10 +631,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -714,10 +660,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -740,10 +682,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -766,10 +704,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -807,10 +741,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -837,10 +767,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -871,10 +797,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -901,10 +823,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -935,10 +853,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -965,10 +879,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -991,10 +901,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -1017,10 +923,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -1043,10 +945,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -1073,10 +971,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -1103,10 +997,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -1136,10 +1026,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -1178,10 +1064,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -1206,10 +1088,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -1234,10 +1112,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -1276,10 +1150,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -1346,10 +1216,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -1546,10 +1412,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -1567,10 +1429,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -1592,10 +1450,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -1615,10 +1469,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -1633,14 +1483,6 @@
           "roleHash": "0x773024e5c6253bae0fb686f41313bd7e695a02242d1d500aee25ca6b6af52810",
           "decoded": true,
           "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
@@ -1659,10 +1501,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -1688,10 +1526,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -1711,10 +1545,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -1732,10 +1562,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -1768,10 +1594,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -1795,10 +1617,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -1813,14 +1631,6 @@
           "roleHash": "0xaf696490f0ffa6d88b163727a360c55526eb6f399da6cf81c926d8a74ae1ff10",
           "decoded": true,
           "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
@@ -1841,10 +1651,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -1862,10 +1668,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -1898,10 +1700,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -1923,10 +1721,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -1955,10 +1749,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             },
@@ -1981,10 +1771,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -2039,10 +1825,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -2081,10 +1863,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -2107,10 +1885,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -2145,10 +1919,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -2171,10 +1941,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -2202,10 +1968,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -2229,17 +1991,14 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
           ],
           "transactions": [
             "0x033b81a70215310869ef178bc2b3896bf5ad94794f166fe18988614c884bfc93",
-            "0xadbc35b53863cd9a0e111ab5a3085f133ba951e3ec6959be02fe086b30395175"
+            "0xadbc35b53863cd9a0e111ab5a3085f133ba951e3ec6959be02fe086b30395175",
+            "0x732fa852e4770ccd86fb664d16bbc24bd4ad3558ebabdd360beff4aeffb02e9f"
           ]
         }
       ]
@@ -2265,10 +2024,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -2296,10 +2051,6 @@
               "name": "FastTrackTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0",
               "name": "Guardian"
             }
@@ -2322,10 +2073,6 @@
               "name": "FastTrackTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0",
               "name": "Guardian"
             }
@@ -2346,10 +2093,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -2368,10 +2111,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -2399,10 +2138,6 @@
               "name": "FastTrackTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0",
               "name": "Guardian"
             }
@@ -2425,10 +2160,6 @@
               "name": "FastTrackTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0",
               "name": "Guardian"
             }
@@ -2449,10 +2180,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -2471,10 +2198,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -2489,20 +2212,6 @@
       "scope": "contract",
       "permissions": [
         {
-          "functionSig": "setMaxLoopsLimit(uint256)",
-          "roleHash": "0x4d277fb4b0e6d6a90f3528ebed301fe2dd6d651031614d3f5c198e6a77b34754",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0xff56bc1ff73eb6080adde8bae3c8a0ad00d1b276741aa3f220a7d2e3319061b4"
-          ]
-        },
-        {
           "functionSig": "setRewardRecipient(address)",
           "roleHash": "0x218f12e528b42ec290c3b765b77ccb9c6c6391f784e16e1ad332d279ac21a281",
           "decoded": true,
@@ -2514,216 +2223,6 @@
           ],
           "transactions": [
             "0xff56bc1ff73eb6080adde8bae3c8a0ad00d1b276741aa3f220a7d2e3319061b4"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0xAeB0FEd69354f34831fe1D16475D9A83ddaCaDA6",
-      "name": "VToken_vARB_Core",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "syncCash()",
-          "roleHash": "0xf55540031593a900bbc32cfee5a9597ff792d0d11741c06494aa6e25063cec39",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0xd9f439635a301b592399720e9d3b083f11d4ce9f97348121017a69b5b8f5e548"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x4f3a73f318C5EA67A86eaaCE24309F29f89900dF",
-      "name": "VToken_vgmBTC-USDC_Core",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "syncCash()",
-          "roleHash": "0xb61fc6ba99f1c925bdb85411ba111c26ff6e5dd99100a459b067e83a19d110cb",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0xd9f439635a301b592399720e9d3b083f11d4ce9f97348121017a69b5b8f5e548"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x9bb8cEc9C0d46F53b4f2173BB2A0221F66c353cC",
-      "name": "VToken_vgmWETH-USDC_Core",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "syncCash()",
-          "roleHash": "0x6b970f24f7099be506f270230ee6ba11d06abc927b6ee8da29078728b74353de",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0xd9f439635a301b592399720e9d3b083f11d4ce9f97348121017a69b5b8f5e548"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x7D8609f8da70fF9027E9bc5229Af4F6727662707",
-      "name": "VToken_vUSDC_Core",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "syncCash()",
-          "roleHash": "0x3e3d54697ed5cd998c17fbcc683d456953d9bc75bb931d225a41f6aa445e6ee8",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0xd9f439635a301b592399720e9d3b083f11d4ce9f97348121017a69b5b8f5e548"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0xB9F9117d4200dC296F9AcD1e8bE1937df834a2fD",
-      "name": "VToken_vUSDT_Core",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "syncCash()",
-          "roleHash": "0x2d63fbdd89a11c8ef2315e37c9ea01a51641c02917f25ac02ab5a5640c79f2cb",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0xd9f439635a301b592399720e9d3b083f11d4ce9f97348121017a69b5b8f5e548"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0xaDa57840B372D4c28623E87FC175dE8490792811",
-      "name": "VToken_vWBTC_Core",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "syncCash()",
-          "roleHash": "0x7cb649f96f8b73fbae06389534c89a6c81eee340d10ef768e198354c2917391a",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0xd9f439635a301b592399720e9d3b083f11d4ce9f97348121017a69b5b8f5e548"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x246a35E79a3a0618535A469aDaF5091cAA9f7E88",
-      "name": "VToken_vweETH_LiquidStakedETH",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "syncCash()",
-          "roleHash": "0x3d4a5f87c7c53ae2d3c8692dceb79c95ba0998723b047f603bfa42bdfa390bf5",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0x0749c26d6260231d0902da0116c2696dae66d7b8f0cf25fe8dffb72f9322c444"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x68a34332983f4Bf866768DD6D6E638b02eF5e1f0",
-      "name": "VToken_vWETH_Core",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "syncCash()",
-          "roleHash": "0x53e9f40f69a659a6f96e41e1aea7461fc48bc9c99ac66186d6ccc7f59e9ec82d",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0xd9f439635a301b592399720e9d3b083f11d4ce9f97348121017a69b5b8f5e548"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x39D6d13Ea59548637104E40e729E4aABE27FE106",
-      "name": "VToken_vWETH_LiquidStakedETH",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "syncCash()",
-          "roleHash": "0x9eaa059283091d088ce3c3d4832e847e1e583416ba3f54920b419316713928b3",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0x0749c26d6260231d0902da0116c2696dae66d7b8f0cf25fe8dffb72f9322c444"
-          ]
-        }
-      ]
-    },
-    {
-      "address": "0x9df6B5132135f14719696bBAe3C54BAb272fDb16",
-      "name": "VToken_vwstETH_LiquidStakedETH",
-      "scope": "contract",
-      "permissions": [
-        {
-          "functionSig": "syncCash()",
-          "roleHash": "0x93fe7ad2cb78e15cd76e203779441deb3fa31246df6566de42719588379b46c6",
-          "decoded": true,
-          "grantees": [
-            {
-              "address": "0x4b94589Cc23F618687790036726f744D602c4017",
-              "name": "NormalTimelock"
-            }
-          ],
-          "transactions": [
-            "0x0749c26d6260231d0902da0116c2696dae66d7b8f0cf25fe8dffb72f9322c444"
           ]
         }
       ]
@@ -2745,10 +2244,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0",
@@ -2773,10 +2268,6 @@
               "name": "FastTrackTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0",
               "name": "Guardian"
             }
@@ -2797,10 +2288,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -2819,10 +2306,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -2850,10 +2333,6 @@
               "name": "FastTrackTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0",
               "name": "Guardian"
             }
@@ -2876,10 +2355,6 @@
               "name": "FastTrackTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0",
               "name": "Guardian"
             }
@@ -2900,10 +2375,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -2922,10 +2393,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -2967,10 +2434,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -3008,10 +2471,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -3033,10 +2492,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -3062,10 +2517,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -3087,10 +2538,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -3119,10 +2566,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -3140,10 +2583,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -3169,10 +2608,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -3192,10 +2627,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -3213,10 +2644,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -3242,10 +2669,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -3267,10 +2690,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -3296,10 +2715,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -3323,10 +2738,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -3344,10 +2755,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -3384,10 +2791,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -3422,10 +2825,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -3443,10 +2842,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -3481,10 +2876,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -3540,10 +2931,6 @@
               "name": "NormalTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             }
@@ -3561,10 +2948,6 @@
             {
               "address": "0x4b94589Cc23F618687790036726f744D602c4017",
               "name": "NormalTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -3597,10 +2980,6 @@
               "name": "FastTrackTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0",
               "name": "Guardian"
             }
@@ -3623,10 +3002,6 @@
               "name": "FastTrackTimelock"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0",
               "name": "Guardian"
             }
@@ -3647,10 +3022,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -3669,10 +3040,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [
@@ -3711,10 +3078,6 @@
               "name": "Guardian"
             },
             {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
-            {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
             },
@@ -3736,10 +3099,6 @@
             {
               "address": "0x14e0E151b33f9802b3e75b621c1457afc44DcAA0",
               "name": "Guardian"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
@@ -3775,10 +3134,6 @@
           "roleHash": "0x7a9b7d4a6179cbaf5b57264fbd0fd3ca4b06c18ecc90879c4615311876f2667a",
           "decoded": true,
           "grantees": [
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
-            },
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
@@ -3827,10 +3182,6 @@
             {
               "address": "0x2286a9B2a5246218f2fC1F380383f45BDfCE3E04",
               "name": "FastTrackTimelock"
-            },
-            {
-              "address": "0x181E4f8F21D087bF02Ea2F64D5e550849FBca674",
-              "name": "CriticalTimelock"
             }
           ],
           "transactions": [

@@ -1,10 +1,10 @@
 {
   "network": "opsepolia",
   "acmAddress": "0x1652E12C8ABE2f0D84466F0fc1fA4286491B3BC1",
-  "height": 46063015,
-  "updatedAt": "2026-07-13T07:42:52.357Z",
+  "height": 46683454,
+  "updatedAt": "2026-07-27T16:25:09.118Z",
   "verified": true,
-  "verifiedAt": "2026-07-13T07:43:08.307Z",
+  "verifiedAt": "2026-07-27T16:41:06.424Z",
   "schemaVersion": 1,
   "contracts": [
     {

@@ -1,10 +1,10 @@
 {
   "network": "basesepolia",
   "acmAddress": "0x724138223D8F76b519fdE715f60124E7Ce51e051",
-  "height": 43965561,
-  "updatedAt": "2026-07-10T16:03:46.586Z",
+  "height": 44700722,
+  "updatedAt": "2026-07-27T16:32:22.996Z",
   "verified": true,
-  "verifiedAt": "2026-07-12T14:14:58.479Z",
+  "verifiedAt": "2026-07-27T16:41:06.806Z",
   "schemaVersion": 1,
   "contracts": [
     {

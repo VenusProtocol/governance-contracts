@@ -1,6 +1,6 @@
 # ACM Permissions — zksyncsepolia
 
-Snapshot block: 7845631 · Updated: 2026-07-10 · Contracts: 17 · Permissions: 114 · Verification: ✅ verified on-chain (as of 2026-07-12)
+Snapshot block: 7974619 · Updated: 2026-07-27 · Contracts: 17 · Permissions: 114 · Verification: ✅ verified on-chain (as of 2026-07-27)
 
 ## BoundValidator / BoundValidator_Proxy (`0x0A4daBeF41C83Af7e30FfC33feC56ba769f3D24b`)
 

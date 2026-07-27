@@ -1,10 +1,10 @@
 {
   "network": "sepolia",
   "acmAddress": "0xbf705C00578d43B6147ab4eaE04DBBEd1ccCdc96",
-  "height": 11244278,
-  "updatedAt": "2026-07-10T16:02:28.093Z",
+  "height": 11362799,
+  "updatedAt": "2026-07-27T16:33:12.243Z",
   "verified": true,
-  "verifiedAt": "2026-07-12T14:14:59.628Z",
+  "verifiedAt": "2026-07-27T16:41:03.820Z",
   "schemaVersion": 1,
   "contracts": [
     {

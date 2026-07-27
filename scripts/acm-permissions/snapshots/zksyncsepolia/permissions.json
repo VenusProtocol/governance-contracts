@@ -1,10 +1,10 @@
 {
   "network": "zksyncsepolia",
   "acmAddress": "0xD07f543d47c3a8997D6079958308e981AC14CD01",
-  "height": 7845631,
-  "updatedAt": "2026-07-10T16:02:26.685Z",
+  "height": 7974619,
+  "updatedAt": "2026-07-27T16:21:26.661Z",
   "verified": true,
-  "verifiedAt": "2026-07-12T14:15:00.535Z",
+  "verifiedAt": "2026-07-27T16:41:05.677Z",
   "schemaVersion": 1,
   "contracts": [
     {

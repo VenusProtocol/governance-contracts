@@ -1,10 +1,10 @@
 {
   "network": "arbitrumsepolia",
   "acmAddress": "0xa36AD96441cB931D8dFEAAaC97D3FaB4B39E590F",
-  "height": 286082172,
-  "updatedAt": "2026-07-10T16:04:55.261Z",
+  "height": 291936187,
+  "updatedAt": "2026-07-27T16:22:45.863Z",
   "verified": true,
-  "verifiedAt": "2026-07-12T14:25:20.251Z",
+  "verifiedAt": "2026-07-27T16:41:07.330Z",
   "schemaVersion": 1,
   "contracts": [
     {
