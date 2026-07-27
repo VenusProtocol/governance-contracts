@@ -3,17 +3,17 @@
     {
       "address": "0xBa2a43279a228cf9cD94d072777d8d98e7e0a229",
       "origin": "old BNBPermissions.json",
-      "note": "retired risk-config contract; still holds active bscmainnet grants (pause/unpause, setRiskParameterConfig, toggleConfigActive); absent from all deployment files"
+      "note": "retired risk-config contract, absent from all deployment files; holds nothing as of bscmainnet 112465173 — kept so its role hashes stay decodable if re-granted"
     },
     {
       "address": "0xE7252dccd79F2A555E314B9cdd440745b697D562",
       "origin": "old BNBPermissions.json",
-      "note": "retired risk steward; still holds an active setMaxDeltaBps grant and is a live grantee on the wildcard setMarketBorrow/SupplyCaps roles; absent from all deployment files"
+      "note": "retired risk steward, absent from all deployment files; holds nothing and grants nothing as of bscmainnet 112465173 — kept so its role hashes stay decodable if re-granted"
     },
     {
       "address": "0xea2f042e1A4f057EF8A5220e57733AD747ea8867",
       "origin": "old BNBPermissions.json",
-      "note": "retired oracle; still holds an active setTokenConfig grant; absent from all deployment files"
+      "note": "retired oracle, absent from all deployment files; holds nothing as of bscmainnet 112465173 — kept so its role hashes stay decodable if re-granted"
     }
   ]
 }
