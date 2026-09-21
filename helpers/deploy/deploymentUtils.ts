@@ -26,6 +26,7 @@ const mainnetNetworks = [
   "hardhat",
 ];
 
+// eslint-disable-next-line complexity -- predates the complexity gates, tracked for refactor
 export const guardian = async (network: SUPPORTED_NETWORKS): Promise<string> => {
   const { deployer } = await getNamedAccounts();
   if (network === "hardhat") {
