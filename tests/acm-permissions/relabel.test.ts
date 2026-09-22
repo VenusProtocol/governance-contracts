@@ -5,8 +5,8 @@ import * as path from "path";
 
 import { GUARDIANS } from "../../scripts/acm-permissions/config";
 import { roleHash } from "../../scripts/acm-permissions/core/decoder";
-import { refreshNetwork } from "../../scripts/acm-permissions/core/refresh";
 import { loadKnownAddresses, loadNameMap, loadSignatures } from "../../scripts/acm-permissions/core/registry";
+import { relabelNetwork } from "../../scripts/acm-permissions/core/relabel";
 import { saveSnapshotFile } from "../../scripts/acm-permissions/core/snapshot";
 import { SnapshotFile } from "../../scripts/acm-permissions/types";
 
@@ -15,11 +15,11 @@ import { SnapshotFile } from "../../scripts/acm-permissions/types";
 // derive their fixtures from whatever is currently registered, so they stay valid as the
 // registry grows (e.g. once the periphery source is added) instead of depending on one
 // hardcoded address/signature pair.
-describe("refreshNetwork", () => {
+describe("relabelNetwork", () => {
   let baseDir: string;
 
   beforeEach(() => {
-    baseDir = fs.mkdtempSync(path.join(os.tmpdir(), "acm-refresh-test-"));
+    baseDir = fs.mkdtempSync(path.join(os.tmpdir(), "acm-relabel-test-"));
   });
   afterEach(() => fs.rmSync(baseDir, { recursive: true, force: true }));
 
@@ -61,7 +61,7 @@ describe("refreshNetwork", () => {
     };
     saveSnapshotFile("bscmainnet", stub, baseDir);
 
-    const result = refreshNetwork("bscmainnet", { baseDir });
+    const result = relabelNetwork("bscmainnet", { baseDir });
 
     expect(result).to.deep.equal({ newlyDecoded: 1, total: 1, unresolved: 0 });
 
@@ -111,7 +111,7 @@ describe("refreshNetwork", () => {
     };
     saveSnapshotFile("sepolia", stub, baseDir);
 
-    const result = refreshNetwork("sepolia", { baseDir });
+    const result = relabelNetwork("sepolia", { baseDir });
     expect(result).to.deep.equal({ newlyDecoded: 0, total: 1, unresolved: 0 });
 
     const dir = path.join(baseDir, "sepolia");
@@ -119,7 +119,7 @@ describe("refreshNetwork", () => {
     expect(reloaded.contracts[0].name).to.equal(currentName);
     expect(reloaded.contracts[0].permissions[0].grantees[0].name).to.equal(currentName);
     expect(reloaded.height).to.equal(42); // non-legacy network, no table — height still untouched
-    // refresh makes no chain calls — verified/verifiedAt must carry forward unchanged.
+    // relabel makes no chain calls — verified/verifiedAt must carry forward unchanged.
     expect(reloaded.verified).to.equal(true);
     expect(reloaded.verifiedAt).to.equal("2026-07-01T00:00:00Z");
     expect(fs.readFileSync(path.join(dir, "permissions.md"), "utf8")).to.contain(
@@ -128,6 +128,6 @@ describe("refreshNetwork", () => {
   });
 
   it("warns and returns null when no snapshot exists for the network", () => {
-    expect(refreshNetwork("opsepolia", { baseDir })).to.equal(null);
+    expect(relabelNetwork("opsepolia", { baseDir })).to.equal(null);
   });
 });

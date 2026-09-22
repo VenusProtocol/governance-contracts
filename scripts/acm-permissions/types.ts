@@ -49,7 +49,7 @@ export interface SnapshotMeta {
   updatedAt: string;
   // Persistent verification status — set true (with a timestamp) whenever a fetch's
   // diff-verify or a full `acm:verify` run completes against the chain; carried forward
-  // unchanged by `refresh` (which makes no chain calls). Absent/false renders as
+  // unchanged by `relabel` (which makes no chain calls). Absent/false renders as
   // "not verified" in permissions.md.
   verified?: boolean;
   verifiedAt?: string;

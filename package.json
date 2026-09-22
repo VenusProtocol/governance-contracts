@@ -46,7 +46,7 @@
     "acm:verify": "ts-node scripts/acm-permissions/cli.ts verify",
     "acm:filter": "ts-node scripts/acm-permissions/cli.ts filter",
     "acm:build-registry": "ts-node scripts/acm-permissions/cli.ts build-registry",
-    "acm:refresh": "ts-node scripts/acm-permissions/cli.ts refresh"
+    "acm:relabel": "ts-node scripts/acm-permissions/cli.ts relabel"
   },
   "dependencies": {
     "@venusprotocol/solidity-utilities": "2.0.0",

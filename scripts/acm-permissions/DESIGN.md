@@ -469,7 +469,7 @@ event for. Checkpointed sequential scanning is what guarantees no events are mis
 
 - header: schema version, network, ACM address, snapshot block (`height`), timestamp,
   plus the optional `verified`/`verifiedAt` fields — the persistent stamp of the last
-  successful on-chain verification (§8), carried forward by `refresh` and cleared by a
+  successful on-chain verification (§8), carried forward by `relabel` and cleared by a
   `verify` run that finds mismatches;
 - every contract that has at least one active permission: address + resolved name;
 - per contract: each guarded function signature with its role hash and `decoded` flag;

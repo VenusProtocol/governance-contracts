@@ -11,7 +11,6 @@ import { scanRange } from "./core/fetcher";
 import { expandAliases, filterPermissions, renderFilterMd, slugify } from "./core/filter";
 import { writePermissionsOutputs } from "./core/output";
 import { applyEvents } from "./core/reducer";
-import { refreshNetwork } from "./core/refresh";
 import {
   loadKnownAddresses,
   loadLegacyOnlySignatures,
@@ -21,6 +20,7 @@ import {
   recordDroppedSignatures,
   requireSignaturesForLegacy,
 } from "./core/registry";
+import { relabelNetwork } from "./core/relabel";
 import { fileToState, loadSnapshotFile, reannotateUndecoded, saveSnapshotFile, stateToFile } from "./core/snapshot";
 import { ACM_ABI, AcmLike, verifyAllAndFix, verifyDiff } from "./core/verifier";
 import { buildContractRegistry } from "./registry-builder/contracts";
@@ -106,7 +106,7 @@ async function fetchNetwork(
     },
   }); // checkpoint
   // Up to date: the re-annotation applied to `state` above is discarded unsaved here (no
-  // rewrite on a no-op run) — that's fine, `yarn acm:refresh` exists precisely to persist
+  // rewrite on a no-op run) — that's fine, `yarn acm:relabel` exists precisely to persist
   // re-annotation without a rescan.
   if (scan.upToDate) return { network, status: "up-to-date" as const };
   const diff = diffSnapshots(prevState, state);
@@ -371,7 +371,7 @@ async function fetchCommand(values: {
   if (anyFailed) process.exit(1);
 }
 
-function refreshCommand(values: { network?: string }): void {
+function relabelCommand(values: { network?: string }): void {
   let selected: Network[];
   try {
     selected = resolveNetworks(values.network ?? "all");
@@ -380,11 +380,11 @@ function refreshCommand(values: { network?: string }): void {
     process.exit(2);
   }
 
-  console.log("\n=== refresh summary ===");
+  console.log("\n=== relabel summary ===");
   let anyFailed = false;
   for (const network of selected) {
     try {
-      const result = refreshNetwork(network);
+      const result = relabelNetwork(network);
       if (result)
         console.log(
           `${network}: ${result.total} roles, ${result.newlyDecoded} newly decoded, ${result.unresolved} still unresolved`,
@@ -422,9 +422,9 @@ if (require.main === module) {
     else if (cmd === "fetch") await fetchCommand(values);
     else if (cmd === "verify") await verifyCommand(values);
     else if (cmd === "filter") filterCommand(values);
-    else if (cmd === "refresh") refreshCommand(values);
+    else if (cmd === "relabel") relabelCommand(values);
     else {
-      console.error("usage: cli.ts <build-registry|fetch|verify|filter|refresh> [--network all]");
+      console.error("usage: cli.ts <build-registry|fetch|verify|filter|relabel> [--network all]");
       process.exit(2);
     }
   })().catch(e => {

@@ -26,7 +26,7 @@ export function renderPermissionsMd(file: SnapshotFile): string {
   const unresolvedPerms = file.contracts.filter(c => c.scope === "unresolved").flatMap(c => c.permissions);
   const permissionCount = file.contracts.reduce((sum, c) => sum + c.permissions.length, 0);
   // Derived from the persistent verified/verifiedAt fields on the snapshot itself (set by
-  // `fetch`'s diff-verify or a full `acm:verify` run, carried forward unchanged by `refresh`)
+  // `fetch`'s diff-verify or a full `acm:verify` run, carried forward unchanged by `relabel`)
   // rather than a per-call boolean, so the header always reflects the last time this exact
   // snapshot was actually checked against the chain — not just whether this render call was
   // triggered by a run that happened to verify something.
