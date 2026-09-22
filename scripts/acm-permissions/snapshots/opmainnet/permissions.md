@@ -1,6 +1,6 @@
 # ACM Permissions — opmainnet
 
-Snapshot block: 154785253 · Updated: 2026-07-27 · Contracts: 13 · Permissions: 105 · Verification: ✅ verified on-chain (as of 2026-07-27)
+Snapshot block: 157238817 · Updated: 2026-09-22 · Contracts: 13 · Permissions: 105 · Verification: ✅ verified on-chain (as of 2026-07-27)
 
 ## BoundValidator / BoundValidator_Proxy (`0x37A04a1eF784448377a19F2b1b67cD40c09eA505`)
 

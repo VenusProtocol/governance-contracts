@@ -1,22 +1,6 @@
 # ACM Permissions — bsctestnet
 
-Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permissions: 674 · Verification: ✅ verified on-chain (as of 2026-07-27)
-
-## 0x044E572144bc08ed2D90E081EeEd7b5b6Cb01016 (`0x044E572144bc08ed2D90E081EeEd7b5b6Cb01016`)
-
-| Function | Grantees |
-| --- | --- |
-| `addResource(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `lowerResourceCap(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `raiseResourceCap(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `removeResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setBlocksPerYear(uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setInnerDepositQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setInnerWithdrawQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `sweep(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `unpauseResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `updateResourceAdapter(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+Snapshot block: 132508069 · Updated: 2026-09-22 · Contracts: 119 · Permissions: 766 · Verification: ✅ verified on-chain (as of 2026-09-22)
 
 ## 0x05968239d978601146D3e50eE1F29e8571249fB0 (`0x05968239d978601146D3e50eE1F29e8571249fB0`)
 
@@ -35,21 +19,22 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `setMinAmountToConvert(uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setPoolsAssetsDirectTransfer(address[],address[][],bool[][])` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 
-## 0x11e39DC7b8b16BBDA8D9C2903dF741Ae9341Ec88 (`0x11e39DC7b8b16BBDA8D9C2903dF741Ae9341Ec88`)
+## 0x11960c84d6c4F2a978a12372721C3A6A88C78f4c (`0x11960c84d6c4F2a978a12372721C3A6A88C78f4c`)
 
 | Function | Grantees |
 | --- | --- |
-| `addResource(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `lowerResourceCap(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `raiseResourceCap(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `removeResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setBlocksPerYear(uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setInnerDepositQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setInnerWithdrawQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `sweep(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `unpauseResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `updateResourceAdapter(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setAllowedLiquidator(address,bool)` | Guardian, NormalTimelock |
+| `setAllowedSupplier(address,address,bool)` | Guardian, NormalTimelock |
+| `setCloseFactor(uint256)` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
+| `setCollateralFactor(address,uint256,uint256)` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
+| `setForcedLiquidation(address,bool)` | Guardian, NormalTimelock |
+| `setLiquidationAllowlistEnabled(bool)` | Guardian, NormalTimelock |
+| `setLiquidationIncentive(uint256)` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
+| `setMarketBorrowCaps(address[],uint256[])` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
+| `setMarketLiquidationIncentive(address,uint256)` | Guardian, NormalTimelock |
+| `setMarketSupplyCaps(address[],uint256[])` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
+| `setMinLiquidatableCollateral(uint256)` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
+| `setSupplyAllowlistEnabled(address,bool)` | Guardian, NormalTimelock |
 
 ## 0x18F2543DCCD09dEb0e28575008CD24c0700e964B (`0x18F2543DCCD09dEb0e28575008CD24c0700e964B`)
 
@@ -99,6 +84,33 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `setVaiMintCap(uint256)` | NormalTimelock |
 | `setVenusTreasury(address)` | NormalTimelock |
 
+## 0x28e5E0ce9c15E3dE00855C2dda7cA260B470FCC2 (`0x28e5E0ce9c15E3dE00855C2dda7cA260B470FCC2`)
+
+| Function | Grantees |
+| --- | --- |
+| `addResource(address,address)` | NormalTimelock |
+| `cancelDepositRequest(address)` | Guardian, NormalTimelock |
+| `cancelRedeemRequest(address)` | Guardian, NormalTimelock |
+| `claimCancelDeposit(address)` | Guardian, NormalTimelock |
+| `claimCancelRedeem(address)` | Guardian, NormalTimelock |
+| `claimDeposit(address)` | Guardian, NormalTimelock |
+| `claimRedeem(address)` | Guardian, NormalTimelock |
+| `disablePriceAgeGuard(address)` | Guardian, NormalTimelock |
+| `forceRemoveResource(address)` | NormalTimelock |
+| `pauseResource(address)` | NormalTimelock |
+| `removeResource(address)` | NormalTimelock |
+| `requestRedeem(address,uint256)` | Guardian, NormalTimelock |
+| `setDropGuardRate(address,uint16,uint16,uint32)` | Guardian, NormalTimelock |
+| `setDropGuardSnapshot(address,uint128,uint64)` | Guardian, NormalTimelock |
+| `setGrowthGuardRate(address,uint16,uint16,uint32)` | Guardian, NormalTimelock |
+| `setGrowthGuardSnapshot(address,uint128,uint64)` | Guardian, NormalTimelock |
+| `setInnerDepositQueue(address[])` | NormalTimelock |
+| `setInnerWithdrawQueue(address[])` | NormalTimelock |
+| `setPriceAgeGuard(address,address,uint64,uint64)` | Guardian, NormalTimelock |
+| `sweep(address,address)` | NormalTimelock |
+| `unpauseResource(address)` | NormalTimelock |
+| `updateResourceAdapter(address,address)` | NormalTimelock |
+
 ## 0x2B8e226a462138250df2551bb499ad71218c4353 (`0x2B8e226a462138250df2551bb499ad71218c4353`)
 
 | Function | Grantees |
@@ -106,6 +118,13 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `pauseFundsTransfer()` | Guardian |
 | `resumeFundsTransfer()` | Guardian |
 | `setTokensDistributionSpeed(address[],uint256[])` | Guardian |
+
+## 0x309bC6e25672fDBCFa09D76bAA68be59f215f98d (`0x309bC6e25672fDBCFa09D76bAA68be59f215f98d`)
+
+| Function | Grantees |
+| --- | --- |
+| `setDirectPrice(address,uint256)` | NormalTimelock |
+| `setTokenConfig(TokenConfig)` | NormalTimelock |
 
 ## 0x31DEb4D1326838522697f7a012992f0824d80f2b (`0x31DEb4D1326838522697f7a012992f0824d80f2b`)
 
@@ -252,13 +271,6 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `unpauseResource(address)` | Guardian |
 | `updateResourceAdapter(address,address)` | Guardian |
 
-## 0x5346f648029d1D1d1034e09e8AD7a115f5D7A159 (`0x5346f648029d1D1d1034e09e8AD7a115f5D7A159`)
-
-| Function | Grantees |
-| --- | --- |
-| `addHub(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `removeHub(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-
 ## 0x5A53efCa9ac93c6456d60E3c33839e3F06BA9356 (`0x5A53efCa9ac93c6456d60E3c33839e3F06BA9356`)
 
 | Function | Grantees |
@@ -337,30 +349,6 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `setTrustedRemoteAddress(uint16,bytes)` | NormalTimelock |
 | `unpause()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 
-## 0x7cE6ADF754D0eC81A6CF8ACd9C7454F45077dc61 (`0x7cE6ADF754D0eC81A6CF8ACd9C7454F45077dc61`)
-
-| Function | Grantees |
-| --- | --- |
-| `addYieldGroup(address,uint256,uint16)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `emergencyReallocate((address,address,uint256)[],(address,address,uint256)[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `lowerMaxWithdrawalSize(uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `lowerYieldGroupCap(address,uint256,uint16)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseHub()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseYieldGroup(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `raiseMaxWithdrawalSize(uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `raiseYieldGroupCap(address,uint256,uint16)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `reallocate((address,address,uint256)[],(address,address,uint256)[])` | Guardian |
-| `removeYieldGroup(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setFeeRecipient(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setManagementFeeBps(uint16)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setOuterDepositQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setOuterWithdrawQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setPerformanceFeeBps(uint16)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setRedeemFeeBps(uint16)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `sweep(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `unpauseHub()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `unpauseYieldGroup(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-
 ## 0x84e96554776607E5Ba78aeC299a81b70D03a53D6 (`0x84e96554776607E5Ba78aeC299a81b70D03a53D6`)
 
 | Function | Grantees |
@@ -417,6 +405,31 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `unpauseHub()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `unpauseYieldGroup(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 
+## 0x8DFF12277C44E73cbF551ceB6E5Ae1eD4CC85542 (`0x8DFF12277C44E73cbF551ceB6E5Ae1eD4CC85542`)
+
+| Function | Grantees |
+| --- | --- |
+| `addResource(address,address)` | NormalTimelock |
+| `cancelDepositRequest(address)` | Guardian, NormalTimelock |
+| `cancelRedeemRequest(address)` | Guardian, NormalTimelock |
+| `claimCancelDeposit(address)` | 0x55DBc82609005A0204008790852457dF1F979093, Guardian, NormalTimelock |
+| `claimCancelRedeem(address)` | 0x55DBc82609005A0204008790852457dF1F979093, Guardian, NormalTimelock |
+| `claimDeposit(address)` | 0x55DBc82609005A0204008790852457dF1F979093, Guardian, NormalTimelock |
+| `claimRedeem(address)` | 0x55DBc82609005A0204008790852457dF1F979093, Guardian, NormalTimelock |
+| `forceRemoveResource(address)` | NormalTimelock |
+| `pauseResource(address)` | NormalTimelock |
+| `removeResource(address)` | NormalTimelock |
+| `requestRedeem(address,uint256)` | Guardian, NormalTimelock |
+| `setInnerDepositQueue(address[])` | NormalTimelock |
+| `setInnerWithdrawQueue(address[])` | NormalTimelock |
+| `setNavGuardEnabled(address,bool,bool)` | Guardian, NormalTimelock |
+| `setNavGuardRate(address,uint16,uint16,uint16,uint32,bool,bool)` | Guardian, NormalTimelock |
+| `setNavGuardSnapshot(address,uint128,uint64)` | Guardian, NormalTimelock |
+| `setSpotAPYBps(address,uint64)` | Guardian, NormalTimelock |
+| `sweep(address,address)` | NormalTimelock |
+| `unpauseResource(address)` | NormalTimelock |
+| `updateResourceAdapter(address,address)` | NormalTimelock |
+
 ## 0x9084aFAaa6b06171B59Ce629295c86c8974CcEF8 (`0x9084aFAaa6b06171B59Ce629295c86c8974CcEF8`)
 
 | Function | Grantees |
@@ -433,19 +446,11 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `processUpdate(RiskParameterUpdate)` | 0x31DEb4D1326838522697f7a012992f0824d80f2b |
 | `setMaxIncreaseBps(uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 
-## 0xA0Fb0fFeBdcB7F45A3Ec841cCE7F78B7CeBD0f82 (`0xA0Fb0fFeBdcB7F45A3Ec841cCE7F78B7CeBD0f82`)
+## 0xa7CB7C1cf9C31fC077Fd7c6dEa30119Bec796f1D (`0xa7CB7C1cf9C31fC077Fd7c6dEa30119Bec796f1D`)
 
 | Function | Grantees |
 | --- | --- |
-| `addResource(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `forceRemoveResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `removeResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setInnerDepositQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setInnerWithdrawQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `sweep(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `unpauseResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `updateResourceAdapter(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `_setReserveFactor(uint256)` | Guardian |
 
 ## 0xa7D2A407A40A071681CeeEaa9C6C59259eaF0597 (`0xa7D2A407A40A071681CeeEaa9C6C59259eaF0597`)
 
@@ -468,6 +473,12 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `addOrRemoveAssetFromPrime(address,bool)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `addOrUpdateDistributionConfigs(DistributionConfig[])` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `removeDistributionConfig(Schema,address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+
+## 0xc9cc8D6F8dE76943B8f34C8aA730A0e892322f28 (`0xc9cc8D6F8dE76943B8f34C8aA730A0e892322f28`)
+
+| Function | Grantees |
+| --- | --- |
+| `_setReserveFactor(uint256)` | Guardian |
 
 ## 0xcBF6db3DC2f3F8e3552b12B564a8Faf74B64DaeA (`0xcBF6db3DC2f3F8e3552b12B564a8Faf74B64DaeA`)
 
@@ -659,6 +670,22 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `addTokenConverter(address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `removeTokenConverter(address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 
+## CoreSource_USDT (`0x11e39DC7b8b16BBDA8D9C2903dF741Ae9341Ec88`)
+
+| Function | Grantees |
+| --- | --- |
+| `addResource(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `lowerResourceCap(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `raiseResourceCap(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `removeResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setBlocksPerYear(uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setInnerDepositQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setInnerWithdrawQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `sweep(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `unpauseResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `updateResourceAdapter(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
 ## DeviationBoundedOracle / DeviationBoundedOracle_Proxy (`0xE0dafC97895B3c98d3B96D3f8739AaC73166beB8`)
 
 | Function | Grantees |
@@ -719,6 +746,67 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `handleLTVAdjust(address,uint256)` | 0x61859C84E0C6aB7B5A9801A962C660477f31a2D3 |
 | `handleSupplyCapExceeding(address)` | 0x61859C84E0C6aB7B5A9801A962C660477f31a2D3 |
 | `setMarketConfig(address,(uint256,uint256,bool))` | 0x61859C84E0C6aB7B5A9801A962C660477f31a2D3, Guardian, NormalTimelock |
+
+## FluxSource_USDT (`0x044E572144bc08ed2D90E081EeEd7b5b6Cb01016`)
+
+| Function | Grantees |
+| --- | --- |
+| `addResource(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `lowerResourceCap(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `raiseResourceCap(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `removeResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setBlocksPerYear(uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setInnerDepositQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setInnerWithdrawQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `sweep(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `unpauseResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `updateResourceAdapter(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## FRVSource_USDT (`0xA0Fb0fFeBdcB7F45A3Ec841cCE7F78B7CeBD0f82`)
+
+| Function | Grantees |
+| --- | --- |
+| `addResource(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `forceRemoveResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `removeResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setInnerDepositQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setInnerWithdrawQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `sweep(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `unpauseResource(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `updateResourceAdapter(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## Hub_USDT (`0x7cE6ADF754D0eC81A6CF8ACd9C7454F45077dc61`)
+
+| Function | Grantees |
+| --- | --- |
+| `addYieldGroup(address,uint256,uint16)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `emergencyReallocate((address,address,uint256)[],(address,address,uint256)[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `lowerMaxWithdrawalSize(uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `lowerYieldGroupCap(address,uint256,uint16)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseHub()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseYieldGroup(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `raiseMaxWithdrawalSize(uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `raiseYieldGroupCap(address,uint256,uint16)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `reallocate((address,address,uint256)[],(address,address,uint256)[])` | Guardian |
+| `removeYieldGroup(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setFeeRecipient(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setManagementFeeBps(uint16)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setOuterDepositQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setOuterWithdrawQueue(address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setPerformanceFeeBps(uint16)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `setRedeemFeeBps(uint16)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `sweep(address,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `unpauseHub()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `unpauseYieldGroup(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+
+## HubRegistry (`0x5346f648029d1D1d1034e09e8AD7a115f5D7A159`)
+
+| Function | Grantees |
+| --- | --- |
+| `addHub(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `removeHub(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 
 ## InstitutionalVaultControllerProxy (`0xf77dED2A00F94e33C392126238360D4642c16Ba2`)
 
@@ -979,10 +1067,10 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `_setActionsPaused(address[],uint8[],bool)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `_setForcedLiquidation(address,bool)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `_setForcedLiquidationForUser(address,address,bool)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
-| `_setMarketBorrowCaps(address[],uint256[])` | 0x05968239d978601146D3e50eE1F29e8571249fB0, 0x67dD3aD52f6b575654651B5228de88fEF9462724, 0x9b40390771cAeEa69DE55EEd176aeDC72d70cA3E, CriticalTimelock, FastTrackTimelock, MarketCapsRiskSteward / MarketCapsRiskSteward_Proxy, NormalTimelock |
-| `_setMarketSupplyCaps(address[],uint256[])` | 0x05968239d978601146D3e50eE1F29e8571249fB0, 0x67dD3aD52f6b575654651B5228de88fEF9462724, 0x9b40390771cAeEa69DE55EEd176aeDC72d70cA3E, CriticalTimelock, FastTrackTimelock, MarketCapsRiskSteward / MarketCapsRiskSteward_Proxy, NormalTimelock |
+| `_setMarketBorrowCaps(address[],uint256[])` | 0x05968239d978601146D3e50eE1F29e8571249fB0, 0x67dD3aD52f6b575654651B5228de88fEF9462724, 0x9b40390771cAeEa69DE55EEd176aeDC72d70cA3E, CriticalTimelock, FastTrackTimelock, Guardian, MarketCapsRiskSteward / MarketCapsRiskSteward_Proxy, NormalTimelock |
+| `_setMarketSupplyCaps(address[],uint256[])` | 0x05968239d978601146D3e50eE1F29e8571249fB0, 0x67dD3aD52f6b575654651B5228de88fEF9462724, 0x9b40390771cAeEa69DE55EEd176aeDC72d70cA3E, CriticalTimelock, FastTrackTimelock, Guardian, MarketCapsRiskSteward / MarketCapsRiskSteward_Proxy, NormalTimelock |
 | `_setProtocolPaused(bool)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
-| `_supportMarket(address)` | NormalTimelock |
+| `_supportMarket(address)` | Guardian, NormalTimelock |
 | `addPoolMarkets(uint96[],address[])` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `createPool(string)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `removePoolMarket(uint96,address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
@@ -994,7 +1082,7 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `setDeviationBoundedOracle(address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setFlashLoanPaused(bool)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setIsBorrowAllowed(uint96,address,bool)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `setLiquidationIncentive(address,uint256)` | NormalTimelock |
+| `setLiquidationIncentive(address,uint256)` | Guardian, NormalTimelock |
 | `setLiquidationIncentive(uint96,address,uint256)` | NormalTimelock |
 | `setPoolActive(uint96,bool)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setPoolLabel(uint96,string)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
@@ -1199,49 +1287,83 @@ Snapshot block: 121608669 · Updated: 2026-07-27 · Contracts: 113 · Permission
 | `_setMarketBorrowCaps(address[],uint256[])` | EBrake / EBrake_Proxy |
 | `_setMarketSupplyCaps(address[],uint256[])` | EBrake / EBrake_Proxy |
 | `_setReserveFactor(uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+| `addHub(address)` | Guardian |
 | `addMarket(AddMarketInput)` | NormalTimelock |
 | `addPool(string,address,uint256,uint256,uint256)` | NormalTimelock |
+| `addResource(address,address)` | Guardian |
+| `addYieldGroup(address,uint256,uint16)` | Guardian |
 | `decreaseCF(address,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `decreaseCF(address,uint96,uint256)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `disablePoolBorrow(uint96,address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `emergencyReallocate((address,address,uint256)[],(address,address,uint256)[])` | Guardian |
+| `forceRemoveResource(address)` | Guardian |
+| `lowerMaxWithdrawalSize(uint256)` | Guardian |
+| `lowerResourceCap(address,uint256)` | Guardian |
+| `lowerYieldGroupCap(address,uint256,uint16)` | Guardian |
+| `openVault()` | Guardian |
 | `pauseActions(address[],uint8[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `pauseBorrow(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `pauseFlashLoan()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseHub()` | Guardian |
 | `pauseRedeem(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseResource(address)` | Guardian |
 | `pauseSupply(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `pauseTransfer(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
+| `pauseYieldGroup(address)` | Guardian |
+| `raiseMaxWithdrawalSize(uint256)` | Guardian |
+| `raiseResourceCap(address,uint256)` | Guardian |
+| `raiseYieldGroupCap(address,uint256,uint16)` | Guardian |
+| `reallocate((address,address,uint256)[],(address,address,uint256)[])` | Guardian |
+| `removeHub(address)` | Guardian |
+| `removeResource(address)` | Guardian |
+| `removeYieldGroup(address)` | Guardian |
 | `resetBorrowCapSnapshot(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `resetCFSnapshot(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `resetSupplyCapSnapshot(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `revokeFlashLoanAccess(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `setActionsPaused(address[],uint256[],bool)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+| `setBlocksPerYear(uint256)` | Guardian |
 | `setCloseFactor(uint256)` | 0x1aF50D1Ee859Bb972384F1f96F3cFCccfC5Ac210, 0x22E7443A271A4A59EcF2c96134B579d60dc15a1A, 0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B, 0xF57fdd25224807B1113f40E4F95c5f625fB458E2, NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
 | `setCollateralFactor(address,uint256,uint256)` | 0x1aF50D1Ee859Bb972384F1f96F3cFCccfC5Ac210, 0x22E7443A271A4A59EcF2c96134B579d60dc15a1A, 0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B, 0xF57fdd25224807B1113f40E4F95c5f625fB458E2, CriticalTimelock, EBrake / EBrake_Proxy, FastTrackTimelock, Guardian, NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
 | `setCollateralFactor(uint96,address,uint256,uint256)` | EBrake / EBrake_Proxy |
-| `setDirectPrice(address,uint256)` | 0x93cda8c581e174ae45844EF4F298D79106b201e3 |
+| `setDirectPrice(address,uint256)` | 0x93cda8c581e174ae45844EF4F298D79106b201e3, Guardian |
+| `setFeeRecipient(address)` | Guardian |
 | `setFlashLoanEnabled(bool)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setFlashLoanFeeMantissa(uint256,uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setFlashLoanPaused(bool)` | EBrake / EBrake_Proxy |
 | `setGrowthRate(uint256,uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+| `setInnerDepositQueue(address[])` | Guardian |
+| `setInnerWithdrawQueue(address[])` | Guardian |
 | `setInterestRateModel(address)` | 0x36190f4735A23D67C23AF9F9688617Ec00208Ddd, 0x3d6E0b2a7b389d7942C80657Ef898932e1fD63Cb, 0x6b28f5112f948dC820d302945A2cE06F664C207B, CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setIsBorrowAllowed(uint96,address,bool)` | EBrake / EBrake_Proxy |
 | `setLastRewardingBlock(address[],uint32[],uint32[])` | NormalTimelock |
 | `setLiquidationIncentive(uint256)` | 0x1aF50D1Ee859Bb972384F1f96F3cFCccfC5Ac210, 0x22E7443A271A4A59EcF2c96134B579d60dc15a1A, 0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B, 0xF57fdd25224807B1113f40E4F95c5f625fB458E2, NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
+| `setManagementFeeBps(uint16)` | Guardian |
 | `setMarketBorrowCaps(address[],uint256[])` | 0x1aF50D1Ee859Bb972384F1f96F3cFCccfC5Ac210, 0x22E7443A271A4A59EcF2c96134B579d60dc15a1A, 0x67dD3aD52f6b575654651B5228de88fEF9462724, 0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B, 0x9b40390771cAeEa69DE55EEd176aeDC72d70cA3E, 0xF57fdd25224807B1113f40E4F95c5f625fB458E2, CriticalTimelock, EBrake / EBrake_Proxy, FastTrackTimelock, Guardian, NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
 | `setMarketSupplyCaps(address[],uint256[])` | 0x1aF50D1Ee859Bb972384F1f96F3cFCccfC5Ac210, 0x22E7443A271A4A59EcF2c96134B579d60dc15a1A, 0x67dD3aD52f6b575654651B5228de88fEF9462724, 0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B, 0x9b40390771cAeEa69DE55EEd176aeDC72d70cA3E, 0xF57fdd25224807B1113f40E4F95c5f625fB458E2, CriticalTimelock, EBrake / EBrake_Proxy, FastTrackTimelock, Guardian, NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
 | `setMaxLoopsLimit(uint256)` | NormalTimelock |
 | `setMinLiquidatableCollateral(uint256)` | 0x1aF50D1Ee859Bb972384F1f96F3cFCccfC5Ac210, 0x22E7443A271A4A59EcF2c96134B579d60dc15a1A, 0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B, 0xF57fdd25224807B1113f40E4F95c5f625fB458E2, NormalTimelock, PoolRegistry / PoolRegistry_Proxy |
+| `setOuterDepositQueue(address[])` | Guardian |
+| `setOuterWithdrawQueue(address[])` | Guardian |
+| `setPerformanceFeeBps(uint16)` | Guardian |
 | `setPoolName(address,string)` | NormalTimelock |
 | `setProtocolSeizeShare(uint256)` | NormalTimelock |
+| `setRedeemFeeBps(uint16)` | Guardian |
 | `setReduceReservesBlockDelta(uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setReserveFactor(uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setRewardRecipient(address)` | NormalTimelock |
 | `setRewardTokenSpeeds(address[],uint256[],uint256[])` | Guardian, NormalTimelock |
 | `setSnapshot(uint256,uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `setSnapshotGap(uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+| `setTokenConfig(TokenConfig)` | Guardian |
 | `setWhiteListFlashLoanAccount(address,bool)` | EBrake / EBrake_Proxy |
 | `supportMarket(address)` | 0x1aF50D1Ee859Bb972384F1f96F3cFCccfC5Ac210, 0x22E7443A271A4A59EcF2c96134B579d60dc15a1A, 0x94911A95B9BB6d83eB7d3623DBCd2C75b6A0316B, 0xF57fdd25224807B1113f40E4F95c5f625fB458E2, PoolRegistry / PoolRegistry_Proxy |
 | `swapPoolsAssets(address[],uint256[],address[][])` | Guardian |
+| `sweep(address,address)` | Guardian |
 | `unlistMarket(address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+| `unpauseHub()` | Guardian |
+| `unpauseResource(address)` | Guardian |
+| `unpauseYieldGroup(address)` | Guardian |
 | `updateJumpRateModel(uint256,uint256,uint256,uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `updatePoolMetadata(address,VenusPoolMetaData)` | NormalTimelock |
+| `updateResourceAdapter(address,address)` | Guardian |

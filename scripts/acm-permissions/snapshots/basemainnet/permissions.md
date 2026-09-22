@@ -1,6 +1,6 @@
 # ACM Permissions — basemainnet
 
-Snapshot block: 49190050 · Updated: 2026-07-27 · Contracts: 20 · Permissions: 130 · Verification: ✅ verified on-chain (as of 2026-07-27)
+Snapshot block: 51643514 · Updated: 2026-09-22 · Contracts: 20 · Permissions: 130 · Verification: ✅ verified on-chain (as of 2026-07-27)
 
 ## AerodromeSlipstreamOracle / AerodromeSlipstreamOracle_Proxy (`0x5DE0B322A74088fD64CDD01042BE2fBc47FE82EC`)
 

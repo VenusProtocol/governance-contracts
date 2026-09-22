@@ -1,6 +1,6 @@
 # ACM Permissions — ethereum
 
-Snapshot block: 25625304 · Updated: 2026-07-27 · Contracts: 28 · Permissions: 148 · Verification: ✅ verified on-chain (as of 2026-07-27)
+Snapshot block: 26032667 · Updated: 2026-09-22 · Contracts: 28 · Permissions: 148 · Verification: ✅ verified on-chain (as of 2026-07-27)
 
 ## AuxiliaryCommandsAggregator / AuxiliaryCommandsAggregator_Proxy (`0xc79Cb7efEBd121DC4B39eA141C214606595D665A`)
 

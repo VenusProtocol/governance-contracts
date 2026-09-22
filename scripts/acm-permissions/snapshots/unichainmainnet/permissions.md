@@ -1,6 +1,6 @@
 # ACM Permissions — unichainmainnet
 
-Snapshot block: 54421631 · Updated: 2026-07-27 · Contracts: 12 · Permissions: 103 · Verification: ✅ verified on-chain (as of 2026-07-27)
+Snapshot block: 59327398 · Updated: 2026-09-22 · Contracts: 12 · Permissions: 103 · Verification: ✅ verified on-chain (as of 2026-07-27)
 
 ## BoundValidator / BoundValidator_Proxy (`0xfdaA5dEEA7850997dA8A6E2F2Ab42E60F1011C19`)
 

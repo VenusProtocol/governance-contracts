@@ -1,6 +1,6 @@
 # ACM Permissions — zksyncmainnet
 
-Snapshot block: 71331070 · Updated: 2026-07-27 · Contracts: 15 · Permissions: 109 · Verification: ✅ verified on-chain (as of 2026-07-27)
+Snapshot block: 72161780 · Updated: 2026-09-22 · Contracts: 15 · Permissions: 109 · Verification: ✅ verified on-chain (as of 2026-07-27)
 
 ## AuxiliaryCommandsAggregator / AuxiliaryCommandsAggregator_Proxy (`0x0B906d55025cE88bF713764AAc6F23918a25fA49`)
 

@@ -1,6 +1,6 @@
 # ACM Permissions — opbnbmainnet
 
-Snapshot block: 168209406 · Updated: 2026-07-27 · Contracts: 10 · Permissions: 89 · Verification: ✅ verified on-chain (as of 2026-07-27)
+Snapshot block: 187834492 · Updated: 2026-09-22 · Contracts: 10 · Permissions: 89 · Verification: ✅ verified on-chain (as of 2026-07-27)
 
 ## BinanceOracle / BinanceOracle_Proxy (`0xB09EC9B628d04E1287216Aa3e2432291f50F9588`)
 

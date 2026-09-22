@@ -1,6 +1,6 @@
 # ACM Permissions — unichainsepolia
 
-Snapshot block: 58317017 · Updated: 2026-07-27 · Contracts: 16 · Permissions: 112 · Verification: ✅ verified on-chain (as of 2026-07-27)
+Snapshot block: 63223329 · Updated: 2026-09-22 · Contracts: 16 · Permissions: 112 · Verification: ✅ verified on-chain (as of 2026-07-27)
 
 ## BoundValidator / BoundValidator_Proxy (`0x51C9F57Ffc0A4dD6d135aa3b856571F5A4e4C6CB`)
 

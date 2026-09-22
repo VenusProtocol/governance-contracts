@@ -1,6 +1,6 @@
 # ACM Permissions — sepolia
 
-Snapshot block: 11362799 · Updated: 2026-07-27 · Contracts: 36 · Permissions: 242 · Verification: ✅ verified on-chain (as of 2026-07-27)
+Snapshot block: 11757524 · Updated: 2026-09-22 · Contracts: 36 · Permissions: 242 · Verification: ✅ verified on-chain (as of 2026-07-27)
 
 ## 0x0E33024CD69530126586186C282573D8BD6783ea (`0x0E33024CD69530126586186C282573D8BD6783ea`)
 
