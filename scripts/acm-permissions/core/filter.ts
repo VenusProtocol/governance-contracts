@@ -40,6 +40,28 @@ function resolveLabel(label: string, network: Network, nameMap: Record<string, s
   return addresses;
 }
 
+// Every permission in the snapshot held by one of `targets` and by none of `excluded`, optionally
+// narrowed to `onlySigs`.
+function matchPermissions(
+  file: SnapshotFile,
+  targets: Set<string>,
+  excluded: Set<string>,
+  onlySigs: Set<string> | null,
+): FilterResult[string] {
+  const matches: FilterResult[string] = [];
+  for (const contract of file.contracts) {
+    for (const permission of contract.permissions) {
+      if (onlySigs && (permission.functionSig === null || !onlySigs.has(permission.functionSig))) continue;
+      const isGrantedToLabel = permission.grantees.some(g => targets.has(ethers.utils.getAddress(g.address)));
+      const isAlsoExcluded = permission.grantees.some(g => excluded.has(ethers.utils.getAddress(g.address)));
+      if (isGrantedToLabel && !isAlsoExcluded) {
+        matches.push({ contract: contract.name, functionSig: permission.functionSig, roleHash: permission.roleHash });
+      }
+    }
+  }
+  return matches;
+}
+
 export function filterPermissions(
   file: SnapshotFile,
   grantees: string[],
@@ -58,18 +80,7 @@ export function filterPermissions(
 
   for (const label of grantees) {
     const targets = new Set(resolveLabel(label, network, nameMap).map(a => ethers.utils.getAddress(a)));
-    const matches: FilterResult[string] = [];
-    for (const contract of file.contracts) {
-      for (const permission of contract.permissions) {
-        if (onlySigs && (permission.functionSig === null || !onlySigs.has(permission.functionSig))) continue;
-        const isGrantedToLabel = permission.grantees.some(g => targets.has(ethers.utils.getAddress(g.address)));
-        const isAlsoExcluded = permission.grantees.some(g => excluded.has(ethers.utils.getAddress(g.address)));
-        if (isGrantedToLabel && !isAlsoExcluded) {
-          matches.push({ contract: contract.name, functionSig: permission.functionSig, roleHash: permission.roleHash });
-        }
-      }
-    }
-    result[label] = matches;
+    result[label] = matchPermissions(file, targets, excluded, onlySigs);
   }
 
   return result;

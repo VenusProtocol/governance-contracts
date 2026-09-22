@@ -299,6 +299,19 @@ function filterCommand(values: {
   console.log(`wrote ${mdPath}`);
 }
 
+const fetchSummary = (fetch: FetchResult) =>
+  fetch.status === "up-to-date"
+    ? "up-to-date"
+    : `ok (added ${fetch.added} removed ${fetch.removed} corrections ${fetch.corrections})`;
+
+// Empty unless --verify ran, so the summary line reads the same as before when it did not.
+const verifySummary = (verify: VerifyResult | null) => {
+  if (verify === null) return "";
+  return verify.status === "skipped"
+    ? " · verify skipped (no snapshot)"
+    : ` · verified ${verify.verified} entries, ${verify.fixed.length} fixed`;
+};
+
 async function fetchCommand(values: {
   network?: string;
   "chunk-size"?: string;
@@ -343,26 +356,16 @@ async function fetchCommand(values: {
   let anyFailed = false;
   results.forEach((result, i) => {
     const network = selected[i];
-    if (result.status === "fulfilled") {
-      const { fetch, verify } = result.value;
-      const fetchPart =
-        fetch.status === "up-to-date"
-          ? "up-to-date"
-          : `ok (added ${fetch.added} removed ${fetch.removed} corrections ${fetch.corrections})`;
-      const verifyPart =
-        verify === null
-          ? ""
-          : verify.status === "skipped"
-          ? " · verify skipped (no snapshot)"
-          : ` · verified ${verify.verified} entries, ${verify.fixed.length} fixed`;
-      console.log(`${network}: ${fetchPart}${verifyPart}`);
-      if (verify?.status === "ok")
-        for (const label of verify.fixed) console.log(`  fixed: ${label} — was in snapshot but not on-chain; removed`);
-    } else {
+    if (result.status !== "fulfilled") {
       anyFailed = true;
       const message = result.reason instanceof Error ? result.reason.message : String(result.reason);
       console.log(`${network}: FAILED: ${message}`);
+      return;
     }
+    const { fetch, verify } = result.value;
+    console.log(`${network}: ${fetchSummary(fetch)}${verifySummary(verify)}`);
+    if (verify?.status === "ok")
+      for (const label of verify.fixed) console.log(`  fixed: ${label} — was in snapshot but not on-chain; removed`);
   });
 
   if (anyFailed) process.exit(1);
