@@ -1,12 +1,19 @@
 # ACM Permissions — bscmainnet
 
-Snapshot block: 123363019 · Updated: 2026-09-22 · Contracts: 81 · Permissions: 516 · Verification: ✅ verified on-chain (as of 2026-09-22)
+Snapshot block: 123363019 · Updated: 2026-09-22 · Contracts: 85 · Permissions: 516 · Verification: ✅ verified on-chain (as of 2026-09-22)
 
 ## AccessControlManager (`0x4788629ABc6cFCA10F9f969efdEAa1cF70c23555`)
 
 | Function | Grantees |
 | --- | --- |
 | `DEFAULT_ADMIN_ROLE` | NormalTimelock |
+
+## AproOracle (`0x04480f1Ba2252CDF89deB022B58d0a03d1B4cF91`)
+
+| Function | Grantees |
+| --- | --- |
+| `setDirectPrice(address,uint256)` | Guardian 3, NormalTimelock |
+| `setTokenConfig(TokenConfig)` | NormalTimelock |
 
 ## AtlasOracle / AtlasOracle_Proxy (`0x9E6928Ec418948ceb9f1cd9872fD312b13D841D0`)
 
@@ -51,6 +58,31 @@ Snapshot block: 123363019 · Updated: 2026-09-22 · Contracts: 81 · Permissions
 | --- | --- |
 | `executeBuyback(address,uint256,uint256,uint256,address,bytes,address)` | 0x88ac9ca69A371f47798Df18e5C36449af44526a4 |
 | `forwardBaseAsset(address,uint256)` | 0x88ac9ca69A371f47798Df18e5C36449af44526a4 |
+
+## CentrifugeSource_USDT (`0xDA5AFfeb43719f517676E031a727071c7D400983`)
+
+| Function | Grantees |
+| --- | --- |
+| `addResource(address,address)` | NormalTimelock |
+| `cancelDepositRequest(address)` | 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock |
+| `cancelRedeemRequest(address)` | 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock |
+| `claimCancelDeposit(address)` | 0x194b1F6c57d023Fa59497ee5A7976dB47f183929, 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock |
+| `claimCancelRedeem(address)` | 0x194b1F6c57d023Fa59497ee5A7976dB47f183929, 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock |
+| `claimDeposit(address)` | 0x194b1F6c57d023Fa59497ee5A7976dB47f183929, 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock |
+| `claimRedeem(address)` | 0x194b1F6c57d023Fa59497ee5A7976dB47f183929, 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock |
+| `forceRemoveResource(address)` | Guardian 2, NormalTimelock |
+| `pauseResource(address)` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock |
+| `removeResource(address)` | NormalTimelock |
+| `requestRedeem(address,uint256)` | 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock |
+| `setInnerDepositQueue(address[])` | 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock |
+| `setInnerWithdrawQueue(address[])` | 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock |
+| `setNavGuardEnabled(address,bool,bool)` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock |
+| `setNavGuardRate(address,uint16,uint16,uint16,uint32,bool,bool)` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock |
+| `setNavGuardSnapshot(address,uint128,uint64)` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock |
+| `setSpotAPYBps(address,uint64)` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock |
+| `sweep(address,address)` | NormalTimelock |
+| `unpauseResource(address)` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock |
+| `updateResourceAdapter(address,address)` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock |
 
 ## ChainlinkOracle / ChainlinkOracle_Proxy (`0x1B2103441A0A108daD8848D8F5d790e4D402921F`)
 
@@ -461,6 +493,12 @@ Snapshot block: 123363019 · Updated: 2026-09-22 · Contracts: 81 · Permissions
 | `setTrustedRemoteAddress(uint16,bytes)` | NormalTimelock |
 | `unpause()` | FastTrackTimelock, Guardian 2, NormalTimelock |
 
+## PancakeStableOracle (`0x8440889CaEC04FeFEB52c3c5cd729548864E7886`)
+
+| Function | Grantees |
+| --- | --- |
+| `setPoolConfig(address,address,uint8,uint8,address,uint8)` | Guardian 2, NormalTimelock |
+
 ## PancakeSwapOracle / PancakeSwapOracle_Proxy (`0x44B72078240A3509979faF450085Fa818401D32E`)
 
 | Function | Grantees |
@@ -771,6 +809,15 @@ Snapshot block: 123363019 · Updated: 2026-09-22 · Contracts: 81 · Permissions
 | --- | --- |
 | `setInterestRateModel(address)` | FastTrackTimelock, NormalTimelock |
 
+## vceBTC (`0xAB7D138c6e6fF1bfD3ac871d0dB08f9442Ce927F`)
+
+| Function | Grantees |
+| --- | --- |
+| `burn(address,uint256)` | Guardian 1, NormalTimelock |
+| `mint(address,uint256)` | Guardian 1, NormalTimelock |
+| `pause()` | Guardian 1, NormalTimelock |
+| `unpause()` | Guardian 1, NormalTimelock |
+
 ## VenusERC4626Factory / VenusERC4626Factory_Proxy (`0xC2f7924809830886EB04c6b40725Fd68F1891fA2`)
 
 | Function | Grantees |
@@ -900,35 +947,3 @@ Snapshot block: 123363019 · Updated: 2026-09-22 · Contracts: 81 · Permissions
 | `unlistMarket(address)` | FastTrackTimelock, Guardian 2, NormalTimelock |
 | `updateJumpRateModel(uint256,uint256,uint256,uint256)` | FastTrackTimelock, NormalTimelock |
 | `updatePoolMetadata(address,VenusPoolMetaData)` | NormalTimelock |
-
-## ⚠️ Unresolved roles
-
-| Role hash | Grantees | Transactions |
-| --- | --- | --- |
-| `0x0dcfea2dcc8b49eb30397c92470f8646a1f30f921d37edaa1e58dfdecd6645f1` | 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0x1084c97625e732e2b746a34cae6c8ebb902a824af5ad2556549f915020cf4839` | NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0x1f73f4d3fd6ea38a0fa7140620501fa2bb1b9f7a4e45e02c61c60ebe0606b72a` | Guardian 1, NormalTimelock | 0x8834742a9f80a009d9dfdcacaee593f43cc7feb48e2c10e0ee4a81105dc0d905 |
-| `0x1f8980d0dc8a3421db8e5ba5e6bcfc1328fb067dc7a54ab90cc8370f03e3354f` | Guardian 3, NormalTimelock | 0x79d1a3920e6e4c2c336fc7e5bbd52bc3d9a57192c030d8be5ff74d81f487f107 |
-| `0x2fd2c200b42d639b60d69de0d542231ee316d3164f97a1e46feb734082f4081c` | 0x194b1F6c57d023Fa59497ee5A7976dB47f183929, 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0x3ef812eb90d3b7d9df3ba4a0b13a5ee7c77fb07712a9c7356ea0b1be475d2d6f` | 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0x4c8a4157811c330a29f0a0d44c0ee3615ad4b37823fdf9cc25528f43d4e3327b` | 0x194b1F6c57d023Fa59497ee5A7976dB47f183929, 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0x5bf72cee7b07e607cb3b6bbf2972d39b442c275128354c6d184351558eabb393` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0x6bff1143d41147677303f84a93f0625f995888f053f24c3a6596b8c4039b5a67` | Guardian 2, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0x7aabbcd80000a563bcd35eba1122fdbe8dcf01df8a7c507c3019f10ba0c66d3b` | 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0x807217a8be8eb78025834ba8742347948c23f047594e975c14afefab56a52ecf` | Guardian 2, NormalTimelock | 0xd45f992d8bd61a7f92e757635718b91e2a51ea6c2321b38f8562194df596847b |
-| `0x84afad717483b6b25e8f9718b50321b49c6b0d9134026e890d76dfa161d39e4c` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0x88f50a77a3391e1d733a3b865584c50d2eaa0abbee2d891b171dcb67c286cf95` | Guardian 1, NormalTimelock | 0x8834742a9f80a009d9dfdcacaee593f43cc7feb48e2c10e0ee4a81105dc0d905 |
-| `0x91729b59d8bc4acd2482c2ae7aa8e7d04f109970a6d17bd58170f71e3b9e17c4` | NormalTimelock | 0x79d1a3920e6e4c2c336fc7e5bbd52bc3d9a57192c030d8be5ff74d81f487f107 |
-| `0x9e432d259d26e86f9caead649175b196ae3d01157175dbfe76934d5c093ce9a6` | 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0xa219be0562da6bdc8dd969697a67e45ea9e5d54c6c78201b593d1d62a7809465` | NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0xb465e9873ecc8d8a9721a04419444a305e1341df46b9b37721e172cbe93c24e1` | Guardian 1, NormalTimelock | 0x8834742a9f80a009d9dfdcacaee593f43cc7feb48e2c10e0ee4a81105dc0d905 |
-| `0xcede55a57850af803252da38456ab19ce266d93613c72263a35432271e5eb130` | Guardian 1, NormalTimelock | 0x8834742a9f80a009d9dfdcacaee593f43cc7feb48e2c10e0ee4a81105dc0d905 |
-| `0xd7c5e4614271fe2a467abb8c04aa35723391c0ee684962023f4ab9053d488d19` | 0x194b1F6c57d023Fa59497ee5A7976dB47f183929, 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0xe0e15dd454af32fd7542b8a01155ead802a052b8b517a3b7e462c0c756a8b043` | 0x194b1F6c57d023Fa59497ee5A7976dB47f183929, 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0xe22b6fb9888491222416d60473d774ee614457564795090aa4765e172e8e26fc` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0xe9974dd46edb518d29efbc9e6109dc0235ba44cb5d61b55eb07b144f7862d0b8` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0xf3150f1a0222272ac630934f6a8efc2d5b4ca38ca9545d3d5948c609aa49e4f8` | 0x83f426233B358A36953F6951161E76FB7c866a7A, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0xf4e806277f744d9e16d63c406638681af7e5fe7d22250947f4596d918498e241` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0xf5bd6444215a00011edb767d0cc0930b05fbc583b9d790b163dd9748a5fd2f91` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0xfbcf298760370d4250e8440ecffdbfe68e4eb37e90b25571cbf44e5ab03f75c5` | 0x83f426233B358A36953F6951161E76FB7c866a7A, Guardian 2, NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |
-| `0xfc18842ba30f501f8d15601cbc272bea69e7e16d151754f6402de6f2a3985614` | NormalTimelock | 0x712a4d1f8dfc34ecf5200b44bdabc0c94ab3dec5699c09f1c37b1761ea178141 |

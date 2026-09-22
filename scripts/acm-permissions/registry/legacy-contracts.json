@@ -14,6 +14,30 @@
       "address": "0xea2f042e1A4f057EF8A5220e57733AD747ea8867",
       "origin": "old BNBPermissions.json",
       "note": "retired oracle, absent from all deployment files; holds nothing as of bscmainnet 112465173 — kept so its role hashes stay decodable if re-granted"
+    },
+    {
+      "address": "0xDA5AFfeb43719f517676E031a727071c7D400983",
+      "name": "CentrifugeSource_USDT",
+      "origin": "VIP-661 — Centrifuge yield-group source on Hub_USDT, behind CENTRIFUGE_BEACON (0xAe90Cfb3E2Bc97508F58E7e076Acf38f3bfC820f)",
+      "note": "REMOVE once @venusprotocol/liquidity-hub publishes a version whose deployments/bscmainnet includes it, then rebuild the registry — the generated name takes over"
+    },
+    {
+      "address": "0xAB7D138c6e6fF1bfD3ac871d0dB08f9442Ce927F",
+      "name": "vceBTC",
+      "origin": "VIP-656 — Ceffu Custody BTC for Venus, a fixed-rate-vaults deployment",
+      "note": "REMOVE once @venusprotocol/fixed-rate-vaults publishes a version whose deployments/bscmainnet includes it, then rebuild the registry — the generated name takes over"
+    },
+    {
+      "address": "0x04480f1Ba2252CDF89deB022B58d0a03d1B4cF91",
+      "name": "AproOracle",
+      "origin": "VIP-654 — APRO oracle added as the BStocks pivot",
+      "note": "REMOVE once @venusprotocol/oracle publishes a version whose deployments/bscmainnet includes it, then rebuild the registry — the generated name takes over"
+    },
+    {
+      "address": "0x8440889CaEC04FeFEB52c3c5cd729548864E7886",
+      "name": "PancakeStableOracle",
+      "origin": "VIP-647 — PCS stable-swap oracle, ownership accepted by the Normal Timelock in that VIP",
+      "note": "REMOVE once @venusprotocol/oracle publishes a version whose deployments/bscmainnet includes it, then rebuild the registry — the generated name takes over"
     }
   ]
 }

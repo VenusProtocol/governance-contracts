@@ -7,6 +7,8 @@ import { Network } from "../types";
 
 const readJson = (f: string) => JSON.parse(fs.readFileSync(f, "utf8"));
 const contractsFile = (n: Network) => path.join(REGISTRY_DIR, "contracts", `${n}.json`);
+const legacyContracts = (): { address: string; name?: string }[] =>
+  readJson(path.join(REGISTRY_DIR, "legacy-contracts.json")).contracts;
 
 export function loadNameMap(network: Network): Record<string, string> {
   const f = contractsFile(network);
@@ -14,7 +16,18 @@ export function loadNameMap(network: Network): Record<string, string> {
     console.warn(`[registry] missing ${f} — names will be raw addresses`);
     return {};
   }
-  return readJson(f);
+  const map: Record<string, string> = readJson(f);
+  // Manual entries fill the gaps the generated map cannot: a contract deployed at runtime, or
+  // one whose package has not published its deployment yet. The generated name wins on a clash,
+  // so a manual entry left behind after the package ships is shadowed rather than authoritative.
+  // bscmainnet-only, matching loadKnownAddresses — the file holds bscmainnet addresses.
+  if (network === "bscmainnet")
+    for (const c of legacyContracts())
+      if (c.name) {
+        const key = ethers.utils.getAddress(c.address);
+        map[key] ??= c.name;
+      }
+  return map;
 }
 export function nameFor(map: Record<string, string>, address: string): string {
   const key = ethers.utils.getAddress(address);
@@ -83,9 +96,7 @@ export function recordDroppedSignatures(
 // ACM ignores, and it should surface as unresolved rather than decode as a wildcard.
 export function loadKnownAddresses(network: Network): string[] {
   const set = new Set<string>(Object.keys(loadNameMap(network)));
-  if (network === "bscmainnet")
-    for (const c of readJson(path.join(REGISTRY_DIR, "legacy-contracts.json")).contracts)
-      set.add(ethers.utils.getAddress(c.address));
+  if (network === "bscmainnet") for (const c of legacyContracts()) set.add(ethers.utils.getAddress(c.address));
   return [...set];
 }
 export function requireSignaturesForLegacy(network: Network): void {
