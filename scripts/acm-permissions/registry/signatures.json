@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-07-27T16:18:59.880Z",
+  "generatedAt": "2026-09-22T11:11:40.007Z",
   "contracts": [
     {
       "name": "AAVE",
@@ -213,6 +213,78 @@
       "signatures": [
         "isAllowedToCall(address,string)",
         "owner()"
+      ]
+    },
+    {
+      "name": "AdapterCoreV1",
+      "addresses": {
+        "bscmainnet": [
+          "0x4E514a0C7aB9d140eE204dfA0017574270D92944"
+        ],
+        "bsctestnet": [
+          "0xDf669957448eCB23309eEFda4de230c62d22AE33"
+        ]
+      },
+      "signatures": [
+        "EXP_SCALE()",
+        "MANTISSA_ONE()",
+        "accrue(address)",
+        "asset(address)",
+        "deposit(address,uint256)",
+        "maxDeposit(address)",
+        "maxWithdraw(address,address)",
+        "receiptBalance(address,address)",
+        "spotAPYBps(address,uint256)",
+        "totalAssets(address,address)",
+        "validateRegistration(address)",
+        "withdraw(address,uint256,address)"
+      ]
+    },
+    {
+      "name": "AdapterFRV",
+      "addresses": {
+        "bscmainnet": [
+          "0x1FA0365bDd603452CE96BE3c0e12Db5515a35902"
+        ],
+        "bsctestnet": [
+          "0xeF0E85ab9A23F50EB4595CF7e2F5461feF7E7fc5"
+        ]
+      },
+      "signatures": [
+        "accrue(address)",
+        "asset(address)",
+        "deposit(address,uint256)",
+        "maxDeposit(address)",
+        "maxWithdraw(address,address)",
+        "receiptBalance(address,address)",
+        "spotAPYBps(address,uint256)",
+        "totalAssets(address,address)",
+        "validateRegistration(address)",
+        "withdraw(address,uint256,address)"
+      ]
+    },
+    {
+      "name": "AdapterFlux",
+      "addresses": {
+        "bscmainnet": [
+          "0xA81bDf813A428053E764C34Bc679b3E4d0807be3"
+        ],
+        "bsctestnet": [
+          "0x15Dca35ae0b16BeceabAEC9Dea49630e8C601730"
+        ]
+      },
+      "signatures": [
+        "LENDING_RESOLVER()",
+        "accrue(address)",
+        "asset(address)",
+        "deposit(address,uint256)",
+        "maxDeposit(address)",
+        "maxWithdraw(address,address)",
+        "receiptBalance(address,address)",
+        "spotAPYBps(address,uint256)",
+        "totalAssets(address,address)",
+        "validateRegistration(address)",
+        "withdraw(address,uint256,address)"
       ]
     },
     {
@@ -4324,6 +4396,153 @@
       ]
     },
     {
+      "name": "CoreBeacon",
+      "addresses": {
+        "bscmainnet": [
+          "0x195a0F1BCF73C3Beb609a1271E8E08b8E4c098C6"
+        ],
+        "bsctestnet": [
+          "0xbBEe25aE7d2Db035Afc327fb0096fC88FDfF3170"
+        ]
+      },
+      "signatures": [
+        "implementation()",
+        "owner()",
+        "renounceOwnership()",
+        "transferOwnership(address)",
+        "upgradeTo(address)"
+      ]
+    },
+    {
+      "name": "CoreSource_U",
+      "addresses": {
+        "bscmainnet": [
+          "0x8A680F77A5367FA7cD33a02f51896Cb1d55159c3"
+        ]
+      },
+      "signatures": [
+        "accessControlManager()",
+        "accrue()",
+        "addResource(address,address)",
+        "asset()",
+        "blocksPerYear()",
+        "deposit(uint256)",
+        "depositResource(address,uint256)",
+        "dispatchDepositExternal(address,address,uint256)",
+        "dispatchWithdrawExternal(address,address,uint256,address)",
+        "hub()",
+        "initialize(address,address,uint256,address)",
+        "innerDepositQueue()",
+        "innerWithdrawQueue()",
+        "lowerResourceCap(address,uint256)",
+        "maxDeposit()",
+        "maxWithdraw()",
+        "pauseResource(address)",
+        "raiseResourceCap(address,uint256)",
+        "removeResource(address)",
+        "resourceCap(address)",
+        "resourceConfig(address)",
+        "resources()",
+        "setBlocksPerYear(uint256)",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "spotAPYBps()",
+        "sweep(address,address)",
+        "totalAssets()",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)",
+        "withdraw(uint256,address)",
+        "withdrawResource(address,uint256,address)"
+      ]
+    },
+    {
+      "name": "CoreSource_USDC",
+      "addresses": {
+        "bscmainnet": [
+          "0x299D9Be7CEfff91c68F13F267d525CFC18e965ef"
+        ]
+      },
+      "signatures": [
+        "accessControlManager()",
+        "accrue()",
+        "addResource(address,address)",
+        "asset()",
+        "blocksPerYear()",
+        "deposit(uint256)",
+        "depositResource(address,uint256)",
+        "dispatchDepositExternal(address,address,uint256)",
+        "dispatchWithdrawExternal(address,address,uint256,address)",
+        "hub()",
+        "initialize(address,address,uint256,address)",
+        "innerDepositQueue()",
+        "innerWithdrawQueue()",
+        "lowerResourceCap(address,uint256)",
+        "maxDeposit()",
+        "maxWithdraw()",
+        "pauseResource(address)",
+        "raiseResourceCap(address,uint256)",
+        "removeResource(address)",
+        "resourceCap(address)",
+        "resourceConfig(address)",
+        "resources()",
+        "setBlocksPerYear(uint256)",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "spotAPYBps()",
+        "sweep(address,address)",
+        "totalAssets()",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)",
+        "withdraw(uint256,address)",
+        "withdrawResource(address,uint256,address)"
+      ]
+    },
+    {
+      "name": "CoreSource_USDT",
+      "addresses": {
+        "bscmainnet": [
+          "0xC9E6ceD9589363f8dC5695Be2C79AB4dDaECC94B"
+        ],
+        "bsctestnet": [
+          "0x11e39DC7b8b16BBDA8D9C2903dF741Ae9341Ec88"
+        ]
+      },
+      "signatures": [
+        "accessControlManager()",
+        "accrue()",
+        "addResource(address,address)",
+        "asset()",
+        "blocksPerYear()",
+        "deposit(uint256)",
+        "depositResource(address,uint256)",
+        "dispatchDepositExternal(address,address,uint256)",
+        "dispatchWithdrawExternal(address,address,uint256,address)",
+        "hub()",
+        "initialize(address,address,uint256,address)",
+        "innerDepositQueue()",
+        "innerWithdrawQueue()",
+        "lowerResourceCap(address,uint256)",
+        "maxDeposit()",
+        "maxWithdraw()",
+        "pauseResource(address)",
+        "raiseResourceCap(address,uint256)",
+        "removeResource(address)",
+        "resourceCap(address)",
+        "resourceConfig(address)",
+        "resources()",
+        "setBlocksPerYear(uint256)",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "spotAPYBps()",
+        "sweep(address,address)",
+        "totalAssets()",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)",
+        "withdraw(uint256,address)",
+        "withdrawResource(address,uint256,address)"
+      ]
+    },
+    {
       "name": "CorrelatedTokenOracle",
       "addresses": {},
       "signatures": [
@@ -5446,6 +5665,141 @@
       ]
     },
     {
+      "name": "FRVBeacon",
+      "addresses": {
+        "bscmainnet": [
+          "0x8A5EceDD726246682402430b9B24c19bF61B7f1d"
+        ],
+        "bsctestnet": [
+          "0x6196Ec22133610132563B03b6Fad5aa766A9C037"
+        ]
+      },
+      "signatures": [
+        "implementation()",
+        "owner()",
+        "renounceOwnership()",
+        "transferOwnership(address)",
+        "upgradeTo(address)"
+      ]
+    },
+    {
+      "name": "FRVSource_U",
+      "addresses": {
+        "bscmainnet": [
+          "0x30908eddB9E94add7AC9944a0adda66d80B89143"
+        ]
+      },
+      "signatures": [
+        "accessControlManager()",
+        "accrue()",
+        "addResource(address,address)",
+        "asset()",
+        "deposit(uint256)",
+        "depositResource(address,uint256)",
+        "dispatchDepositExternal(address,address,uint256)",
+        "dispatchWithdrawExternal(address,address,uint256,address)",
+        "forceRemoveResource(address)",
+        "hub()",
+        "initialize(address,address,address)",
+        "innerDepositQueue()",
+        "innerWithdrawQueue()",
+        "maxDeposit()",
+        "maxWithdraw()",
+        "pauseResource(address)",
+        "removeResource(address)",
+        "resourceConfig(address)",
+        "resources()",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "spotAPYBps()",
+        "sweep(address,address)",
+        "totalAssets()",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)",
+        "withdraw(uint256,address)",
+        "withdrawResource(address,uint256,address)"
+      ]
+    },
+    {
+      "name": "FRVSource_USDC",
+      "addresses": {
+        "bscmainnet": [
+          "0x438388847eE16850Ab4f5b82dc7954c0d043B716"
+        ]
+      },
+      "signatures": [
+        "accessControlManager()",
+        "accrue()",
+        "addResource(address,address)",
+        "asset()",
+        "deposit(uint256)",
+        "depositResource(address,uint256)",
+        "dispatchDepositExternal(address,address,uint256)",
+        "dispatchWithdrawExternal(address,address,uint256,address)",
+        "forceRemoveResource(address)",
+        "hub()",
+        "initialize(address,address,address)",
+        "innerDepositQueue()",
+        "innerWithdrawQueue()",
+        "maxDeposit()",
+        "maxWithdraw()",
+        "pauseResource(address)",
+        "removeResource(address)",
+        "resourceConfig(address)",
+        "resources()",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "spotAPYBps()",
+        "sweep(address,address)",
+        "totalAssets()",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)",
+        "withdraw(uint256,address)",
+        "withdrawResource(address,uint256,address)"
+      ]
+    },
+    {
+      "name": "FRVSource_USDT",
+      "addresses": {
+        "bscmainnet": [
+          "0x621eF38cE0C4e7060fF0bF3D609E3D46EC144bE7"
+        ],
+        "bsctestnet": [
+          "0xA0Fb0fFeBdcB7F45A3Ec841cCE7F78B7CeBD0f82"
+        ]
+      },
+      "signatures": [
+        "accessControlManager()",
+        "accrue()",
+        "addResource(address,address)",
+        "asset()",
+        "deposit(uint256)",
+        "depositResource(address,uint256)",
+        "dispatchDepositExternal(address,address,uint256)",
+        "dispatchWithdrawExternal(address,address,uint256,address)",
+        "forceRemoveResource(address)",
+        "hub()",
+        "initialize(address,address,address)",
+        "innerDepositQueue()",
+        "innerWithdrawQueue()",
+        "maxDeposit()",
+        "maxWithdraw()",
+        "pauseResource(address)",
+        "removeResource(address)",
+        "resourceConfig(address)",
+        "resources()",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "spotAPYBps()",
+        "sweep(address,address)",
+        "totalAssets()",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)",
+        "withdraw(uint256,address)",
+        "withdrawResource(address,uint256,address)"
+      ]
+    },
+    {
       "name": "FastTrackTimelock",
       "addresses": {
         "arbitrumone": [
@@ -5575,6 +5929,153 @@
         "venusSupplySpeeds(address)",
         "venusSupplyState(address)",
         "venusVAIVaultRate()"
+      ]
+    },
+    {
+      "name": "FluxBeacon",
+      "addresses": {
+        "bscmainnet": [
+          "0x9bb6a3Ac5955fA8dc236560CA9D51483d1d79f15"
+        ],
+        "bsctestnet": [
+          "0x6b9CA74F82848668EA04D56E0A8396A816ba5330"
+        ]
+      },
+      "signatures": [
+        "implementation()",
+        "owner()",
+        "renounceOwnership()",
+        "transferOwnership(address)",
+        "upgradeTo(address)"
+      ]
+    },
+    {
+      "name": "FluxSource_U",
+      "addresses": {
+        "bscmainnet": [
+          "0xe31B8851c3fa9B3dD39a04a2ed9493869A410616"
+        ]
+      },
+      "signatures": [
+        "accessControlManager()",
+        "accrue()",
+        "addResource(address,address)",
+        "asset()",
+        "blocksPerYear()",
+        "deposit(uint256)",
+        "depositResource(address,uint256)",
+        "dispatchDepositExternal(address,address,uint256)",
+        "dispatchWithdrawExternal(address,address,uint256,address)",
+        "hub()",
+        "initialize(address,address,uint256,address)",
+        "innerDepositQueue()",
+        "innerWithdrawQueue()",
+        "lowerResourceCap(address,uint256)",
+        "maxDeposit()",
+        "maxWithdraw()",
+        "pauseResource(address)",
+        "raiseResourceCap(address,uint256)",
+        "removeResource(address)",
+        "resourceCap(address)",
+        "resourceConfig(address)",
+        "resources()",
+        "setBlocksPerYear(uint256)",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "spotAPYBps()",
+        "sweep(address,address)",
+        "totalAssets()",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)",
+        "withdraw(uint256,address)",
+        "withdrawResource(address,uint256,address)"
+      ]
+    },
+    {
+      "name": "FluxSource_USDC",
+      "addresses": {
+        "bscmainnet": [
+          "0xA65bB4b20542268B64CF08871a98D75342AFE927"
+        ]
+      },
+      "signatures": [
+        "accessControlManager()",
+        "accrue()",
+        "addResource(address,address)",
+        "asset()",
+        "blocksPerYear()",
+        "deposit(uint256)",
+        "depositResource(address,uint256)",
+        "dispatchDepositExternal(address,address,uint256)",
+        "dispatchWithdrawExternal(address,address,uint256,address)",
+        "hub()",
+        "initialize(address,address,uint256,address)",
+        "innerDepositQueue()",
+        "innerWithdrawQueue()",
+        "lowerResourceCap(address,uint256)",
+        "maxDeposit()",
+        "maxWithdraw()",
+        "pauseResource(address)",
+        "raiseResourceCap(address,uint256)",
+        "removeResource(address)",
+        "resourceCap(address)",
+        "resourceConfig(address)",
+        "resources()",
+        "setBlocksPerYear(uint256)",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "spotAPYBps()",
+        "sweep(address,address)",
+        "totalAssets()",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)",
+        "withdraw(uint256,address)",
+        "withdrawResource(address,uint256,address)"
+      ]
+    },
+    {
+      "name": "FluxSource_USDT",
+      "addresses": {
+        "bscmainnet": [
+          "0xe3df38E12E37ED80E1b3ccf2bdf84F9e1527ce14"
+        ],
+        "bsctestnet": [
+          "0x044E572144bc08ed2D90E081EeEd7b5b6Cb01016"
+        ]
+      },
+      "signatures": [
+        "accessControlManager()",
+        "accrue()",
+        "addResource(address,address)",
+        "asset()",
+        "blocksPerYear()",
+        "deposit(uint256)",
+        "depositResource(address,uint256)",
+        "dispatchDepositExternal(address,address,uint256)",
+        "dispatchWithdrawExternal(address,address,uint256,address)",
+        "hub()",
+        "initialize(address,address,uint256,address)",
+        "innerDepositQueue()",
+        "innerWithdrawQueue()",
+        "lowerResourceCap(address,uint256)",
+        "maxDeposit()",
+        "maxWithdraw()",
+        "pauseResource(address)",
+        "raiseResourceCap(address,uint256)",
+        "removeResource(address)",
+        "resourceCap(address)",
+        "resourceConfig(address)",
+        "resources()",
+        "setBlocksPerYear(uint256)",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "spotAPYBps()",
+        "sweep(address,address)",
+        "totalAssets()",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)",
+        "withdraw(uint256,address)",
+        "withdrawResource(address,uint256,address)"
       ]
     },
     {
@@ -5834,6 +6335,469 @@
         "admin()",
         "implementation()",
         "pendingAdmin()"
+      ]
+    },
+    {
+      "name": "Hub",
+      "addresses": {},
+      "signatures": [
+        "addYieldGroup(address,uint256,uint16)",
+        "emergencyReallocate((address,address,uint256)[],(address,address,uint256)[])",
+        "lowerMaxWithdrawalSize(uint256)",
+        "lowerYieldGroupCap(address,uint256,uint16)",
+        "pauseHub()",
+        "pauseYieldGroup(address)",
+        "raiseMaxWithdrawalSize(uint256)",
+        "raiseYieldGroupCap(address,uint256,uint16)",
+        "reallocate((address,address,uint256)[],(address,address,uint256)[])",
+        "removeYieldGroup(address)",
+        "setFeeRecipient(address)",
+        "setManagementFeeBps(uint16)",
+        "setOuterDepositQueue(address[])",
+        "setOuterWithdrawQueue(address[])",
+        "setPerformanceFeeBps(uint16)",
+        "setRedeemFeeBps(uint16)",
+        "sweep(address,address)",
+        "unpauseHub()",
+        "unpauseYieldGroup(address)"
+      ]
+    },
+    {
+      "name": "HubBeacon",
+      "addresses": {
+        "bscmainnet": [
+          "0x0f20e1004962e2DF16c16FC15460Dc6480626321"
+        ],
+        "bsctestnet": [
+          "0x7cbaC6991aC33DaFDD347e84CFbE2F372b936d92"
+        ]
+      },
+      "signatures": [
+        "implementation()",
+        "owner()",
+        "renounceOwnership()",
+        "transferOwnership(address)",
+        "upgradeTo(address)"
+      ]
+    },
+    {
+      "name": "HubImpl",
+      "addresses": {
+        "bscmainnet": [
+          "0x44BCabAF2e63A7B883EDeA6A721d47b4bC081d02"
+        ],
+        "bsctestnet": [
+          "0x9Ea3900fC0a413eFCe485F19d8681498b9600A41"
+        ]
+      },
+      "signatures": [
+        "BPS_DENOMINATOR()",
+        "EXP_SCALE()",
+        "MAX_DECIMALS_OFFSET()",
+        "MAX_FEE_BPS()",
+        "MAX_MGMT_FEE_PER_ACCRUAL_BPS()",
+        "MAX_REDEEM_FEE_BPS()",
+        "SECONDS_PER_YEAR()",
+        "acceptOwnership()",
+        "accessControlManager()",
+        "accrueFees()",
+        "addYieldGroup(address,uint256,uint16)",
+        "allowance(address,address)",
+        "approve(address,uint256)",
+        "asset()",
+        "balanceOf(address)",
+        "convertToAssets(uint256)",
+        "convertToShares(uint256)",
+        "decimals()",
+        "decreaseAllowance(address,uint256)",
+        "deposit(uint256,address)",
+        "depositWithConsent(uint256,address,bytes32)",
+        "emergencyReallocate(tuple[],tuple[])",
+        "feeBps()",
+        "feeRecipient()",
+        "highWaterMarkPerShare()",
+        "hubPaused()",
+        "increaseAllowance(address,uint256)",
+        "initialize(address,string,string,address,uint8,uint256,address)",
+        "lowerMaxWithdrawalSize(uint256)",
+        "lowerYieldGroupCap(address,uint256,uint16)",
+        "maxDeposit(address)",
+        "maxMint(address)",
+        "maxRedeem(address)",
+        "maxWithdraw(address)",
+        "maxWithdrawalSize()",
+        "mint(uint256,address)",
+        "mintWithConsent(uint256,address,bytes32)",
+        "name()",
+        "outerDepositQueue()",
+        "outerWithdrawQueue()",
+        "owner()",
+        "pauseHub()",
+        "pauseYieldGroup(address)",
+        "pendingOwner()",
+        "previewDeposit(uint256)",
+        "previewMint(uint256)",
+        "previewRedeem(uint256)",
+        "previewWithdraw(uint256)",
+        "raiseMaxWithdrawalSize(uint256)",
+        "raiseYieldGroupCap(address,uint256,uint16)",
+        "reallocate(tuple[],tuple[])",
+        "redeem(uint256,address,address)",
+        "redeemFeeBps()",
+        "registeredYieldGroups()",
+        "removeYieldGroup(address)",
+        "renounceOwnership()",
+        "setAccessControlManager(address)",
+        "setFeeRecipient(address)",
+        "setManagementFeeBps(uint16)",
+        "setOuterDepositQueue(address[])",
+        "setOuterWithdrawQueue(address[])",
+        "setPerformanceFeeBps(uint16)",
+        "setRedeemFeeBps(uint16)",
+        "sweep(address,address)",
+        "symbol()",
+        "totalAssets()",
+        "totalSupply()",
+        "transfer(address,uint256)",
+        "transferFrom(address,address,uint256)",
+        "transferOwnership(address)",
+        "unpauseHub()",
+        "unpauseYieldGroup(address)",
+        "withdraw(uint256,address,address)",
+        "yieldGroupConfig(address)",
+        "yieldGroupEffectiveCap(address)"
+      ]
+    },
+    {
+      "name": "HubRegistry",
+      "addresses": {
+        "bscmainnet": [
+          "0x6D93Fd479f2d37445CFBe132412e316a0364acc2"
+        ],
+        "bsctestnet": [
+          "0x5346f648029d1D1d1034e09e8AD7a115f5D7A159"
+        ]
+      },
+      "signatures": [
+        "acceptOwnership()",
+        "accessControlManager()",
+        "addHub(address)",
+        "assetForHub(address)",
+        "getHubs()",
+        "getHubsCount()",
+        "hubForAsset(address)",
+        "initialize(address)",
+        "isHub(address)",
+        "owner()",
+        "pendingOwner()",
+        "removeHub(address)",
+        "renounceOwnership()",
+        "setAccessControlManager(address)",
+        "transferOwnership(address)"
+      ]
+    },
+    {
+      "name": "HubRegistryImpl",
+      "addresses": {
+        "bscmainnet": [
+          "0x4426a09d5425ca2103896A88C1e9a1F5779a4d3a"
+        ],
+        "bsctestnet": [
+          "0x4D2C18fB4520c2e4f7C754979e9a4F3BbC1BCe92"
+        ]
+      },
+      "signatures": [
+        "acceptOwnership()",
+        "accessControlManager()",
+        "addHub(address)",
+        "assetForHub(address)",
+        "getHubs()",
+        "getHubsCount()",
+        "hubForAsset(address)",
+        "initialize(address)",
+        "isHub(address)",
+        "owner()",
+        "pendingOwner()",
+        "removeHub(address)",
+        "renounceOwnership()",
+        "setAccessControlManager(address)",
+        "transferOwnership(address)"
+      ]
+    },
+    {
+      "name": "HubRegistryProxyAdmin",
+      "addresses": {
+        "bsctestnet": [
+          "0x9f8413eEE33D434F6D4f40C83181f32A831c9ef7"
+        ]
+      },
+      "signatures": [
+        "changeProxyAdmin(address,address)",
+        "getProxyAdmin(address)",
+        "getProxyImplementation(address)",
+        "owner()",
+        "renounceOwnership()",
+        "transferOwnership(address)",
+        "upgrade(address,address)",
+        "upgradeAndCall(address,address,bytes)"
+      ]
+    },
+    {
+      "name": "Hub_U",
+      "addresses": {
+        "bscmainnet": [
+          "0x0e5AA174d4F31b757a237eb1999DE151596788B0"
+        ]
+      },
+      "signatures": [
+        "BPS_DENOMINATOR()",
+        "EXP_SCALE()",
+        "MAX_DECIMALS_OFFSET()",
+        "MAX_FEE_BPS()",
+        "MAX_MGMT_FEE_PER_ACCRUAL_BPS()",
+        "MAX_REDEEM_FEE_BPS()",
+        "SECONDS_PER_YEAR()",
+        "acceptOwnership()",
+        "accessControlManager()",
+        "accrueFees()",
+        "addYieldGroup(address,uint256,uint16)",
+        "allowance(address,address)",
+        "approve(address,uint256)",
+        "asset()",
+        "balanceOf(address)",
+        "convertToAssets(uint256)",
+        "convertToShares(uint256)",
+        "decimals()",
+        "decreaseAllowance(address,uint256)",
+        "deposit(uint256,address)",
+        "depositWithConsent(uint256,address,bytes32)",
+        "emergencyReallocate(tuple[],tuple[])",
+        "feeBps()",
+        "feeRecipient()",
+        "highWaterMarkPerShare()",
+        "hubPaused()",
+        "increaseAllowance(address,uint256)",
+        "initialize(address,string,string,address,uint8,uint256,address)",
+        "lowerMaxWithdrawalSize(uint256)",
+        "lowerYieldGroupCap(address,uint256,uint16)",
+        "maxDeposit(address)",
+        "maxMint(address)",
+        "maxRedeem(address)",
+        "maxWithdraw(address)",
+        "maxWithdrawalSize()",
+        "mint(uint256,address)",
+        "mintWithConsent(uint256,address,bytes32)",
+        "name()",
+        "outerDepositQueue()",
+        "outerWithdrawQueue()",
+        "owner()",
+        "pauseHub()",
+        "pauseYieldGroup(address)",
+        "pendingOwner()",
+        "previewDeposit(uint256)",
+        "previewMint(uint256)",
+        "previewRedeem(uint256)",
+        "previewWithdraw(uint256)",
+        "raiseMaxWithdrawalSize(uint256)",
+        "raiseYieldGroupCap(address,uint256,uint16)",
+        "reallocate(tuple[],tuple[])",
+        "redeem(uint256,address,address)",
+        "redeemFeeBps()",
+        "registeredYieldGroups()",
+        "removeYieldGroup(address)",
+        "renounceOwnership()",
+        "setAccessControlManager(address)",
+        "setFeeRecipient(address)",
+        "setManagementFeeBps(uint16)",
+        "setOuterDepositQueue(address[])",
+        "setOuterWithdrawQueue(address[])",
+        "setPerformanceFeeBps(uint16)",
+        "setRedeemFeeBps(uint16)",
+        "sweep(address,address)",
+        "symbol()",
+        "totalAssets()",
+        "totalSupply()",
+        "transfer(address,uint256)",
+        "transferFrom(address,address,uint256)",
+        "transferOwnership(address)",
+        "unpauseHub()",
+        "unpauseYieldGroup(address)",
+        "withdraw(uint256,address,address)",
+        "yieldGroupConfig(address)",
+        "yieldGroupEffectiveCap(address)"
+      ]
+    },
+    {
+      "name": "Hub_USDC",
+      "addresses": {
+        "bscmainnet": [
+          "0x9D2D9592cF8DFbf59107fAab703d08494BE14617"
+        ]
+      },
+      "signatures": [
+        "BPS_DENOMINATOR()",
+        "EXP_SCALE()",
+        "MAX_DECIMALS_OFFSET()",
+        "MAX_FEE_BPS()",
+        "MAX_MGMT_FEE_PER_ACCRUAL_BPS()",
+        "MAX_REDEEM_FEE_BPS()",
+        "SECONDS_PER_YEAR()",
+        "acceptOwnership()",
+        "accessControlManager()",
+        "accrueFees()",
+        "addYieldGroup(address,uint256,uint16)",
+        "allowance(address,address)",
+        "approve(address,uint256)",
+        "asset()",
+        "balanceOf(address)",
+        "convertToAssets(uint256)",
+        "convertToShares(uint256)",
+        "decimals()",
+        "decreaseAllowance(address,uint256)",
+        "deposit(uint256,address)",
+        "depositWithConsent(uint256,address,bytes32)",
+        "emergencyReallocate(tuple[],tuple[])",
+        "feeBps()",
+        "feeRecipient()",
+        "highWaterMarkPerShare()",
+        "hubPaused()",
+        "increaseAllowance(address,uint256)",
+        "initialize(address,string,string,address,uint8,uint256,address)",
+        "lowerMaxWithdrawalSize(uint256)",
+        "lowerYieldGroupCap(address,uint256,uint16)",
+        "maxDeposit(address)",
+        "maxMint(address)",
+        "maxRedeem(address)",
+        "maxWithdraw(address)",
+        "maxWithdrawalSize()",
+        "mint(uint256,address)",
+        "mintWithConsent(uint256,address,bytes32)",
+        "name()",
+        "outerDepositQueue()",
+        "outerWithdrawQueue()",
+        "owner()",
+        "pauseHub()",
+        "pauseYieldGroup(address)",
+        "pendingOwner()",
+        "previewDeposit(uint256)",
+        "previewMint(uint256)",
+        "previewRedeem(uint256)",
+        "previewWithdraw(uint256)",
+        "raiseMaxWithdrawalSize(uint256)",
+        "raiseYieldGroupCap(address,uint256,uint16)",
+        "reallocate(tuple[],tuple[])",
+        "redeem(uint256,address,address)",
+        "redeemFeeBps()",
+        "registeredYieldGroups()",
+        "removeYieldGroup(address)",
+        "renounceOwnership()",
+        "setAccessControlManager(address)",
+        "setFeeRecipient(address)",
+        "setManagementFeeBps(uint16)",
+        "setOuterDepositQueue(address[])",
+        "setOuterWithdrawQueue(address[])",
+        "setPerformanceFeeBps(uint16)",
+        "setRedeemFeeBps(uint16)",
+        "sweep(address,address)",
+        "symbol()",
+        "totalAssets()",
+        "totalSupply()",
+        "transfer(address,uint256)",
+        "transferFrom(address,address,uint256)",
+        "transferOwnership(address)",
+        "unpauseHub()",
+        "unpauseYieldGroup(address)",
+        "withdraw(uint256,address,address)",
+        "yieldGroupConfig(address)",
+        "yieldGroupEffectiveCap(address)"
+      ]
+    },
+    {
+      "name": "Hub_USDT",
+      "addresses": {
+        "bscmainnet": [
+          "0x18AfDACF30F8671021dec4b78297E39d2FE87226"
+        ],
+        "bsctestnet": [
+          "0x7cE6ADF754D0eC81A6CF8ACd9C7454F45077dc61"
+        ]
+      },
+      "signatures": [
+        "BPS_DENOMINATOR()",
+        "EXP_SCALE()",
+        "MAX_DECIMALS_OFFSET()",
+        "MAX_FEE_BPS()",
+        "MAX_MGMT_FEE_PER_ACCRUAL_BPS()",
+        "MAX_REDEEM_FEE_BPS()",
+        "SECONDS_PER_YEAR()",
+        "acceptOwnership()",
+        "accessControlManager()",
+        "accrueFees()",
+        "addYieldGroup(address,uint256,uint16)",
+        "allowance(address,address)",
+        "approve(address,uint256)",
+        "asset()",
+        "balanceOf(address)",
+        "convertToAssets(uint256)",
+        "convertToShares(uint256)",
+        "decimals()",
+        "decreaseAllowance(address,uint256)",
+        "deposit(uint256,address)",
+        "depositWithConsent(uint256,address,bytes32)",
+        "emergencyReallocate(tuple[],tuple[])",
+        "feeBps()",
+        "feeRecipient()",
+        "highWaterMarkPerShare()",
+        "hubPaused()",
+        "increaseAllowance(address,uint256)",
+        "initialize(address,string,string,address,uint8,uint256,address)",
+        "lowerMaxWithdrawalSize(uint256)",
+        "lowerYieldGroupCap(address,uint256,uint16)",
+        "maxDeposit(address)",
+        "maxMint(address)",
+        "maxRedeem(address)",
+        "maxWithdraw(address)",
+        "maxWithdrawalSize()",
+        "mint(uint256,address)",
+        "mintWithConsent(uint256,address,bytes32)",
+        "name()",
+        "outerDepositQueue()",
+        "outerWithdrawQueue()",
+        "owner()",
+        "pauseHub()",
+        "pauseYieldGroup(address)",
+        "pendingOwner()",
+        "previewDeposit(uint256)",
+        "previewMint(uint256)",
+        "previewRedeem(uint256)",
+        "previewWithdraw(uint256)",
+        "raiseMaxWithdrawalSize(uint256)",
+        "raiseYieldGroupCap(address,uint256,uint16)",
+        "reallocate(tuple[],tuple[])",
+        "redeem(uint256,address,address)",
+        "redeemFeeBps()",
+        "registeredYieldGroups()",
+        "removeYieldGroup(address)",
+        "renounceOwnership()",
+        "setAccessControlManager(address)",
+        "setFeeRecipient(address)",
+        "setManagementFeeBps(uint16)",
+        "setOuterDepositQueue(address[])",
+        "setOuterWithdrawQueue(address[])",
+        "setPerformanceFeeBps(uint16)",
+        "setRedeemFeeBps(uint16)",
+        "sweep(address,address)",
+        "symbol()",
+        "totalAssets()",
+        "totalSupply()",
+        "transfer(address,uint256)",
+        "transferFrom(address,address,uint256)",
+        "transferOwnership(address)",
+        "unpauseHub()",
+        "unpauseYieldGroup(address)",
+        "withdraw(uint256,address,address)",
+        "yieldGroupConfig(address)",
+        "yieldGroupEffectiveCap(address)"
       ]
     },
     {
@@ -12055,6 +13019,25 @@
       "signatures": [
         "_supportMarket(address)",
         "unlistMarket(address)"
+      ]
+    },
+    {
+      "name": "Migrator",
+      "addresses": {
+        "bscmainnet": [
+          "0xfe6b8BEf1215C19Cd247FbF495ef560932F1Eb9B"
+        ],
+        "bsctestnet": [
+          "0x343D518d8C89f9B5D770000F1ed80f45bF1419f5"
+        ]
+      },
+      "signatures": [
+        "VBNB()",
+        "WBNB()",
+        "migrateFromCore(address,uint256,address,address,uint256)",
+        "migrateFromCoreBNB(uint256,address,address,uint256)",
+        "migrateFromCoreBNBWithConsent(uint256,address,address,uint256,bytes32)",
+        "migrateFromCoreWithConsent(address,uint256,address,address,uint256,bytes32)"
       ]
     },
     {
@@ -29135,6 +30118,167 @@
         "implementation()",
         "pendingAdmin()",
         "pendingImplementation()"
+      ]
+    },
+    {
+      "name": "YieldGroup",
+      "addresses": {},
+      "signatures": [
+        "lowerResourceCap(address,uint256)",
+        "raiseResourceCap(address,uint256)",
+        "setBlocksPerYear(uint256)"
+      ]
+    },
+    {
+      "name": "YieldGroupBase",
+      "addresses": {},
+      "signatures": [
+        "addResource(address,address)",
+        "pauseResource(address)",
+        "removeResource(address)",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "sweep(address,address)",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)"
+      ]
+    },
+    {
+      "name": "YieldGroupCoreImpl",
+      "addresses": {
+        "bscmainnet": [
+          "0x3BccED778CAaf97AE8ff8Bedc16d2165aA15771b"
+        ],
+        "bsctestnet": [
+          "0x96b839765b7bc062e354f57c8F9f7Be328C4fb63"
+        ]
+      },
+      "signatures": [
+        "accessControlManager()",
+        "accrue()",
+        "addResource(address,address)",
+        "asset()",
+        "blocksPerYear()",
+        "deposit(uint256)",
+        "depositResource(address,uint256)",
+        "dispatchDepositExternal(address,address,uint256)",
+        "dispatchWithdrawExternal(address,address,uint256,address)",
+        "hub()",
+        "initialize(address,address,uint256,address)",
+        "innerDepositQueue()",
+        "innerWithdrawQueue()",
+        "lowerResourceCap(address,uint256)",
+        "maxDeposit()",
+        "maxWithdraw()",
+        "pauseResource(address)",
+        "raiseResourceCap(address,uint256)",
+        "removeResource(address)",
+        "resourceCap(address)",
+        "resourceConfig(address)",
+        "resources()",
+        "setBlocksPerYear(uint256)",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "spotAPYBps()",
+        "sweep(address,address)",
+        "totalAssets()",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)",
+        "withdraw(uint256,address)",
+        "withdrawResource(address,uint256,address)"
+      ]
+    },
+    {
+      "name": "YieldGroupFRV",
+      "addresses": {},
+      "signatures": [
+        "forceRemoveResource(address)"
+      ]
+    },
+    {
+      "name": "YieldGroupFRVImpl",
+      "addresses": {
+        "bscmainnet": [
+          "0x72D115b1Be69a2065fED0B0574F95B3E46BD4502"
+        ],
+        "bsctestnet": [
+          "0x4fC5cFafCa279777DfF65f7D7e19205d3785304C"
+        ]
+      },
+      "signatures": [
+        "accessControlManager()",
+        "accrue()",
+        "addResource(address,address)",
+        "asset()",
+        "deposit(uint256)",
+        "depositResource(address,uint256)",
+        "dispatchDepositExternal(address,address,uint256)",
+        "dispatchWithdrawExternal(address,address,uint256,address)",
+        "forceRemoveResource(address)",
+        "hub()",
+        "initialize(address,address,address)",
+        "innerDepositQueue()",
+        "innerWithdrawQueue()",
+        "maxDeposit()",
+        "maxWithdraw()",
+        "pauseResource(address)",
+        "removeResource(address)",
+        "resourceConfig(address)",
+        "resources()",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "spotAPYBps()",
+        "sweep(address,address)",
+        "totalAssets()",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)",
+        "withdraw(uint256,address)",
+        "withdrawResource(address,uint256,address)"
+      ]
+    },
+    {
+      "name": "YieldGroupFluxImpl",
+      "addresses": {
+        "bscmainnet": [
+          "0xFD49a719E0bF7f588F77bBEdf10dd8E843774499"
+        ],
+        "bsctestnet": [
+          "0xEe52fb9ec5bcD6868a3D7f2FBb3e71e9D6Fc97dd"
+        ]
+      },
+      "signatures": [
+        "accessControlManager()",
+        "accrue()",
+        "addResource(address,address)",
+        "asset()",
+        "blocksPerYear()",
+        "deposit(uint256)",
+        "depositResource(address,uint256)",
+        "dispatchDepositExternal(address,address,uint256)",
+        "dispatchWithdrawExternal(address,address,uint256,address)",
+        "hub()",
+        "initialize(address,address,uint256,address)",
+        "innerDepositQueue()",
+        "innerWithdrawQueue()",
+        "lowerResourceCap(address,uint256)",
+        "maxDeposit()",
+        "maxWithdraw()",
+        "pauseResource(address)",
+        "raiseResourceCap(address,uint256)",
+        "removeResource(address)",
+        "resourceCap(address)",
+        "resourceConfig(address)",
+        "resources()",
+        "setBlocksPerYear(uint256)",
+        "setInnerDepositQueue(address[])",
+        "setInnerWithdrawQueue(address[])",
+        "spotAPYBps()",
+        "sweep(address,address)",
+        "totalAssets()",
+        "unpauseResource(address)",
+        "updateResourceAdapter(address,address)",
+        "withdraw(uint256,address)",
+        "withdrawResource(address,uint256,address)"
       ]
     },
     {
