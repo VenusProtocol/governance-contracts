@@ -79,18 +79,15 @@ Deployed contract abis and addresses are exported in the `deployments` directory
 $ yarn hardhat export --network <network-name> --export ./deployments/<network-name>.json
 ```
 
-### Permissions Fetcher Tool
+### ACM Permissions Tool
 
-To fetch all permissions, run the following command:
-
-```
-$ npx hardhat run scripts/ACMPermissions/index.ts --network <network-nme>
-```
-
-To fetch only timelock permissions excluding guardian, run:
+`scripts/acm-permissions/` maintains a committed snapshot of every Access Control Manager permission
+on each supported network. See its [README](scripts/acm-permissions/README.md) for the full guide.
 
 ```
-$ npx hardhat run scripts/ACMPermissions/fetchNonGuardianPermissions.ts --network <network-nme>
+$ yarn acm:fetch --network <network-name>   # scan new grants/revokes into the snapshot
+$ yarn acm:verify --network <network-name>  # re-check every stored entry against the chain
+$ yarn acm:filter --network <network-name> --grantees Timelocks,Guardian
 ```
 
 ### Discussion
