@@ -4,7 +4,16 @@ import * as fs from "fs";
 import { parseArgs } from "node:util";
 import * as path from "path";
 
-import { REGISTRY_DIR, STARTING_BLOCKS, acmAddress, filtersDir, isLegacyAcm, rpcUrl, snapshotDir } from "./config";
+import {
+  DEFAULT_ADMIN_ROLE,
+  REGISTRY_DIR,
+  STARTING_BLOCKS,
+  acmAddress,
+  filtersDir,
+  isLegacyAcm,
+  rpcUrl,
+  snapshotDir,
+} from "./config";
 import { buildHashTable } from "./core/decoder";
 import { diffSnapshots } from "./core/diff";
 import { scanRange } from "./core/fetcher";
@@ -26,7 +35,7 @@ import { ACM_ABI, AcmLike, verifyAllAndFix, verifyDiff } from "./core/verifier";
 import { buildContractRegistry } from "./registry-builder/contracts";
 import { buildSignatures, flattenSignatures } from "./registry-builder/signatures";
 import { loadManifest, resolveSource } from "./registry-builder/sources";
-import { NETWORKS, Network, SnapshotFile } from "./types";
+import { NETWORKS, Network, SnapshotDiff, SnapshotFile } from "./types";
 
 // Ensures exactly one trailing newline (idempotent — callers that already append "\n"
 // themselves are unaffected) so every generated file matches prettier's EOF convention.
@@ -67,6 +76,17 @@ async function buildRegistry() {
     writeAtomic(path.join(REGISTRY_DIR, "contracts", `${n}.json`), JSON.stringify(reg, null, 2));
     console.log(`${n}: ${Object.keys(reg).length} named contracts`);
   }
+}
+
+// Only a diff-verify that actually made eth_calls may stamp the snapshot verified. A scan that
+// advanced the height without finding events produces an empty diff, so verifyDiff checked
+// nothing — carry the previous stamp through rather than claiming a fresh verification.
+export function verificationStamp(
+  diff: SnapshotDiff,
+  prev: SnapshotFile | null,
+): { verified?: boolean; verifiedAt?: string } {
+  if (diff.added.length + diff.removed.length === 0) return { verified: prev?.verified, verifiedAt: prev?.verifiedAt };
+  return { verified: true, verifiedAt: new Date().toISOString() };
 }
 
 type FetchResult =
@@ -122,12 +142,7 @@ async function fetchNetwork(
         `snapshot follows chain`,
     );
   }
-  // Diff-verify always runs when there were changes (above) and, having completed without
-  // throwing, has reconciled `state` against the chain (applying `corrections` where replay
-  // disagreed) — so the snapshot this run produces is verified on-chain as of right now,
-  // regardless of whether any corrections were needed.
-  const verifiedAt = new Date().toISOString();
-  const file = stateToFile(state, { ...meta(), height: scan.toBlock, verified: true, verifiedAt }, names);
+  const file = stateToFile(state, { ...meta(), height: scan.toBlock, ...verificationStamp(diff, prevFile) }, names);
   saveSnapshotFile(network, file);
   writePermissionsOutputs(network, file, names);
   return {
@@ -142,6 +157,21 @@ async function fetchNetwork(
 type VerifyResult =
   | { network: Network; status: "skipped" }
   | { network: Network; status: "ok"; verified: number; fixed: string[] };
+
+// One probe call before the sweep. A pruning node has no state at an older snapshot's block and
+// rejects every read, so without this the run burns its full retry budget on each of hundreds of
+// entries (hours on the larger networks) before reporting the same thing this says immediately.
+async function requireStateAt(acm: AcmLike, network: Network, height: number): Promise<void> {
+  try {
+    await acm.hasRole(DEFAULT_ADMIN_ROLE, acmAddress(network), { blockTag: height });
+  } catch (e) {
+    throw new Error(
+      `RPC has no state at block ${height} (the snapshot's height) — point ARCHIVE_NODE_${network} at an ` +
+        `archive node, or run \`yarn acm:fetch --network ${network}\` first to bring the snapshot to the ` +
+        `chain head. Underlying error: ${(e as Error).message}`,
+    );
+  }
+}
 
 // Full on-chain verification, chain-authoritative: every snapshot entry the chain denies is
 // dropped from the snapshot (the same correction fetch's diff-verify applies to false adds),
@@ -163,10 +193,14 @@ async function verifyNetwork(network: Network): Promise<VerifyResult> {
   const state = fileToState(file);
   const names = loadNameMap(network);
   const total = Object.values(state).reduce((sum, role) => sum + role.grantees.length, 0);
+  await requireStateAt(acm, network, file.height);
   // Human-readable labels for the fixed entries: logged here at fix time, and returned so the
   // final summary block can repeat them (in a parallel multi-network run, lines printed here
   // scroll away among the per-chunk logs).
-  const fixed = (await verifyAllAndFix(acm, network, state)).map(entry => {
+  // Pinned to the snapshot's own block: the snapshot describes state as of `height`, so checking
+  // it against `latest` would delete entries a later block revoked and leave the file labelled
+  // "as of height" while holding as-of-latest content.
+  const fixed = (await verifyAllAndFix(acm, network, state, { blockTag: file.height })).map(entry => {
     const contract = entry.contractAddress === null ? "UNRESOLVED" : nameFor(names, entry.contractAddress);
     const sig = entry.functionSig ?? entry.roleHash;
     return `${contract}.${sig} grantee ${nameFor(names, entry.account)}`;
@@ -334,8 +368,8 @@ async function fetchCommand(values: {
   let toBlock: number | undefined;
   if (values.to !== undefined) {
     toBlock = parseInt(values.to, 10);
-    if (!Number.isFinite(toBlock)) {
-      console.error(`invalid --to: ${values.to} — expected an integer block number`);
+    if (!Number.isFinite(toBlock) || toBlock < 0) {
+      console.error(`invalid --to: ${values.to} — expected a non-negative integer block number`);
       process.exit(2);
     }
   }

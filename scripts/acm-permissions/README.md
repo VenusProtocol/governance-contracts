@@ -44,7 +44,9 @@ that is already stored locally.
 
 `fetch` scans from the snapshot's last completed block to the requested block or current chain head.
 It applies grant and revoke events, verifies every changed entry against the same end block, and then
-writes the updated snapshot.
+writes the updated snapshot. A run that finds changes stamps the snapshot as verified; a run that only
+advances the block height without finding events verified nothing, so it carries the previous
+verification stamp through unchanged.
 
 ```bash
 yarn acm:fetch                                      # all networks, in parallel
@@ -76,6 +78,12 @@ yarn acm:verify --network bscmainnet,ethereum
 This is a full audit of stored entries. It can prove that an entry in the snapshot is still active,
 but it cannot find a permission missing from the snapshot; only event scanning can do that. Use
 `fetch --rebuild` if you suspect a gap in scan history.
+
+Every check is pinned to the snapshot's own block, so the result describes the same chain state the
+snapshot claims and `height` stays meaningful. That needs an RPC still holding state at that block.
+The public fallbacks prune, so on anything but a just-fetched snapshot either run `fetch` first or
+point `ARCHIVE_NODE_<network>` at an archive node. A single probe call runs before the sweep, so a
+node without that state fails in seconds with a message naming the fix, rather than part way in.
 
 ### Filter by grantee
 
