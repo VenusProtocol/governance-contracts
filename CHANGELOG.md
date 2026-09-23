@@ -1,3 +1,11 @@
+## 2.15.0-dev.3 (2026-09-23)
+
+* Merge pull request #178 from VenusProtocol/feat/code-complexity-gates ([2d0a591](https://github.com/VenusProtocol/governance-contracts/commit/2d0a591)), closes [#178](https://github.com/VenusProtocol/governance-contracts/issues/178)
+* refactor: replace guardian network chain with a lookup record ([9742608](https://github.com/VenusProtocol/governance-contracts/commit/9742608))
+* chore: enforce function complexity limits in eslint and sonarjs ([99b2126](https://github.com/VenusProtocol/governance-contracts/commit/99b2126))
+* chore: suppress cognitive complexity gate on getRoleHashTable ([240da67](https://github.com/VenusProtocol/governance-contracts/commit/240da67))
+* chore: suppress complexity gate on guardian network lookup ([a58720a](https://github.com/VenusProtocol/governance-contracts/commit/a58720a))
+
 ## 2.15.0-dev.2 (2026-06-29)
 
 * Merge pull request #175 from VenusProtocol/feat/increase-proposal-Threshold ([b35c8f0](https://github.com/VenusProtocol/governance-contracts/commit/b35c8f0)), closes [#175](https://github.com/VenusProtocol/governance-contracts/issues/175)
