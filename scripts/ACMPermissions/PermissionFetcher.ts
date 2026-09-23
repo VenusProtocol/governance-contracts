@@ -139,6 +139,7 @@ export class PermissionFetcher {
     return { account: decodedData[0], contractAddress: decodedData[1], functionSignature: decodedData[2] };
   }
 
+  // eslint-disable-next-line sonarjs/cognitive-complexity -- predates the complexity gates, tracked for refactor
   private getRoleHashTable(filePath: string): Record<string, Role> {
     const jsonData = fs.readFileSync(filePath, "utf8");
     const data = JSON.parse(jsonData);
