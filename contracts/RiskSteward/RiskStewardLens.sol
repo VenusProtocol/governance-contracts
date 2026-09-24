@@ -13,69 +13,35 @@ import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroll
 /**
  * @title RiskStewardLens
  * @author Venus
- * @notice Read-only view of a risk parameter update: the value on the market today, the value the update would set,
- *         whether it is applied right away or timelocked, and when it unlocks, or whether it has expired or is held
- *         back by debounce, by another pending update, or by a newer update that replaced it.
- * @dev Reports facts rather than predicting the receiver's verdict. The steward's `isSafeForDirectExecution` and
- *      the receiver's `isUpdateExecutable` are called directly. Only a few receiver rules are restated here: the
- *      pause, config-active, expiry, timelock, debounce, pending-update and latest-update rules, one or two lines each.
- *      If the receiver changes one of them, the matching part here has to change too. `previewUpdate` does not check
- *      whether the oracle would accept the update. It holds no state, so it can be redeployed, e.g. to decode a new
- *      update type.
+ * @notice Shows the current and proposed values of a risk update, plus when it can take effect.
+ * @dev Uses the steward and receiver for execution checks, but mirrors some receiver rules to preview unprocessed
+ *      updates. Keep those rules in sync with the receiver. `previewUpdate` does not validate oracle publication.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract RiskStewardLens {
     /**
-     * @notice Details of a risk parameter update
-     * @param updateId The oracle update ID. For `previewUpdate`, the ID the update would get if published now
-     * @param updateType The update type, e.g. `supplyCap`
-     * @param market The market the update targets
-     * @param status The update's status on the receiver; `None` means `processUpdate` has not run for it yet
-     * @param isRemote Whether the update is sent to another chain instead of being applied on this one
-     * @param isPaused Whether the receiver is paused. A pause stops only `processUpdate`, so it holds back an update
-     *        not yet processed but not the execution of one already pending
-     * @param isConfigActive Whether the receiver's config for the update type is active; a type never configured is
-     *        inactive. While it is off, `processUpdate` and `executeRegisteredUpdate` both reject the update. It can be
-     *        switched back on with its steward, timelock and debounce unchanged, so for an update not yet processed
-     *        the other fields still show what would happen then; only `executableNow` stays false. A type never
-     *        configured has no steward to ask, so those fields (`unlockTime`, `debounceEndsAt`, `blockingUpdateId`)
-     *        are left at 0
-     * @param executableNow Whether the next call would apply the change right away. For an update not yet processed,
-     *        whether `processUpdate` would apply it in the same call: the receiver is not paused, the config is
-     *        active, the steward's `isSafeForDirectExecution` passes, and neither debounce nor another pending update
-     *        holds it back. For a pending update, whether `executeRegisteredUpdate` would accept it now, from the
-     *        receiver's `isUpdateExecutable`. Always false for a remote update, which this chain only sends
-     * @param unlockTime When the update becomes executable. For an update not yet processed, the unlock time
-     *        `processUpdate` would set if called now. For a remote update, the time it is sent from this chain; the
-     *        destination receiver then holds it for its own `remoteDelay` after arrival
-     * @param expiresAt The last time the update's next step still accepts it; once it is in the past, the update can
-     *        no longer take effect. For an update not yet processed, the last time `processUpdate` accepts it: its
-     *        publish time plus `UPDATE_EXPIRATION_TIME`, minus the timelock, because the receiver rejects an update
-     *        that would expire before its timelock ends, even one it would apply right away. Once that has passed, the
-     *        fields that describe processing (`executableNow`, `unlockTime`, `debounceEndsAt`, `blockingUpdateId`)
-     *        are left at 0. Debounce or a blocking update can hold it back past this time: it can never be processed
-     *        if `debounceEndsAt` is later than `expiresAt`, and a blocker whose own `expiresAt` is not before this one
-     *        frees it in time only if an executor executes or rejects the blocker. For a pending update, the last time
-     *        `executeRegisteredUpdate` accepts it, and for a sent one the last time it can be resent: its publish time
-     *        plus `UPDATE_EXPIRATION_TIME`. 0 for an update that is executed, rejected or expired on the receiver, or
-     *        replaced, since there is nothing left for it to miss
-     * @param debounceEndsAt The earliest time `processUpdate` accepts an update for this market and type, counted
-     *        from the last one executed; it holds the update back only while it is in the future. 0 if none was
-     *        executed. Not applied to remote updates on this chain. 0 once the update is processed, because only
-     *        `processUpdate` checks debounce
-     * @param blockingUpdateId Another update for the same market and type that is still pending and unexpired. While
-     *        it exists, `processUpdate` rejects this one; 0 if there is none. Not applied to remote updates. 0 once
-     *        the update is processed, because only `processUpdate` checks it
-     * @param replacedByUpdateId A newer update published to the oracle for the same market and type. While it exists,
-     *        `processUpdate` rejects this one with `UpdateIsExpired`; 0 if there is none. When it is set, the fields that
-     *        describe processing (`executableNow`, `unlockTime`, `debounceEndsAt`, `blockingUpdateId`) are left at 0,
-     *        because this update will never be processed. Always 0 for `previewUpdate` and for an update already
-     *        processed
-     * @param currentValues The market's value today, in the same layout as `proposedValues`. Empty for a remote
-     *        update, because this lens cannot read a market on another chain, and for an update type it does not know
-     * @param proposedValues The value the update would set: `[cap]` for caps, `[collateralFactor,
-     *        liquidationThreshold]` for collateral factors, and `[uint160(interestRateModel)]` for an interest rate
-     *        model. Empty for an update type this lens does not know, or a value of the wrong length
+     * @notice Identity, values, and execution state of a risk update.
+     * @param updateId Oracle ID, or the next expected ID for a preview
+     * @param updateType Parameter name, such as `supplyCap`
+     * @param market Target market
+     * @param status Receiver status; `None` means the update has not been processed
+     * @param isRemote Whether this chain forwards the update to another chain
+     * @param isPaused Whether the receiver is paused; this blocks processing, not execution of pending updates
+     * @param isConfigActive Whether the update type is enabled on the receiver
+     * @param executableNow Whether processing would apply an unprocessed update now, or a pending update can execute
+     *        now. Always false for remote updates. Caller permissions are not checked
+     * @param unlockTime Unlock time stored for a processed update, or the time processing would set now. For remote
+     *        updates, this is the send time on this chain, before the destination's delay
+     * @param expiresAt Last time the next step accepts the update. Before processing, this is publication plus expiry
+     *        period minus timelock. Once pending or sent, it is publication plus expiry period. Zero when resolved or
+     *        replaced. Debounce or another pending update may block processing until after this time
+     * @param debounceEndsAt When the last execution's debounce ends; zero if none. Only applies before local processing
+     * @param blockingUpdateId Pending, unexpired update for this market and type; zero if none. Only applies before
+     *        local processing
+     * @param replacedByUpdateId Newer oracle update for this market and type; zero if none or already processed
+     * @param currentValues Current market values; empty for remote or unknown update types
+     * @param proposedValues Decoded values: `[cap]`, `[collateralFactor, liquidationThreshold]`, or
+     *        `[uint160(interestRateModel)]`. Empty for unknown types or an unexpected value length
      */
     struct UpdateDetails {
         uint256 updateId;
@@ -100,19 +66,19 @@ contract RiskStewardLens {
     bytes32 internal constant COLLATERAL_FACTORS_KEY = keccak256("collateralFactors");
     bytes32 internal constant INTEREST_RATE_MODEL_KEY = keccak256("interestRateModel");
 
-    /// @notice The receiver whose updates this lens describes
+    /// @notice Receiver queried by this lens.
     RiskStewardReceiver public immutable RISK_STEWARD_RECEIVER;
 
-    /// @notice The oracle the receiver reads updates from
+    /// @notice Oracle used by the receiver.
     IRiskOracle public immutable RISK_ORACLE;
 
-    /// @notice The core pool comptroller, needed because its `markets` getter has a different shape from isolated pools'
+    /// @notice Core pool comptroller, whose market data differs from isolated pools.
     address public immutable CORE_POOL_COMPTROLLER;
 
     /**
-     * @param riskStewardReceiver_ The RiskStewardReceiver to describe
-     * @param corePoolComptroller_ The core pool comptroller on this chain
-     * @custom:error Throws ZeroAddressNotAllowed if either address is zero
+     * @param riskStewardReceiver_ Receiver to query
+     * @param corePoolComptroller_ Core pool comptroller on this chain
+     * @custom:error ZeroAddressNotAllowed if either address is zero
      */
     constructor(RiskStewardReceiver riskStewardReceiver_, address corePoolComptroller_) {
         ensureNonzeroAddress(address(riskStewardReceiver_));
@@ -124,14 +90,11 @@ contract RiskStewardLens {
     }
 
     /**
-     * @notice Returns the details of an update already published to the oracle, at any stage: not yet processed,
-     *         registered and waiting on its timelock, or resolved
-     * @param updateId The oracle update ID
-     * @return details The update's details
-     * @custom:error Throws InvalidUpdateId (from the oracle) if the update does not exist
-     * @custom:error For an update not yet processed, throws the steward's error if it rejects the update
-     * @custom:error Throws PoolDoesNotExist (from the core pool comptroller) for an eMode update whose pool does not
-     *               exist; such an update can never be executed
+     * @notice Gets a published update's current values and execution state.
+     * @param updateId Oracle update ID
+     * @return details The update details
+     * @custom:error InvalidUpdateId if the oracle has no update with this ID
+     * @custom:error May forward a steward error for an unprocessed update, or PoolDoesNotExist for an unknown eMode pool
      */
     function getUpdateDetails(uint256 updateId) external view returns (UpdateDetails memory details) {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
@@ -146,7 +109,7 @@ contract RiskStewardLens {
         if (status == IRiskStewardReceiver.UpdateStatus.None) {
             uint256 latestId = RISK_ORACLE.getLatestUpdateIdByTypeAndMarket(update.updateType, update.market);
             if (latestId != updateId) {
-                // `processUpdate` rejects a replaced update outright, so there is no processing to preview.
+                // A newer update prevents this one from being processed.
                 details.replacedByUpdateId = latestId;
                 return details;
             }
@@ -157,21 +120,17 @@ contract RiskStewardLens {
     }
 
     /**
-     * @notice Previews an update before it is proposed, as if it were published to the oracle and processed now
-     * @dev Takes exactly the arguments of `RiskOracle.publishRiskParameterUpdate`, so a proposal's calldata can be
-     *      checked here by swapping the target and the selector.
-     * @param referenceId An external reference ID associated with the update
-     * @param newValue The encoded new value of the risk parameter
-     * @param updateType Type of update performed
-     * @param market Address for market of the parameter update
-     * @param poolId Pool identifier for eMode-style collateral configuration (0 for regular markets)
-     * @param dstEid Destination endpoint ID for cross-chain routing
-     * @param additionalData Additional data for the update
-     * @return details The update's details
-     * @custom:error Throws the steward's error if it rejects the update, e.g. `RedundantValue` for a value the market
-     *               already has
-     * @custom:error Throws PoolDoesNotExist (from the core pool comptroller) for an eMode update whose pool does not
-     *               exist; such an update can never be executed
+     * @notice Previews an update as if it were published and processed now.
+     * @dev Uses the same arguments as `RiskOracle.publishRiskParameterUpdate` for easy proposal checks.
+     * @param referenceId External reference ID
+     * @param newValue Encoded proposed value
+     * @param updateType Parameter name
+     * @param market Target market
+     * @param poolId eMode pool ID, or zero for a regular market
+     * @param dstEid Destination endpoint ID for a remote update
+     * @param additionalData Extra data passed with the update
+     * @return details The previewed details
+     * @custom:error May forward a steward error or PoolDoesNotExist for an unknown eMode pool
      */
     function previewUpdate(
         string memory referenceId,
@@ -202,10 +161,9 @@ contract RiskStewardLens {
     }
 
     /**
-     * @notice Builds the details that do not depend on the update's status on the receiver: identity and values.
-     *         The caller fills in the rest.
-     * @param update The update to build the details for
-     * @return details The partly filled details
+     * @notice Fills in the update's identity and values, regardless of receiver status.
+     * @param update Update to inspect
+     * @return details Partially filled details
      */
     function _buildDetails(RiskParameterUpdate memory update) internal view returns (UpdateDetails memory details) {
         details.updateId = update.updateId;
@@ -216,33 +174,29 @@ contract RiskStewardLens {
         details.isConfigActive = RISK_STEWARD_RECEIVER.getRiskParameterConfig(update.updateType).active;
         details.proposedValues = _decodeProposedValues(update);
 
-        // A remote market is on another chain, so its value cannot be read here and is left empty.
+        // The destination market's current value is unavailable on this chain.
         if (!details.isRemote) details.currentValues = _readCurrentValues(update);
     }
 
     /**
-     * @notice Fills in what `processUpdate` would do with an update that has not been processed yet: what holds it
-     *         back, whether it is applied right away, and the unlock time it would set if called now.
-     * @param update The update to preview
-     * @param details The details being filled in
+     * @notice Previews processing, including blockers and the expected unlock time.
+     * @param update Unprocessed update
+     * @param details Details to fill in
      */
     function _previewProcessUpdate(RiskParameterUpdate memory update, UpdateDetails memory details) internal view {
         IRiskStewardReceiver.RiskParamConfig memory config = RISK_STEWARD_RECEIVER.getRiskParameterConfig(
             update.updateType
         );
 
-        // Covers both of the receiver's expiry rejections: already expired, and expiring before the timelock ends.
-        // The receiver applies them to remote updates too, so this comes before the remote return. The subtraction
-        // cannot underflow: the receiver keeps every timelock below `UPDATE_EXPIRATION_TIME`.
+        // The receiver rejects updates that expire before their timelock ends, including remote updates.
+        // Configured timelocks are shorter than the expiry period, so subtraction is safe.
         details.expiresAt = _getExpirationTime(update) - config.timelock;
         if (details.expiresAt < block.timestamp) return;
 
-        // A type never configured has no steward to ask. A switched-off type keeps its steward, so it is previewed
-        // as if switched back on, and only `executableNow` reflects that it is off.
+        // A disabled type can still be previewed; an unconfigured type has no steward to query.
         if (config.riskSteward == address(0)) return;
 
-        // Remote updates are sent right away and never timelocked on this chain. Debounce and pending updates are
-        // enforced on the destination chain, not here.
+        // Remote updates are sent now; the destination handles its own delay and blockers.
         if (details.isRemote) {
             details.unlockTime = block.timestamp;
             return;
@@ -251,11 +205,10 @@ contract RiskStewardLens {
         details.debounceEndsAt = _getDebounceEnd(update, config.debounce);
         details.blockingUpdateId = _getBlockingUpdate(update);
 
-        // Not caught: every steward rejection is permanent for this update, and `processUpdate` would revert the same way.
+        // Surface steward errors, just as `processUpdate` does.
         bool safe = IRiskSteward(config.riskSteward).isSafeForDirectExecution(update);
         details.unlockTime = safe ? block.timestamp : block.timestamp + config.timelock;
-        // The receiver rejects the update while paused or switched off, while debounce runs (`debounceEndsAt > now`),
-        // or while another update is pending.
+        // Processing needs an active, unpaused receiver with no debounce or pending update.
         details.executableNow =
             safe &&
             config.active &&
@@ -265,12 +218,11 @@ contract RiskStewardLens {
     }
 
     /**
-     * @notice Fills in the unlock time and expiry of an update the receiver has already registered.
-     * @dev The expiry no longer subtracts the timelock, as it does before registration, because the timelock is
-     *      already set and only execution, or a resend for a remote update, is left.
-     * @param update The update to fill in
-     * @param registeredUnlockTime The unlock time stored on the receiver
-     * @param details The details being filled in
+     * @notice Adds the stored unlock time and any remaining expiry window.
+     * @dev Registered updates expire at publication time plus the full expiry period.
+     * @param update Registered update
+     * @param registeredUnlockTime Unlock time stored by the receiver
+     * @param details Details to fill in
      */
     function _previewRegisteredUpdate(
         RiskParameterUpdate memory update,
@@ -285,10 +237,10 @@ contract RiskStewardLens {
     }
 
     /**
-     * @notice Returns when the debounce from the last executed update for this market and type ends.
-     * @param update The update to check
-     * @param debounce The debounce configured for the update's type
-     * @return The debounce end time, or 0 if no update of this type was executed on this market
+     * @notice Gets when debounce ends for this market and update type.
+     * @param update Update to check
+     * @param debounce Configured debounce period
+     * @return End time, or zero if no matching update has executed
      */
     function _getDebounceEnd(RiskParameterUpdate memory update, uint256 debounce) internal view returns (uint256) {
         uint256 lastProcessedId = RISK_STEWARD_RECEIVER.lastProcessedUpdate(update.updateTypeKey, update.market);
@@ -299,10 +251,10 @@ contract RiskStewardLens {
     }
 
     /**
-     * @notice Returns another pending, unexpired update for the same market and type, which blocks this one.
-     * @dev An expired pending update is left out, because `processUpdate` marks it expired and carries on.
-     * @param update The update to check
-     * @return The blocking update's ID, or 0 if there is none
+     * @notice Finds a pending update that blocks this market and type.
+     * @dev Expired pending updates do not block processing.
+     * @param update Update to check
+     * @return Blocking update ID, or zero
      */
     function _getBlockingUpdate(RiskParameterUpdate memory update) internal view returns (uint256) {
         uint256 registeredId = RISK_STEWARD_RECEIVER.lastRegisteredUpdate(update.updateTypeKey, update.market);
@@ -317,18 +269,18 @@ contract RiskStewardLens {
     }
 
     /**
-     * @notice Returns when the update stops being executable: its publish time plus `UPDATE_EXPIRATION_TIME`.
-     * @param update The update to check
-     * @return The expiration time
+     * @notice Gets publication time plus the receiver's expiry period.
+     * @param update Update to check
+     * @return Expiration time
      */
     function _getExpirationTime(RiskParameterUpdate memory update) internal view returns (uint256) {
         return update.timestamp + RISK_STEWARD_RECEIVER.UPDATE_EXPIRATION_TIME();
     }
 
     /**
-     * @notice Reads the value the update would replace from the market's comptroller or vToken.
-     * @param update The update whose current value is read
-     * @return values The current value, in the same layout as `_decodeProposedValues`; empty for an unknown update type
+     * @notice Reads the current value from the market's comptroller or vToken.
+     * @param update Update to inspect
+     * @return values Current values in the proposed value's layout, or empty for an unknown type
      */
     function _readCurrentValues(RiskParameterUpdate memory update) internal view returns (uint256[] memory values) {
         bytes32 key = update.updateTypeKey;
@@ -346,23 +298,22 @@ contract RiskStewardLens {
             return values;
         }
 
-        // Any type other than the two caps is unknown to this lens, so its value stays empty.
+        // Unknown types have no value reader.
         if (key != SUPPLY_CAP_KEY && key != BORROW_CAP_KEY) return values;
 
-        // Core and isolated pools share the cap getters' signatures.
+        // Both pool types use the same cap getters.
         values = new uint256[](1);
         ICorePoolComptroller comptroller = ICorePoolComptroller(ICorePoolVToken(market).comptroller());
         values[0] = key == SUPPLY_CAP_KEY ? comptroller.supplyCaps(market) : comptroller.borrowCaps(market);
     }
 
     /**
-     * @notice Reads a market's collateral factor and liquidation threshold, from its eMode pool when `poolId` is set.
-     * @dev An isolated pool market has no eMode pools, so a non-zero `poolId` returns zeros there. Such an update is
-     *      still registered, but the steward's `applyUpdate` reverts with `InvalidPool` when it is executed.
-     * @param market The market to read
-     * @param poolId The eMode pool to read from (0 for the market's regular collateral factors)
-     * @return collateralFactor The current collateral factor
-     * @return liquidationThreshold The current liquidation threshold
+     * @notice Reads a market's collateral factor and liquidation threshold.
+     * @dev A nonzero eMode pool ID on an isolated market returns zeros; execution later reverts with `InvalidPool`.
+     * @param market Market to read
+     * @param poolId eMode pool ID, or zero for regular factors
+     * @return collateralFactor Current collateral factor
+     * @return liquidationThreshold Current liquidation threshold
      */
     function _readCollateralFactors(
         address market,
@@ -385,12 +336,11 @@ contract RiskStewardLens {
     }
 
     /**
-     * @notice Decodes the update's `newValue` into plain numbers.
-     * @dev A value of the wrong length is returned empty instead of reverting the view; the steward rejects it anyway.
-     *      An interest rate model is decoded as a plain `uint256`, not an address, so a malformed value shows up as a
-     *      number above 160 bits instead of reverting the view.
-     * @param update The update to decode
-     * @return values The decoded value, or empty for an unknown update type or a malformed value
+     * @notice Decodes the proposed value into numbers.
+     * @dev Unexpected lengths return an empty array. Interest rate models remain `uint256`, so values above 160 bits
+     *      are visible here even though the steward rejects them.
+     * @param update Update to decode
+     * @return values Decoded values, or empty for an unknown type or unexpected length
      */
     function _decodeProposedValues(RiskParameterUpdate memory update) internal pure returns (uint256[] memory values) {
         bytes32 key = update.updateTypeKey;
