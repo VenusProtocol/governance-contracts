@@ -18,9 +18,10 @@ import { IIsolatedPoolsComptroller } from "../interfaces/IIsolatedPoolsComptroll
  *         back by debounce, by another pending update, or by a newer update that replaced it.
  * @dev Reports facts rather than predicting the receiver's verdict. The steward's `isSafeForDirectExecution` and
  *      the receiver's `isUpdateExecutable` are called directly. Only a few receiver rules are restated here: the
- *      config-active, expiry, timelock, debounce, pending-update and latest-update rules, one or two lines each. If
- *      the receiver changes one of them, the matching part here has to change too. It holds no state, so it can be
- *      redeployed, e.g. to decode a new update type.
+ *      pause, config-active, expiry, timelock, debounce, pending-update and latest-update rules, one or two lines each.
+ *      If the receiver changes one of them, the matching part here has to change too. `previewUpdate` does not check
+ *      whether the oracle would accept the update. It holds no state, so it can be redeployed, e.g. to decode a new
+ *      update type.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract RiskStewardLens {
@@ -31,20 +32,33 @@ contract RiskStewardLens {
      * @param market The market the update targets
      * @param status The update's status on the receiver; `None` means `processUpdate` has not run for it yet
      * @param isRemote Whether the update is sent to another chain instead of being applied on this one
+     * @param isPaused Whether the receiver is paused. A pause stops only `processUpdate`, so it holds back an update
+     *        not yet processed but not the execution of one already pending
+     * @param isConfigActive Whether the receiver's config for the update type is active; a type never configured is
+     *        inactive. While it is off, `processUpdate` and `executeRegisteredUpdate` both reject the update. It can be
+     *        switched back on with its steward, timelock and debounce unchanged, so for an update not yet processed
+     *        the other fields still show what would happen then; only `executableNow` stays false. A type never
+     *        configured has no steward to ask, so those fields (`unlockTime`, `debounceEndsAt`, `blockingUpdateId`)
+     *        are left at 0
      * @param executableNow Whether the next call would apply the change right away. For an update not yet processed,
-     *        whether `processUpdate` would apply it in the same call: the steward's `isSafeForDirectExecution` passes
-     *        and neither debounce nor another pending update holds it back. For a pending update, whether
-     *        `executeRegisteredUpdate` would accept it now, from the receiver's `isUpdateExecutable`. Always false for
-     *        a remote update, which this chain only sends
+     *        whether `processUpdate` would apply it in the same call: the receiver is not paused, the config is
+     *        active, the steward's `isSafeForDirectExecution` passes, and neither debounce nor another pending update
+     *        holds it back. For a pending update, whether `executeRegisteredUpdate` would accept it now, from the
+     *        receiver's `isUpdateExecutable`. Always false for a remote update, which this chain only sends
      * @param unlockTime When the update becomes executable. For an update not yet processed, the unlock time
      *        `processUpdate` would set if called now. For a remote update, the time it is sent from this chain; the
      *        destination receiver then holds it for its own `remoteDelay` after arrival
-     * @param isExpired Whether the update can no longer take effect because of its expiry, which falls
-     *        `UPDATE_EXPIRATION_TIME` after it was published. For an update not yet processed, `processUpdate` would
-     *        reject it: it has expired, or it would expire before its timelock ends. For a pending update, it has
-     *        expired and `executeRegisteredUpdate` would reject it. When it is set, the fields that describe
-     *        processing (`executableNow`, `unlockTime`, `debounceEndsAt`, `blockingUpdateId`) are left at 0.
-     *        Always false for an update that is executed, rejected or sent
+     * @param expiresAt The last time the update's next step still accepts it; once it is in the past, the update can
+     *        no longer take effect. For an update not yet processed, the last time `processUpdate` accepts it: its
+     *        publish time plus `UPDATE_EXPIRATION_TIME`, minus the timelock, because the receiver rejects an update
+     *        that would expire before its timelock ends, even one it would apply right away. Once that has passed, the
+     *        fields that describe processing (`executableNow`, `unlockTime`, `debounceEndsAt`, `blockingUpdateId`)
+     *        are left at 0. Debounce or a blocking update can hold it back past this time: it can never be processed
+     *        if `debounceEndsAt` is later than `expiresAt`, and a blocker whose own `expiresAt` is not before this one
+     *        frees it in time only if an executor executes or rejects the blocker. For a pending update, the last time
+     *        `executeRegisteredUpdate` accepts it, and for a sent one the last time it can be resent: its publish time
+     *        plus `UPDATE_EXPIRATION_TIME`. 0 for an update that is executed, rejected or expired on the receiver, or
+     *        replaced, since there is nothing left for it to miss
      * @param debounceEndsAt The earliest time `processUpdate` accepts an update for this market and type, counted
      *        from the last one executed; it holds the update back only while it is in the future. 0 if none was
      *        executed. Not applied to remote updates on this chain. 0 once the update is processed, because only
@@ -69,9 +83,11 @@ contract RiskStewardLens {
         address market;
         IRiskStewardReceiver.UpdateStatus status;
         bool isRemote;
+        bool isPaused;
+        bool isConfigActive;
         bool executableNow;
         uint256 unlockTime;
-        bool isExpired;
+        uint256 expiresAt;
         uint256 debounceEndsAt;
         uint256 blockingUpdateId;
         uint256 replacedByUpdateId;
@@ -114,7 +130,6 @@ contract RiskStewardLens {
      * @return details The update's details
      * @custom:error Throws InvalidUpdateId (from the oracle) if the update does not exist
      * @custom:error For an update not yet processed, throws the steward's error if it rejects the update
-     * @custom:error For an update not yet processed, throws ConfigNotActive if its type's config is inactive
      * @custom:error Throws PoolDoesNotExist (from the core pool comptroller) for an eMode update whose pool does not
      *               exist; such an update can never be executed
      */
@@ -155,7 +170,6 @@ contract RiskStewardLens {
      * @return details The update's details
      * @custom:error Throws the steward's error if it rejects the update, e.g. `RedundantValue` for a value the market
      *               already has
-     * @custom:error Throws ConfigNotActive if the update type's config is inactive
      * @custom:error Throws PoolDoesNotExist (from the core pool comptroller) for an eMode update whose pool does not
      *               exist; such an update can never be executed
      */
@@ -198,6 +212,8 @@ contract RiskStewardLens {
         details.updateType = update.updateType;
         details.market = update.market;
         details.isRemote = update.destLzEid != 0 && update.destLzEid != RISK_STEWARD_RECEIVER.LAYER_ZERO_EID();
+        details.isPaused = RISK_STEWARD_RECEIVER.paused();
+        details.isConfigActive = RISK_STEWARD_RECEIVER.getRiskParameterConfig(update.updateType).active;
         details.proposedValues = _decodeProposedValues(update);
 
         // A remote market is on another chain, so its value cannot be read here and is left empty.
@@ -214,15 +230,16 @@ contract RiskStewardLens {
         IRiskStewardReceiver.RiskParamConfig memory config = RISK_STEWARD_RECEIVER.getRiskParameterConfig(
             update.updateType
         );
-        // `processUpdate` rejects an inactive type with this error, local or remote. A type never configured is inactive too.
-        if (!config.active) revert IRiskStewardReceiver.ConfigNotActive();
 
         // Covers both of the receiver's expiry rejections: already expired, and expiring before the timelock ends.
-        // The receiver applies them to remote updates too, so this comes before the remote return.
-        if (_getExpirationTime(update) < block.timestamp + config.timelock) {
-            details.isExpired = true;
-            return;
-        }
+        // The receiver applies them to remote updates too, so this comes before the remote return. The subtraction
+        // cannot underflow: the receiver keeps every timelock below `UPDATE_EXPIRATION_TIME`.
+        details.expiresAt = _getExpirationTime(update) - config.timelock;
+        if (details.expiresAt < block.timestamp) return;
+
+        // A type never configured has no steward to ask. A switched-off type keeps its steward, so it is previewed
+        // as if switched back on, and only `executableNow` reflects that it is off.
+        if (config.riskSteward == address(0)) return;
 
         // Remote updates are sent right away and never timelocked on this chain. Debounce and pending updates are
         // enforced on the destination chain, not here.
@@ -237,15 +254,20 @@ contract RiskStewardLens {
         // Not caught: every steward rejection is permanent for this update, and `processUpdate` would revert the same way.
         bool safe = IRiskSteward(config.riskSteward).isSafeForDirectExecution(update);
         details.unlockTime = safe ? block.timestamp : block.timestamp + config.timelock;
-        // The receiver rejects the update while debounce runs (`debounceEndsAt > now`) or another update is pending.
-        details.executableNow = safe && details.debounceEndsAt <= block.timestamp && details.blockingUpdateId == 0;
+        // The receiver rejects the update while paused or switched off, while debounce runs (`debounceEndsAt > now`),
+        // or while another update is pending.
+        details.executableNow =
+            safe &&
+            config.active &&
+            !details.isPaused &&
+            details.debounceEndsAt <= block.timestamp &&
+            details.blockingUpdateId == 0;
     }
 
     /**
      * @notice Fills in the unlock time and expiry of an update the receiver has already registered.
-     * @dev Only a pending update can still expire; executed, rejected and sent updates are final. The check is
-     *      `expiry < now`, not the `expiry < now + timelock` used before registration, because the timelock is
-     *      already set and only execution is left.
+     * @dev The expiry no longer subtracts the timelock, as it does before registration, because the timelock is
+     *      already set and only execution, or a resend for a remote update, is left.
      * @param update The update to fill in
      * @param registeredUnlockTime The unlock time stored on the receiver
      * @param details The details being filled in
@@ -255,10 +277,11 @@ contract RiskStewardLens {
         uint256 registeredUnlockTime,
         UpdateDetails memory details
     ) internal view {
-        details.isExpired =
-            details.status == IRiskStewardReceiver.UpdateStatus.Pending &&
-            _getExpirationTime(update) < block.timestamp;
-        if (!details.isExpired) details.unlockTime = registeredUnlockTime;
+        details.unlockTime = registeredUnlockTime;
+        if (
+            details.status == IRiskStewardReceiver.UpdateStatus.Pending ||
+            details.status == IRiskStewardReceiver.UpdateStatus.SENT_TO_DESTINATION
+        ) details.expiresAt = _getExpirationTime(update);
     }
 
     /**

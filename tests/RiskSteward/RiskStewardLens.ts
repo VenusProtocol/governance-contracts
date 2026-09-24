@@ -1,4 +1,4 @@
-import { loadFixture, time } from "@nomicfoundation/hardhat-network-helpers";
+import { loadFixture, takeSnapshot, time } from "@nomicfoundation/hardhat-network-helpers";
 import { expect } from "chai";
 import fs from "fs";
 import { ethers, upgrades } from "hardhat";
@@ -43,7 +43,8 @@ describe("RiskStewardLens", async function () {
     ["ipfs://QmLens", parseUnitsToHex(value), "borrowCap", mockCoreVToken.address, 0, destLzEid, "0x"] as const;
 
   // One core pool market (caps 8, CF 0.5 / LT 0.6) behind the real oracle, receiver and stewards, with a 50% safe
-  // delta, 6h timelock and 1 day debounce. Nothing is sent over LayerZero, so the endpoint only has to exist.
+  // delta, 6h timelock and 1 day debounce. Remote updates go to a second mock endpoint where nothing listens: the mock
+  // swallows the failed delivery, so the send succeeds on this chain, which is all the lens reads.
   const lensFixture = async () => {
     const [deployer] = await ethers.getSigners();
 
@@ -90,6 +91,15 @@ describe("RiskStewardLens", async function () {
       },
     );
 
+    const remoteEndpoint = await new ethers.ContractFactory(
+      endpointArtifact.abi,
+      endpointArtifact.bytecode,
+      deployer,
+    ).deploy(ETHEREUM_LZV2_CHAIN_ID);
+    await endpoint.setDestLzEndpoint(remoteEndpoint.address, remoteEndpoint.address);
+    await riskStewardReceiver.setPeer(ETHEREUM_LZV2_CHAIN_ID, ethers.utils.hexZeroPad(remoteEndpoint.address, 32));
+    await deployer.sendTransaction({ to: riskStewardReceiver.address, value: parseUnits("1", 18) });
+
     const stewardOptions = (constructorArgs: string[]) => ({
       constructorArgs,
       initializer: "initialize",
@@ -116,6 +126,8 @@ describe("RiskStewardLens", async function () {
       [riskOracle.address, "addUpdateType(string)"],
       [riskStewardReceiver.address, "setRiskParameterConfig(string,address,uint256,uint256)"],
       [riskStewardReceiver.address, "setConfigActive(string,bool)"],
+      [riskStewardReceiver.address, "setPaused(bool)"],
+      [riskStewardReceiver.address, "setWhitelistedExecutor(address,bool)"],
       [marketCapsRiskSteward.address, "setSafeDeltaBps(uint256)"],
       [collateralFactorsRiskSteward.address, "setSafeDeltaBps(uint256)"],
     ];
@@ -124,6 +136,7 @@ describe("RiskStewardLens", async function () {
     }
 
     await riskOracle.addAuthorizedSender(deployer.address);
+    await riskStewardReceiver.setWhitelistedExecutor(deployer.address, true);
     const stewardByType: [string, string][] = [
       ["supplyCap", marketCapsRiskSteward.address],
       ["borrowCap", marketCapsRiskSteward.address],
@@ -160,12 +173,13 @@ describe("RiskStewardLens", async function () {
     await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(10));
     const published = await lens.getUpdateDetails(1);
     expect(published.executableNow).to.equal(true);
-    expect(published.isExpired).to.equal(false);
+    expect(published.expiresAt).to.be.gt(await time.latest());
 
     await riskStewardReceiver.processUpdate(1);
     const executed = await lens.getUpdateDetails(1);
     expect(executed.status).to.equal(2); // Executed
     expect(executed.executableNow).to.equal(false);
+    expect(executed.expiresAt).to.equal(0); // nothing left for it to miss
     expect(executed.currentValues).to.deep.equal([parseUnits("10", 18)]);
 
     // The next proposal is held back by debounce from the execution above
@@ -252,7 +266,7 @@ describe("RiskStewardLens", async function () {
     await time.increase(EXPIRATION_TIME + 1);
 
     const expired = await lens.getUpdateDetails(1);
-    expect(expired.isExpired).to.equal(true);
+    expect(expired.expiresAt).to.be.lt(await time.latest());
     expect(expired.unlockTime).to.equal(0);
     expect(expired.currentValues).to.deep.equal([parseUnits("8", 18)]);
     await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
@@ -261,13 +275,22 @@ describe("RiskStewardLens", async function () {
     );
   });
 
-  it("flags an unprocessed update that would expire before its timelock ends", async function () {
+  it("expires an unprocessed update one timelock before its 2 days are up", async function () {
     await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(3));
-    // Still inside its 2 days, but less than the 6 hour timelock remains
-    await time.increase(EXPIRATION_TIME - SIX_HOURS + 60);
+    const publishedAt = (await riskOracle.getUpdateById(1)).timestamp;
+    const expiresAt = (await lens.getUpdateDetails(1)).expiresAt;
+    expect(expiresAt).to.equal(publishedAt.add(EXPIRATION_TIME - SIX_HOURS));
 
+    // processUpdate still accepts it at exactly expiresAt
+    const snapshot = await takeSnapshot();
+    await time.setNextBlockTimestamp(expiresAt);
+    await riskStewardReceiver.processUpdate(1);
+    await snapshot.restore();
+
+    // One second later it is still inside its 2 days, but less than the 6 hour timelock remains
+    await time.increaseTo(expiresAt.add(1));
     const tooLate = await lens.getUpdateDetails(1);
-    expect(tooLate.isExpired).to.equal(true);
+    expect(tooLate.expiresAt).to.equal(expiresAt);
     expect(tooLate.unlockTime).to.equal(0);
     await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
       riskStewardReceiver,
@@ -278,14 +301,71 @@ describe("RiskStewardLens", async function () {
   it("flags a pending update that expired before it was executed", async function () {
     await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(3));
     await riskStewardReceiver.processUpdate(1);
-    expect((await lens.getUpdateDetails(1)).isExpired).to.equal(false);
+    // Once registered, the timelock is no longer subtracted: execution just has to happen within the 2 days
+    const publishedAt = (await riskOracle.getUpdateById(1)).timestamp;
+    expect((await lens.getUpdateDetails(1)).expiresAt).to.equal(publishedAt.add(EXPIRATION_TIME));
 
     await time.increase(EXPIRATION_TIME + 1);
     const expired = await lens.getUpdateDetails(1);
     expect(expired.status).to.equal(1); // still Pending on the receiver
-    expect(expired.isExpired).to.equal(true);
+    expect(expired.expiresAt).to.be.lt(await time.latest());
     expect(expired.executableNow).to.equal(false);
-    expect(expired.unlockTime).to.equal(0);
+    expect(expired.unlockTime).to.equal((await riskStewardReceiver.updates(1)).unlockTime);
+  });
+
+  it("reports a sent remote update and how long it can still be resent", async function () {
+    await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(12, ETHEREUM_LZV2_CHAIN_ID));
+    await riskStewardReceiver.processUpdate(1);
+
+    const sent = await lens.getUpdateDetails(1);
+    expect(sent.status).to.equal(5); // SENT_TO_DESTINATION
+    expect(sent.isRemote).to.equal(true);
+    expect(sent.executableNow).to.equal(false);
+    expect(sent.unlockTime).to.equal((await riskStewardReceiver.updates(1)).unlockTime);
+    // A resend has no timelock ahead of it, so the full 2 days apply
+    const publishedAt = (await riskOracle.getUpdateById(1)).timestamp;
+    expect(sent.expiresAt).to.equal(publishedAt.add(EXPIRATION_TIME));
+    expect(sent.currentValues).to.be.empty;
+  });
+
+  it("reports nothing left to miss for a rejected update or one the receiver marked expired", async function () {
+    await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(3));
+    await riskStewardReceiver.processUpdate(1);
+    await riskStewardReceiver.rejectUpdate(1);
+
+    const rejected = await lens.getUpdateDetails(1);
+    expect(rejected.status).to.equal(3); // Rejected
+    expect(rejected.executableNow).to.equal(false);
+    expect(rejected.expiresAt).to.equal(0);
+    expect(rejected.unlockTime).to.equal((await riskStewardReceiver.updates(1)).unlockTime);
+
+    // processUpdate marks a pending update Expired when a newer one for the same market and type comes in after it
+    await riskOracle.publishRiskParameterUpdate(
+      "ipfs://QmLensExpired",
+      parseUnitsToHex(3),
+      "supplyCap",
+      mockCoreVToken.address,
+      0,
+      0,
+      "0x",
+    );
+    await riskStewardReceiver.processUpdate(2);
+    await time.increase(EXPIRATION_TIME + 1);
+    await riskOracle.publishRiskParameterUpdate(
+      "ipfs://QmLensExpired",
+      parseUnitsToHex(10),
+      "supplyCap",
+      mockCoreVToken.address,
+      0,
+      0,
+      "0x",
+    );
+    await riskStewardReceiver.processUpdate(3);
+
+    const expired = await lens.getUpdateDetails(2);
+    expect(expired.status).to.equal(4); // Expired
+    expect(expired.executableNow).to.equal(false);
+    expect(expired.expiresAt).to.equal(0);
   });
 
   it("reverts with the steward's error when the steward rejects the update", async function () {
@@ -368,42 +448,97 @@ describe("RiskStewardLens", async function () {
     expect(preview.proposedValues).to.deep.equal([parseUnits("12", 18)]);
   });
 
-  it("reverts with ConfigNotActive for a local update whose type has no steward", async function () {
-    await expect(
-      lens.previewUpdate(
-        "ipfs://QmLensNoSteward",
-        parseUnitsToHex(1),
-        "unknownType",
-        mockCoreVToken.address,
-        0,
-        0,
-        "0x",
-      ),
-    ).to.be.revertedWithCustomError(riskStewardReceiver, "ConfigNotActive");
+  it("flags a paused receiver, which holds back processUpdate but not the execution of a pending update", async function () {
+    await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(3));
+    await riskStewardReceiver.processUpdate(1);
+    await time.increase(SIX_HOURS + 1);
+    await riskStewardReceiver.setPaused(true);
+
+    // 8 -> 12 is within the safe delta and nothing else holds it back, so only the pause stops it
+    const preview = await lens.previewUpdate(
+      "ipfs://QmLensPaused",
+      parseUnitsToHex(12),
+      "supplyCap",
+      mockCoreVToken.address,
+      0,
+      0,
+      "0x",
+    );
+    expect(preview.isPaused).to.equal(true);
+    expect(preview.executableNow).to.equal(false);
+
+    const pending = await lens.getUpdateDetails(1);
+    expect(pending.isPaused).to.equal(true);
+    expect(pending.executableNow).to.equal(true);
+
+    await riskStewardReceiver.setPaused(false);
+    expect(
+      (
+        await lens.previewUpdate(
+          "ipfs://QmLensPaused",
+          parseUnitsToHex(12),
+          "supplyCap",
+          mockCoreVToken.address,
+          0,
+          0,
+          "0x",
+        )
+      ).executableNow,
+    ).to.equal(true);
   });
 
-  it("reverts with ConfigNotActive for a type whose config was switched off", async function () {
-    await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(10));
-    await riskStewardReceiver.setConfigActive("borrowCap", false);
-
-    // The steward is still set, but processUpdate rejects the type, and so does the lens
-    await expect(lens.previewUpdate(...borrowCapArgs(10))).to.be.revertedWithCustomError(
-      riskStewardReceiver,
-      "ConfigNotActive",
+  it("flags a local update whose type was never configured on the receiver", async function () {
+    const preview = await lens.previewUpdate(
+      "ipfs://QmLensNoSteward",
+      parseUnitsToHex(1),
+      "unknownType",
+      mockCoreVToken.address,
+      0,
+      0,
+      "0x",
     );
-    await expect(lens.getUpdateDetails(1)).to.be.revertedWithCustomError(riskStewardReceiver, "ConfigNotActive");
-    await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
-      riskStewardReceiver,
-      "ConfigNotActive",
-    );
+    expect(preview.isConfigActive).to.equal(false);
+    expect(preview.executableNow).to.equal(false);
+    expect(preview.unlockTime).to.equal(0);
   });
 
-  it("reverts with ConfigNotActive for a remote update whose type is switched off", async function () {
+  it("flags a switched-off type but still previews it with its stored config", async function () {
+    await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(3));
+    await riskStewardReceiver.processUpdate(1);
+    await time.increase(SIX_HOURS + 1);
     await riskStewardReceiver.setConfigActive("borrowCap", false);
-    await expect(lens.previewUpdate(...borrowCapArgs(12, ETHEREUM_LZV2_CHAIN_ID))).to.be.revertedWithCustomError(
-      riskStewardReceiver,
-      "ConfigNotActive",
-    );
+
+    // Unlocked and unexpired, so the switched-off config is the only reason it cannot run
+    const pending = await lens.getUpdateDetails(1);
+    expect(pending.isConfigActive).to.equal(false);
+    expect(pending.executableNow).to.equal(false);
+    expect(pending.unlockTime).to.equal((await riskStewardReceiver.updates(1)).unlockTime);
+
+    // A new proposal is previewed as if the config were switched back on as stored; only executableNow says it is off
+    const safe = await lens.previewUpdate(...borrowCapArgs(4));
+    expect(safe.isConfigActive).to.equal(false);
+    expect(safe.executableNow).to.equal(false);
+    expect(safe.unlockTime).to.be.closeTo(await time.latest(), 1); // 8 -> 4 is within the safe delta
+    expect(safe.blockingUpdateId).to.equal(1);
+    expect(safe.currentValues).to.deep.equal([parseUnits("8", 18)]);
+
+    // 8 -> 2 is outside the safe delta, so the stored 6 hour timelock still applies
+    const timelocked = await lens.previewUpdate(...borrowCapArgs(2));
+    expect(timelocked.unlockTime.sub(await time.latest())).to.be.within(SIX_HOURS, SIX_HOURS + 1);
+
+    const remote = await lens.previewUpdate(...borrowCapArgs(12, ETHEREUM_LZV2_CHAIN_ID));
+    expect(remote.isConfigActive).to.equal(false);
+    expect(remote.unlockTime).to.be.closeTo(await time.latest(), 1);
+  });
+
+  it("still flags expiry for an unprocessed update whose config is switched off", async function () {
+    await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(3));
+    await riskStewardReceiver.setConfigActive("borrowCap", false);
+    await time.increase(EXPIRATION_TIME + 1);
+
+    const expired = await lens.getUpdateDetails(1);
+    expect(expired.expiresAt).to.be.lt(await time.latest());
+    expect(expired.isConfigActive).to.equal(false);
   });
 
   it("returns empty values for an update type it does not know", async function () {

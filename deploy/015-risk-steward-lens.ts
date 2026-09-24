@@ -16,7 +16,6 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
     from: deployer,
     log: true,
     args: [riskStewardReceiver.address, corePoolComptroller],
-    skipIfAlreadyDeployed: true,
   });
 };
 
