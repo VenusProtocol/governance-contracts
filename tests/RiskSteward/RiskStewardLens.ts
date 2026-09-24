@@ -163,6 +163,7 @@ describe("RiskStewardLens", async function () {
     const preview = await lens.previewUpdate(...borrowCapArgs(10));
     expect(preview.updateId).to.equal(1);
     expect(preview.status).to.equal(0); // None
+    expect(preview.canProcessNow).to.equal(true);
     expect(preview.executableNow).to.equal(true);
     expect(preview.unlockTime).to.be.closeTo(await time.latest(), 1);
     expect(preview.currentValues).to.deep.equal([parseUnits("8", 18)]);
@@ -178,6 +179,7 @@ describe("RiskStewardLens", async function () {
     await riskStewardReceiver.processUpdate(1);
     const executed = await lens.getUpdateDetails(1);
     expect(executed.status).to.equal(2); // Executed
+    expect(executed.canProcessNow).to.equal(false);
     expect(executed.executableNow).to.equal(false);
     expect(executed.expiresAt).to.equal(0); // nothing left for it to miss
     expect(executed.currentValues).to.deep.equal([parseUnits("10", 18)]);
@@ -186,6 +188,7 @@ describe("RiskStewardLens", async function () {
     const executedAt = (await riskStewardReceiver.updates(1)).executedAt;
     const next = await lens.previewUpdate(...borrowCapArgs(12));
     expect(next.debounceEndsAt).to.equal(executedAt.add(DAY_AND_ONE_SECOND));
+    expect(next.canProcessNow).to.equal(false);
     // 10 -> 12 is within the safe delta, but debounce still holds it back
     expect(next.executableNow).to.equal(false);
 
@@ -193,11 +196,13 @@ describe("RiskStewardLens", async function () {
     await time.increase(DAY_AND_ONE_SECOND);
     const afterDebounce = await lens.previewUpdate(...borrowCapArgs(12));
     expect(afterDebounce.debounceEndsAt).to.equal(executedAt.add(DAY_AND_ONE_SECOND));
+    expect(afterDebounce.canProcessNow).to.equal(true);
     expect(afterDebounce.executableNow).to.equal(true);
   });
 
   it("tracks a timelocked update from registration to expiry", async function () {
     const preview = await lens.previewUpdate(...borrowCapArgs(3));
+    expect(preview.canProcessNow).to.equal(true);
     expect(preview.executableNow).to.equal(false);
     expect(preview.unlockTime.sub(await time.latest())).to.be.within(SIX_HOURS, SIX_HOURS + 1);
 
@@ -205,6 +210,7 @@ describe("RiskStewardLens", async function () {
     await riskStewardReceiver.processUpdate(1);
     const pending = await lens.getUpdateDetails(1);
     expect(pending.status).to.equal(1); // Pending
+    expect(pending.canProcessNow).to.equal(false);
     expect(pending.unlockTime).to.equal((await riskStewardReceiver.updates(1)).unlockTime);
     expect(pending.executableNow).to.equal(false);
     expect(pending.blockingUpdateId).to.equal(0); // itself does not count
@@ -212,6 +218,7 @@ describe("RiskStewardLens", async function () {
     // A new proposal for the same market is blocked by the pending one
     const blocked = await lens.previewUpdate(...borrowCapArgs(4));
     expect(blocked.blockingUpdateId).to.equal(1);
+    expect(blocked.canProcessNow).to.equal(false);
     // 8 -> 4 is within the safe delta, but the pending update still holds it back
     expect(blocked.executableNow).to.equal(false);
 
@@ -243,6 +250,7 @@ describe("RiskStewardLens", async function () {
 
     const replaced = await lens.getUpdateDetails(1);
     expect(replaced.replacedByUpdateId).to.equal(2);
+    expect(replaced.canProcessNow).to.equal(false);
     expect(replaced.unlockTime).to.equal(0); // it will never be processed, so nothing is projected
     expect(replaced.currentValues).to.deep.equal([parseUnits("8", 18)]);
     expect((await lens.getUpdateDetails(2)).replacedByUpdateId).to.equal(0);
@@ -267,6 +275,7 @@ describe("RiskStewardLens", async function () {
 
     const expired = await lens.getUpdateDetails(1);
     expect(expired.expiresAt).to.be.lt(await time.latest());
+    expect(expired.canProcessNow).to.equal(false);
     expect(expired.unlockTime).to.equal(0);
     expect(expired.currentValues).to.deep.equal([parseUnits("8", 18)]);
     await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
@@ -444,6 +453,8 @@ describe("RiskStewardLens", async function () {
   it("leaves the current value of a remote update empty", async function () {
     const preview = await lens.previewUpdate(...borrowCapArgs(12, ETHEREUM_LZV2_CHAIN_ID));
     expect(preview.isRemote).to.equal(true);
+    expect(preview.canProcessNow).to.equal(true);
+    expect(preview.executableNow).to.equal(false);
     expect(preview.currentValues).to.be.empty;
     expect(preview.proposedValues).to.deep.equal([parseUnits("12", 18)]);
   });
@@ -465,10 +476,12 @@ describe("RiskStewardLens", async function () {
       "0x",
     );
     expect(preview.isPaused).to.equal(true);
+    expect(preview.canProcessNow).to.equal(false);
     expect(preview.executableNow).to.equal(false);
 
     const pending = await lens.getUpdateDetails(1);
     expect(pending.isPaused).to.equal(true);
+    expect(pending.canProcessNow).to.equal(false);
     expect(pending.executableNow).to.equal(true);
 
     await riskStewardReceiver.setPaused(false);
@@ -498,6 +511,7 @@ describe("RiskStewardLens", async function () {
       "0x",
     );
     expect(preview.isConfigActive).to.equal(false);
+    expect(preview.canProcessNow).to.equal(false);
     expect(preview.executableNow).to.equal(false);
     expect(preview.unlockTime).to.equal(0);
   });
@@ -517,6 +531,7 @@ describe("RiskStewardLens", async function () {
     // A new proposal is previewed as if the config were switched back on as stored; only executableNow says it is off
     const safe = await lens.previewUpdate(...borrowCapArgs(4));
     expect(safe.isConfigActive).to.equal(false);
+    expect(safe.canProcessNow).to.equal(false);
     expect(safe.executableNow).to.equal(false);
     expect(safe.unlockTime).to.be.closeTo(await time.latest(), 1); // 8 -> 4 is within the safe delta
     expect(safe.blockingUpdateId).to.equal(1);

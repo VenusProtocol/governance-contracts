@@ -42,6 +42,8 @@ contract RiskStewardLens {
      * @param currentValues Current market values; empty for remote or unknown update types
      * @param proposedValues Decoded values: `[cap]`, `[collateralFactor, liquidationThreshold]`, or
      *        `[uint160(interestRateModel)]`. Empty for unknown types or an unexpected value length
+     * @param canProcessNow Whether an unprocessed update passes the receiver's processing checks now. False after
+     *        processing; does not check whether publication or a remote send will succeed
      */
     struct UpdateDetails {
         uint256 updateId;
@@ -59,6 +61,7 @@ contract RiskStewardLens {
         uint256 replacedByUpdateId;
         uint256[] currentValues;
         uint256[] proposedValues;
+        bool canProcessNow;
     }
 
     bytes32 internal constant SUPPLY_CAP_KEY = keccak256("supplyCap");
@@ -196,6 +199,8 @@ contract RiskStewardLens {
         // A disabled type can still be previewed; an unconfigured type has no steward to query.
         if (config.riskSteward == address(0)) return;
 
+        details.canProcessNow = config.active && !details.isPaused;
+
         // Remote updates are sent now; the destination handles its own delay and blockers.
         if (details.isRemote) {
             details.unlockTime = block.timestamp;
@@ -204,17 +209,15 @@ contract RiskStewardLens {
 
         details.debounceEndsAt = _getDebounceEnd(update, config.debounce);
         details.blockingUpdateId = _getBlockingUpdate(update);
+        details.canProcessNow =
+            details.canProcessNow &&
+            details.debounceEndsAt <= block.timestamp &&
+            details.blockingUpdateId == 0;
 
         // Surface steward errors, just as `processUpdate` does.
         bool safe = IRiskSteward(config.riskSteward).isSafeForDirectExecution(update);
         details.unlockTime = safe ? block.timestamp : block.timestamp + config.timelock;
-        // Processing needs an active, unpaused receiver with no debounce or pending update.
-        details.executableNow =
-            safe &&
-            config.active &&
-            !details.isPaused &&
-            details.debounceEndsAt <= block.timestamp &&
-            details.blockingUpdateId == 0;
+        details.executableNow = safe && details.canProcessNow;
     }
 
     /**
