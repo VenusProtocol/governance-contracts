@@ -150,7 +150,7 @@ describe("RiskStewardLens", async function () {
     const preview = await lens.previewUpdate(...borrowCapArgs(10));
     expect(preview.updateId).to.equal(1);
     expect(preview.status).to.equal(0); // None
-    expect(preview.executesDirectly).to.equal(true);
+    expect(preview.executableNow).to.equal(true);
     expect(preview.unlockTime).to.be.closeTo(await time.latest(), 1);
     expect(preview.currentValues).to.deep.equal([parseUnits("8", 18)]);
     expect(preview.proposedValues).to.deep.equal([parseUnits("10", 18)]);
@@ -159,8 +159,8 @@ describe("RiskStewardLens", async function () {
 
     await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(10));
     const published = await lens.getUpdateDetails(1);
-    expect(published.executesDirectly).to.equal(true);
-    expect(published.expiresAt).to.equal((await riskOracle.getUpdateById(1)).timestamp.add(EXPIRATION_TIME));
+    expect(published.executableNow).to.equal(true);
+    expect(published.isExpired).to.equal(false);
 
     await riskStewardReceiver.processUpdate(1);
     const executed = await lens.getUpdateDetails(1);
@@ -172,15 +172,19 @@ describe("RiskStewardLens", async function () {
     const executedAt = (await riskStewardReceiver.updates(1)).executedAt;
     const next = await lens.previewUpdate(...borrowCapArgs(12));
     expect(next.debounceEndsAt).to.equal(executedAt.add(DAY_AND_ONE_SECOND));
+    // 10 -> 12 is within the safe delta, but debounce still holds it back
+    expect(next.executableNow).to.equal(false);
 
-    // Once the debounce has passed it no longer holds anything back, so it reads 0
+    // Once the debounce has passed, the end time stays the same; it simply lies in the past
     await time.increase(DAY_AND_ONE_SECOND);
-    expect((await lens.previewUpdate(...borrowCapArgs(12))).debounceEndsAt).to.equal(0);
+    const afterDebounce = await lens.previewUpdate(...borrowCapArgs(12));
+    expect(afterDebounce.debounceEndsAt).to.equal(executedAt.add(DAY_AND_ONE_SECOND));
+    expect(afterDebounce.executableNow).to.equal(true);
   });
 
   it("tracks a timelocked update from registration to expiry", async function () {
     const preview = await lens.previewUpdate(...borrowCapArgs(3));
-    expect(preview.executesDirectly).to.equal(false);
+    expect(preview.executableNow).to.equal(false);
     expect(preview.unlockTime.sub(await time.latest())).to.be.within(SIX_HOURS, SIX_HOURS + 1);
 
     await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(3));
@@ -192,7 +196,10 @@ describe("RiskStewardLens", async function () {
     expect(pending.blockingUpdateId).to.equal(0); // itself does not count
 
     // A new proposal for the same market is blocked by the pending one
-    expect((await lens.previewUpdate(...borrowCapArgs(4))).blockingUpdateId).to.equal(1);
+    const blocked = await lens.previewUpdate(...borrowCapArgs(4));
+    expect(blocked.blockingUpdateId).to.equal(1);
+    // 8 -> 4 is within the safe delta, but the pending update still holds it back
+    expect(blocked.executableNow).to.equal(false);
 
     await time.increase(SIX_HOURS + 1);
     expect((await lens.getUpdateDetails(1)).executableNow).to.equal(true);
@@ -240,6 +247,47 @@ describe("RiskStewardLens", async function () {
     expect((await lens.getUpdateDetails(1)).replacedByUpdateId).to.equal(2);
   });
 
+  it("flags an unprocessed update that has already expired", async function () {
+    await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(3));
+    await time.increase(EXPIRATION_TIME + 1);
+
+    const expired = await lens.getUpdateDetails(1);
+    expect(expired.isExpired).to.equal(true);
+    expect(expired.unlockTime).to.equal(0);
+    expect(expired.currentValues).to.deep.equal([parseUnits("8", 18)]);
+    await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
+      riskStewardReceiver,
+      "UpdateIsExpired",
+    );
+  });
+
+  it("flags an unprocessed update that would expire before its timelock ends", async function () {
+    await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(3));
+    // Still inside its 2 days, but less than the 6 hour timelock remains
+    await time.increase(EXPIRATION_TIME - SIX_HOURS + 60);
+
+    const tooLate = await lens.getUpdateDetails(1);
+    expect(tooLate.isExpired).to.equal(true);
+    expect(tooLate.unlockTime).to.equal(0);
+    await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
+      riskStewardReceiver,
+      "UpdateWillExpireBeforeUnlock",
+    );
+  });
+
+  it("flags a pending update that expired before it was executed", async function () {
+    await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(3));
+    await riskStewardReceiver.processUpdate(1);
+    expect((await lens.getUpdateDetails(1)).isExpired).to.equal(false);
+
+    await time.increase(EXPIRATION_TIME + 1);
+    const expired = await lens.getUpdateDetails(1);
+    expect(expired.status).to.equal(1); // still Pending on the receiver
+    expect(expired.isExpired).to.equal(true);
+    expect(expired.executableNow).to.equal(false);
+    expect(expired.unlockTime).to.equal(0);
+  });
+
   it("reverts with the steward's error when the steward rejects the update", async function () {
     await expect(lens.previewUpdate(...borrowCapArgs(8))).to.be.revertedWithCustomError(
       marketCapsRiskSteward,
@@ -265,7 +313,7 @@ describe("RiskStewardLens", async function () {
       0,
       "0x",
     );
-    expect(preview.executesDirectly).to.equal(false);
+    expect(preview.executableNow).to.equal(false);
     expect(preview.currentValues).to.deep.equal([parseUnits("0.7", 18), parseUnits("0.8", 18)]);
     expect(preview.proposedValues).to.deep.equal([parseUnits("0.75", 18), parseUnits("0.8", 18)]);
   });
@@ -313,10 +361,10 @@ describe("RiskStewardLens", async function () {
     expect(preview.proposedValues).to.deep.equal([ethers.BigNumber.from(newIRM)]);
   });
 
-  it("marks the current value of a remote update as unknown", async function () {
+  it("leaves the current value of a remote update empty", async function () {
     const preview = await lens.previewUpdate(...borrowCapArgs(12, ETHEREUM_LZV2_CHAIN_ID));
     expect(preview.isRemote).to.equal(true);
-    expect(preview.currentValues).to.deep.equal([ethers.constants.MaxUint256]);
+    expect(preview.currentValues).to.be.empty;
     expect(preview.proposedValues).to.deep.equal([parseUnits("12", 18)]);
   });
 
@@ -350,8 +398,23 @@ describe("RiskStewardLens", async function () {
     );
   });
 
+  it("reverts with ConfigNotActive for a remote update whose type is switched off", async function () {
+    await riskStewardReceiver.setConfigActive("borrowCap", false);
+    await expect(lens.previewUpdate(...borrowCapArgs(12, ETHEREUM_LZV2_CHAIN_ID))).to.be.revertedWithCustomError(
+      riskStewardReceiver,
+      "ConfigNotActive",
+    );
+  });
+
   it("returns empty values for an update type it does not know", async function () {
-    // Remote, so no steward is asked and only the lens's own decoding is exercised
+    // Configured on the receiver but unknown to the lens, e.g. a type added after the lens was deployed. Remote, so
+    // no steward is asked and only the lens's own decoding is exercised.
+    await riskStewardReceiver.setRiskParameterConfig(
+      "unknownType",
+      marketCapsRiskSteward.address,
+      DAY_AND_ONE_SECOND,
+      SIX_HOURS,
+    );
     const preview = await lens.previewUpdate(
       "ipfs://QmLensUnknown",
       parseUnitsToHex(1),
