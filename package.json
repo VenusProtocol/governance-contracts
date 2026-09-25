@@ -28,7 +28,7 @@
     "access": "public"
   },
   "scripts": {
-    "compile": "hardhat compile && hardhat compile --config hardhat.config.zksync.ts && forge build",
+    "compile": "hardhat compile && hardhat compile --config hardhat.config.zksync.ts",
     "test": "hardhat test && forge test",
     "build": "rm -rf dist && hardhat compile && hardhat compile --config hardhat.config.zksync.ts && tsc --declaration",
     "publish:dist": "yarn build && cd dist && yarn publish --access public",
