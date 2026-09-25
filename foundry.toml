@@ -1,0 +1,22 @@
+# Foundry runs alongside Hardhat, it does not replace it. Hardhat keeps the TypeScript tests,
+# deployments and the zkSync build. Foundry only runs tests/foundry, for what Hardhat cannot do:
+# in-EVM fuzzing, stateful invariants and cheatcode-driven fork tests.
+#
+#   forge test             the fuzz budget the edit loop wants
+#   FOUNDRY_PROFILE=ci     the thorough budget CI uses
+
+[profile.default]
+test = 'tests/foundry'
+# Not the default here: with Hardhat's artifacts/ present, Foundry would write into it.
+out = 'out'
+cache_path = 'cache-foundry'
+
+# Matches the 0.8.25 compiler in hardhat.config.ts. Foundry has one optimizer setting for every
+# compiler, so the 0.5.16 contracts build here with 10000 runs instead of Hardhat's 200.
+evm_version = 'paris'
+optimizer = true
+optimizer_runs = 10000
+
+# Everything not set here is inherited from the default profile.
+[profile.ci]
+fuzz = { runs = 2000 }
