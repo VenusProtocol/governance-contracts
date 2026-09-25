@@ -28,8 +28,8 @@
     "access": "public"
   },
   "scripts": {
-    "compile": "hardhat compile && hardhat compile --config hardhat.config.zksync.ts",
-    "test": "hardhat test",
+    "compile": "hardhat compile && hardhat compile --config hardhat.config.zksync.ts && forge build",
+    "test": "hardhat test && forge test",
     "build": "rm -rf dist && hardhat compile && hardhat compile --config hardhat.config.zksync.ts && tsc --declaration",
     "publish:dist": "yarn build && cd dist && yarn publish --access public",
     "lint": "yarn lint:ts && yarn lint:sol && yarn prettier:check",
@@ -41,7 +41,7 @@
     "prettier:cached": "prettier --write --cache \"**/*.{js,json,md,ts,yaml,yml,sol}\"",
     "docgen": "hardhat docgen",
     "prepare": "husky install",
-    "clean": "hardhat clean && hardhat clean --config hardhat.config.zksync.ts",
+    "clean": "hardhat clean && hardhat clean --config hardhat.config.zksync.ts && forge clean",
     "postinstall": "yarn patch-package"
   },
   "dependencies": {
