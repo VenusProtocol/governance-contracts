@@ -31,6 +31,20 @@ const NETWORKS = [
   "unichainmainnet",
 ];
 
+/** Every other deployments/ directory. One in neither list fails the run, so a new chain is never
+ *  unchecked by default. */
+const SKIPPED_NETWORKS = [
+  "bsctestnet",
+  "sepolia",
+  "arbitrumsepolia",
+  "opbnbtestnet",
+  "basesepolia",
+  "opsepolia",
+  "unichainsepolia",
+  "zksyncmainnet",
+  "zksyncsepolia",
+];
+
 /** hardhat-deploy writes the implementation behind a proxy under this suffix. */
 const SUFFIX = "_Implementation.json";
 
@@ -140,7 +154,14 @@ function collectTargets(): Target[] {
 
   for (const network of NETWORKS) {
     const dir = path.join(ROOT, "deployments", network);
-    if (!fs.existsSync(dir)) continue;
+    // A missing directory is a typo in NETWORKS, which would otherwise drop the whole chain.
+    if (!fs.existsSync(dir)) {
+      targets.push({
+        key: `NETWORKS/${network}`,
+        blocked: "listed in NETWORKS but deployments/ has no such directory",
+      });
+      continue;
+    }
     for (const file of fs.readdirSync(dir).filter(f => f.endsWith(SUFFIX))) {
       const key = `${network}/${file.slice(0, -SUFFIX.length)}`;
       targets.push(targetFor(key, path.posix.join("deployments", network, file)));
@@ -157,6 +178,15 @@ function collectTargets(): Target[] {
     targets.push({
       key: `DELEGATOR_IMPLS/${name}`,
       blocked: "listed in DELEGATOR_IMPLS but has no deployment file on any network",
+    });
+  }
+
+  const classified = new Set([...NETWORKS, ...SKIPPED_NETWORKS]);
+  for (const entry of fs.readdirSync(path.join(ROOT, "deployments"), { withFileTypes: true })) {
+    if (!entry.isDirectory() || classified.has(entry.name)) continue;
+    targets.push({
+      key: `NETWORKS/${entry.name}`,
+      blocked: "deployments/ has this network but it is in neither NETWORKS nor SKIPPED_NETWORKS",
     });
   }
   return targets;
