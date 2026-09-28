@@ -24,10 +24,15 @@ contract RiskStewardLens {
      * @param updateId Oracle ID, or the next expected ID for a preview
      * @param updateType Parameter name, such as `supplyCap`
      * @param market Target market
+     * @param poolId Core pool eMode pool ID, or zero for a regular market. Only collateral factor updates use it
+     * @param chainId Chain the update applies on: this chain for a local update, the destination for a remote one.
+     *        Zero for a remote update to an endpoint ID this lens does not know
      * @param status Receiver status; `None` means the update has not been processed
      * @param isRemote Whether this chain forwards the update to another chain
      * @param isPaused Whether the receiver is paused; this blocks processing, not execution of pending updates
      * @param isConfigActive Whether the update type is enabled on the receiver
+     * @param canProcessNow Whether an unprocessed update passes the receiver's processing checks now. False after
+     *        processing; does not check whether publication or a remote send will succeed
      * @param executableNow Whether processing would apply an unprocessed update now, or a pending update can execute
      *        now. Always false for remote updates. Caller permissions are not checked
      * @param unlockTime Unlock time stored for a processed update, or the time processing would set now. For remote
@@ -42,17 +47,18 @@ contract RiskStewardLens {
      * @param currentValues Current market values; empty for remote or unknown update types
      * @param proposedValues Decoded values: `[cap]`, `[collateralFactor, liquidationThreshold]`, or
      *        `[uint160(interestRateModel)]`. Empty for unknown types or an unexpected value length
-     * @param canProcessNow Whether an unprocessed update passes the receiver's processing checks now. False after
-     *        processing; does not check whether publication or a remote send will succeed
      */
     struct UpdateDetails {
         uint256 updateId;
         string updateType;
         address market;
+        uint96 poolId;
+        uint256 chainId;
         IRiskStewardReceiver.UpdateStatus status;
         bool isRemote;
         bool isPaused;
         bool isConfigActive;
+        bool canProcessNow;
         bool executableNow;
         uint256 unlockTime;
         uint256 expiresAt;
@@ -61,7 +67,6 @@ contract RiskStewardLens {
         uint256 replacedByUpdateId;
         uint256[] currentValues;
         uint256[] proposedValues;
-        bool canProcessNow;
     }
 
     bytes32 internal constant SUPPLY_CAP_KEY = keccak256("supplyCap");
@@ -172,7 +177,9 @@ contract RiskStewardLens {
         details.updateId = update.updateId;
         details.updateType = update.updateType;
         details.market = update.market;
+        details.poolId = update.poolId;
         details.isRemote = update.destLzEid != 0 && update.destLzEid != RISK_STEWARD_RECEIVER.LAYER_ZERO_EID();
+        details.chainId = details.isRemote ? _getChainId(update.destLzEid) : block.chainid;
         details.isPaused = RISK_STEWARD_RECEIVER.paused();
         details.isConfigActive = RISK_STEWARD_RECEIVER.getRiskParameterConfig(update.updateType).active;
         details.proposedValues = _decodeProposedValues(update);
@@ -356,5 +363,31 @@ contract RiskStewardLens {
             values = new uint256[](2);
             (values[0], values[1]) = abi.decode(update.newValue, (uint256, uint256));
         }
+    }
+
+    /**
+     * @notice Maps a LayerZero endpoint ID to its chain ID.
+     * @param eid LayerZero V2 endpoint ID
+     * @return Chain ID, or zero for an unknown endpoint ID
+     */
+    // solhint-disable-next-line code-complexity
+    function _getChainId(uint32 eid) internal pure returns (uint256) {
+        // Mainnets
+        if (eid == 30101) return 1; // Ethereum
+        if (eid == 30110) return 42161; // Arbitrum One
+        if (eid == 30111) return 10; // OP Mainnet
+        if (eid == 30165) return 324; // zkSync Era
+        if (eid == 30184) return 8453; // Base
+        if (eid == 30202) return 204; // opBNB
+        if (eid == 30320) return 130; // Unichain
+        // Testnets
+        if (eid == 40161) return 11155111; // Sepolia
+        if (eid == 40202) return 5611; // opBNB testnet
+        if (eid == 40231) return 421614; // Arbitrum Sepolia
+        if (eid == 40232) return 11155420; // OP Sepolia
+        if (eid == 40245) return 84532; // Base Sepolia
+        if (eid == 40305) return 300; // zkSync Sepolia
+        if (eid == 40333) return 1301; // Unichain Sepolia
+        return 0;
     }
 }

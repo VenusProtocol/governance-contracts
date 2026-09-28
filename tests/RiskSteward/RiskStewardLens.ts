@@ -4,6 +4,7 @@ import fs from "fs";
 import { ethers, upgrades } from "hardhat";
 import path from "path";
 
+import { LZ_V2_EID } from "../../helpers/deploy/constants";
 import {
   MarketCapsRiskSteward,
   MockCoreComptroller,
@@ -162,6 +163,10 @@ describe("RiskStewardLens", async function () {
   it("previews a direct execution before it is proposed, then follows it once published", async function () {
     const preview = await lens.previewUpdate(...borrowCapArgs(10));
     expect(preview.updateId).to.equal(1);
+    const { chainId } = await ethers.provider.getNetwork();
+    expect(preview.chainId).to.equal(chainId);
+    // Targeting this chain's own endpoint ID is still a local update
+    expect((await lens.previewUpdate(...borrowCapArgs(10, BSC_LZV2_CHAIN_ID))).chainId).to.equal(chainId);
     expect(preview.status).to.equal(0); // None
     expect(preview.canProcessNow).to.equal(true);
     expect(preview.executableNow).to.equal(true);
@@ -329,6 +334,7 @@ describe("RiskStewardLens", async function () {
     const sent = await lens.getUpdateDetails(1);
     expect(sent.status).to.equal(5); // SENT_TO_DESTINATION
     expect(sent.isRemote).to.equal(true);
+    expect(sent.chainId).to.equal(1); // Ethereum
     expect(sent.executableNow).to.equal(false);
     expect(sent.unlockTime).to.equal((await riskStewardReceiver.updates(1)).unlockTime);
     // A resend has no timelock ahead of it, so the full 2 days apply
@@ -384,6 +390,13 @@ describe("RiskStewardLens", async function () {
     );
   });
 
+  it("reverts with the oracle's error for an update ID the oracle does not have", async function () {
+    await riskOracle.publishRiskParameterUpdate(...borrowCapArgs(10));
+
+    await expect(lens.getUpdateDetails(0)).to.be.revertedWithCustomError(riskOracle, "InvalidUpdateId");
+    await expect(lens.getUpdateDetails(2)).to.be.revertedWithCustomError(riskOracle, "InvalidUpdateId");
+  });
+
   it("reads eMode collateral factors from the pool the update targets", async function () {
     const poolId = 1;
     await mockCoreComptroller.setCollateralFactor(
@@ -402,6 +415,7 @@ describe("RiskStewardLens", async function () {
       0,
       "0x",
     );
+    expect(preview.poolId).to.equal(poolId);
     expect(preview.executableNow).to.equal(false);
     expect(preview.currentValues).to.deep.equal([parseUnits("0.7", 18), parseUnits("0.8", 18)]);
     expect(preview.proposedValues).to.deep.equal([parseUnits("0.75", 18), parseUnits("0.8", 18)]);
@@ -457,6 +471,21 @@ describe("RiskStewardLens", async function () {
     expect(preview.executableNow).to.equal(false);
     expect(preview.currentValues).to.be.empty;
     expect(preview.proposedValues).to.deep.equal([parseUnits("12", 18)]);
+  });
+
+  it("maps every destination endpoint ID to the chain ID its deployments were made on", async function () {
+    // BSC sends the updates, so it is never a destination, and hardhat is not a real network
+    const destinations = Object.entries(LZ_V2_EID).filter(
+      ([network]) => !["bscmainnet", "bsctestnet", "hardhat"].includes(network),
+    );
+    for (const [network, eid] of destinations) {
+      const chainId = Number(fs.readFileSync(path.join(__dirname, `../../deployments/${network}/.chainId`), "utf8"));
+      const preview = await lens.previewUpdate(...borrowCapArgs(12, eid));
+      expect(preview.chainId).to.equal(chainId, network);
+    }
+
+    // An endpoint ID with no chain ID in the lens
+    expect((await lens.previewUpdate(...borrowCapArgs(12, 30999))).chainId).to.equal(0);
   });
 
   it("flags a paused receiver, which holds back processUpdate but not the execution of a pending update", async function () {
