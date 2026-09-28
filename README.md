@@ -26,6 +26,8 @@ foundryup --install v1.5.1
 
 npx hardhat test
 
+forge test
+
 ```
 
 ### Hardhat Commands
