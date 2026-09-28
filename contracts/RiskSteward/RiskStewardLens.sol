@@ -84,6 +84,15 @@ contract RiskStewardLens {
     address public immutable CORE_POOL_COMPTROLLER;
 
     /**
+     * @notice Thrown when a collateral factor update gives an eMode pool ID for an isolated market.
+     * @dev Isolated pools have no eMode pools. The receiver still queues such an update behind the timelock, but the
+     *      steward reverts with `InvalidPool` when executing it, so the update can never apply.
+     * @param market Isolated market the update targets
+     * @param poolId eMode pool ID the update gives
+     */
+    error EModePoolOnIsolatedMarket(address market, uint96 poolId);
+
+    /**
      * @param riskStewardReceiver_ Receiver to query
      * @param corePoolComptroller_ Core pool comptroller on this chain
      * @custom:error ZeroAddressNotAllowed if either address is zero
@@ -103,6 +112,7 @@ contract RiskStewardLens {
      * @return details The update details
      * @custom:error InvalidUpdateId if the oracle has no update with this ID
      * @custom:error May forward a steward error for an unprocessed update, or PoolDoesNotExist for an unknown eMode pool
+     * @custom:error EModePoolOnIsolatedMarket if a collateral factor update targets an eMode pool on an isolated market
      */
     function getUpdateDetails(uint256 updateId) external view returns (UpdateDetails memory details) {
         RiskParameterUpdate memory update = RISK_ORACLE.getUpdateById(updateId);
@@ -139,6 +149,7 @@ contract RiskStewardLens {
      * @param additionalData Extra data passed with the update
      * @return details The previewed details
      * @custom:error May forward a steward error or PoolDoesNotExist for an unknown eMode pool
+     * @custom:error EModePoolOnIsolatedMarket if a collateral factor update targets an eMode pool on an isolated market
      */
     function previewUpdate(
         string memory referenceId,
@@ -319,7 +330,6 @@ contract RiskStewardLens {
 
     /**
      * @notice Reads a market's collateral factor and liquidation threshold.
-     * @dev A nonzero eMode pool ID on an isolated market returns zeros; execution later reverts with `InvalidPool`.
      * @param market Market to read
      * @param poolId eMode pool ID, or zero for regular factors
      * @return collateralFactor Current collateral factor
@@ -332,9 +342,8 @@ contract RiskStewardLens {
         address comptroller = ICorePoolVToken(market).comptroller();
 
         if (comptroller != CORE_POOL_COMPTROLLER) {
-            if (poolId == 0) {
-                (, collateralFactor, liquidationThreshold) = IIsolatedPoolsComptroller(comptroller).markets(market);
-            }
+            if (poolId != 0) revert EModePoolOnIsolatedMarket(market, poolId);
+            (, collateralFactor, liquidationThreshold) = IIsolatedPoolsComptroller(comptroller).markets(market);
         } else if (poolId == 0) {
             (, collateralFactor, , liquidationThreshold, , , ) = ICorePoolComptroller(comptroller).markets(market);
         } else {

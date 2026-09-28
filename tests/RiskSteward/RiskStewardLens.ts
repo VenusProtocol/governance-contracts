@@ -442,11 +442,10 @@ describe("RiskStewardLens", async function () {
       parseUnits("0.5", 18),
       parseUnits("0.6", 18),
     ]);
-    // Isolated pools have no eMode pools, so there is nothing to read
-    expect((await previewCollateralFactors(1)).currentValues).to.deep.equal([
-      ethers.constants.Zero,
-      ethers.constants.Zero,
-    ]);
+    // Isolated pools have no eMode pools, so the steward would fail this update at execution
+    await expect(previewCollateralFactors(1))
+      .to.be.revertedWithCustomError(lens, "EModePoolOnIsolatedMarket")
+      .withArgs(isolatedVToken.address, 1);
   });
 
   it("returns an interest rate model update as addresses", async function () {
