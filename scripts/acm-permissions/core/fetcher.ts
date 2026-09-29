@@ -17,6 +17,8 @@ export async function scanRange(opts: {
   const { provider, network, acmAddress, table, chunkSize, onChunk, log = () => undefined } = opts;
   const toBlock = opts.toBlock ?? (await withRetry(() => provider.getBlockNumber(), `${network} getBlockNumber`));
   if (opts.fromBlock > toBlock) return { fromBlock: opts.fromBlock, toBlock, totalEvents: 0, upToDate: true };
+  // Modern ACMs: PermissionGranted/Revoked only, so DEFAULT_ADMIN_ROLE and direct grantRole
+  // calls (RoleGranted only) are out of scope there — see DESIGN.md §6.1.
   const t = isLegacyAcm(network) ? TOPICS.legacy : TOPICS.modern;
   let totalEvents = 0;
   for (let start = opts.fromBlock; start <= toBlock; ) {

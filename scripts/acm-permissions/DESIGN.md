@@ -34,6 +34,8 @@ CLI that:
   output; investigation is future work).
 - Advanced filter conditions (e.g. "timelock but not guardian" presets). Phase 1 filter
   is a simple multi-select by grantee.
+- ACM admin roles (`DEFAULT_ADMIN_ROLE`) on the 15 modern networks, which only emit
+  `RoleGranted` (§6.1).
 
 ---
 
@@ -332,6 +334,15 @@ ACM emits self-describing events:
 Decoding is direct. `contractAddress == address(0)` means a **wildcard** permission
 (account may call `functionSig` on any contract) and is represented explicitly in the
 snapshot with `"scope": "wildcard"`.
+
+**Out of scope: admin roles.** Only `giveCallPermission`/`revokeCallPermission` emit these
+events. `DEFAULT_ADMIN_ROLE` (set in the constructor via `_setupRole`, later moved with
+`grantRole`), and any role given through a direct `grantRole`, emits only OpenZeppelin's
+`RoleGranted`/`RoleRevoked`, which the modern scan does not read. Those holders are real
+on-chain but absent from the snapshot on all 15 modern networks; only bscmainnet (§6.2)
+records `DEFAULT_ADMIN_ROLE`. Covering it would take a second `RoleGranted`/`RoleRevoked`
+scan filtered to `role == bytes32(0)`, verified with `hasRole` (not `hasPermission`), plus
+a `--rebuild` of each modern network to backfill history.
 
 State key: `(contractAddress, functionSig)`.
 

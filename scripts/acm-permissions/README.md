@@ -189,6 +189,13 @@ be there because its function was removed, or simply because its current source 
 by the registry builder. Use the origin notes in `registry/legacy-signatures.json` to tell the cases
 apart.
 
+One consequence of the two event models: ACM admin roles are recorded only on `bscmainnet`. On every
+other network, `DEFAULT_ADMIN_ROLE` (and any role given with a direct `grantRole` call rather than
+`giveCallPermission`) emits only `RoleGranted`, which the modern scan does not read, so those
+holders are out of scope there and never appear in the snapshot. The admin is still granted on-chain
+(for example, `hasRole(bytes32(0), NormalTimelock)` is `true` on Arbitrum One); check it with
+`hasRole` directly.
+
 ## Common workflows
 
 Routine update:
