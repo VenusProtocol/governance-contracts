@@ -30,7 +30,16 @@ import {
   requireSignaturesForLegacy,
 } from "./core/registry";
 import { relabelNetwork } from "./core/relabel";
-import { fileToState, loadSnapshotFile, reannotateUndecoded, saveSnapshotFile, stateToFile } from "./core/snapshot";
+import {
+  clearCheckpoint,
+  fileToState,
+  loadCheckpoint,
+  loadSnapshotFile,
+  resumeScan,
+  saveCheckpoint,
+  saveSnapshotFile,
+  stateToFile,
+} from "./core/snapshot";
 import { ACM_ABI, AcmLike, verifyAllAndFix, verifyDiff } from "./core/verifier";
 import { buildContractRegistry } from "./registry-builder/contracts";
 import { buildSignatures, flattenSignatures } from "./registry-builder/signatures";
@@ -104,34 +113,39 @@ async function fetchNetwork(
   const table = isLegacyAcm(network) ? buildHashTable(loadKnownAddresses(network), loadSignatures()) : null;
   if (opts.rebuild) fs.rmSync(snapshotDir(network), { recursive: true, force: true });
   const prevFile = loadSnapshotFile(network);
-  const state = prevFile ? fileToState(prevFile) : {};
-  // Re-annotate any previously-undecoded roles using the (possibly grown) legacy hash table
-  // BEFORE taking the deep copy below, so re-annotation alone never shows up as a diff.
-  reannotateUndecoded(state, table);
-  const prevState = JSON.parse(JSON.stringify(state)); // deep copy for diffing
-  const fromBlock = (prevFile?.height ?? STARTING_BLOCKS[network] - 1) + 1;
-  const meta = () => ({ network, acmAddress: acmAddr, height: 0, updatedAt: new Date().toISOString() });
+  const checkpoint = loadCheckpoint(network);
+  const resume = resumeScan(prevFile, checkpoint, table);
+  const { baseHeight, prevState, state, pending } = resume;
+  if (checkpoint && !pending) {
+    console.warn(
+      `[${network}] discarding checkpoint built on snapshot block ${checkpoint.baseHeight} — ` +
+        `permissions.json is at ${baseHeight}`,
+    );
+    clearCheckpoint(network);
+  }
+  let height = resume.height ?? STARTING_BLOCKS[network] - 1;
   const scan = await scanRange({
     provider,
     network,
     acmAddress: acmAddr,
     table,
-    fromBlock,
+    fromBlock: height + 1,
     toBlock: opts.toBlock,
     chunkSize: opts.chunkSize,
     log: console.log,
     onChunk: (events, end) => {
       applyEvents(state, events);
-      saveSnapshotFile(network, stateToFile(state, { ...meta(), height: end }, names));
+      height = end;
+      saveCheckpoint(network, { baseHeight, height, state });
     },
-  }); // checkpoint
-  // Up to date: the re-annotation applied to `state` above is discarded unsaved here (no
-  // rewrite on a no-op run) — that's fine, `yarn acm:relabel` exists precisely to persist
-  // re-annotation without a rescan.
-  if (scan.upToDate) return { network, status: "up-to-date" as const };
+  });
+  // Up to date with nothing pending: the re-annotation applied above is discarded unsaved (no
+  // rewrite on a no-op run) — `yarn acm:relabel` exists precisely to persist re-annotation
+  // without a rescan. A pending checkpoint still falls through to be verified and saved.
+  if (scan.upToDate && !pending) return { network, status: "up-to-date" as const };
   const diff = diffSnapshots(prevState, state);
   const acm = new ethers.Contract(acmAddr, ACM_ABI, provider) as unknown as AcmLike;
-  const corrections = await verifyDiff(acm, network, diff, state, { blockTag: scan.toBlock });
+  const corrections = await verifyDiff(acm, network, diff, state, { blockTag: height });
   // Corrections only live in the console now (changes.md/json are gone — `git diff` on the
   // committed permissions.json/md is the change log), so print each one in full.
   for (const c of corrections) {
@@ -142,9 +156,14 @@ async function fetchNetwork(
         `snapshot follows chain`,
     );
   }
-  const file = stateToFile(state, { ...meta(), height: scan.toBlock, ...verificationStamp(diff, prevFile) }, names);
+  const file = stateToFile(
+    state,
+    { network, acmAddress: acmAddr, height, updatedAt: new Date().toISOString(), ...verificationStamp(diff, prevFile) },
+    names,
+  );
   saveSnapshotFile(network, file);
   writePermissionsOutputs(network, file, names);
+  clearCheckpoint(network);
   return {
     network,
     status: "ok" as const,

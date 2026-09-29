@@ -5,10 +5,16 @@ import * as path from "path";
 
 import { WILDCARD } from "../../scripts/acm-permissions/config";
 import { HashTable } from "../../scripts/acm-permissions/core/decoder";
+import { diffSnapshots } from "../../scripts/acm-permissions/core/diff";
 import {
+  Checkpoint,
+  clearCheckpoint,
   fileToState,
+  loadCheckpoint,
   loadSnapshotFile,
   reannotateUndecoded,
+  resumeScan,
+  saveCheckpoint,
   saveSnapshotFile,
   stateToFile,
 } from "../../scripts/acm-permissions/core/snapshot";
@@ -159,5 +165,57 @@ describe("snapshot file store (load/save)", () => {
       JSON.stringify({ schemaVersion: 1, height: "not-a-number", contracts: [] } as unknown as SnapshotFile),
     );
     expect(() => loadSnapshotFile("sepolia", baseDir)).to.throw(/corrupt snapshot for sepolia/);
+  });
+});
+
+describe("checkpoint store", () => {
+  let baseDir: string;
+
+  beforeEach(() => {
+    baseDir = fs.mkdtempSync(path.join(os.tmpdir(), "acm-checkpoint-test-"));
+  });
+  afterEach(() => fs.rmSync(baseDir, { recursive: true, force: true }));
+
+  it("round-trips, clears, and never touches permissions.json", () => {
+    const cp: Checkpoint = { baseHeight: 100, height: 200, state };
+    expect(loadCheckpoint("sepolia", baseDir)).to.equal(null);
+    saveCheckpoint("sepolia", cp, baseDir);
+    expect(loadCheckpoint("sepolia", baseDir)).to.deep.equal(cp);
+    expect(loadSnapshotFile("sepolia", baseDir)).to.equal(null);
+    clearCheckpoint("sepolia", baseDir);
+    expect(loadCheckpoint("sepolia", baseDir)).to.equal(null);
+  });
+});
+
+describe("resumeScan", () => {
+  const baseline = stateToFile({ "0xr1": state["0xr1"] }, meta, {});
+  const scanned: SnapshotState = { "0xr1": state["0xr1"], "0xr2": state["0xr2"] };
+
+  it("resumes a checkpoint built on the snapshot, diffing against the snapshot so pending changes get verified", () => {
+    const r = resumeScan(baseline, { baseHeight: meta.height, height: 500, state: scanned }, null);
+    expect(r.pending).to.not.equal(null);
+    expect(r.height).to.equal(500);
+    expect(r.state).to.deep.equal(scanned);
+    expect(r.prevState).to.deep.equal({ "0xr1": state["0xr1"] });
+    expect(diffSnapshots(r.prevState, r.state).added.map(e => e.roleHash)).to.deep.equal(["0xr2"]);
+  });
+
+  it("discards a checkpoint built on a different snapshot height", () => {
+    const r = resumeScan(baseline, { baseHeight: meta.height - 1, height: 500, state: scanned }, null);
+    expect(r.pending).to.equal(null);
+    expect(r.height).to.equal(meta.height);
+    expect(r.state).to.deep.equal(r.prevState);
+    expect(r.state).to.not.equal(r.prevState);
+  });
+
+  it("resumes an interrupted first build (no snapshot yet) against an empty baseline", () => {
+    const r = resumeScan(null, { baseHeight: null, height: 500, state: scanned }, null);
+    expect(r.height).to.equal(500);
+    expect(diffSnapshots(r.prevState, r.state).added).to.have.length(2);
+  });
+
+  it("starts fresh when there is neither snapshot nor checkpoint", () => {
+    const r = resumeScan(null, null, null);
+    expect(r).to.deep.include({ baseHeight: null, height: null, pending: null, state: {}, prevState: {} });
   });
 });

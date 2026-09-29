@@ -305,17 +305,17 @@ Per network, independently and in parallel (`Promise.allSettled`, one async task
 network — chunks within a network remain sequential):
 
 ```
-resume height = snapshot.height (or ACM deployment block if no snapshot)
+resume height = checkpoint.height, else snapshot.height (or ACM deployment block if neither)
 for each chunk [start, start+chunkSize-1] up to latest block:
     logs   = provider.getLogs(ACM address, grant/revoke topics, chunk range)   (retry: 5x, exp. backoff)
     events = decode(logs)                    — model depends on network (below)
     sort events by (blockNumber, logIndex)   — deterministic replay order
     state  = reduce(state, events)
-    write snapshot atomically (tmp file + rename), height = chunk end          ← resume point
+    write checkpoint.json atomically (tmp file + rename), height = chunk end   ← resume point
 after last chunk:
-    diff = compare(previous committed snapshot, new snapshot)
+    diff = compare(permissions.json, new state)
     verify diff on-chain (Section 8.1)
-    write permissions.md, unresolved-roles.json
+    write permissions.json, permissions.md, unresolved-roles.json; delete checkpoint.json
     with --verify: full self-correcting sweep of the final list (Section 8.2)
 ```
 
@@ -403,10 +403,17 @@ parallelism — is identical across all networks.
 
 ## 7. Resumability
 
-- The snapshot file embeds `height` (last fully processed block) and is written
-  **atomically after every chunk** (write `permissions.json.tmp`, then rename).
-- Killing the process at any point loses at most the in-flight chunk; the next run
-  continues from `height + 1`.
+- Scan progress goes to `checkpoint.json` beside the snapshot (gitignored), written
+  **atomically after every chunk** (tmp file, then rename). It holds the replay state,
+  `height` (last fully processed block) and `baseHeight` (the `permissions.json` height
+  the scan started from).
+- `permissions.json` is written only after the diff-verify (§8.1) passes, then the
+  checkpoint is deleted. It is always the last verified snapshot, never a half-scanned one.
+- Killing the process at any point, or a diff-verify that fails, loses at most the
+  in-flight chunk; the next run continues from the checkpoint's `height + 1` but still
+  diffs against `permissions.json`, so every change since the last verified snapshot is
+  verified, including changes scanned before the interruption. A checkpoint whose
+  `baseHeight` no longer matches `permissions.json` (e.g. after a `git pull`) is discarded.
 - `--to` overrides where scanning stops, for debugging; `--rebuild` deletes the
   network's snapshot and starts from the ACM deployment block.
 

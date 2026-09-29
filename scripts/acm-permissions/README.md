@@ -58,9 +58,12 @@ yarn acm:fetch --network ethereum --verify          # also verify every stored e
 yarn acm:fetch --network bscmainnet --rebuild       # discard its snapshot and scan from deployment
 ```
 
-The default chunk size is 40,000 blocks. A snapshot is saved atomically after every chunk, so an
-interrupted run continues from the next unprocessed block. Networks run independently: one failed
-network does not stop the others, but the command exits with an error if any network fails.
+The default chunk size is 40,000 blocks. Progress is saved atomically to a local, gitignored
+`checkpoint.json` after every chunk, so an interrupted run continues from the next unprocessed block.
+`permissions.json` is written only once the changes are verified, and a resumed run verifies every
+change since that file, including the ones found before the interruption. Networks run
+independently: one failed network does not stop the others, but the command exits with an error if
+any network fails.
 
 Use `--rebuild` carefully. It removes the selected network's existing snapshot before scanning again
 from the configured ACM deployment block.
