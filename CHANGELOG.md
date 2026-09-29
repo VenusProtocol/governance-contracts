@@ -1,3 +1,17 @@
+## 2.15.0-dev.4 (2026-09-29)
+
+* Merge pull request #181 from VenusProtocol/feat/foundry-setup ([c89a278](https://github.com/VenusProtocol/governance-contracts/commit/c89a278)), closes [#181](https://github.com/VenusProtocol/governance-contracts/issues/181)
+* chore: drop redundant foundry config and forge build from compile ([8d3c921](https://github.com/VenusProtocol/governance-contracts/commit/8d3c921))
+* chore: drop the foundry failure dirs and unused invariant config ([c6c4e2b](https://github.com/VenusProtocol/governance-contracts/commit/c6c4e2b))
+* chore: lower the ci fuzz budget to 2000 runs ([d14aaf2](https://github.com/VenusProtocol/governance-contracts/commit/d14aaf2))
+* chore: pin forge-std v1.15.0, fork rpc config, forge out of yarn ([65bdd6b](https://github.com/VenusProtocol/governance-contracts/commit/65bdd6b))
+* docs: add foundry and the forge-std submodule to the setup steps ([f116b44](https://github.com/VenusProtocol/governance-contracts/commit/f116b44))
+* docs: add the forge test command to the readme ([73f7838](https://github.com/VenusProtocol/governance-contracts/commit/73f7838))
+* docs: document the foundry setup and what belongs in it ([4a09078](https://github.com/VenusProtocol/governance-contracts/commit/4a09078))
+* docs: drop the foundry readme ([79ac4a2](https://github.com/VenusProtocol/governance-contracts/commit/79ac4a2))
+* test: fuzz access control manager permission scoping in foundry ([832581d](https://github.com/VenusProtocol/governance-contracts/commit/832581d))
+* feat: add foundry alongside hardhat with forge-std and a ci job ([666fc39](https://github.com/VenusProtocol/governance-contracts/commit/666fc39))
+
 ## 2.15.0-dev.3 (2026-09-23)
 
 * Merge pull request #178 from VenusProtocol/feat/code-complexity-gates ([2d0a591](https://github.com/VenusProtocol/governance-contracts/commit/2d0a591)), closes [#178](https://github.com/VenusProtocol/governance-contracts/issues/178)
