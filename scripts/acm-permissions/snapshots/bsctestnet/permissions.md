@@ -1,6 +1,6 @@
 # ACM Permissions — bsctestnet
 
-Snapshot block: 132508069 · Updated: 2026-09-22 · Contracts: 119 · Permissions: 766 · Verification: ✅ verified on-chain (as of 2026-09-22)
+Snapshot block: 133830834 · Updated: 2026-09-29 · Contracts: 121 · Permissions: 790 · Verification: ✅ verified on-chain (as of 2026-09-29)
 
 ## 0x05968239d978601146D3e50eE1F29e8571249fB0 (`0x05968239d978601146D3e50eE1F29e8571249fB0`)
 
@@ -23,6 +23,8 @@ Snapshot block: 132508069 · Updated: 2026-09-22 · Contracts: 119 · Permission
 
 | Function | Grantees |
 | --- | --- |
+| `enterMarketForAccount(address,address)` | 0xbB3304B6a1eB1d48E1d2EE78eadDadD4024DF358, Guardian |
+| `setActionsPaused(address[],uint256[],bool)` | Guardian |
 | `setAllowedLiquidator(address,bool)` | Guardian, NormalTimelock |
 | `setAllowedSupplier(address,address,bool)` | Guardian, NormalTimelock |
 | `setCloseFactor(uint256)` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
@@ -35,6 +37,7 @@ Snapshot block: 132508069 · Updated: 2026-09-22 · Contracts: 119 · Permission
 | `setMarketSupplyCaps(address[],uint256[])` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
 | `setMinLiquidatableCollateral(uint256)` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
 | `setSupplyAllowlistEnabled(address,bool)` | Guardian, NormalTimelock |
+| `unlistMarket(address)` | Guardian |
 
 ## 0x18F2543DCCD09dEb0e28575008CD24c0700e964B (`0x18F2543DCCD09dEb0e28575008CD24c0700e964B`)
 
@@ -51,6 +54,15 @@ Snapshot block: 132508069 · Updated: 2026-09-22 · Contracts: 119 · Permission
 | --- | --- |
 | `addMarket(AddMarketInput)` | Guardian |
 | `createRegistryPool(string,address,uint256,uint256,uint256,address,uint256,address)` | Guardian |
+
+## 0x211c38CB5543D1dd589c06ba1a27eDcF0FE25e2f (`0x211c38CB5543D1dd589c06ba1a27eDcF0FE25e2f`)
+
+| Function | Grantees |
+| --- | --- |
+| `setHubNavConfig(address,address,uint16,uint16)` | Guardian, NormalTimelock |
+| `setMinHubNavGapBps(uint16)` | Guardian, NormalTimelock |
+| `setNavMonitoringEnabled(address,address,bool)` | Guardian, NormalTimelock |
+| `setTrustedKeeper(address,bool)` | Guardian, NormalTimelock |
 
 ## 0x22E7443A271A4A59EcF2c96134B579d60dc15a1A (`0x22E7443A271A4A59EcF2c96134B579d60dc15a1A`)
 
@@ -466,6 +478,26 @@ Snapshot block: 132508069 · Updated: 2026-09-22 · Contracts: 119 · Permission
 | --- | --- |
 | `fundXVSVault(uint256)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 
+## 0xb084B5af4a040933790Cdc1b2d15ac7BB3514E50 (`0xb084B5af4a040933790Cdc1b2d15ac7BB3514E50`)
+
+| Function | Grantees |
+| --- | --- |
+| `enterMarketForAccount(address,address)` | Guardian |
+| `setActionsPaused(address[],uint256[],bool)` | Guardian |
+| `setAllowedLiquidator(address,bool)` | Guardian |
+| `setAllowedSupplier(address,address,bool)` | Guardian |
+| `setCloseFactor(uint256)` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
+| `setCollateralFactor(address,uint256,uint256)` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
+| `setForcedLiquidation(address,bool)` | Guardian |
+| `setLiquidationAllowlistEnabled(bool)` | Guardian |
+| `setLiquidationIncentive(uint256)` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
+| `setMarketBorrowCaps(address[],uint256[])` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
+| `setMarketLiquidationIncentive(address,uint256)` | Guardian |
+| `setMarketSupplyCaps(address[],uint256[])` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
+| `setMinLiquidatableCollateral(uint256)` | 0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B |
+| `setSupplyAllowlistEnabled(address,bool)` | Guardian |
+| `unlistMarket(address)` | Guardian |
+
 ## 0xB46BDd025F8FB78eD5174155F74Cb452DF15d6D4 (`0xB46BDd025F8FB78eD5174155F74Cb452DF15d6D4`)
 
 | Function | Grantees |
@@ -715,6 +747,7 @@ Snapshot block: 132508069 · Updated: 2026-09-22 · Contracts: 119 · Permission
 | --- | --- |
 | `decreaseCF(address,uint256)` | DeviationSentinel / DeviationSentinel_Proxy, Executor / Executor_Proxy |
 | `pauseBorrow(address)` | DeviationSentinel / DeviationSentinel_Proxy, Executor / Executor_Proxy |
+| `pauseHub(address)` | 0x211c38CB5543D1dd589c06ba1a27eDcF0FE25e2f |
 | `pauseSupply(address)` | DeviationSentinel / DeviationSentinel_Proxy, Executor / Executor_Proxy |
 | `setMarketBorrowCaps(address[],uint256[])` | Executor / Executor_Proxy |
 | `setMarketSupplyCaps(address[],uint256[])` | Executor / Executor_Proxy |
@@ -1073,6 +1106,7 @@ Snapshot block: 132508069 · Updated: 2026-09-22 · Contracts: 119 · Permission
 | `_supportMarket(address)` | Guardian, NormalTimelock |
 | `addPoolMarkets(uint96[],address[])` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `createPool(string)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
+| `enterMarketForAccount(address,address)` | 0xbB3304B6a1eB1d48E1d2EE78eadDadD4024DF358 |
 | `removePoolMarket(uint96,address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
 | `seizeVenus(address[],address,address[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `seizeVenus(address[],address)` | CriticalTimelock, FastTrackTimelock, NormalTimelock |
@@ -1304,12 +1338,12 @@ Snapshot block: 132508069 · Updated: 2026-09-22 · Contracts: 119 · Permission
 | `pauseActions(address[],uint8[])` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `pauseBorrow(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `pauseFlashLoan()` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseHub()` | Guardian |
+| `pauseHub()` | EBrake / EBrake_Proxy, Guardian |
 | `pauseRedeem(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseResource(address)` | Guardian |
+| `pauseResource(address)` | EBrake / EBrake_Proxy, Guardian |
 | `pauseSupply(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
 | `pauseTransfer(address)` | CriticalTimelock, FastTrackTimelock, Guardian, NormalTimelock |
-| `pauseYieldGroup(address)` | Guardian |
+| `pauseYieldGroup(address)` | EBrake / EBrake_Proxy, Guardian |
 | `raiseMaxWithdrawalSize(uint256)` | Guardian |
 | `raiseResourceCap(address,uint256)` | Guardian |
 | `raiseYieldGroupCap(address,uint256,uint16)` | Guardian |

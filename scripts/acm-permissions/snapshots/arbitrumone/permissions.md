@@ -1,6 +1,6 @@
 # ACM Permissions — arbitrumone
 
-Snapshot block: 507764846 · Updated: 2026-09-22 · Contracts: 26 · Permissions: 152 · Verification: ✅ verified on-chain (as of 2026-07-27)
+Snapshot block: 509975492 · Updated: 2026-09-29 · Contracts: 26 · Permissions: 152 · Verification: ✅ verified on-chain (as of 2026-07-27)
 
 ## AuxiliaryCommandsAggregator / AuxiliaryCommandsAggregator_Proxy (`0x768FEf3a88ea92cCF9CAcDf0aB15C4B29B3C1379`)
 

@@ -1,10 +1,10 @@
 {
   "network": "bsctestnet",
   "acmAddress": "0x45f8a08F534f34A97187626E05d4b6648Eeaa9AA",
-  "height": 132508069,
-  "updatedAt": "2026-09-22T11:14:26.234Z",
+  "height": 133830834,
+  "updatedAt": "2026-09-29T08:33:58.298Z",
   "verified": true,
-  "verifiedAt": "2026-09-22T11:14:26.234Z",
+  "verifiedAt": "2026-09-29T08:33:58.298Z",
   "schemaVersion": 1,
   "contracts": [
     {
@@ -455,10 +455,15 @@
             {
               "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
               "name": "Guardian"
+            },
+            {
+              "address": "0x957c09e3Ac3d9e689244DC74307c94111FBa8B42",
+              "name": "EBrake / EBrake_Proxy"
             }
           ],
           "transactions": [
-            "0x545825dd67eaaa312aa0f2afd8759ba46cb40439d3ca5844d7a6154907d1cc11"
+            "0x545825dd67eaaa312aa0f2afd8759ba46cb40439d3ca5844d7a6154907d1cc11",
+            "0x733b5535375ac8f9b8bfc4d83903b3ad7e7345acb83a248bec4f00ce337e8cf9"
           ]
         },
         {
@@ -495,10 +500,15 @@
             {
               "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
               "name": "Guardian"
+            },
+            {
+              "address": "0x957c09e3Ac3d9e689244DC74307c94111FBa8B42",
+              "name": "EBrake / EBrake_Proxy"
             }
           ],
           "transactions": [
-            "0x56e092d51070f5e9c174e550a2cafcfd74807dc98ab259c768f411a7f6926455"
+            "0x56e092d51070f5e9c174e550a2cafcfd74807dc98ab259c768f411a7f6926455",
+            "0x733b5535375ac8f9b8bfc4d83903b3ad7e7345acb83a248bec4f00ce337e8cf9"
           ]
         },
         {
@@ -561,10 +571,15 @@
             {
               "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
               "name": "Guardian"
+            },
+            {
+              "address": "0x957c09e3Ac3d9e689244DC74307c94111FBa8B42",
+              "name": "EBrake / EBrake_Proxy"
             }
           ],
           "transactions": [
-            "0x7b825800e4dd4c1fdf1981cd5402e7247a632bf4bb1a4bcb384292aa1d787bc8"
+            "0x7b825800e4dd4c1fdf1981cd5402e7247a632bf4bb1a4bcb384292aa1d787bc8",
+            "0x733b5535375ac8f9b8bfc4d83903b3ad7e7345acb83a248bec4f00ce337e8cf9"
           ]
         },
         {
@@ -1964,6 +1979,39 @@
       "scope": "contract",
       "permissions": [
         {
+          "functionSig": "enterMarketForAccount(address,address)",
+          "roleHash": "0x199fe5533f8d6d50b1dab84a870d01966c7d00b0c580a7b4b808428feb840dfa",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            },
+            {
+              "address": "0xbB3304B6a1eB1d48E1d2EE78eadDadD4024DF358",
+              "name": "0xbB3304B6a1eB1d48E1d2EE78eadDadD4024DF358"
+            }
+          ],
+          "transactions": [
+            "0xf24bf2623a8485cda5e90c4263842e6672127ec7882b09d70912c4983a53db3e",
+            "0xe42c1e9b9e4292b4f9412888ca4ded8c3c454fe8b6b7aed1d3f74e064ce0dbf9"
+          ]
+        },
+        {
+          "functionSig": "setActionsPaused(address[],uint256[],bool)",
+          "roleHash": "0x68fd9408ef0a21cb66563f4ad63c8f20b36b4b4187348f8bfe25a8a4c806b2cd",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0xf24bf2623a8485cda5e90c4263842e6672127ec7882b09d70912c4983a53db3e"
+          ]
+        },
+        {
           "functionSig": "setAllowedLiquidator(address,bool)",
           "roleHash": "0x8d9092d78b62aede18057203fb411ab1fb829f05c293680fba6d05330df881cf",
           "decoded": true,
@@ -2154,6 +2202,20 @@
           "transactions": [
             "0x3da87cd5d0430c45b6f90a5589ed93bf2eddfa8faf4e6e0b03be7dca55d850cb"
           ]
+        },
+        {
+          "functionSig": "unlistMarket(address)",
+          "roleHash": "0x2283ec7b8347e1f52f5fdae3ea5bf7b1c079d51f56a429990f6e02b4f47be396",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0xf24bf2623a8485cda5e90c4263842e6672127ec7882b09d70912c4983a53db3e"
+          ]
         }
       ]
     },
@@ -2291,6 +2353,85 @@
           ],
           "transactions": [
             "0x9447f10b159e7f6983888f19a074b59f9a33a74d1838db264cd7d0fcec0741d4"
+          ]
+        }
+      ]
+    },
+    {
+      "address": "0x211c38CB5543D1dd589c06ba1a27eDcF0FE25e2f",
+      "name": "0x211c38CB5543D1dd589c06ba1a27eDcF0FE25e2f",
+      "scope": "contract",
+      "permissions": [
+        {
+          "functionSig": "setHubNavConfig(address,address,uint16,uint16)",
+          "roleHash": "0x041a713a4708512ecbfbfc4d208ae55616075230d4ca9274e187fd1bcbfb430e",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xce10739590001705F7FF231611ba4A48B2820327",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0x733b5535375ac8f9b8bfc4d83903b3ad7e7345acb83a248bec4f00ce337e8cf9"
+          ]
+        },
+        {
+          "functionSig": "setMinHubNavGapBps(uint16)",
+          "roleHash": "0x5c84e4813ed6990c663c4b1822af1cb2f6367a367ce4ffdf73486657e1680666",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xce10739590001705F7FF231611ba4A48B2820327",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0x733b5535375ac8f9b8bfc4d83903b3ad7e7345acb83a248bec4f00ce337e8cf9"
+          ]
+        },
+        {
+          "functionSig": "setNavMonitoringEnabled(address,address,bool)",
+          "roleHash": "0x84bb4da032cad4928e6b17454372cc7758e2f4074bfdc249a1f0711951d71c17",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xce10739590001705F7FF231611ba4A48B2820327",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0x733b5535375ac8f9b8bfc4d83903b3ad7e7345acb83a248bec4f00ce337e8cf9"
+          ]
+        },
+        {
+          "functionSig": "setTrustedKeeper(address,bool)",
+          "roleHash": "0x46e509de0874b501dfe19fe03dc60a6ec58a7ebf6561debf1eb04a0a64980993",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xce10739590001705F7FF231611ba4A48B2820327",
+              "name": "NormalTimelock"
+            },
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0x733b5535375ac8f9b8bfc4d83903b3ad7e7345acb83a248bec4f00ce337e8cf9"
           ]
         }
       ]
@@ -7341,6 +7482,223 @@
       ]
     },
     {
+      "address": "0xb084B5af4a040933790Cdc1b2d15ac7BB3514E50",
+      "name": "0xb084B5af4a040933790Cdc1b2d15ac7BB3514E50",
+      "scope": "contract",
+      "permissions": [
+        {
+          "functionSig": "enterMarketForAccount(address,address)",
+          "roleHash": "0x08fff594dff9a0d2468d0fbbbe100962a3ef09ac7dc50bafe615179d7c9f7285",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0x96e031d3e0d8e1ea26c80acd5d0aeedae4f941ecb3bb386de5838d04340869ca"
+          ]
+        },
+        {
+          "functionSig": "setActionsPaused(address[],uint256[],bool)",
+          "roleHash": "0x90e1b112c2cfb07988b948a37371b4823a2f49b342fa23f90d7040f4abaf38d9",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0x56ebdb402cac9427870b7d87a98f8ae6e90c85e673c7d4e533525f3c99ecdde1"
+          ]
+        },
+        {
+          "functionSig": "setAllowedLiquidator(address,bool)",
+          "roleHash": "0x6e73c3436eb33b5ce98b0a82575132adfc15bd7f9fdebf12aff75eb239efbf7a",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0xd126c6cde8faf308f21271a77f5570f3475a658896c32fe99acba56272ff43d5"
+          ]
+        },
+        {
+          "functionSig": "setAllowedSupplier(address,address,bool)",
+          "roleHash": "0x0a0abac707c5a9118c94c0104dfcb2d38b9886069015ec1fdad752375afffa93",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0x61277b4f4357bddc3a658a1253f3421aa1ae25d69674fda38f8030a32052d123"
+          ]
+        },
+        {
+          "functionSig": "setCloseFactor(uint256)",
+          "roleHash": "0x34e0577f337b8fba404e9c6b4c1a256a1c2ea43cfe3fff5c940efc50a23430c0",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B",
+              "name": "0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B"
+            }
+          ],
+          "transactions": [
+            "0x67cdca6127006f206a920a2d6c75b7503ba0483b5a7c1dc206cbd24f1e600fd1"
+          ]
+        },
+        {
+          "functionSig": "setCollateralFactor(address,uint256,uint256)",
+          "roleHash": "0x7d04ee5e0eb5c801a86f16bf5b1d0d31bafacbe5017755fd77e4c038a282af7e",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B",
+              "name": "0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B"
+            }
+          ],
+          "transactions": [
+            "0x08219bbe460624bb2696469242a93bdd88d623c73fb00f418be4084dffedd239"
+          ]
+        },
+        {
+          "functionSig": "setForcedLiquidation(address,bool)",
+          "roleHash": "0x7ca01be9ed26d50ac8b24201f5014e35a056a5266f5c36c3749fae77b1e7e693",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0xa93b610b7dcf510d5f457510c8f72663642af475ed73109a8389a7091f03138c"
+          ]
+        },
+        {
+          "functionSig": "setLiquidationAllowlistEnabled(bool)",
+          "roleHash": "0x1fceb50b7316740c953a5d7199a7906795f41986b33eae0e7a851924df6ddd46",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0xb2522102408dcf346e15ee543d4b2052f450320b4638645541f8069560936c70"
+          ]
+        },
+        {
+          "functionSig": "setLiquidationIncentive(uint256)",
+          "roleHash": "0x3948eeea27bcfdf1af7e369d4e491e5a79382aa87bb6944dbc4a5af3fd6d16d7",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B",
+              "name": "0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B"
+            }
+          ],
+          "transactions": [
+            "0xe766770f62f923c57a74dc7775529c2ea986b39b946b844aaff4aa085d11083b"
+          ]
+        },
+        {
+          "functionSig": "setMarketBorrowCaps(address[],uint256[])",
+          "roleHash": "0x753b8fa8f004cce81700994f4f56d3ae87b7b658cf3e911b87f806eb0a3bfc7b",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B",
+              "name": "0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B"
+            }
+          ],
+          "transactions": [
+            "0xa3394165490b0df5bebf0f01405ea3a165ee71b346db9a249dcb3af68eb54333"
+          ]
+        },
+        {
+          "functionSig": "setMarketLiquidationIncentive(address,uint256)",
+          "roleHash": "0x5db9207efa99f6c8986dfa3ec9dbcedb5d0ecd7d3cb70b1f746934aa525b8d4b",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0x7d34283ef153804453cab4ef7b7a60e48f2549c4fd97d35bc8c7b6d16fa41d20"
+          ]
+        },
+        {
+          "functionSig": "setMarketSupplyCaps(address[],uint256[])",
+          "roleHash": "0x3a7acca064e9370707316b32b36b06f9dc5586b5065be6951203b9e9c860843f",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B",
+              "name": "0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B"
+            }
+          ],
+          "transactions": [
+            "0x2d20199326c8a63307a5eff985af07048b60d236186fc1e78cb55c7958213f38"
+          ]
+        },
+        {
+          "functionSig": "setMinLiquidatableCollateral(uint256)",
+          "roleHash": "0xa3248f3147c0c369d7905e2df7725ac5dd065dc7c6088894a655df1c763d6387",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B",
+              "name": "0xeAA45288d804971e5a76f33559e629F5b2b1Cb8B"
+            }
+          ],
+          "transactions": [
+            "0xa763f829911a25cdf69a6e07d6d635fcac6b4d22f34714d12daea7d44ca74431"
+          ]
+        },
+        {
+          "functionSig": "setSupplyAllowlistEnabled(address,bool)",
+          "roleHash": "0xea2ef7cdaa36acd8bfb0b3ca9bcd2298e075f7b27a9e44e71f2ceed89eeff60f",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0x87f30fe251f6faec874597ebc81e4aab6f092ce87336700076d0c3001a541de2"
+          ]
+        },
+        {
+          "functionSig": "unlistMarket(address)",
+          "roleHash": "0xd4895be16b93bc5a8d3d7ca9e8240e62e785bdfe377c06f4d2e1d148389ea648",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x2Ce1d0ffD7E869D9DF33e28552b12DdDed326706",
+              "name": "Guardian"
+            }
+          ],
+          "transactions": [
+            "0xf2f0e808f6f2fb51a345b06b3c3d5c2caa666ed90dedf47a76d515d92d95bdcb"
+          ]
+        }
+      ]
+    },
+    {
       "address": "0xB46BDd025F8FB78eD5174155F74Cb452DF15d6D4",
       "name": "0xB46BDd025F8FB78eD5174155F74Cb452DF15d6D4",
       "scope": "contract",
@@ -9578,6 +9936,20 @@
           "transactions": [
             "0x011c3a491cf6924534a2d11a869f0c696e4baba4fb6a9952760c25e9e8c9c79c",
             "0x444bf9ce2771e031270042e67a8d4749f51de6bf62d62c3169a89eb090a60d6a"
+          ]
+        },
+        {
+          "functionSig": "pauseHub(address)",
+          "roleHash": "0x214bfa271890b9cd91eb52e61e1a888540bc000a2245df583ef54b6025e8b03b",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0x211c38CB5543D1dd589c06ba1a27eDcF0FE25e2f",
+              "name": "0x211c38CB5543D1dd589c06ba1a27eDcF0FE25e2f"
+            }
+          ],
+          "transactions": [
+            "0x733b5535375ac8f9b8bfc4d83903b3ad7e7345acb83a248bec4f00ce337e8cf9"
           ]
         },
         {
@@ -14529,6 +14901,20 @@
           ],
           "transactions": [
             "0x7aba31bf8b75a857bccbb0b6941814588196555e3184db5726115de508ece5a1"
+          ]
+        },
+        {
+          "functionSig": "enterMarketForAccount(address,address)",
+          "roleHash": "0x543b4cb7b9fd6516860cd728f185111615efa6dd738be909b8c3c7d442a5a100",
+          "decoded": true,
+          "grantees": [
+            {
+              "address": "0xbB3304B6a1eB1d48E1d2EE78eadDadD4024DF358",
+              "name": "0xbB3304B6a1eB1d48E1d2EE78eadDadD4024DF358"
+            }
+          ],
+          "transactions": [
+            "0xe42c1e9b9e4292b4f9412888ca4ded8c3c454fe8b6b7aed1d3f74e064ce0dbf9"
           ]
         },
         {
