@@ -50,7 +50,8 @@ const SUFFIX = "_Implementation.json";
 
 /**
  * Implementations behind GovernorBravoDelegator, which is not a hardhat-deploy proxy, so nothing in
- * the artifacts marks them. Only list contracts that something delegatecalls into.
+ * the artifacts marks them. Only list contracts that something delegatecalls into. OZ's scan misses them
+ * too, so check:upgrade-safety in package.json validates each by name.
  */
 const DELEGATOR_IMPLS = ["GovernorBravoDelegate"];
 
@@ -103,9 +104,9 @@ function assertReferenceIsUsable(): void {
   if (!BASE_REF) {
     if (!process.env.CI) return;
     console.error(
-      "No base ref. GitHub sets GITHUB_BASE_REF on pull_request events only, so this job must be " +
-        "gated on `if: github.event_name == 'pull_request'`. Comparing against the working tree " +
-        "here would compare the branch with itself.\nSet STORAGE_LAYOUT_BASE_REF to pick a ref explicitly.",
+      "No base ref. GitHub sets GITHUB_BASE_REF on pull_request events only, so this workflow must " +
+        "trigger on pull_request, not push. Comparing against the working tree here would compare " +
+        "the branch with itself.\nSet STORAGE_LAYOUT_BASE_REF to pick a ref explicitly.",
     );
     process.exit(1);
   }
@@ -253,7 +254,7 @@ function check(target: Target, current: Map<string, Layout>): string | undefined
 
 interface Results {
   failures: string[];
-  /** Allowlisted targets that now pass. */
+  /** Allowlist keys whose target now passes or no longer exists. */
   stale: string[];
 }
 
@@ -291,6 +292,7 @@ function classify(targets: Target[], current: Map<string, Layout>, allowlist: Re
       console.log(`  ${verdict.kind.padEnd(9)} ${target.key}${source}`);
     }
   }
+  results.stale.push(...Object.keys(allowlist).filter(key => !targets.some(t => t.key === key)));
   return results;
 }
 
@@ -315,7 +317,9 @@ function main(): void {
 
   if (stale.length > 0) {
     console.log(
-      `\nThese now pass -- delete them from storage-layout-allowlist.json:\n${stale.map(s => `  ${s}`).join("\n")}`,
+      `\nThese pass or match no deployment -- delete them from storage-layout-allowlist.json:\n${stale
+        .map(s => `  ${s}`)
+        .join("\n")}`,
     );
   }
   if (verdict === "FAILED") process.exit(1);

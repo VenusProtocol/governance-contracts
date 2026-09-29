@@ -3,7 +3,6 @@ name: Upgrade safety
 # Pull requests only: the layout check diffs against GITHUB_BASE_REF, which push events lack.
 on:
   pull_request:
-    branches: [main, develop]
 
 jobs:
   upgrade-safety:
