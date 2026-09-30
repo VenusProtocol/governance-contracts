@@ -170,24 +170,6 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
     }
 
     /**
-     * @dev Shared logic for storing a batch of calls.
-     * @param calls Non-empty array of (target, signature, arguments) calls to store.
-     * @return index The storage index of the newly added batch.
-     */
-    function _addBatch(Call[] calldata calls) internal returns (uint256 index) {
-        if (calls.length == 0) revert EmptyCalls();
-        index = batches.length;
-        Call[] storage batch = batches.push();
-        for (uint256 i; i < calls.length; ++i) {
-            Call calldata c = calls[i];
-            if (bytes(c.signature).length == 0) revert EmptySignature(i);
-            if (c.target.code.length == 0) revert InvalidTarget(i, c.target);
-            batch.push(c);
-        }
-        emit BatchAdded(index);
-    }
-
-    /**
      * @notice Execute every call in batch `index` sequentially. A batch can be executed only once.
      * @param index Index of the batch to execute.
      * @custom:event Emits BatchExecuted
@@ -228,5 +210,23 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
     function getBatch(uint256 index) external view returns (Call[] memory calls) {
         if (index >= batches.length) revert BatchNotFound(index);
         return batches[index];
+    }
+
+    /**
+     * @dev Shared logic for storing a batch of calls.
+     * @param calls Non-empty array of (target, signature, arguments) calls to store.
+     * @return index The storage index of the newly added batch.
+     */
+    function _addBatch(Call[] calldata calls) internal returns (uint256 index) {
+        if (calls.length == 0) revert EmptyCalls();
+        index = batches.length;
+        Call[] storage batch = batches.push();
+        for (uint256 i; i < calls.length; ++i) {
+            Call calldata c = calls[i];
+            if (bytes(c.signature).length == 0) revert EmptySignature(i);
+            if (c.target.code.length == 0) revert InvalidTarget(i, c.target);
+            batch.push(c);
+        }
+        emit BatchAdded(index);
     }
 }
