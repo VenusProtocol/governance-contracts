@@ -7,10 +7,10 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
 /**
  * @title ACMCommandsAggregator
  * @author Venus
- * @notice This contract is a helper to aggregate multiple grant and revoke permissions in batches and execute them in one go.
- * @custom:deprecated Anyone can add or execute its batches, so it must never be granted the ACM admin role again. Use
- * AuxiliaryCommandsAggregator, whose batches are added by authorized batchers and executed through the
- * AccessControlManager, with each call named by its signature.
+ * @notice DEPRECATED: anyone can add or execute its batches, so it must never be granted the ACM admin role again.
+ *         Use AuxiliaryCommandsAggregator, whose batches are added by authorized batchers and executed through the
+ *         AccessControlManager, with each call named by its signature.
+ *         This contract is a helper to aggregate multiple grant and revoke permissions in batches and execute them in one go.
  */
 contract ACMCommandsAggregator {
     /*

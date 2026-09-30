@@ -10,8 +10,8 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
  * @notice Stores pre-seeded batches of generic on-chain calls and executes them in one go,
  *         reducing the calldata footprint of governance proposals that would otherwise exceed
  *         GovernorBravo's gas limit when encoding many large-array parameters.
- *         Each call names its function by signature, like a Timelock transaction, and the selector
- *         is derived from it, so a stored batch reads back as signatures and arguments.
+ *         Each call is Timelock-style: a function signature plus ABI-encoded arguments. The selector
+ *         is derived from the signature, so a stored batch reads back as signatures and arguments.
  */
 contract AuxiliaryCommandsAggregator is AccessControlledV8 {
     /**
