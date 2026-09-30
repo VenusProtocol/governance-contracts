@@ -1,3 +1,38 @@
+## 2.15.0-dev.5 (2026-09-30)
+
+* Merge pull request #179 from VenusProtocol/feat/risk-steward-update-preview ([393fe37](https://github.com/VenusProtocol/governance-contracts/commit/393fe37)), closes [#179](https://github.com/VenusProtocol/governance-contracts/issues/179)
+* feat: distinguish processable risk updates ([8e85b55](https://github.com/VenusProtocol/governance-contracts/commit/8e85b55))
+* feat: updating deployment files ([d29c806](https://github.com/VenusProtocol/governance-contracts/commit/d29c806))
+* feat(risk-steward): add RiskStewardLens deployments on bscmainnet and bsctestnet ([cdc7145](https://github.com/VenusProtocol/governance-contracts/commit/cdc7145))
+* feat(risk-steward): add RiskStewardLens to preview risk parameter updates ([f35a3cd](https://github.com/VenusProtocol/governance-contracts/commit/f35a3cd))
+* feat(risk-steward): report pause, config and expiry deadline in RiskStewardLens ([0a62f47](https://github.com/VenusProtocol/governance-contracts/commit/0a62f47))
+* feat(risk-steward): report target chain ID and eMode pool ID in RiskStewardLens ([875a631](https://github.com/VenusProtocol/governance-contracts/commit/875a631))
+* fix(risk-steward): flag expired updates and simplify executableNow in RiskStewardLens ([575b133](https://github.com/VenusProtocol/governance-contracts/commit/575b133))
+* fix(risk-steward): revert on an eMode pool ID for an isolated market in RiskStewardLens ([4ca3985](https://github.com/VenusProtocol/governance-contracts/commit/4ca3985))
+* docs: clarify RiskStewardLens comments ([6da4528](https://github.com/VenusProtocol/governance-contracts/commit/6da4528))
+
+## 2.15.0-dev.4 (2026-09-29)
+
+* Merge pull request #181 from VenusProtocol/feat/foundry-setup ([c89a278](https://github.com/VenusProtocol/governance-contracts/commit/c89a278)), closes [#181](https://github.com/VenusProtocol/governance-contracts/issues/181)
+* chore: drop redundant foundry config and forge build from compile ([8d3c921](https://github.com/VenusProtocol/governance-contracts/commit/8d3c921))
+* chore: drop the foundry failure dirs and unused invariant config ([c6c4e2b](https://github.com/VenusProtocol/governance-contracts/commit/c6c4e2b))
+* chore: lower the ci fuzz budget to 2000 runs ([d14aaf2](https://github.com/VenusProtocol/governance-contracts/commit/d14aaf2))
+* chore: pin forge-std v1.15.0, fork rpc config, forge out of yarn ([65bdd6b](https://github.com/VenusProtocol/governance-contracts/commit/65bdd6b))
+* docs: add foundry and the forge-std submodule to the setup steps ([f116b44](https://github.com/VenusProtocol/governance-contracts/commit/f116b44))
+* docs: add the forge test command to the readme ([73f7838](https://github.com/VenusProtocol/governance-contracts/commit/73f7838))
+* docs: document the foundry setup and what belongs in it ([4a09078](https://github.com/VenusProtocol/governance-contracts/commit/4a09078))
+* docs: drop the foundry readme ([79ac4a2](https://github.com/VenusProtocol/governance-contracts/commit/79ac4a2))
+* test: fuzz access control manager permission scoping in foundry ([832581d](https://github.com/VenusProtocol/governance-contracts/commit/832581d))
+* feat: add foundry alongside hardhat with forge-std and a ci job ([666fc39](https://github.com/VenusProtocol/governance-contracts/commit/666fc39))
+
+## 2.15.0-dev.3 (2026-09-23)
+
+* Merge pull request #178 from VenusProtocol/feat/code-complexity-gates ([2d0a591](https://github.com/VenusProtocol/governance-contracts/commit/2d0a591)), closes [#178](https://github.com/VenusProtocol/governance-contracts/issues/178)
+* refactor: replace guardian network chain with a lookup record ([9742608](https://github.com/VenusProtocol/governance-contracts/commit/9742608))
+* chore: enforce function complexity limits in eslint and sonarjs ([99b2126](https://github.com/VenusProtocol/governance-contracts/commit/99b2126))
+* chore: suppress cognitive complexity gate on getRoleHashTable ([240da67](https://github.com/VenusProtocol/governance-contracts/commit/240da67))
+* chore: suppress complexity gate on guardian network lookup ([a58720a](https://github.com/VenusProtocol/governance-contracts/commit/a58720a))
+
 ## 2.15.0-dev.2 (2026-06-29)
 
 * Merge pull request #175 from VenusProtocol/feat/increase-proposal-Threshold ([b35c8f0](https://github.com/VenusProtocol/governance-contracts/commit/b35c8f0)), closes [#175](https://github.com/VenusProtocol/governance-contracts/issues/175)

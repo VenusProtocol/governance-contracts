@@ -2,7 +2,7 @@
   "name": "@venusprotocol/governance-contracts",
   "description": "",
   "repository": "git@github.com:VenusProtocol/governance-contracts.git",
-  "version": "2.15.0-dev.2",
+  "version": "2.15.0-dev.5",
   "author": "",
   "files": [
     "artifacts",
@@ -30,6 +30,7 @@
   "scripts": {
     "compile": "hardhat compile && hardhat compile --config hardhat.config.zksync.ts",
     "test": "hardhat test",
+    "test:foundry": "forge test",
     "build": "rm -rf dist && hardhat compile && hardhat compile --config hardhat.config.zksync.ts && tsc --declaration",
     "publish:dist": "yarn build && cd dist && yarn publish --access public",
     "lint": "yarn lint:ts && yarn lint:sol && yarn prettier:check",
@@ -41,7 +42,7 @@
     "prettier:cached": "prettier --write --cache \"**/*.{js,json,md,ts,yaml,yml,sol}\"",
     "docgen": "hardhat docgen",
     "prepare": "husky install",
-    "clean": "hardhat clean && hardhat clean --config hardhat.config.zksync.ts",
+    "clean": "hardhat clean && hardhat clean --config hardhat.config.zksync.ts && rm -rf out cache-foundry",
     "postinstall": "yarn patch-package",
     "acm:fetch": "ts-node scripts/acm-permissions/cli.ts fetch",
     "acm:verify": "ts-node scripts/acm-permissions/cli.ts verify",

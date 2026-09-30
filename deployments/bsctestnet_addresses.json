@@ -25,6 +25,7 @@
     "RiskOracle": "0x4DEA4D1A9F6101D4adacE89f16064D780D2F241d",
     "RiskOracle_Implementation": "0xA55eaE955E4aC038a7aFCcB373E35FD1fab13f34",
     "RiskOracle_Proxy": "0x4DEA4D1A9F6101D4adacE89f16064D780D2F241d",
+    "RiskStewardLens": "0x21f8E1471b153f49BE1d645A008E4a57434eEd23",
     "RiskStewardReceiver": "0x2F6eb64826f3A067eBFFb5909De7AA4e0Cb31b81",
     "RiskStewardReceiver_Implementation": "0xFfc0438D9E9FFf9b59f8EF9718d7C8e508D0b0CA",
     "RiskStewardReceiver_Proxy": "0x2F6eb64826f3A067eBFFb5909De7AA4e0Cb31b81"

@@ -6,11 +6,17 @@
 
 - Solc - v0.8.25 (https://github.com/ethereum/solidity/releases/tag/v0.8.25)
 
+- Foundry - v1.5.1 (https://getfoundry.sh)
+
 ### Installing
 
 ```
 
 npm install
+
+git submodule update --init --recursive
+
+foundryup --install v1.5.1
 
 ```
 
@@ -19,6 +25,8 @@ npm install
 ```
 
 npx hardhat test
+
+forge test
 
 ```
 
