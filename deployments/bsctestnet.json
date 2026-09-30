@@ -13964,6 +13964,339 @@
         }
       ]
     },
+    "RiskStewardLens": {
+      "address": "0x21f8E1471b153f49BE1d645A008E4a57434eEd23",
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "contract RiskStewardReceiver",
+              "name": "riskStewardReceiver_",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "corePoolComptroller_",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "market",
+              "type": "address"
+            },
+            {
+              "internalType": "uint96",
+              "name": "poolId",
+              "type": "uint96"
+            }
+          ],
+          "name": "EModePoolOnIsolatedMarket",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "ZeroAddressNotAllowed",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "CORE_POOL_COMPTROLLER",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "RISK_ORACLE",
+          "outputs": [
+            {
+              "internalType": "contract IRiskOracle",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "RISK_STEWARD_RECEIVER",
+          "outputs": [
+            {
+              "internalType": "contract RiskStewardReceiver",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            }
+          ],
+          "name": "getUpdateDetails",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "updateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "updateType",
+                  "type": "string"
+                },
+                {
+                  "internalType": "address",
+                  "name": "market",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint96",
+                  "name": "poolId",
+                  "type": "uint96"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "chainId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "enum IRiskStewardReceiver.UpdateStatus",
+                  "name": "status",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isRemote",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isPaused",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isConfigActive",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "canProcessNow",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "executableNow",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "unlockTime",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "expiresAt",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "debounceEndsAt",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "blockingUpdateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "replacedByUpdateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "currentValues",
+                  "type": "uint256[]"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "proposedValues",
+                  "type": "uint256[]"
+                }
+              ],
+              "internalType": "struct RiskStewardLens.UpdateDetails",
+              "name": "details",
+              "type": "tuple"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "referenceId",
+              "type": "string"
+            },
+            {
+              "internalType": "bytes",
+              "name": "newValue",
+              "type": "bytes"
+            },
+            {
+              "internalType": "string",
+              "name": "updateType",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "market",
+              "type": "address"
+            },
+            {
+              "internalType": "uint96",
+              "name": "poolId",
+              "type": "uint96"
+            },
+            {
+              "internalType": "uint32",
+              "name": "dstEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "additionalData",
+              "type": "bytes"
+            }
+          ],
+          "name": "previewUpdate",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "updateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "updateType",
+                  "type": "string"
+                },
+                {
+                  "internalType": "address",
+                  "name": "market",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint96",
+                  "name": "poolId",
+                  "type": "uint96"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "chainId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "enum IRiskStewardReceiver.UpdateStatus",
+                  "name": "status",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isRemote",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isPaused",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isConfigActive",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "canProcessNow",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "executableNow",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "unlockTime",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "expiresAt",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "debounceEndsAt",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "blockingUpdateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "replacedByUpdateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "currentValues",
+                  "type": "uint256[]"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "proposedValues",
+                  "type": "uint256[]"
+                }
+              ],
+              "internalType": "struct RiskStewardLens.UpdateDetails",
+              "name": "details",
+              "type": "tuple"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ]
+    },
     "RiskStewardReceiver": {
       "address": "0x2F6eb64826f3A067eBFFb5909De7AA4e0Cb31b81",
       "abi": [
