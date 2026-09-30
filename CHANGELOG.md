@@ -1,3 +1,16 @@
+## 2.15.0-dev.5 (2026-09-30)
+
+* Merge pull request #179 from VenusProtocol/feat/risk-steward-update-preview ([393fe37](https://github.com/VenusProtocol/governance-contracts/commit/393fe37)), closes [#179](https://github.com/VenusProtocol/governance-contracts/issues/179)
+* feat: distinguish processable risk updates ([8e85b55](https://github.com/VenusProtocol/governance-contracts/commit/8e85b55))
+* feat: updating deployment files ([d29c806](https://github.com/VenusProtocol/governance-contracts/commit/d29c806))
+* feat(risk-steward): add RiskStewardLens deployments on bscmainnet and bsctestnet ([cdc7145](https://github.com/VenusProtocol/governance-contracts/commit/cdc7145))
+* feat(risk-steward): add RiskStewardLens to preview risk parameter updates ([f35a3cd](https://github.com/VenusProtocol/governance-contracts/commit/f35a3cd))
+* feat(risk-steward): report pause, config and expiry deadline in RiskStewardLens ([0a62f47](https://github.com/VenusProtocol/governance-contracts/commit/0a62f47))
+* feat(risk-steward): report target chain ID and eMode pool ID in RiskStewardLens ([875a631](https://github.com/VenusProtocol/governance-contracts/commit/875a631))
+* fix(risk-steward): flag expired updates and simplify executableNow in RiskStewardLens ([575b133](https://github.com/VenusProtocol/governance-contracts/commit/575b133))
+* fix(risk-steward): revert on an eMode pool ID for an isolated market in RiskStewardLens ([4ca3985](https://github.com/VenusProtocol/governance-contracts/commit/4ca3985))
+* docs: clarify RiskStewardLens comments ([6da4528](https://github.com/VenusProtocol/governance-contracts/commit/6da4528))
+
 ## 2.15.0-dev.4 (2026-09-29)
 
 * Merge pull request #181 from VenusProtocol/feat/foundry-setup ([c89a278](https://github.com/VenusProtocol/governance-contracts/commit/c89a278)), closes [#181](https://github.com/VenusProtocol/governance-contracts/issues/181)
