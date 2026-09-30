@@ -64,7 +64,7 @@ MNEMONIC="<>" BSC_API_KEY="<>" npx hardhat run ./script/hardhat/deploy.ts --netw
 
 ### Upgrade Safety
 
-CI runs both checks on every pull request. To run them locally:
+CI runs both checks on every pull request into `main` or `develop`. To run them locally:
 
 ```
 yarn hardhat compile
