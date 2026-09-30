@@ -4,6 +4,7 @@ import { HardhatRuntimeEnvironment } from "hardhat/types";
 
 const SUPPORTED_NETWORKS = [
   "bscmainnet",
+  "bsctestnet",
   "ethereum",
   "sepolia",
   "arbitrumone",

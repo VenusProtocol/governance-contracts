@@ -7,7 +7,10 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
 /**
  * @title ACMCommandsAggregator
  * @author Venus
- * @notice This contract is a helper to aggregate multiple grant and revoke permissions in batches and execute them in one go.
+ * @notice DEPRECATED: anyone can add or execute its batches, so it must never be granted the ACM admin role again.
+ *         Use AuxiliaryCommandsAggregator, whose batches are added by authorized batchers and executed through the
+ *         AccessControlManager, with each call named by its signature.
+ *         This contract is a helper to aggregate multiple grant and revoke permissions in batches and execute them in one go.
  */
 contract ACMCommandsAggregator {
     /*
@@ -81,6 +84,7 @@ contract ACMCommandsAggregator {
      * @notice Function to add grant permissions
      * @param _permissions Array of permissions
      * @custom:event Emits GrantPermissionsAdded event
+     * @custom:error EmptyPermissions if `_permissions` is empty
      */
     function addGrantPermissions(Permission[] memory _permissions) external {
         if (_permissions.length == 0) {
@@ -103,6 +107,7 @@ contract ACMCommandsAggregator {
      * @notice Function to add revoke permissions
      * @param _permissions Array of permissions
      * @custom:event Emits RevokePermissionsAdded event
+     * @custom:error EmptyPermissions if `_permissions` is empty
      */
     function addRevokePermissions(Permission[] memory _permissions) external {
         if (_permissions.length == 0) {
