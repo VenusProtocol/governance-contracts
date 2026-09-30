@@ -88,6 +88,20 @@ if (FORK_MAINNET) {
         expect(await acm.hasRole(adminRole, AGGREGATOR)).to.equal(false);
         expect(await aggregator.batchExecuted(0)).to.equal(true);
       });
+
+      it("executes a raw batch added through the original addBatch((address,bytes)[],uint256)", async () => {
+        const batcher = await initMainnetUser(BATCHER, parseEther("1"));
+        const index = await aggregator.batchCount();
+        await aggregator
+          .connect(batcher)
+          ["addBatch((address,bytes)[],uint256)"](
+            [{ target: ACM, data: acm.interface.getSighash("DEFAULT_ADMIN_ROLE") }],
+            index,
+          );
+
+        expect((await aggregator.getBatch(index))[0].signature).to.equal("");
+        await expect(aggregator.executeBatch(index)).to.emit(aggregator, "BatchExecuted").withArgs(index);
+      });
     });
   });
 }
