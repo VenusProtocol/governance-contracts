@@ -10,7 +10,7 @@ import {
 } from "../../typechain";
 import { forking, initMainnetUser } from "./utils";
 
-const FORK_MAINNET = process.env.FORKED_NETWORK === "bscmainnet";
+const FORK_MAINNET = process.env.FORK === "true" && process.env.FORKED_NETWORK === "bscmainnet";
 
 const AGGREGATOR = "0x528A428748dfE73DFcc844176B401475D1831057";
 const PROXY_ADMIN = "0x6beb6D2695B67FEb73ad4f172E8E2975497187e4";
