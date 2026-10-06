@@ -24,7 +24,12 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
         bytes data;
     }
 
-    /// @dev Deprecated slot for the `(target, data)` batches array. Never reuse it.
+    /**
+     * @dev Deprecated slot for the `(target, data)` batches array; it still holds that array's length.
+     *      Never reuse it.
+     * @custom:oz-renamed-from batches
+     * @custom:oz-retyped-from struct AuxiliaryCommandsAggregator.Call[][]
+     */
     uint256 private __deprecatedBatches;
 
     /// @notice Addresses authorized to add batches.
