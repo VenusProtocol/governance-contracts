@@ -1,0 +1,64 @@
+{
+  "signatures": [
+    {
+      "signature": "cancelDepositRequest(address)",
+      "origin": "VIP-661 grant on CentrifugeSource_USDT (0xDA5AFfeb43719f517676E031a727071c7D400983); the Centrifuge yield-group source is not in @venusprotocol/liquidity-hub@2.0.0, so this string is not derivable from any source. TEMPORARY — not a retired string like the rest of this file: REMOVE it once liquidity-hub publishes the contract and `yarn acm:build-registry` picks the signature up, otherwise the entry outlives its purpose and hides a real gap"
+    },
+    {
+      "signature": "cancelRedeemRequest(address)",
+      "origin": "VIP-661 grant on CentrifugeSource_USDT (0xDA5AFfeb43719f517676E031a727071c7D400983); the Centrifuge yield-group source is not in @venusprotocol/liquidity-hub@2.0.0, so this string is not derivable from any source. TEMPORARY — not a retired string like the rest of this file: REMOVE it once liquidity-hub publishes the contract and `yarn acm:build-registry` picks the signature up, otherwise the entry outlives its purpose and hides a real gap"
+    },
+    {
+      "signature": "claimCancelDeposit(address)",
+      "origin": "VIP-661 grant on CentrifugeSource_USDT (0xDA5AFfeb43719f517676E031a727071c7D400983); the Centrifuge yield-group source is not in @venusprotocol/liquidity-hub@2.0.0, so this string is not derivable from any source. TEMPORARY — not a retired string like the rest of this file: REMOVE it once liquidity-hub publishes the contract and `yarn acm:build-registry` picks the signature up, otherwise the entry outlives its purpose and hides a real gap"
+    },
+    {
+      "signature": "claimCancelRedeem(address)",
+      "origin": "VIP-661 grant on CentrifugeSource_USDT (0xDA5AFfeb43719f517676E031a727071c7D400983); the Centrifuge yield-group source is not in @venusprotocol/liquidity-hub@2.0.0, so this string is not derivable from any source. TEMPORARY — not a retired string like the rest of this file: REMOVE it once liquidity-hub publishes the contract and `yarn acm:build-registry` picks the signature up, otherwise the entry outlives its purpose and hides a real gap"
+    },
+    {
+      "signature": "claimDeposit(address)",
+      "origin": "VIP-661 grant on CentrifugeSource_USDT (0xDA5AFfeb43719f517676E031a727071c7D400983); the Centrifuge yield-group source is not in @venusprotocol/liquidity-hub@2.0.0, so this string is not derivable from any source. TEMPORARY — not a retired string like the rest of this file: REMOVE it once liquidity-hub publishes the contract and `yarn acm:build-registry` picks the signature up, otherwise the entry outlives its purpose and hides a real gap"
+    },
+    {
+      "signature": "claimRedeem(address)",
+      "origin": "VIP-661 grant on CentrifugeSource_USDT (0xDA5AFfeb43719f517676E031a727071c7D400983); the Centrifuge yield-group source is not in @venusprotocol/liquidity-hub@2.0.0, so this string is not derivable from any source. TEMPORARY — not a retired string like the rest of this file: REMOVE it once liquidity-hub publishes the contract and `yarn acm:build-registry` picks the signature up, otherwise the entry outlives its purpose and hides a real gap"
+    },
+    {
+      "signature": "createVault(VaultConfig,InstitutionalConfig,RiskConfig,string,string,string)",
+      "origin": "VIP-640 grant on InstitutionalVaultControllerProxy (0x6D9e91cB766259af42619c14c994E694E57e6E85); fixed-rate-vaults is absent from sources.json and extractFromAbi emits `tuple` for struct params, so this string is not derivable"
+    },
+    {
+      "signature": "requestRedeem(address,uint256)",
+      "origin": "VIP-661 grant on CentrifugeSource_USDT (0xDA5AFfeb43719f517676E031a727071c7D400983); the Centrifuge yield-group source is not in @venusprotocol/liquidity-hub@2.0.0, so this string is not derivable from any source. TEMPORARY — not a retired string like the rest of this file: REMOVE it once liquidity-hub publishes the contract and `yarn acm:build-registry` picks the signature up, otherwise the entry outlives its purpose and hides a real gap"
+    },
+    {
+      "signature": "setMaxDeltaBps(uint256)",
+      "origin": "old BNBPermissions.json; absent from package sources. Decodes nothing live as of bscmainnet 112465173 — kept so the role hash stays decodable if re-granted"
+    },
+    {
+      "signature": "setNavGuardEnabled(address,bool,bool)",
+      "origin": "VIP-661 grant on CentrifugeSource_USDT (0xDA5AFfeb43719f517676E031a727071c7D400983); the Centrifuge yield-group source is not in @venusprotocol/liquidity-hub@2.0.0, so this string is not derivable from any source. TEMPORARY — not a retired string like the rest of this file: REMOVE it once liquidity-hub publishes the contract and `yarn acm:build-registry` picks the signature up, otherwise the entry outlives its purpose and hides a real gap"
+    },
+    {
+      "signature": "setNavGuardRate(address,uint16,uint16,uint16,uint32,bool,bool)",
+      "origin": "VIP-661 grant on CentrifugeSource_USDT (0xDA5AFfeb43719f517676E031a727071c7D400983); the Centrifuge yield-group source is not in @venusprotocol/liquidity-hub@2.0.0, so this string is not derivable from any source. TEMPORARY — not a retired string like the rest of this file: REMOVE it once liquidity-hub publishes the contract and `yarn acm:build-registry` picks the signature up, otherwise the entry outlives its purpose and hides a real gap"
+    },
+    {
+      "signature": "setNavGuardSnapshot(address,uint128,uint64)",
+      "origin": "VIP-661 grant on CentrifugeSource_USDT (0xDA5AFfeb43719f517676E031a727071c7D400983); the Centrifuge yield-group source is not in @venusprotocol/liquidity-hub@2.0.0, so this string is not derivable from any source. TEMPORARY — not a retired string like the rest of this file: REMOVE it once liquidity-hub publishes the contract and `yarn acm:build-registry` picks the signature up, otherwise the entry outlives its purpose and hides a real gap"
+    },
+    {
+      "signature": "setSpotAPYBps(address,uint64)",
+      "origin": "VIP-661 grant on CentrifugeSource_USDT (0xDA5AFfeb43719f517676E031a727071c7D400983); the Centrifuge yield-group source is not in @venusprotocol/liquidity-hub@2.0.0, so this string is not derivable from any source. TEMPORARY — not a retired string like the rest of this file: REMOVE it once liquidity-hub publishes the contract and `yarn acm:build-registry` picks the signature up, otherwise the entry outlives its purpose and hides a real gap"
+    },
+    {
+      "signature": "sweepTokenFromPool(address,address,address,uint256)",
+      "origin": "VIP-357 grant on RiskFundV2 (0xdF31a28D68A2AB381D42b380649Ead7ae2A76E42); absent from protocol-reserve sources. bscmainnet grant now revoked; decodes the bsctestnet grant"
+    },
+    {
+      "signature": "toggleConfigActive(string)",
+      "origin": "old BNBPermissions.json; absent from package sources. bscmainnet grants now revoked; sole decoder for 3 live bsctestnet permissions"
+    }
+  ]
+}
