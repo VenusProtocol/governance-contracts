@@ -1,5 +1,6 @@
-import { ethers, getNamedAccounts } from "hardhat";
+import { deployments, ethers, getNamedAccounts } from "hardhat";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
+import { AuxiliaryCommandsAggregator } from "typechain";
 
 import bscMainnetGovernanceDeployments from "../../deployments/bscmainnet.json";
 import bscTestnetGovernanceDeployments from "../../deployments/bsctestnet.json";
@@ -145,6 +146,50 @@ export const getSourceChainId = async (network: SUPPORTED_NETWORKS) => {
     return LZ_CHAINID.bscmainnet;
   }
   return 1;
+};
+
+const ACM_PERMISSION_SIGNATURES = {
+  grant: "giveCallPermission(address,string,address)",
+  revoke: "revokeCallPermission(address,string,address)",
+};
+
+// Estimate: storing one call costs ~250k gas, so 50 calls keep a batch under Ethereum's 16.7M per-transaction gas cap.
+// The size only sets how many batches a permission list is split into; each batch executes the same way.
+const PERMISSION_BATCH_SIZE = 50;
+
+// Uses the compiled ABI, not the deployment record's, which can predate the deployed implementation.
+const getAggregator = async (): Promise<AuxiliaryCommandsAggregator> => {
+  const { deployer } = await getNamedAccounts();
+  const { address } = await deployments.get("AuxiliaryCommandsAggregator");
+  return ethers.getContractAt("AuxiliaryCommandsAggregator", address, deployer);
+};
+
+export const requireAuthorizedBatcher = async (): Promise<void> => {
+  const { deployer } = await getNamedAccounts();
+  if (!(await (await getAggregator()).authorizedBatchers(deployer))) {
+    throw new Error(`${deployer} is not an authorized batcher on AuxiliaryCommandsAggregator`);
+  }
+};
+
+export const addPermissionBatches = async (permissions: string[][], action: "grant" | "revoke"): Promise<string[]> => {
+  const aggregator = await getAggregator();
+  const acm = await aggregator.accessControlManager();
+  const calls = permissions.map(([contractAddress, functionSig, account]) => ({
+    target: acm,
+    signature: ACM_PERMISSION_SIGNATURES[action],
+    data: ethers.utils.defaultAbiCoder.encode(
+      ["address", "string", "address"],
+      [contractAddress, functionSig, account],
+    ),
+  }));
+
+  const indexes: string[] = [];
+  for (let i = 0; i < calls.length; i += PERMISSION_BATCH_SIZE) {
+    const tx = await aggregator["addBatch((address,string,bytes)[])"](calls.slice(i, i + PERMISSION_BATCH_SIZE));
+    const receipt = await tx.wait();
+    indexes.push(receipt.events?.find(event => event.event === "BatchAdded")?.args?.index.toString());
+  }
+  return indexes;
 };
 
 export const onlyHardhat = () => async (hre: HardhatRuntimeEnvironment) => {
