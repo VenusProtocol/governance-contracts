@@ -56,7 +56,7 @@ if (FORK_MAINNET) {
         expect(await aggregator.accessControlManager()).to.equal(acmBefore);
         expect(await aggregator.authorizedBatchers(BATCHER)).to.equal(true);
         expect(await retiredSlot()).to.equal(ethers.utils.hexZeroPad(ethers.utils.hexlify(RETIRED_BATCH_COUNT), 32));
-        expect(await aggregator.batchCount()).to.equal(0);
+        expect(await aggregator.getBatchCount()).to.equal(0);
       });
 
       it("executes an ACM grant batch while lent the admin role", async () => {
@@ -89,18 +89,35 @@ if (FORK_MAINNET) {
         expect(await aggregator.batchExecuted(0)).to.equal(true);
       });
 
-      it("executes a raw batch added through the original addBatch((address,bytes)[],uint256)", async () => {
+      it("executes a raw batch added with an empty signature", async () => {
         const batcher = await initMainnetUser(BATCHER, parseEther("1"));
-        const index = await aggregator.batchCount();
+        const index = await aggregator.getBatchCount();
         await aggregator
           .connect(batcher)
-          ["addBatch((address,bytes)[],uint256)"](
-            [{ target: ACM, data: acm.interface.getSighash("DEFAULT_ADMIN_ROLE") }],
+          ["addBatch((address,string,bytes)[],uint256)"](
+            [{ target: ACM, signature: "", data: acm.interface.getSighash("DEFAULT_ADMIN_ROLE") }],
             index,
           );
 
         expect((await aggregator.getBatch(index))[0].signature).to.equal("");
         await expect(aggregator.executeBatch(index)).to.emit(aggregator, "BatchExecuted").withArgs(index);
+      });
+
+      // The upgrade drops the pre-upgrade (target, data) ABI; callers must move to (target, signature, data).
+      it("no longer exposes the original addBatch((address,bytes)[]) and batchCount()", async () => {
+        const batcher = await initMainnetUser(BATCHER, parseEther("1"));
+        const legacy = new ethers.Contract(
+          AGGREGATOR,
+          [
+            "function addBatch((address target, bytes data)[] calls, uint256 expectedIndex) returns (uint256)",
+            "function batchCount() view returns (uint256)",
+          ],
+          batcher,
+        );
+        const call = { target: ACM, data: acm.interface.getSighash("DEFAULT_ADMIN_ROLE") };
+
+        await expect(legacy.addBatch([call], await aggregator.getBatchCount())).to.be.reverted;
+        await expect(legacy.batchCount()).to.be.reverted;
       });
     });
   });

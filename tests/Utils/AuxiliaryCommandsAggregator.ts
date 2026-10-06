@@ -10,12 +10,9 @@ const { defaultAbiCoder, hexConcat, id } = ethers.utils;
 
 const ADD_BATCH = "addBatch((address,string,bytes)[])";
 const ADD_BATCH_AT = "addBatch((address,string,bytes)[],uint256)";
-const ADD_RAW_BATCH = "addBatch((address,bytes)[])";
-const ADD_RAW_BATCH_AT = "addBatch((address,bytes)[],uint256)";
 const PERMISSION_SIG = "executeBatch(uint256)";
 
 type Call = { target: string; signature: string; data: string };
-type RawCall = { target: string; data: string };
 
 describe("AuxiliaryCommandsAggregator", () => {
   let deployer: SignerWithAddress,
@@ -57,10 +54,14 @@ describe("AuxiliaryCommandsAggregator", () => {
   // wrong selector would revert.
   const zeroArgCall = (): Call => ({ target: acm.address, signature: "DEFAULT_ADMIN_ROLE()", data: "0x" });
 
-  const toRaw = (c: Call): RawCall => ({ target: c.target, data: hexConcat([id(c.signature).slice(0, 10), c.data]) });
+  // Timelock-style raw call: empty signature, selector in the data.
+  const toRaw = (c: Call): Call => ({
+    target: c.target,
+    signature: "",
+    data: hexConcat([id(c.signature).slice(0, 10), c.data]),
+  });
 
   const addBatch = (calls: Call[]) => aggregator.connect(batcher)[ADD_BATCH](calls);
-  const addRawBatch = (calls: RawCall[]) => aggregator.connect(batcher)[ADD_RAW_BATCH](calls);
 
   const missingAdminRole = (account: string) =>
     hexConcat([
@@ -132,7 +133,7 @@ describe("AuxiliaryCommandsAggregator", () => {
 
       await expect(addBatch(calls)).to.emit(aggregator, "BatchAdded").withArgs(0);
 
-      expect(await aggregator.batchCount()).to.equal(1);
+      expect(await aggregator.getBatchCount()).to.equal(1);
       expect(await aggregator.batchExecuted(0)).to.equal(false);
       const stored = await aggregator.getBatch(0);
       expect(stored.map(c => ({ target: c.target, signature: c.signature, data: c.data }))).to.deep.equal(calls);
@@ -144,7 +145,7 @@ describe("AuxiliaryCommandsAggregator", () => {
       await expect(aggregator.connect(batcher)[ADD_BATCH_AT]([zeroArgCall()], 1))
         .to.emit(aggregator, "BatchAdded")
         .withArgs(1);
-      expect(await aggregator.batchCount()).to.equal(2);
+      expect(await aggregator.getBatchCount()).to.equal(2);
     });
 
     it("reverts if the expected index is not the next one", async () => {
@@ -160,21 +161,24 @@ describe("AuxiliaryCommandsAggregator", () => {
       await expect(aggregator.connect(stranger)[ADD_BATCH_AT]([zeroArgCall()], 0))
         .to.be.revertedWithCustomError(aggregator, "NotAllowedToBatchCommands")
         .withArgs(stranger.address);
-      await expect(aggregator.connect(stranger)[ADD_RAW_BATCH]([toRaw(zeroArgCall())]))
-        .to.be.revertedWithCustomError(aggregator, "NotAllowedToBatchCommands")
-        .withArgs(stranger.address);
-      await expect(aggregator.connect(stranger)[ADD_RAW_BATCH_AT]([toRaw(zeroArgCall())], 0))
-        .to.be.revertedWithCustomError(aggregator, "NotAllowedToBatchCommands")
-        .withArgs(stranger.address);
     });
 
     it("reverts if there are no calls", async () => {
       await expect(addBatch([])).to.be.revertedWithCustomError(aggregator, "EmptyCalls");
     });
 
-    it("reverts if a call has an empty signature", async () => {
-      await expect(addBatch([zeroArgCall(), { ...zeroArgCall(), signature: "" }]))
-        .to.be.revertedWithCustomError(aggregator, "EmptySignature")
+    it("stores a call with an empty signature as raw calldata, like the Timelock", async () => {
+      const calls = [zeroArgCall(), toRaw(grantCall())];
+      await addBatch(calls);
+      expect((await aggregator.getBatch(0)).map(c => c.signature)).to.deep.equal([zeroArgCall().signature, ""]);
+    });
+
+    it("reverts if a call with an empty signature has calldata shorter than a selector", async () => {
+      await expect(addBatch([{ ...zeroArgCall(), signature: "" }]))
+        .to.be.revertedWithCustomError(aggregator, "MissingSelector")
+        .withArgs(0);
+      await expect(addBatch([zeroArgCall(), { target: acm.address, signature: "", data: "0xa217fd" }]))
+        .to.be.revertedWithCustomError(aggregator, "MissingSelector")
         .withArgs(1);
     });
 
@@ -189,61 +193,11 @@ describe("AuxiliaryCommandsAggregator", () => {
         .to.be.revertedWithCustomError(aggregator, "InvalidTarget")
         .withArgs(0, AddressZero);
     });
-
-    it("stores raw calls with an empty signature", async () => {
-      const calls = [toRaw(grantCall()), toRaw(zeroArgCall())];
-      expect(await aggregator.connect(batcher).callStatic[ADD_RAW_BATCH](calls)).to.equal(0);
-
-      await expect(addRawBatch(calls)).to.emit(aggregator, "BatchAdded").withArgs(0);
-
-      expect(await aggregator.batchCount()).to.equal(1);
-      const stored = await aggregator.getBatch(0);
-      expect(stored.map(c => ({ target: c.target, signature: c.signature, data: c.data }))).to.deep.equal(
-        calls.map(c => ({ ...c, signature: "" })),
-      );
-    });
-
-    it("accepts the next index as the expected index for raw calls", async () => {
-      await addRawBatch([toRaw(zeroArgCall())]);
-
-      await expect(aggregator.connect(batcher)[ADD_RAW_BATCH_AT]([toRaw(zeroArgCall())], 1))
-        .to.emit(aggregator, "BatchAdded")
-        .withArgs(1);
-      expect(await aggregator.batchCount()).to.equal(2);
-    });
-
-    it("reverts if the expected index for raw calls is not the next one", async () => {
-      await expect(aggregator.connect(batcher)[ADD_RAW_BATCH_AT]([toRaw(zeroArgCall())], 1))
-        .to.be.revertedWithCustomError(aggregator, "InvalidBatchIndex")
-        .withArgs(1, 0);
-    });
-
-    it("reverts if there are no raw calls", async () => {
-      await expect(addRawBatch([])).to.be.revertedWithCustomError(aggregator, "EmptyCalls");
-    });
-
-    it("reverts if a raw call's calldata is shorter than a selector", async () => {
-      await expect(addRawBatch([{ target: acm.address, data: "0x" }]))
-        .to.be.revertedWithCustomError(aggregator, "MissingSelector")
-        .withArgs(0);
-      await expect(addRawBatch([toRaw(zeroArgCall()), { target: acm.address, data: "0xa217fd" }]))
-        .to.be.revertedWithCustomError(aggregator, "MissingSelector")
-        .withArgs(1);
-    });
-
-    it("reverts if a raw call targets an account without code or the zero address", async () => {
-      await expect(addRawBatch([toRaw(zeroArgCall()), { ...toRaw(zeroArgCall()), target: stranger.address }]))
-        .to.be.revertedWithCustomError(aggregator, "InvalidTarget")
-        .withArgs(1, stranger.address);
-      await expect(addRawBatch([{ ...toRaw(zeroArgCall()), target: AddressZero }]))
-        .to.be.revertedWithCustomError(aggregator, "InvalidTarget")
-        .withArgs(0, AddressZero);
-    });
   });
 
   describe("executeBatch", () => {
     it("sends each raw call's calldata as is", async () => {
-      await addRawBatch([toRaw(grantCall()), toRaw(zeroArgCall())]);
+      await addBatch([toRaw(grantCall()), toRaw(zeroArgCall())]);
       await acm.grantRole(HashZero, aggregator.address);
 
       await expect(aggregator.connect(governance).executeBatch(0)).to.emit(aggregator, "BatchExecuted").withArgs(0);
@@ -253,7 +207,7 @@ describe("AuxiliaryCommandsAggregator", () => {
     });
 
     it("executes raw and signature batches side by side", async () => {
-      await addRawBatch([toRaw(zeroArgCall())]);
+      await addBatch([toRaw(zeroArgCall())]);
       await addBatch([zeroArgCall()]);
 
       await expect(aggregator.connect(governance).executeBatch(0)).to.emit(aggregator, "BatchExecuted").withArgs(0);
@@ -261,7 +215,7 @@ describe("AuxiliaryCommandsAggregator", () => {
     });
 
     it("reverts with the inner revert data if a raw call fails", async () => {
-      await addRawBatch([toRaw(zeroArgCall()), toRaw(grantCall())]);
+      await addBatch([toRaw(zeroArgCall()), toRaw(grantCall())]);
 
       await expect(aggregator.connect(governance).executeBatch(0))
         .to.be.revertedWithCustomError(aggregator, "CallFailed")
@@ -271,7 +225,7 @@ describe("AuxiliaryCommandsAggregator", () => {
     it("executes raw calls for less gas than the same calls with signatures", async () => {
       const calls = [grantCall(), zeroArgCall()];
       await addBatch(calls);
-      await addRawBatch(calls.map(toRaw));
+      await addBatch(calls.map(toRaw));
       await acm.grantRole(HashZero, aggregator.address);
 
       const withSignatures = await (await aggregator.connect(governance).executeBatch(0)).wait();
@@ -319,6 +273,14 @@ describe("AuxiliaryCommandsAggregator", () => {
       await expect(aggregator.connect(governance).executeBatch(0))
         .to.be.revertedWithCustomError(aggregator, "CallFailed")
         .withArgs(0, 1, missingAdminRole(aggregator.address));
+    });
+
+    it("reverts with empty revert data if a signature matches no function on the target", async () => {
+      await addBatch([{ target: acm.address, signature: "nope()", data: "0x" }]);
+
+      await expect(aggregator.connect(governance).executeBatch(0))
+        .to.be.revertedWithCustomError(aggregator, "CallFailed")
+        .withArgs(0, 0, "0x");
     });
 
     it("resets the executed flag when a call reverts", async () => {

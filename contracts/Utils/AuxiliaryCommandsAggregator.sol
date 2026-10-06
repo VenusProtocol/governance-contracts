@@ -7,36 +7,20 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
 /**
  * @title AuxiliaryCommandsAggregator
  * @author Venus
- * @notice Stores pre-seeded batches of generic on-chain calls and executes them in one go,
- *         reducing the calldata footprint of governance proposals that would otherwise exceed
- *         GovernorBravo's gas limit when encoding many large-array parameters.
- *         A batch is added in one of two formats. Signature calls are Timelock-style: a function signature
- *         plus ABI-encoded arguments, with the selector derived from the signature, so the batch reads back
- *         as signatures and arguments. Raw calls carry the full calldata, selector included; they skip
- *         storing and hashing signatures, so they cost less gas to add and execute.
+ * @notice Holds batches of calls seeded ahead of a governance proposal, so the proposal executes one
+ *         `executeBatch` call instead of carrying calldata too large for GovernorBravo. Each call is a
+ *         function signature plus its arguments, or an empty signature with full calldata, as in the Timelock.
  */
 contract AuxiliaryCommandsAggregator is AccessControlledV8 {
     /**
      * @notice A single call in a batch.
-     * @dev `data` holds the ABI-encoded arguments only; the selector is derived from `signature`.
-     *      A raw call is stored as a `Call` with an empty `signature` and its full calldata in `data`.
      * @param target Contract to call.
-     * @param signature Function signature, e.g. `transfer(address,uint256)`; empty for a raw call.
-     * @param data ABI-encoded arguments, or the full calldata for a raw call.
+     * @param signature Function signature, e.g. `transfer(address,uint256)`, or empty to send `data` as is.
+     * @param data ABI-encoded arguments, or the full calldata when `signature` is empty.
      */
     struct Call {
         address target;
         string signature;
-        bytes data;
-    }
-
-    /**
-     * @notice A single raw call in a batch.
-     * @param target Contract to call.
-     * @param data Full calldata, 4-byte selector included.
-     */
-    struct RawCall {
-        address target;
         bytes data;
     }
 
@@ -46,10 +30,7 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
     /// @notice Addresses authorized to add batches.
     mapping(address => bool) public authorizedBatchers;
 
-    /**
-     * @notice 2-D array of pre-seeded call batches; index 0 is the first batch added.
-     *         Raw calls have an empty signature.
-     */
+    /// @notice 2-D array of pre-seeded call batches; index 0 is the first batch added.
     Call[][] public batches;
 
     /// @notice Whether the batch at a given index has been executed.
@@ -114,13 +95,7 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
     error NotAllowedToBatchCommands(address sender);
 
     /**
-     * @notice Thrown when a call in a new batch has an empty signature.
-     * @param callIndex Index of the offending call within the batch.
-     */
-    error EmptySignature(uint256 callIndex);
-
-    /**
-     * @notice Thrown when a raw call in a new batch has calldata shorter than a function selector.
+     * @notice Thrown when a call with an empty signature has calldata shorter than a function selector.
      * @param callIndex Index of the offending call within the batch.
      */
     error MissingSelector(uint256 callIndex);
@@ -210,26 +185,11 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
      * @custom:event Emits BatchAdded
      * @custom:error NotAllowedToBatchCommands if the caller is not an authorized batcher
      * @custom:error EmptyCalls if `calls` is empty
-     * @custom:error EmptySignature if a call has an empty signature
+     * @custom:error MissingSelector if a call has an empty signature and calldata shorter than 4 bytes
      * @custom:error InvalidTarget if a call targets an address without code
      * @custom:access Restricted to authorized batchers
      */
     function addBatch(Call[] calldata calls) external onlyAuthorizedBatcher returns (uint256 index) {
-        return _addBatch(calls);
-    }
-
-    /**
-     * @notice Append a new batch of raw calls.
-     * @param calls Non-empty array of (target, calldata) calls to store.
-     * @return index The storage index of the newly added batch.
-     * @custom:event Emits BatchAdded
-     * @custom:error NotAllowedToBatchCommands if the caller is not an authorized batcher
-     * @custom:error EmptyCalls if `calls` is empty
-     * @custom:error MissingSelector if a call's calldata is shorter than 4 bytes
-     * @custom:error InvalidTarget if a call targets an address without code
-     * @custom:access Restricted to authorized batchers
-     */
-    function addBatch(RawCall[] calldata calls) external onlyAuthorizedBatcher returns (uint256 index) {
         return _addBatch(calls);
     }
 
@@ -244,7 +204,7 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
      * @custom:error NotAllowedToBatchCommands if the caller is not an authorized batcher
      * @custom:error InvalidBatchIndex if `expectedIndex` is not the next batch index
      * @custom:error EmptyCalls if `calls` is empty
-     * @custom:error EmptySignature if a call has an empty signature
+     * @custom:error MissingSelector if a call has an empty signature and calldata shorter than 4 bytes
      * @custom:error InvalidTarget if a call targets an address without code
      * @custom:access Restricted to authorized batchers
      */
@@ -252,38 +212,14 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
         Call[] calldata calls,
         uint256 expectedIndex
     ) external onlyAuthorizedBatcher returns (uint256 index) {
-        _checkBatchIndex(expectedIndex);
-        return _addBatch(calls);
-    }
-
-    /**
-     * @notice Append a new batch of raw calls, asserting it is stored at `expectedIndex`.
-     * @dev Reverts if another batch was added in the meantime, so the
-     *      caller can rely on the returned index matching what it encoded into its proposal.
-     * @param calls Non-empty array of (target, calldata) calls to store.
-     * @param expectedIndex The index the caller expects this batch to occupy.
-     * @return index The storage index of the newly added batch (equals `expectedIndex`).
-     * @custom:event Emits BatchAdded
-     * @custom:error NotAllowedToBatchCommands if the caller is not an authorized batcher
-     * @custom:error InvalidBatchIndex if `expectedIndex` is not the next batch index
-     * @custom:error EmptyCalls if `calls` is empty
-     * @custom:error MissingSelector if a call's calldata is shorter than 4 bytes
-     * @custom:error InvalidTarget if a call targets an address without code
-     * @custom:access Restricted to authorized batchers
-     */
-    function addBatch(
-        RawCall[] calldata calls,
-        uint256 expectedIndex
-    ) external onlyAuthorizedBatcher returns (uint256 index) {
-        _checkBatchIndex(expectedIndex);
+        if (expectedIndex != batches.length) revert InvalidBatchIndex(expectedIndex, batches.length);
         return _addBatch(calls);
     }
 
     /**
      * @notice Execute every call in batch `index` sequentially. A batch can be executed only once.
-     * @dev A batch is raw when its first call has an empty signature: signature batches reject empty
-     *      signatures and raw batches never set one, so a single read covers the whole batch. A raw call is
-     *      sent as stored; a signature call is sent as its signature's selector followed by its arguments.
+     * @dev As in the Timelock, a call with an empty signature is sent as stored; any other call is sent as
+     *      its signature's selector followed by its arguments.
      * @param index Index of the batch to execute.
      * @custom:event Emits BatchExecuted
      * @custom:error Unauthorized if the caller is not allowed by the AccessControlManager
@@ -299,13 +235,12 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
         batchExecuted[index] = true;
 
         Call[] storage batch = batches[index];
-        bool raw = bytes(batch[0].signature).length == 0;
         uint256 length = batch.length;
         for (uint256 i; i < length; ++i) {
             Call storage c = batch[i];
             bool success;
             bytes memory reason;
-            if (raw) {
+            if (bytes(c.signature).length == 0) {
                 (success, reason) = c.target.call(c.data);
             } else {
                 (success, reason) = c.target.call(abi.encodePacked(bytes4(keccak256(bytes(c.signature))), c.data));
@@ -319,15 +254,14 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
      * @notice Returns the number of batches stored; the next batch added uses this as its index.
      * @return The number of batches stored.
      */
-    function batchCount() external view returns (uint256) {
+    function getBatchCount() external view returns (uint256) {
         return batches.length;
     }
 
     /**
      * @notice Return all calls stored in batch `index`.
      * @param index Index of the batch to retrieve.
-     * @return calls The full array of (target, signature, arguments) calls. In a raw batch each call has an
-     *         empty signature and its full calldata in `data`.
+     * @return calls The calls stored in the batch.
      * @custom:error BatchNotFound if no batch exists at `index`
      */
     function getBatch(uint256 index) external view returns (Call[] memory calls) {
@@ -336,80 +270,24 @@ contract AuxiliaryCommandsAggregator is AccessControlledV8 {
     }
 
     /**
-     * @dev Stores a batch of signature calls. Empty signatures are rejected because an empty signature
-     *      marks a raw batch at execution.
+     * @dev Stores a batch of calls. A call with an empty signature is sent as is, so its data must carry a selector.
      * @param calls Non-empty array of (target, signature, arguments) calls to store.
      * @return index The storage index of the newly added batch.
      * @custom:event Emits BatchAdded
      * @custom:error EmptyCalls if `calls` is empty
-     * @custom:error EmptySignature if a call has an empty signature
-     * @custom:error InvalidTarget if a call targets an address without code
+     * @custom:error MissingSelector if a call has an empty signature and calldata shorter than 4 bytes
+     * @custom:error InvalidTarget if a call targets an address without code, which catches mistyped and zero addresses
      */
     function _addBatch(Call[] calldata calls) internal returns (uint256 index) {
-        Call[] storage batch;
-        (index, batch) = _pushBatch(calls.length);
+        if (calls.length == 0) revert EmptyCalls();
+        index = batches.length;
+        Call[] storage batch = batches.push();
         for (uint256 i; i < calls.length; ++i) {
             Call calldata c = calls[i];
-            if (bytes(c.signature).length == 0) revert EmptySignature(i);
-            _checkTarget(i, c.target);
+            if (bytes(c.signature).length == 0 && c.data.length < 4) revert MissingSelector(i);
+            if (c.target.code.length == 0) revert InvalidTarget(i, c.target);
             batch.push(c);
         }
-    }
-
-    /**
-     * @dev Stores a batch of raw calls. Each call is stored as a `Call` whose signature is never written,
-     *      so it reads back empty.
-     * @param calls Non-empty array of (target, calldata) calls to store.
-     * @return index The storage index of the newly added batch.
-     * @custom:event Emits BatchAdded
-     * @custom:error EmptyCalls if `calls` is empty
-     * @custom:error MissingSelector if a call's calldata is shorter than 4 bytes
-     * @custom:error InvalidTarget if a call targets an address without code
-     */
-    function _addBatch(RawCall[] calldata calls) internal returns (uint256 index) {
-        Call[] storage batch;
-        (index, batch) = _pushBatch(calls.length);
-        for (uint256 i; i < calls.length; ++i) {
-            RawCall calldata c = calls[i];
-            if (c.data.length < 4) revert MissingSelector(i);
-            _checkTarget(i, c.target);
-            Call storage stored = batch.push();
-            stored.target = c.target;
-            stored.data = c.data;
-        }
-    }
-
-    /**
-     * @dev Appends an empty batch for the caller to fill.
-     * @param length Number of calls the batch will hold.
-     * @return index The storage index of the new batch.
-     * @return batch The new batch.
-     * @custom:event Emits BatchAdded
-     * @custom:error EmptyCalls if `length` is zero
-     */
-    function _pushBatch(uint256 length) internal returns (uint256 index, Call[] storage batch) {
-        if (length == 0) revert EmptyCalls();
-        index = batches.length;
-        batch = batches.push();
         emit BatchAdded(index);
-    }
-
-    /**
-     * @dev Reverts unless `expectedIndex` is the index the next batch will be stored at.
-     * @param expectedIndex The index the caller expects the next batch to occupy.
-     * @custom:error InvalidBatchIndex if `expectedIndex` is not the next batch index
-     */
-    function _checkBatchIndex(uint256 expectedIndex) internal view {
-        if (expectedIndex != batches.length) revert InvalidBatchIndex(expectedIndex, batches.length);
-    }
-
-    /**
-     * @dev Reverts if `target` has no code, which catches mistyped and zero addresses.
-     * @param callIndex Index of the call within its batch.
-     * @param target The call's target.
-     * @custom:error InvalidTarget if `target` has no code
-     */
-    function _checkTarget(uint256 callIndex, address target) internal view {
-        if (target.code.length == 0) revert InvalidTarget(callIndex, target);
     }
 }
