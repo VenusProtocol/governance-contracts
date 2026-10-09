@@ -5,7 +5,7 @@
     "ACMCommandsAggregator": "0xB2770DBD5146f7ee0766Dc9E3931433bb697Aa06",
     "AccessControlManager": "0x9E6CeEfDC6183e4D0DF8092A9B90cDF659687daB",
     "AuxiliaryCommandsAggregator": "0x768FEf3a88ea92cCF9CAcDf0aB15C4B29B3C1379",
-    "AuxiliaryCommandsAggregator_Implementation": "0xc79Cb7efEBd121DC4B39eA141C214606595D665A",
+    "AuxiliaryCommandsAggregator_Implementation": "0x8A7d8589A597619A7842d3BC284b9a5a276FaE56",
     "AuxiliaryCommandsAggregator_Proxy": "0x768FEf3a88ea92cCF9CAcDf0aB15C4B29B3C1379",
     "CriticalTimelock": "0x47F65466392ff2aE825d7a170889F7b5b9D8e60D",
     "DefaultProxyAdmin": "0x7B06EF6b68648C61aFE0f715740fE3950B90746B",

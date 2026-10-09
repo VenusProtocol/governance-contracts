@@ -1163,12 +1163,23 @@
       ]
     },
     "AuxiliaryCommandsAggregator_Implementation": {
-      "address": "0x68C120C4b35874593EE494faf4Db6deFcEFf53b4",
+      "address": "0x459cbFFFA49530422fD81c3415686eD2187d047D",
       "abi": [
         {
           "inputs": [],
           "stateMutability": "nonpayable",
           "type": "constructor"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "BatchAlreadyExecuted",
+          "type": "error"
         },
         {
           "inputs": [
@@ -1192,6 +1203,11 @@
               "internalType": "uint256",
               "name": "callIndex",
               "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "reason",
+              "type": "bytes"
             }
           ],
           "name": "CallFailed",
@@ -1221,6 +1237,33 @@
             }
           ],
           "name": "InvalidBatchIndex",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "callIndex",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "target",
+              "type": "address"
+            }
+          ],
+          "name": "InvalidTarget",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "callIndex",
+              "type": "uint256"
+            }
+          ],
+          "name": "MissingSelector",
           "type": "error"
         },
         {
@@ -1418,6 +1461,11 @@
                   "type": "address"
                 },
                 {
+                  "internalType": "string",
+                  "name": "signature",
+                  "type": "string"
+                },
+                {
                   "internalType": "bytes",
                   "name": "data",
                   "type": "bytes"
@@ -1447,6 +1495,11 @@
                   "internalType": "address",
                   "name": "target",
                   "type": "address"
+                },
+                {
+                  "internalType": "string",
+                  "name": "signature",
+                  "type": "string"
                 },
                 {
                   "internalType": "bytes",
@@ -1495,13 +1548,19 @@
           "type": "function"
         },
         {
-          "inputs": [],
-          "name": "batchCount",
-          "outputs": [
+          "inputs": [
             {
               "internalType": "uint256",
               "name": "",
               "type": "uint256"
+            }
+          ],
+          "name": "batchExecuted",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
             }
           ],
           "stateMutability": "view",
@@ -1526,6 +1585,11 @@
               "internalType": "address",
               "name": "target",
               "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "signature",
+              "type": "string"
             },
             {
               "internalType": "bytes",
@@ -1567,6 +1631,11 @@
                   "type": "address"
                 },
                 {
+                  "internalType": "string",
+                  "name": "signature",
+                  "type": "string"
+                },
+                {
                   "internalType": "bytes",
                   "name": "data",
                   "type": "bytes"
@@ -1575,6 +1644,19 @@
               "internalType": "struct AuxiliaryCommandsAggregator.Call[]",
               "name": "calls",
               "type": "tuple[]"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getBatchCount",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
             }
           ],
           "stateMutability": "view",

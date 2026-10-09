@@ -600,9 +600,7 @@
         "blockNumber": 26153349,
         "transactionHash": "0x2e3a37ff3d881edfe9a2cd78cac2190510be4d07c8d3a9b8ac17862fae4ce168",
         "address": "0x05B2EC5B7437FB188175bf440e3EB36af79fe319",
-        "topics": [
-          "0x7f26b83ff96e1f2b6a682f133852f6798a09c465da95921460cefb3847402498"
-        ],
+        "topics": ["0x7f26b83ff96e1f2b6a682f133852f6798a09c465da95921460cefb3847402498"],
         "data": "0x00000000000000000000000000000000000000000000000000000000000000ff",
         "logIndex": 217,
         "blockHash": "0x8e3f2c1adfb49f6a4c3442d6718107cfadb71ab9bcf14f549546716fb86be994"
