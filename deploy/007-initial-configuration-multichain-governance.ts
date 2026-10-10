@@ -1,10 +1,9 @@
 import { ethers, network } from "hardhat";
 import { DeployFunction } from "hardhat-deploy/types";
 import { HardhatRuntimeEnvironment } from "hardhat/types";
-import { ACMCommandsAggregator } from "typechain";
 
 import { SUPPORTED_NETWORKS } from "../helpers/deploy/constants";
-import { guardian } from "../helpers/deploy/deploymentUtils";
+import { addPermissionBatches, guardian, requireAuthorizedBatcher } from "../helpers/deploy/deploymentUtils";
 
 const functionSignatures = {
   normal: [
@@ -56,24 +55,17 @@ const functionSignatures = {
   ],
 };
 
-const grantPermissions = (
-  OMNICHAIN_EXECUTOR_OWNER: string,
-  functionSigs: string[],
-  account: string,
-): ACMCommandsAggregator.PermissionStruct[] =>
-  functionSigs.map(functionSig => ({
-    contractAddress: OMNICHAIN_EXECUTOR_OWNER,
-    functionSig: functionSig,
-    account: account,
-  }));
+const grantPermissions = (OMNICHAIN_EXECUTOR_OWNER: string, functionSigs: string[], account: string): string[][] =>
+  functionSigs.map(functionSig => [OMNICHAIN_EXECUTOR_OWNER, functionSig, account]);
 
 const func: DeployFunction = async function () {
+  await requireAuthorizedBatcher();
+
   const NORMAL_TIMELOCK = await ethers.getContract("NormalTimelock");
   const FASTTRACK_TIMELOCK = await ethers.getContract("FastTrackTimelock");
   const CRITICAL_TIMELOCK = await ethers.getContract("CriticalTimelock");
   const OMNICHAIN_EXECUTOR_OWNER = await ethers.getContract("OmnichainExecutorOwner");
   const GUARDIAN = await guardian(network.name as SUPPORTED_NETWORKS);
-  const acmCommandsAggregator: ACMCommandsAggregator = await ethers.getContract("ACMCommandsAggregator");
 
   // Grant permissions for each category
   const normalGrantPermissions = grantPermissions(
@@ -97,7 +89,7 @@ const func: DeployFunction = async function () {
     GUARDIAN,
   );
 
-  const allGrantPermissions: ACMCommandsAggregator.PermissionStruct[] = [
+  const allGrantPermissions: string[][] = [
     ...normalGrantPermissions,
     ...fasttrackGrantPermissions,
     ...criticalGrantPermissions,
@@ -105,18 +97,18 @@ const func: DeployFunction = async function () {
   ];
 
   try {
-    const tx = await acmCommandsAggregator.addGrantPermissions(allGrantPermissions);
-
-    const receipt = await tx.wait();
-    const events = receipt.events?.filter(event => event.event === "GrantPermissionsAdded");
-    console.log(`Grant Permissions for ${network.name} added with indexes: `, events?.[0].args?.index.toString());
+    const indexes = await addPermissionBatches(allGrantPermissions, "grant");
+    console.log(`Grant Permissions for ${network.name} added with indexes: `, indexes.toString());
   } catch (error) {
     console.error("Error adding grant permissions:", error);
   }
 };
 func.tags = ["multichain-governance-permissions"];
+func.dependencies = ["AuxiliaryCommandsAggregator"];
 
 func.skip = async (hre: HardhatRuntimeEnvironment) =>
-  hre.network.name === "bsctestnet" || hre.network.name === "bscmainnet";
+  hre.network.name === "bsctestnet" ||
+  hre.network.name === "bscmainnet" ||
+  !(await hre.deployments.getOrNull("AuxiliaryCommandsAggregator"));
 
 export default func;
