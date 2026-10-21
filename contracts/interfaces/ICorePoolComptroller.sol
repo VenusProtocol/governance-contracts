@@ -16,6 +16,10 @@ interface ICorePoolComptroller {
 
     function getAllMarkets() external view returns (address[] memory);
 
+    function setActionsPaused(address[] calldata, uint8[] calldata, bool) external;
+
+    function actionPaused(address, uint8) external view returns (bool);
+
     function setCollateralFactor(
         uint96 poolId,
         address vToken,
