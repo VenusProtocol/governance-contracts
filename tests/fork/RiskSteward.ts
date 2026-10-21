@@ -7,6 +7,7 @@ import { ethers, upgrades } from "hardhat";
 
 import {
   AccessControlManager__factory,
+  ActionPauseRiskSteward,
   CollateralFactorsRiskSteward,
   ICorePoolComptroller,
   ICorePoolComptroller__factory,
@@ -46,6 +47,10 @@ const encodeCollateralFactors = (collateralFactor: number, liquidationThreshold:
     [parseUnits(collateralFactor.toString(), 18), parseUnits(liquidationThreshold.toString(), 18)],
   );
 };
+
+const MINT = 0;
+
+const encodeActions = (actions: number[]) => ethers.utils.defaultAbiCoder.encode(["uint8[]"], [actions]);
 
 const DAY_AND_ONE_SECOND = 60 * 60 * 24 + 1;
 const SIX_HOURS = 60 * 60 * 6;
@@ -176,6 +181,27 @@ const riskStewardFixture = async () => {
     unsafeAllow: ["state-variable-immutable"],
   });
 
+  const ActionPauseRiskStewardFactory = await ethers.getContractFactory("ActionPauseRiskSteward");
+  const actionPauseRiskSteward = await upgrades.deployProxy(
+    ActionPauseRiskStewardFactory,
+    [accessControlManager.address],
+    {
+      constructorArgs: [riskStewardReceiver.address],
+      initializer: "initialize",
+      unsafeAllow: ["state-variable-immutable"],
+    },
+  );
+  await accessControlManager.giveCallPermission(
+    CORE_COMPTROLLER_ADDRESS,
+    "_setActionsPaused(address[],uint8[],bool)",
+    actionPauseRiskSteward.address,
+  );
+  await accessControlManager.giveCallPermission(
+    DEFI_COMPTROLLER_ADDRESS,
+    "setActionsPaused(address[],uint256[],bool)",
+    actionPauseRiskSteward.address,
+  );
+
   // Set safeDeltaBps for stewards (5000 = 50%)
   const deltaBps50 = 5000;
   await accessControlManager.giveCallPermission(
@@ -208,6 +234,8 @@ const riskStewardFixture = async () => {
   await riskOracle.connect(timelock).addUpdateType("borrowCap");
   await riskOracle.connect(timelock).addUpdateType("collateralFactors");
   await riskOracle.connect(timelock).addUpdateType("interestRateModel");
+  await riskOracle.connect(timelock).addUpdateType("pauseActions");
+  await riskOracle.connect(timelock).addUpdateType("unpauseActions");
 
   // Configure risk steward receiver
   await riskStewardReceiver
@@ -223,6 +251,12 @@ const riskStewardFixture = async () => {
   await riskStewardReceiver
     .connect(timelock)
     .setRiskParameterConfig("interestRateModel", irmRiskSteward.address, DAY_AND_ONE_SECOND, SIX_HOURS);
+  await riskStewardReceiver
+    .connect(timelock)
+    .setRiskParameterConfig("pauseActions", actionPauseRiskSteward.address, 1, 0);
+  await riskStewardReceiver
+    .connect(timelock)
+    .setRiskParameterConfig("unpauseActions", actionPauseRiskSteward.address, DAY_AND_ONE_SECOND, SIX_HOURS);
 
   // Set executor
   await riskStewardReceiver.connect(timelock).setWhitelistedExecutor(executor.address, true);
@@ -240,6 +274,7 @@ const riskStewardFixture = async () => {
     marketCapsRiskSteward,
     collateralFactorsRiskSteward,
     irmRiskSteward,
+    actionPauseRiskSteward,
     timelock,
     updateSender,
     executor,
@@ -263,6 +298,7 @@ if (FORK_MAINNET) {
       let marketCapsRiskSteward: MarketCapsRiskSteward;
       let collateralFactorsRiskSteward: CollateralFactorsRiskSteward;
       let irmRiskSteward: IRMRiskSteward;
+      let actionPauseRiskSteward: ActionPauseRiskSteward;
       let updateSender: any;
       let executor: any;
 
@@ -280,6 +316,7 @@ if (FORK_MAINNET) {
           marketCapsRiskSteward,
           collateralFactorsRiskSteward,
           irmRiskSteward,
+          actionPauseRiskSteward,
           updateSender,
           executor,
         } = await loadFixture(riskStewardFixture));
@@ -560,6 +597,69 @@ if (FORK_MAINNET) {
             .withArgs(1, vUsdt_DeFI.address, newIRM.address);
 
           expect(await vUsdt_DeFI.interestRateModel()).to.equal(newIRM.address);
+        });
+      });
+
+      describe("action pause updates", async function () {
+        it("should immediately pause MINT on a core pool market and unpause it after the timelock", async function () {
+          expect(await comptroller.actionPaused(vCake_CORE.address, MINT)).to.equal(false);
+
+          await riskOracle
+            .connect(updateSender)
+            .publishRiskParameterUpdate(
+              "ipfs://QmPauseFork",
+              encodeActions([MINT]),
+              "pauseActions",
+              vCake_CORE.address,
+              0,
+              0,
+              "0x",
+            );
+          await expect(riskStewardReceiver.processUpdate(1))
+            .to.emit(actionPauseRiskSteward, "ActionsPausedUpdated")
+            .withArgs(1, vCake_CORE.address, [MINT], true);
+          expect(await comptroller.actionPaused(vCake_CORE.address, MINT)).to.equal(true);
+
+          await riskOracle
+            .connect(updateSender)
+            .publishRiskParameterUpdate(
+              "ipfs://QmUnpauseFork",
+              encodeActions([MINT]),
+              "unpauseActions",
+              vCake_CORE.address,
+              0,
+              0,
+              "0x",
+            );
+          await expect(riskStewardReceiver.processUpdate(2)).to.emit(riskStewardReceiver, "UpdateRegistered");
+
+          await time.increase(SIX_HOURS + 1);
+
+          await expect(riskStewardReceiver.connect(executor).executeRegisteredUpdate(2))
+            .to.emit(actionPauseRiskSteward, "ActionsPausedUpdated")
+            .withArgs(2, vCake_CORE.address, [MINT], false);
+          expect(await comptroller.actionPaused(vCake_CORE.address, MINT)).to.equal(false);
+        });
+
+        it("should immediately pause MINT on an isolated pool market", async function () {
+          const defiComptroller = ICorePoolComptroller__factory.connect(DEFI_COMPTROLLER_ADDRESS, ethers.provider);
+          expect(await defiComptroller.actionPaused(vUsdt_DeFI.address, MINT)).to.equal(false);
+
+          await riskOracle
+            .connect(updateSender)
+            .publishRiskParameterUpdate(
+              "ipfs://QmPauseIsolatedFork",
+              encodeActions([MINT]),
+              "pauseActions",
+              vUsdt_DeFI.address,
+              0,
+              0,
+              "0x",
+            );
+          await expect(riskStewardReceiver.processUpdate(1))
+            .to.emit(actionPauseRiskSteward, "ActionsPausedUpdated")
+            .withArgs(1, vUsdt_DeFI.address, [MINT], true);
+          expect(await defiComptroller.actionPaused(vUsdt_DeFI.address, MINT)).to.equal(true);
         });
       });
     });
