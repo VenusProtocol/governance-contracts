@@ -136,8 +136,9 @@ contract MockCoreComptroller {
     }
 
     /**
-     * @notice Get eMode pool market information (for compatibility with ICorePoolComptroller interface)
-     * @param poolId The eMode pool ID
+     * @notice Get pool market information (for compatibility with ICorePoolComptroller interface)
+     * @dev Pool 0 is the Core Pool, so it returns the same values as `markets`, like the real comptroller
+     * @param poolId The pool ID (0 for the Core Pool, >0 for eMode groups)
      * @param vToken The vToken address
      * @return isListed Whether the market is listed
      * @return collateralFactorMantissa The collateral factor
@@ -164,9 +165,14 @@ contract MockCoreComptroller {
         )
     {
         isListed = vTokenListed[vToken];
-        collateralFactorMantissa = _eModeCollateralFactorMantissa[poolId][vToken];
+        if (poolId == 0) {
+            collateralFactorMantissa = _collateralFactorMantissa[vToken];
+            liquidationThresholdMantissa = _liquidationThresholdMantissa[vToken];
+        } else {
+            collateralFactorMantissa = _eModeCollateralFactorMantissa[poolId][vToken];
+            liquidationThresholdMantissa = _eModeLiquidationThresholdMantissa[poolId][vToken];
+        }
         isVenus = false;
-        liquidationThresholdMantissa = _eModeLiquidationThresholdMantissa[poolId][vToken];
         liquidationIncentiveMantissa = 0;
         marketPoolId = poolId;
         isBorrowAllowed = true;
