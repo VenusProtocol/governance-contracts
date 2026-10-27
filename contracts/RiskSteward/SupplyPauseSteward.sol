@@ -202,8 +202,7 @@ contract SupplyPauseSteward is BaseRiskSteward {
                 pool,
                 market
             );
-            // Also skips pools the market is not listed in, which always read a collateral factor of 0. Calling the
-            // comptroller on one of them would revert and block the pause.
+            // Skip pools already at 0, which also covers pools the market is not listed in
             if (collateralFactor == 0) continue;
 
             uint256 errorCode = CORE_POOL_COMPTROLLER.setCollateralFactor(pool, market, 0, liquidationThreshold);
