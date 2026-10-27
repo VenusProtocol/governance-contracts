@@ -253,6 +253,44 @@ describe("SupplyPauseSteward", async function () {
         LIQUIDATION_THRESHOLD,
       );
     });
+
+    it("applies at once even when the update type has a timelock", async function () {
+      await riskStewardReceiver.setRiskParameterConfig("supplyPause", supplyPauseSteward.address, ONE_DAY, SIX_HOURS);
+      await publish(mockVToken.address);
+
+      const tx = await riskStewardReceiver.processUpdate(1);
+      await expect(tx).to.emit(riskStewardReceiver, "UpdateExecuted").withArgs(1);
+      await expect(tx).to.emit(supplyPauseSteward, "SupplyPaused").withArgs(1, mockVToken.address, 0);
+
+      const registered = await riskStewardReceiver.updates(1);
+      expect(registered.status).to.equal(2); // Executed
+      expect(registered.unlockTime).to.equal(registered.executedAt);
+      expect(await mockComptroller.actionPaused(mockVToken.address, MINT)).to.equal(true);
+    });
+
+    it("pauses a second pool of the same market only after the debounce", async function () {
+      await publish(mockCoreVToken.address);
+      await riskStewardReceiver.processUpdate(1);
+
+      // Updates are keyed by (type, market), so the eMode pool has to wait for the debounce
+      await publish(mockCoreVToken.address, EMODE_POOL_ID);
+      await expect(riskStewardReceiver.processUpdate(2)).to.be.revertedWithCustomError(
+        riskStewardReceiver,
+        "UpdateTooFrequent",
+      );
+      expect(
+        (await mockCoreComptroller.poolMarkets(EMODE_POOL_ID, mockCoreVToken.address)).collateralFactorMantissa,
+      ).to.equal(EMODE_COLLATERAL_FACTOR);
+
+      await time.increase(ONE_DAY);
+      await expect(riskStewardReceiver.processUpdate(2))
+        .to.emit(supplyPauseSteward, "SupplyPaused")
+        .withArgs(2, mockCoreVToken.address, EMODE_POOL_ID);
+
+      const eModeMarket = await mockCoreComptroller.poolMarkets(EMODE_POOL_ID, mockCoreVToken.address);
+      expect(eModeMarket.collateralFactorMantissa).to.equal(0);
+      expect(eModeMarket.liquidationThresholdMantissa).to.equal(EMODE_LIQUIDATION_THRESHOLD);
+    });
   });
 
   describe("validation", async function () {

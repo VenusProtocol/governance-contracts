@@ -114,15 +114,12 @@ contract SupplyPauseSteward is BaseRiskSteward {
         if (msg.sender != address(RISK_STEWARD_RECEIVER)) {
             revert OnlyRiskStewardReceiver();
         }
-
-        address comptroller = ICorePoolVToken(update.market).comptroller();
-        uint96 poolId = update.poolId;
-
-        if (update.updateTypeKey == SUPPLY_PAUSE_KEY) {
-            _pauseSupply(update.updateId, comptroller, update.market, poolId);
-        } else {
+        if (update.updateTypeKey != SUPPLY_PAUSE_KEY) {
             revert UnsupportedUpdateType();
         }
+
+        address comptroller = ICorePoolVToken(update.market).comptroller();
+        _pauseSupply(update.updateId, comptroller, update.market, update.poolId);
     }
 
     /**
@@ -134,18 +131,18 @@ contract SupplyPauseSteward is BaseRiskSteward {
      * @custom:error Throws RedundantValue if MINT is already paused and the collateral factor is already 0
      */
     function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
-        if (update.updateTypeKey == SUPPLY_PAUSE_KEY) {
-            address comptroller = ICorePoolVToken(update.market).comptroller();
-            (uint256 currCF, ) = _getCurrentCollateralFactors(comptroller, update.market, update.poolId);
-
-            if (currCF == 0 && ICorePoolComptroller(comptroller).actionPaused(update.market, MINT_ACTION)) {
-                revert RedundantValue();
-            }
-
-            return true;
+        if (update.updateTypeKey != SUPPLY_PAUSE_KEY) {
+            revert UnsupportedUpdateType();
         }
 
-        revert UnsupportedUpdateType();
+        address comptroller = ICorePoolVToken(update.market).comptroller();
+        (uint256 currCF, ) = _getCurrentCollateralFactors(comptroller, update.market, update.poolId);
+
+        if (currCF == 0 && ICorePoolComptroller(comptroller).actionPaused(update.market, MINT_ACTION)) {
+            revert RedundantValue();
+        }
+
+        return true;
     }
 
     /**
