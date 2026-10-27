@@ -19,6 +19,8 @@ import {
 
 const MINT = 0;
 const EMODE_POOL_ID = 1;
+// A pool that exists but does not list the market under test
+const UNLISTED_POOL_ID = 2;
 
 const COLLATERAL_FACTOR = parseUnits("0.7", 18);
 const LIQUIDATION_THRESHOLD = parseUnits("0.8", 18);
@@ -62,6 +64,14 @@ describe("SupplyPauseSteward", async function () {
     await mockCoreComptroller.setCollateralFactor(
       EMODE_POOL_ID,
       mockCoreVToken.address,
+      EMODE_COLLATERAL_FACTOR,
+      EMODE_LIQUIDATION_THRESHOLD,
+    );
+    const otherCoreVToken = await MockVTokenFactory.deploy(mockCoreComptroller.address);
+    await mockCoreComptroller.supportMarket(otherCoreVToken.address);
+    await mockCoreComptroller.setCollateralFactor(
+      UNLISTED_POOL_ID,
+      otherCoreVToken.address,
       EMODE_COLLATERAL_FACTOR,
       EMODE_LIQUIDATION_THRESHOLD,
     );
@@ -181,45 +191,42 @@ describe("SupplyPauseSteward", async function () {
   });
 
   describe("supplyPause", async function () {
-    it("pauses supply on a core pool market at once, keeping its liquidation threshold", async function () {
+    it("pauses supply in every pool of a core pool market at once, keeping each liquidation threshold", async function () {
       await publish(mockCoreVToken.address);
 
       await expect(riskStewardReceiver.processUpdate(1))
         .to.emit(supplyPauseSteward, "SupplyPaused")
-        .withArgs(1, mockCoreVToken.address, 0)
+        .withArgs(1, mockCoreVToken.address)
         .and.to.emit(riskStewardReceiver, "UpdateExecuted")
         .withArgs(1);
 
-      const market = await mockCoreComptroller.markets(mockCoreVToken.address);
+      const market = await mockCoreComptroller.poolMarkets(0, mockCoreVToken.address);
       expect(market.collateralFactorMantissa).to.equal(0);
       expect(market.liquidationThresholdMantissa).to.equal(LIQUIDATION_THRESHOLD);
-      expect(await mockCoreComptroller.actionPaused(mockCoreVToken.address, MINT)).to.equal(true);
-    });
-
-    it("leaves the market's eMode pools untouched on a core pool update", async function () {
-      await publish(mockCoreVToken.address);
-      await riskStewardReceiver.processUpdate(1);
-
-      const eModeMarket = await mockCoreComptroller.poolMarkets(EMODE_POOL_ID, mockCoreVToken.address);
-      expect(eModeMarket.collateralFactorMantissa).to.equal(EMODE_COLLATERAL_FACTOR);
-      expect(eModeMarket.liquidationThresholdMantissa).to.equal(EMODE_LIQUIDATION_THRESHOLD);
-    });
-
-    it("pauses supply on the update's eMode pool only", async function () {
-      await publish(mockCoreVToken.address, EMODE_POOL_ID);
-
-      await expect(riskStewardReceiver.processUpdate(1))
-        .to.emit(supplyPauseSteward, "SupplyPaused")
-        .withArgs(1, mockCoreVToken.address, EMODE_POOL_ID);
 
       const eModeMarket = await mockCoreComptroller.poolMarkets(EMODE_POOL_ID, mockCoreVToken.address);
       expect(eModeMarket.collateralFactorMantissa).to.equal(0);
       expect(eModeMarket.liquidationThresholdMantissa).to.equal(EMODE_LIQUIDATION_THRESHOLD);
 
-      const market = await mockCoreComptroller.markets(mockCoreVToken.address);
-      expect(market.collateralFactorMantissa).to.equal(COLLATERAL_FACTOR);
-      expect(market.liquidationThresholdMantissa).to.equal(LIQUIDATION_THRESHOLD);
+      // The mock lists a market in any pool it sets a factor on, so this fails if the steward touched pool 2
+      expect((await mockCoreComptroller.poolMarkets(UNLISTED_POOL_ID, mockCoreVToken.address)).isListed).to.equal(
+        false,
+      );
       expect(await mockCoreComptroller.actionPaused(mockCoreVToken.address, MINT)).to.equal(true);
+    });
+
+    it("still zeroes an eMode pool when the core pool is already paused", async function () {
+      await mockCoreComptroller.setCollateralFactor(0, mockCoreVToken.address, 0, LIQUIDATION_THRESHOLD);
+      await mockCoreComptroller.setActionsPaused([mockCoreVToken.address], [MINT], true);
+      await publish(mockCoreVToken.address);
+
+      await expect(riskStewardReceiver.processUpdate(1))
+        .to.emit(supplyPauseSteward, "SupplyPaused")
+        .withArgs(1, mockCoreVToken.address);
+
+      const eModeMarket = await mockCoreComptroller.poolMarkets(EMODE_POOL_ID, mockCoreVToken.address);
+      expect(eModeMarket.collateralFactorMantissa).to.equal(0);
+      expect(eModeMarket.liquidationThresholdMantissa).to.equal(EMODE_LIQUIDATION_THRESHOLD);
     });
 
     it("pauses supply on an isolated pool market at once, keeping its liquidation threshold", async function () {
@@ -227,7 +234,7 @@ describe("SupplyPauseSteward", async function () {
 
       await expect(riskStewardReceiver.processUpdate(1))
         .to.emit(supplyPauseSteward, "SupplyPaused")
-        .withArgs(1, mockVToken.address, 0);
+        .withArgs(1, mockVToken.address);
 
       const market = await mockComptroller.markets(mockVToken.address);
       expect(market.collateralFactorMantissa).to.equal(0);
@@ -260,52 +267,18 @@ describe("SupplyPauseSteward", async function () {
 
       const tx = await riskStewardReceiver.processUpdate(1);
       await expect(tx).to.emit(riskStewardReceiver, "UpdateExecuted").withArgs(1);
-      await expect(tx).to.emit(supplyPauseSteward, "SupplyPaused").withArgs(1, mockVToken.address, 0);
+      await expect(tx).to.emit(supplyPauseSteward, "SupplyPaused").withArgs(1, mockVToken.address);
 
       const registered = await riskStewardReceiver.updates(1);
       expect(registered.status).to.equal(2); // Executed
       expect(registered.unlockTime).to.equal(registered.executedAt);
       expect(await mockComptroller.actionPaused(mockVToken.address, MINT)).to.equal(true);
     });
-
-    it("pauses a second pool of the same market only after the debounce", async function () {
-      await publish(mockCoreVToken.address);
-      await riskStewardReceiver.processUpdate(1);
-
-      // Updates are keyed by (type, market), so the eMode pool has to wait for the debounce
-      await publish(mockCoreVToken.address, EMODE_POOL_ID);
-      await expect(riskStewardReceiver.processUpdate(2)).to.be.revertedWithCustomError(
-        riskStewardReceiver,
-        "UpdateTooFrequent",
-      );
-      expect(
-        (await mockCoreComptroller.poolMarkets(EMODE_POOL_ID, mockCoreVToken.address)).collateralFactorMantissa,
-      ).to.equal(EMODE_COLLATERAL_FACTOR);
-
-      await time.increase(ONE_DAY);
-      await expect(riskStewardReceiver.processUpdate(2))
-        .to.emit(supplyPauseSteward, "SupplyPaused")
-        .withArgs(2, mockCoreVToken.address, EMODE_POOL_ID);
-
-      const eModeMarket = await mockCoreComptroller.poolMarkets(EMODE_POOL_ID, mockCoreVToken.address);
-      expect(eModeMarket.collateralFactorMantissa).to.equal(0);
-      expect(eModeMarket.liquidationThresholdMantissa).to.equal(EMODE_LIQUIDATION_THRESHOLD);
-    });
   });
 
   describe("validation", async function () {
-    it("reverts when a core pool market's supply is already paused", async function () {
+    it("reverts when a core pool market's supply is already paused in every pool", async function () {
       await mockCoreComptroller.setCollateralFactor(0, mockCoreVToken.address, 0, LIQUIDATION_THRESHOLD);
-      await mockCoreComptroller.setActionsPaused([mockCoreVToken.address], [MINT], true);
-      await publish(mockCoreVToken.address);
-
-      await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
-        supplyPauseSteward,
-        "RedundantValue",
-      );
-    });
-
-    it("reverts when an eMode pool's supply is already paused", async function () {
       await mockCoreComptroller.setCollateralFactor(
         EMODE_POOL_ID,
         mockCoreVToken.address,
@@ -313,7 +286,7 @@ describe("SupplyPauseSteward", async function () {
         EMODE_LIQUIDATION_THRESHOLD,
       );
       await mockCoreComptroller.setActionsPaused([mockCoreVToken.address], [MINT], true);
-      await publish(mockCoreVToken.address, EMODE_POOL_ID);
+      await publish(mockCoreVToken.address);
 
       await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
         supplyPauseSteward,
@@ -332,13 +305,37 @@ describe("SupplyPauseSteward", async function () {
       );
     });
 
-    it("reverts on a pool ID for a market outside the Core Pool", async function () {
+    it("reverts on a pool ID on either comptroller, since a pause covers every pool", async function () {
+      await publish(mockCoreVToken.address, EMODE_POOL_ID);
       await publish(mockVToken.address, EMODE_POOL_ID);
 
       await expect(riskStewardReceiver.processUpdate(1)).to.be.revertedWithCustomError(
         supplyPauseSteward,
         "InvalidPool",
       );
+      await expect(riskStewardReceiver.processUpdate(2)).to.be.revertedWithCustomError(
+        supplyPauseSteward,
+        "InvalidPool",
+      );
+      expect(
+        (await mockCoreComptroller.poolMarkets(EMODE_POOL_ID, mockCoreVToken.address)).collateralFactorMantissa,
+      ).to.equal(EMODE_COLLATERAL_FACTOR);
+    });
+
+    it("reports a pool ID as InvalidPool even when every pool is already paused", async function () {
+      await mockCoreComptroller.setCollateralFactor(0, mockCoreVToken.address, 0, LIQUIDATION_THRESHOLD);
+      await mockCoreComptroller.setCollateralFactor(
+        EMODE_POOL_ID,
+        mockCoreVToken.address,
+        0,
+        EMODE_LIQUIDATION_THRESHOLD,
+      );
+      await mockCoreComptroller.setActionsPaused([mockCoreVToken.address], [MINT], true);
+      await publish(mockCoreVToken.address, EMODE_POOL_ID);
+
+      await expect(
+        supplyPauseSteward.isSafeForDirectExecution(await riskOracle.getUpdateById(1)),
+      ).to.be.revertedWithCustomError(supplyPauseSteward, "InvalidPool");
     });
 
     it("reverts on an unsupported update type", async function () {
@@ -393,7 +390,7 @@ describe("SupplyPauseSteward", async function () {
       await time.increase(SIX_HOURS + 1);
       await expect(destinationRiskStewardReceiver.connect(executor).executeUpdate(1))
         .to.emit(destinationSupplyPauseSteward, "SupplyPaused")
-        .withArgs(1, mockVToken.address, 0);
+        .withArgs(1, mockVToken.address);
 
       const market = await mockComptroller.markets(mockVToken.address);
       expect(market.collateralFactorMantissa).to.equal(0);

@@ -31,6 +31,12 @@ contract MockCoreComptroller {
     /// @notice Mapping of vToken addresses to their paused actions
     mapping(address => mapping(uint8 => bool)) internal _actionPaused;
 
+    /// @notice Mapping of (poolId, vToken) to whether the vToken is listed in that eMode pool
+    mapping(uint96 => mapping(address => bool)) internal _eModeListed;
+
+    /// @notice The highest pool ID created so far
+    uint96 public lastPoolId;
+
     /**
      * @notice Add a new vToken to be tracked
      * @param vToken The vToken to add
@@ -77,6 +83,7 @@ contract MockCoreComptroller {
 
     /**
      * @notice Set the collateral factor and liquidation threshold for a vToken
+     * @dev For an eMode pool this also lists the vToken in it and creates the pool if needed
      * @param poolId The pool ID (0 for regular markets, >0 for eMode groups)
      * @param vToken The vToken address
      * @param newCollateralFactorMantissa The new collateral factor
@@ -96,6 +103,8 @@ contract MockCoreComptroller {
         } else {
             _eModeCollateralFactorMantissa[poolId][vToken] = newCollateralFactorMantissa;
             _eModeLiquidationThresholdMantissa[poolId][vToken] = newLiquidationThresholdMantissa;
+            _eModeListed[poolId][vToken] = true;
+            if (poolId > lastPoolId) lastPoolId = poolId;
         }
         return 0;
     }
@@ -164,7 +173,7 @@ contract MockCoreComptroller {
             bool isBorrowAllowed
         )
     {
-        isListed = vTokenListed[vToken];
+        isListed = vTokenListed[vToken] && (poolId == 0 || _eModeListed[poolId][vToken]);
         if (poolId == 0) {
             collateralFactorMantissa = _collateralFactorMantissa[vToken];
             liquidationThresholdMantissa = _liquidationThresholdMantissa[vToken];

@@ -12,9 +12,9 @@ import { ensureNonzeroAddress } from "@venusprotocol/solidity-utilities/contract
 /**
  * @title SupplyPauseSteward
  * @author Venus
- * @notice Pauses supply to a market on updates from its receiver: pauses MINT and sets the collateral factor to 0,
- *         keeping the liquidation threshold. On the source chain every update applies at once; a destination chain
- *         delays every update. Lifting the pause is left to governance.
+ * @notice Pauses supply to a market on updates from its receiver: pauses MINT and sets the collateral factor to 0
+ *         in every pool the market is listed in, keeping each liquidation threshold. On the source chain every
+ *         update applies at once; a destination chain delays every update. Lifting the pause is left to governance.
  * @custom:security-contact https://github.com/VenusProtocol/governance-contracts#discussion
  */
 contract SupplyPauseSteward is BaseRiskSteward {
@@ -51,7 +51,7 @@ contract SupplyPauseSteward is BaseRiskSteward {
     /**
      * @notice Emitted when supply is paused on a market
      */
-    event SupplyPaused(uint256 indexed updateId, address indexed market, uint96 poolId);
+    event SupplyPaused(uint256 indexed updateId, address indexed market);
 
     /**
      * @notice Thrown when the update type is not SUPPLY_PAUSE
@@ -64,12 +64,12 @@ contract SupplyPauseSteward is BaseRiskSteward {
     error OnlyRiskStewardReceiver();
 
     /**
-     * @notice Thrown when MINT is already paused and the collateral factor is already 0
+     * @notice Thrown when MINT is already paused and the collateral factor is already 0 in every pool
      */
     error RedundantValue();
 
     /**
-     * @notice Thrown when an update for a market outside the Core Pool has a pool ID
+     * @notice Thrown when an update has a pool ID, since a pause always covers every pool
      */
     error InvalidPool();
 
@@ -102,12 +102,12 @@ contract SupplyPauseSteward is BaseRiskSteward {
 
     /**
      * @notice Applies a supply pause from the receiver
-     * @param update The update to apply; on the Core Pool its pool ID picks the pool whose collateral factor is set
+     * @param update The update to apply; its pool ID must be 0
      * @custom:access Only the receiver
-     * @custom:event Emits SupplyPaused with the updateId, market and pool ID
+     * @custom:event Emits SupplyPaused with the updateId and market
      * @custom:error Throws OnlyRiskStewardReceiver if the caller is not the receiver
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
-     * @custom:error Throws InvalidPool if an update for a market outside the Core Pool has a pool ID
+     * @custom:error Throws InvalidPool if the update has a pool ID
      * @custom:error Throws SetCollateralFactorFailed if the Core Pool Comptroller returns an error code
      */
     function applyUpdate(RiskParameterUpdate calldata update) external {
@@ -128,47 +128,54 @@ contract SupplyPauseSteward is BaseRiskSteward {
      * @param update The update to check
      * @return Always true
      * @custom:error Throws UnsupportedUpdateType if the update type is not supported
-     * @custom:error Throws RedundantValue if MINT is already paused and the collateral factor is already 0
+     * @custom:error Throws InvalidPool if the update has a pool ID
+     * @custom:error Throws RedundantValue if MINT is already paused and the collateral factor is already 0 in every pool
      */
     function isSafeForDirectExecution(RiskParameterUpdate calldata update) external view returns (bool) {
         if (update.updateTypeKey != SUPPLY_PAUSE_KEY) {
             revert UnsupportedUpdateType();
         }
-
-        address comptroller = ICorePoolVToken(update.market).comptroller();
-        (uint256 currCF, ) = _getCurrentCollateralFactors(comptroller, update.market, update.poolId);
-
-        if (currCF == 0 && ICorePoolComptroller(comptroller).actionPaused(update.market, MINT_ACTION)) {
-            revert RedundantValue();
+        if (update.poolId != 0) {
+            revert InvalidPool();
         }
 
-        return true;
+        address comptroller = ICorePoolVToken(update.market).comptroller();
+        if (!ICorePoolComptroller(comptroller).actionPaused(update.market, MINT_ACTION)) {
+            return true;
+        }
+
+        if (comptroller == address(CORE_POOL_COMPTROLLER)) {
+            uint96 lastPoolId = CORE_POOL_COMPTROLLER.lastPoolId();
+            for (uint96 pool; pool <= lastPoolId; ++pool) {
+                (uint256 currCF, ) = _getCurrentCollateralFactors(comptroller, update.market, pool);
+                if (currCF != 0) return true;
+            }
+        } else {
+            (uint256 currCF, ) = _getCurrentCollateralFactors(comptroller, update.market, 0);
+            if (currCF != 0) return true;
+        }
+
+        revert RedundantValue();
     }
 
     /**
-     * @notice Sets the market's collateral factor to 0, keeping its liquidation threshold, and pauses MINT on it
+     * @notice Sets the market's collateral factor to 0 in every pool, keeping each liquidation threshold, and pauses
+     *         MINT on it
      * @param updateId The update ID from the Risk Oracle
      * @param comptroller The comptroller address
      * @param market The market to pause supply on
-     * @param poolId The Core Pool's pool whose collateral factor is set (0 for other comptrollers)
-     * @custom:event Emits SupplyPaused with the updateId, market and pool ID
+     * @param poolId The update's pool ID, which must be 0
+     * @custom:event Emits SupplyPaused with the updateId and market
      * @custom:error Throws SetCollateralFactorFailed if the Core Pool Comptroller returns an error code
-     * @custom:error Throws InvalidPool if a non-Core comptroller is used together with a non-zero poolId
+     * @custom:error Throws InvalidPool if the pool ID is not 0
      */
     function _pauseSupply(uint256 updateId, address comptroller, address market, uint96 poolId) internal {
-        (, uint256 liquidationThreshold) = _getCurrentCollateralFactors(comptroller, market, poolId);
+        if (poolId != 0) revert InvalidPool();
 
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
-            uint256 errorCode = ICorePoolComptroller(comptroller).setCollateralFactor(
-                poolId,
-                market,
-                0,
-                liquidationThreshold
-            );
-            if (errorCode != 0) revert SetCollateralFactorFailed(errorCode);
+            _setZeroCoreCF(market);
         } else {
-            if (poolId != 0) revert InvalidPool();
-
+            (, uint256 liquidationThreshold) = _getCurrentCollateralFactors(comptroller, market, poolId);
             IIsolatedPoolsComptroller(comptroller).setCollateralFactor(market, 0, liquidationThreshold);
         }
 
@@ -179,7 +186,29 @@ contract SupplyPauseSteward is BaseRiskSteward {
         // Core, isolated and spoke pools share the same `setActionsPaused` signature.
         ICorePoolComptroller(comptroller).setActionsPaused(markets, actions, true);
 
-        emit SupplyPaused(updateId, market, poolId);
+        emit SupplyPaused(updateId, market);
+    }
+
+    /**
+     * @notice Sets the market's collateral factor to 0 in every Core Pool Comptroller pool it is listed in, keeping
+     *         each liquidation threshold
+     * @param market The market whose collateral factors are set
+     * @custom:error Throws SetCollateralFactorFailed if the Core Pool Comptroller returns an error code
+     */
+    function _setZeroCoreCF(address market) internal {
+        uint96 lastPoolId = CORE_POOL_COMPTROLLER.lastPoolId();
+        for (uint96 pool; pool <= lastPoolId; ++pool) {
+            (, uint256 collateralFactor, , uint256 liquidationThreshold, , , ) = CORE_POOL_COMPTROLLER.poolMarkets(
+                pool,
+                market
+            );
+            // Also skips pools the market is not listed in, which always read a collateral factor of 0. Calling the
+            // comptroller on one of them would revert and block the pause.
+            if (collateralFactor == 0) continue;
+
+            uint256 errorCode = CORE_POOL_COMPTROLLER.setCollateralFactor(pool, market, 0, liquidationThreshold);
+            if (errorCode != 0) revert SetCollateralFactorFailed(errorCode);
+        }
     }
 
     /**

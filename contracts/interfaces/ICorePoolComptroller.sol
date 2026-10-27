@@ -20,6 +20,8 @@ interface ICorePoolComptroller {
 
     function actionPaused(address, uint8) external view returns (bool);
 
+    function lastPoolId() external view returns (uint96);
+
     function setCollateralFactor(
         uint96 poolId,
         address vToken,

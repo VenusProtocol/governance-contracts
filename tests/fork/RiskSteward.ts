@@ -32,9 +32,8 @@ const CORE_COMPTROLLER_ADDRESS = "0xfD36E2c2a6789Db23113685031d7F16329158384";
 const vCAKE_CORE = "0x86aC3974e2BD0d60825230fa6F355fF11409df5c";
 const vDAI_CORE = "0x334b3eCB4DCa3593BCCC3c7EBD1A1C1d1780FBF1";
 const vWBNB_CORE = "0x6bCa74586218dB34cdB402295796b79663d816e9";
-// Listed in eMode pool 1 at the fork block
+// Listed in the core pool and eMode pool 1 at the fork block
 const vsUSDe_CORE = "0x699658323d58eE25c69F1a29d476946ab011bD18";
-const EMODE_POOL_ID = 1;
 
 const DEFI_COMPTROLLER_ADDRESS = "0x3344417c9360b963ca93A4e8305361AEde340Ab9";
 const vUSDT_DeFI = "0x1D8bBDE12B6b34140604E18e9f9c6e14deC16854";
@@ -612,7 +611,7 @@ if (FORK_MAINNET) {
             );
           await expect(riskStewardReceiver.processUpdate(1))
             .to.emit(supplyPauseSteward, "SupplyPaused")
-            .withArgs(1, vCake_CORE.address, 0);
+            .withArgs(1, vCake_CORE.address);
 
           const [, collateralFactor, , liquidationThreshold] = await comptroller.markets(vCake_CORE.address);
           expect(collateralFactor).to.equal(0);
@@ -620,32 +619,37 @@ if (FORK_MAINNET) {
           expect(await comptroller.actionPaused(vCake_CORE.address, MINT)).to.equal(true);
         });
 
-        it("should pause supply on the update's eMode pool only", async function () {
-          const [, corePoolCollateralFactorBefore] = await comptroller.markets(vsUSDe_CORE);
-          const [, , , eModeLiquidationThresholdBefore] = await comptroller.poolMarkets(EMODE_POOL_ID, vsUSDe_CORE);
+        it("should pause supply in every pool the market is listed in, keeping each liquidation threshold", async function () {
+          const lastPoolId = (await comptroller.lastPoolId()).toNumber();
+          const listedPools: { poolId: number; liquidationThreshold: BigNumber }[] = [];
+          for (let poolId = 0; poolId <= lastPoolId; poolId++) {
+            const [isListed, collateralFactor, , liquidationThreshold] = await comptroller.poolMarkets(
+              poolId,
+              vsUSDe_CORE,
+            );
+            if (isListed) {
+              expect(collateralFactor).to.not.equal(0);
+              listedPools.push({ poolId, liquidationThreshold });
+            }
+          }
+          // Without an eMode listing this would only re-test the core pool case
+          expect(listedPools.length).to.be.greaterThan(1);
 
           await riskOracle
             .connect(updateSender)
-            .publishRiskParameterUpdate(
-              "ipfs://QmSupplyPauseEModeFork",
-              "0x",
-              "supplyPause",
-              vsUSDe_CORE,
-              EMODE_POOL_ID,
-              0,
-              "0x",
-            );
+            .publishRiskParameterUpdate("ipfs://QmSupplyPauseEModeFork", "0x", "supplyPause", vsUSDe_CORE, 0, 0, "0x");
           await expect(riskStewardReceiver.processUpdate(1))
             .to.emit(supplyPauseSteward, "SupplyPaused")
-            .withArgs(1, vsUSDe_CORE, EMODE_POOL_ID);
+            .withArgs(1, vsUSDe_CORE);
 
-          const [, eModeCollateralFactor, , eModeLiquidationThreshold] = await comptroller.poolMarkets(
-            EMODE_POOL_ID,
-            vsUSDe_CORE,
-          );
-          expect(eModeCollateralFactor).to.equal(0);
-          expect(eModeLiquidationThreshold).to.equal(eModeLiquidationThresholdBefore);
-          expect((await comptroller.markets(vsUSDe_CORE))[1]).to.equal(corePoolCollateralFactorBefore);
+          for (const { poolId, liquidationThreshold } of listedPools) {
+            const [, collateralFactorAfter, , liquidationThresholdAfter] = await comptroller.poolMarkets(
+              poolId,
+              vsUSDe_CORE,
+            );
+            expect(collateralFactorAfter).to.equal(0);
+            expect(liquidationThresholdAfter).to.equal(liquidationThreshold);
+          }
           expect(await comptroller.actionPaused(vsUSDe_CORE, MINT)).to.equal(true);
         });
 
@@ -667,7 +671,7 @@ if (FORK_MAINNET) {
             );
           await expect(riskStewardReceiver.processUpdate(1))
             .to.emit(supplyPauseSteward, "SupplyPaused")
-            .withArgs(1, vUsdt_DeFI.address, 0);
+            .withArgs(1, vUsdt_DeFI.address);
 
           const [, collateralFactor, liquidationThreshold] = await comptroller_defi.markets(vUsdt_DeFI.address);
           expect(collateralFactor).to.equal(0);
