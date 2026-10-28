@@ -22,6 +22,9 @@ contract MockComptroller {
     /// @notice Mapping of vToken addresses to their liquidation thresholds
     mapping(address => uint256) internal _liquidationThresholdMantissa;
 
+    /// @notice Mapping of vToken addresses to their paused actions
+    mapping(address => mapping(uint8 => bool)) internal _actionPaused;
+
     /**
      * @notice Add a new vToken to be tracked
      * @param vToken The vToken to add
@@ -107,5 +110,30 @@ contract MockComptroller {
         isListed = vTokenListed[vToken];
         collateralFactorMantissa = _collateralFactorMantissa[vToken];
         liquidationThresholdMantissa = _liquidationThresholdMantissa[vToken];
+    }
+
+    /**
+     * @notice Pause or unpause actions on vTokens
+     * @param vTokens The vToken addresses
+     * @param actions The action IDs
+     * @param paused The new paused state
+     */
+    function setActionsPaused(address[] calldata vTokens, uint8[] calldata actions, bool paused) external {
+        for (uint256 i; i < vTokens.length; ++i) {
+            require(vTokenListed[vTokens[i]], "vToken not listed");
+            for (uint256 j; j < actions.length; ++j) {
+                _actionPaused[vTokens[i]][actions[j]] = paused;
+            }
+        }
+    }
+
+    /**
+     * @notice Get whether an action is paused on a vToken
+     * @param vToken The vToken address
+     * @param action The action ID
+     * @return Whether the action is paused
+     */
+    function actionPaused(address vToken, uint8 action) external view returns (bool) {
+        return _actionPaused[vToken][action];
     }
 }

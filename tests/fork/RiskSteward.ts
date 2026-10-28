@@ -20,6 +20,7 @@ import {
   MarketCapsRiskSteward,
   RiskOracle,
   RiskStewardReceiver,
+  SupplyPauseSteward,
 } from "../../typechain";
 import { forking, initMainnetUser } from "./utils";
 
@@ -31,6 +32,8 @@ const CORE_COMPTROLLER_ADDRESS = "0xfD36E2c2a6789Db23113685031d7F16329158384";
 const vCAKE_CORE = "0x86aC3974e2BD0d60825230fa6F355fF11409df5c";
 const vDAI_CORE = "0x334b3eCB4DCa3593BCCC3c7EBD1A1C1d1780FBF1";
 const vWBNB_CORE = "0x6bCa74586218dB34cdB402295796b79663d816e9";
+// Listed in the core pool and eMode pool 1 at the fork block
+const vsUSDe_CORE = "0x699658323d58eE25c69F1a29d476946ab011bD18";
 
 const DEFI_COMPTROLLER_ADDRESS = "0x3344417c9360b963ca93A4e8305361AEde340Ab9";
 const vUSDT_DeFI = "0x1D8bBDE12B6b34140604E18e9f9c6e14deC16854";
@@ -46,6 +49,8 @@ const encodeCollateralFactors = (collateralFactor: number, liquidationThreshold:
     [parseUnits(collateralFactor.toString(), 18), parseUnits(liquidationThreshold.toString(), 18)],
   );
 };
+
+const MINT = 0;
 
 const DAY_AND_ONE_SECOND = 60 * 60 * 24 + 1;
 const SIX_HOURS = 60 * 60 * 6;
@@ -176,6 +181,24 @@ const riskStewardFixture = async () => {
     unsafeAllow: ["state-variable-immutable"],
   });
 
+  // Deploy SupplyPauseSteward
+  const SupplyPauseStewardFactory = await ethers.getContractFactory("SupplyPauseSteward");
+  const supplyPauseSteward = await upgrades.deployProxy(SupplyPauseStewardFactory, [accessControlManager.address], {
+    constructorArgs: [comptroller.address, riskStewardReceiver.address],
+    initializer: "initialize",
+    unsafeAllow: ["state-variable-immutable"],
+  });
+  // The Core Pool's `setActionsPaused` alias checks the `_setActionsPaused` permission
+  const supplyPausePermissions: [string, string][] = [
+    [CORE_COMPTROLLER_ADDRESS, "setCollateralFactor(uint96,address,uint256,uint256)"],
+    [CORE_COMPTROLLER_ADDRESS, "_setActionsPaused(address[],uint8[],bool)"],
+    [DEFI_COMPTROLLER_ADDRESS, "setCollateralFactor(address,uint256,uint256)"],
+    [DEFI_COMPTROLLER_ADDRESS, "setActionsPaused(address[],uint256[],bool)"],
+  ];
+  for (const [contract, signature] of supplyPausePermissions) {
+    await accessControlManager.giveCallPermission(contract, signature, supplyPauseSteward.address);
+  }
+
   // Set safeDeltaBps for stewards (5000 = 50%)
   const deltaBps50 = 5000;
   await accessControlManager.giveCallPermission(
@@ -208,6 +231,7 @@ const riskStewardFixture = async () => {
   await riskOracle.connect(timelock).addUpdateType("borrowCap");
   await riskOracle.connect(timelock).addUpdateType("collateralFactors");
   await riskOracle.connect(timelock).addUpdateType("interestRateModel");
+  await riskOracle.connect(timelock).addUpdateType("supplyPause");
 
   // Configure risk steward receiver
   await riskStewardReceiver
@@ -223,6 +247,9 @@ const riskStewardFixture = async () => {
   await riskStewardReceiver
     .connect(timelock)
     .setRiskParameterConfig("interestRateModel", irmRiskSteward.address, DAY_AND_ONE_SECOND, SIX_HOURS);
+  await riskStewardReceiver
+    .connect(timelock)
+    .setRiskParameterConfig("supplyPause", supplyPauseSteward.address, DAY_AND_ONE_SECOND, 0);
 
   // Set executor
   await riskStewardReceiver.connect(timelock).setWhitelistedExecutor(executor.address, true);
@@ -240,6 +267,7 @@ const riskStewardFixture = async () => {
     marketCapsRiskSteward,
     collateralFactorsRiskSteward,
     irmRiskSteward,
+    supplyPauseSteward,
     timelock,
     updateSender,
     executor,
@@ -263,6 +291,7 @@ if (FORK_MAINNET) {
       let marketCapsRiskSteward: MarketCapsRiskSteward;
       let collateralFactorsRiskSteward: CollateralFactorsRiskSteward;
       let irmRiskSteward: IRMRiskSteward;
+      let supplyPauseSteward: SupplyPauseSteward;
       let updateSender: any;
       let executor: any;
 
@@ -280,6 +309,7 @@ if (FORK_MAINNET) {
           marketCapsRiskSteward,
           collateralFactorsRiskSteward,
           irmRiskSteward,
+          supplyPauseSteward,
           updateSender,
           executor,
         } = await loadFixture(riskStewardFixture));
@@ -560,6 +590,125 @@ if (FORK_MAINNET) {
             .withArgs(1, vUsdt_DeFI.address, newIRM.address);
 
           expect(await vUsdt_DeFI.interestRateModel()).to.equal(newIRM.address);
+        });
+      });
+
+      describe("supplyPause updates", async function () {
+        it("should immediately pause supply on a core pool market, keeping its liquidation threshold", async function () {
+          const [, , , liquidationThresholdBefore] = await comptroller.markets(vCake_CORE.address);
+          expect(await comptroller.actionPaused(vCake_CORE.address, MINT)).to.equal(false);
+
+          await riskOracle
+            .connect(updateSender)
+            .publishRiskParameterUpdate(
+              "ipfs://QmSupplyPauseFork",
+              "0x",
+              "supplyPause",
+              vCake_CORE.address,
+              0,
+              0,
+              "0x",
+            );
+          await expect(riskStewardReceiver.processUpdate(1))
+            .to.emit(supplyPauseSteward, "SupplyPaused")
+            .withArgs(1, vCake_CORE.address);
+
+          const [, collateralFactor, , liquidationThreshold] = await comptroller.markets(vCake_CORE.address);
+          expect(collateralFactor).to.equal(0);
+          expect(liquidationThreshold).to.equal(liquidationThresholdBefore);
+          expect(await comptroller.actionPaused(vCake_CORE.address, MINT)).to.equal(true);
+        });
+
+        it("should pause supply in every pool the market is listed in, keeping each liquidation threshold", async function () {
+          const lastPoolId = (await comptroller.lastPoolId()).toNumber();
+          const listedPools: { poolId: number; liquidationThreshold: BigNumber }[] = [];
+          for (let poolId = 0; poolId <= lastPoolId; poolId++) {
+            const [isListed, collateralFactor, , liquidationThreshold] = await comptroller.poolMarkets(
+              poolId,
+              vsUSDe_CORE,
+            );
+            if (isListed) {
+              expect(collateralFactor).to.not.equal(0);
+              listedPools.push({ poolId, liquidationThreshold });
+            }
+          }
+          // Without an eMode listing this would only re-test the core pool case
+          expect(listedPools.length).to.be.greaterThan(1);
+
+          await riskOracle
+            .connect(updateSender)
+            .publishRiskParameterUpdate("ipfs://QmSupplyPauseEModeFork", "0x", "supplyPause", vsUSDe_CORE, 0, 0, "0x");
+          await expect(riskStewardReceiver.processUpdate(1))
+            .to.emit(supplyPauseSteward, "SupplyPaused")
+            .withArgs(1, vsUSDe_CORE);
+
+          for (const { poolId, liquidationThreshold } of listedPools) {
+            const [, collateralFactorAfter, , liquidationThresholdAfter] = await comptroller.poolMarkets(
+              poolId,
+              vsUSDe_CORE,
+            );
+            expect(collateralFactorAfter).to.equal(0);
+            expect(liquidationThresholdAfter).to.equal(liquidationThreshold);
+          }
+          expect(await comptroller.actionPaused(vsUSDe_CORE, MINT)).to.equal(true);
+        });
+
+        it("should immediately pause supply on an isolated pool market, keeping its liquidation threshold", async function () {
+          const defiComptroller = ICorePoolComptroller__factory.connect(DEFI_COMPTROLLER_ADDRESS, ethers.provider);
+          const [, , liquidationThresholdBefore] = await comptroller_defi.markets(vUsdt_DeFI.address);
+          expect(await defiComptroller.actionPaused(vUsdt_DeFI.address, MINT)).to.equal(false);
+
+          await riskOracle
+            .connect(updateSender)
+            .publishRiskParameterUpdate(
+              "ipfs://QmSupplyPauseIsolatedFork",
+              "0x",
+              "supplyPause",
+              vUsdt_DeFI.address,
+              0,
+              0,
+              "0x",
+            );
+          await expect(riskStewardReceiver.processUpdate(1))
+            .to.emit(supplyPauseSteward, "SupplyPaused")
+            .withArgs(1, vUsdt_DeFI.address);
+
+          const [, collateralFactor, liquidationThreshold] = await comptroller_defi.markets(vUsdt_DeFI.address);
+          expect(collateralFactor).to.equal(0);
+          expect(liquidationThreshold).to.equal(liquidationThresholdBefore);
+          expect(await defiComptroller.actionPaused(vUsdt_DeFI.address, MINT)).to.equal(true);
+        });
+
+        it("should revert when the market's supply is already paused", async function () {
+          await riskOracle
+            .connect(updateSender)
+            .publishRiskParameterUpdate(
+              "ipfs://QmSupplyPauseFork",
+              "0x",
+              "supplyPause",
+              vCake_CORE.address,
+              0,
+              0,
+              "0x",
+            );
+          await riskStewardReceiver.processUpdate(1);
+
+          await time.increase(DAY_AND_ONE_SECOND);
+          await riskOracle
+            .connect(updateSender)
+            .publishRiskParameterUpdate(
+              "ipfs://QmSupplyPauseFork2",
+              "0x",
+              "supplyPause",
+              vCake_CORE.address,
+              0,
+              0,
+              "0x",
+            );
+          await expect(riskStewardReceiver.processUpdate(2)).to.be.revertedWithCustomError(
+            supplyPauseSteward,
+            "RedundantValue",
+          );
         });
       });
     });
