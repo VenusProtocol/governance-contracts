@@ -1,3 +1,8 @@
+## 2.15.0-dev.8 (2026-10-28)
+
+* Merge pull request #185 from VenusProtocol/fix/storage-layout-deployed-renames ([a84f262](https://github.com/VenusProtocol/governance-contracts/commit/a84f262)), closes [#185](https://github.com/VenusProtocol/governance-contracts/issues/185)
+* fix: ignore already-deployed oz-renamed-from in storage layout check ([5f74e42](https://github.com/VenusProtocol/governance-contracts/commit/5f74e42))
+
 ## 2.15.0-dev.7 (2026-10-10)
 
 * Merge branch 'develop' into feat/deprecate-acm-commands-aggregator ([0bdfc04](https://github.com/VenusProtocol/governance-contracts/commit/0bdfc04))
