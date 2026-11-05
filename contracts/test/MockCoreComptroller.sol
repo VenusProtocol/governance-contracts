@@ -28,6 +28,15 @@ contract MockCoreComptroller {
     /// @notice Mapping of vToken addresses to boolean indicating if they are listed
     mapping(address => bool) public vTokenListed;
 
+    /// @notice Mapping of vToken addresses to their paused actions
+    mapping(address => mapping(uint8 => bool)) internal _actionPaused;
+
+    /// @notice Mapping of (poolId, vToken) to whether the vToken is listed in that eMode pool
+    mapping(uint96 => mapping(address => bool)) internal _eModeListed;
+
+    /// @notice The highest pool ID created so far
+    uint96 public lastPoolId;
+
     /**
      * @notice Add a new vToken to be tracked
      * @param vToken The vToken to add
@@ -74,6 +83,7 @@ contract MockCoreComptroller {
 
     /**
      * @notice Set the collateral factor and liquidation threshold for a vToken
+     * @dev For an eMode pool this also lists the vToken in it and creates the pool if needed
      * @param poolId The pool ID (0 for regular markets, >0 for eMode groups)
      * @param vToken The vToken address
      * @param newCollateralFactorMantissa The new collateral factor
@@ -93,6 +103,8 @@ contract MockCoreComptroller {
         } else {
             _eModeCollateralFactorMantissa[poolId][vToken] = newCollateralFactorMantissa;
             _eModeLiquidationThresholdMantissa[poolId][vToken] = newLiquidationThresholdMantissa;
+            _eModeListed[poolId][vToken] = true;
+            if (poolId > lastPoolId) lastPoolId = poolId;
         }
         return 0;
     }
@@ -133,8 +145,9 @@ contract MockCoreComptroller {
     }
 
     /**
-     * @notice Get eMode pool market information (for compatibility with ICorePoolComptroller interface)
-     * @param poolId The eMode pool ID
+     * @notice Get pool market information (for compatibility with ICorePoolComptroller interface)
+     * @dev Pool 0 is the Core Pool, so it returns the same values as `markets`, like the real comptroller
+     * @param poolId The pool ID (0 for the Core Pool, >0 for eMode groups)
      * @param vToken The vToken address
      * @return isListed Whether the market is listed
      * @return collateralFactorMantissa The collateral factor
@@ -160,10 +173,15 @@ contract MockCoreComptroller {
             bool isBorrowAllowed
         )
     {
-        isListed = vTokenListed[vToken];
-        collateralFactorMantissa = _eModeCollateralFactorMantissa[poolId][vToken];
+        isListed = vTokenListed[vToken] && (poolId == 0 || _eModeListed[poolId][vToken]);
+        if (poolId == 0) {
+            collateralFactorMantissa = _collateralFactorMantissa[vToken];
+            liquidationThresholdMantissa = _liquidationThresholdMantissa[vToken];
+        } else {
+            collateralFactorMantissa = _eModeCollateralFactorMantissa[poolId][vToken];
+            liquidationThresholdMantissa = _eModeLiquidationThresholdMantissa[poolId][vToken];
+        }
         isVenus = false;
-        liquidationThresholdMantissa = _eModeLiquidationThresholdMantissa[poolId][vToken];
         liquidationIncentiveMantissa = 0;
         marketPoolId = poolId;
         isBorrowAllowed = true;
@@ -175,5 +193,30 @@ contract MockCoreComptroller {
      */
     function getAllMarkets() external view returns (ICorePoolVToken[] memory) {
         return allVTokens;
+    }
+
+    /**
+     * @notice Pause or unpause actions on vTokens
+     * @param vTokens The vToken addresses
+     * @param actions The action IDs
+     * @param paused The new paused state
+     */
+    function setActionsPaused(address[] calldata vTokens, uint8[] calldata actions, bool paused) external {
+        for (uint256 i; i < vTokens.length; ++i) {
+            require(vTokenListed[vTokens[i]], "vToken not listed");
+            for (uint256 j; j < actions.length; ++j) {
+                _actionPaused[vTokens[i]][actions[j]] = paused;
+            }
+        }
+    }
+
+    /**
+     * @notice Get whether an action is paused on a vToken
+     * @param vToken The vToken address
+     * @param action The action ID
+     * @return Whether the action is paused
+     */
+    function actionPaused(address vToken, uint8 action) external view returns (bool) {
+        return _actionPaused[vToken][action];
     }
 }
