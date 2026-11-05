@@ -117,9 +117,12 @@ contract SupplyPauseSteward is BaseRiskSteward {
         if (update.updateTypeKey != SUPPLY_PAUSE_KEY) {
             revert UnsupportedUpdateType();
         }
+        if (update.poolId != 0) {
+            revert InvalidPool();
+        }
 
         address comptroller = ICorePoolVToken(update.market).comptroller();
-        _pauseSupply(update.updateId, comptroller, update.market, update.poolId);
+        _pauseSupply(update.updateId, comptroller, update.market);
     }
 
     /**
@@ -164,18 +167,14 @@ contract SupplyPauseSteward is BaseRiskSteward {
      * @param updateId The update ID from the Risk Oracle
      * @param comptroller The comptroller address
      * @param market The market to pause supply on
-     * @param poolId The update's pool ID, which must be 0
      * @custom:event Emits SupplyPaused with the updateId and market
      * @custom:error Throws SetCollateralFactorFailed if the Core Pool Comptroller returns an error code
-     * @custom:error Throws InvalidPool if the pool ID is not 0
      */
-    function _pauseSupply(uint256 updateId, address comptroller, address market, uint96 poolId) internal {
-        if (poolId != 0) revert InvalidPool();
-
+    function _pauseSupply(uint256 updateId, address comptroller, address market) internal {
         if (comptroller == address(CORE_POOL_COMPTROLLER)) {
             _setZeroCoreCF(market);
         } else {
-            (, uint256 liquidationThreshold) = _getCurrentCollateralFactors(comptroller, market, poolId);
+            (, uint256 liquidationThreshold) = _getCurrentCollateralFactors(comptroller, market, 0);
             IIsolatedPoolsComptroller(comptroller).setCollateralFactor(market, 0, liquidationThreshold);
         }
 

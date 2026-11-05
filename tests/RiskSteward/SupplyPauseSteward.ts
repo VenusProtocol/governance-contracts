@@ -317,6 +317,13 @@ describe("SupplyPauseSteward", async function () {
         supplyPauseSteward,
         "InvalidPool",
       );
+
+      await impersonateAccount(riskStewardReceiver.address);
+      await setBalance(riskStewardReceiver.address, ethers.utils.parseEther("1"));
+      const receiverSigner = await ethers.getSigner(riskStewardReceiver.address);
+      await expect(
+        supplyPauseSteward.connect(receiverSigner).applyUpdate(await riskOracle.getUpdateById(1)),
+      ).to.be.revertedWithCustomError(supplyPauseSteward, "InvalidPool");
       expect(
         (await mockCoreComptroller.poolMarkets(EMODE_POOL_ID, mockCoreVToken.address)).collateralFactorMantissa,
       ).to.equal(EMODE_COLLATERAL_FACTOR);
