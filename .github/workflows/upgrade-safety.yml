@@ -1,0 +1,39 @@
+name: Upgrade safety
+
+# Pull requests only: the layout check diffs against GITHUB_BASE_REF, which push events lack.
+on:
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  upgrade-safety:
+    name: Storage layout and upgrade safety
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v3
+        with:
+          # The layout check reads reference artifacts from the base branch.
+          fetch-depth: 0
+
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+          cache: "yarn"
+
+      - name: Install dependencies
+        run: yarn
+
+      - name: Compile contracts
+        # Both checks read artifacts/build-info, which only a compile produces.
+        run: yarn hardhat compile
+
+      - name: Check upgrade safety
+        # Constructors, state variable assignments, delegatecall, selfdestruct, external library linking.
+        run: yarn check:upgrade-safety
+
+      - name: Check storage layout against deployed implementations
+        # Fails if a contract can no longer be upgraded over what is live on a mainnet.
+        run: yarn check:storage-layout

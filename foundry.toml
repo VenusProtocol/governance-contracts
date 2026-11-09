@@ -1,0 +1,48 @@
+[profile.default]
+test = 'tests/foundry'
+# Not the default here: with Hardhat's artifacts/ present, Foundry would write into it.
+out = 'out'
+cache_path = 'cache-foundry'
+
+# Matches the 0.8.25 compiler in hardhat.config.ts. Foundry has one optimizer setting for every
+# compiler, so the 0.5.16 contracts build here with 10000 runs instead of Hardhat's 200.
+evm_version = 'paris'
+optimizer = true
+optimizer_runs = 10000
+
+# The edit-loop budget for future invariant suites; CI overrides it below.
+[profile.default.invariant]
+runs = 64
+depth = 32
+
+# Everything not set here is inherited from the default profile.
+[profile.ci]
+fuzz = { runs = 2000 }
+invariant = { runs = 1000, depth = 100 }
+
+[profile.lite]
+fuzz = { runs = 50 }
+invariant = { runs = 10 }
+
+# Keep builds quiet; run the linter on demand with: forge lint
+[lint]
+lint_on_build = false
+
+# Fork tests pick an endpoint by name: forge test --fork-url bscmainnet, or
+# vm.createSelectFork("bscmainnet"). The URLs come from the same ARCHIVE_NODE_* variables in
+# .env that the Hardhat fork tests use, and are only resolved when a fork is requested.
+[rpc_endpoints]
+bsctestnet = "${ARCHIVE_NODE_bsctestnet}"
+bscmainnet = "${ARCHIVE_NODE_bscmainnet}"
+sepolia = "${ARCHIVE_NODE_sepolia}"
+ethereum = "${ARCHIVE_NODE_ethereum}"
+opbnbtestnet = "${ARCHIVE_NODE_opbnbtestnet}"
+opbnbmainnet = "${ARCHIVE_NODE_opbnbmainnet}"
+arbitrumsepolia = "${ARCHIVE_NODE_arbitrumsepolia}"
+arbitrumone = "${ARCHIVE_NODE_arbitrumone}"
+opsepolia = "${ARCHIVE_NODE_opsepolia}"
+opmainnet = "${ARCHIVE_NODE_opmainnet}"
+basesepolia = "${ARCHIVE_NODE_basesepolia}"
+basemainnet = "${ARCHIVE_NODE_basemainnet}"
+unichainsepolia = "${ARCHIVE_NODE_unichainsepolia}"
+unichainmainnet = "${ARCHIVE_NODE_unichainmainnet}"

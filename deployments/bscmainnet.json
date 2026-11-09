@@ -1163,12 +1163,23 @@
       ]
     },
     "AuxiliaryCommandsAggregator_Implementation": {
-      "address": "0x68C120C4b35874593EE494faf4Db6deFcEFf53b4",
+      "address": "0x459cbFFFA49530422fD81c3415686eD2187d047D",
       "abi": [
         {
           "inputs": [],
           "stateMutability": "nonpayable",
           "type": "constructor"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "index",
+              "type": "uint256"
+            }
+          ],
+          "name": "BatchAlreadyExecuted",
+          "type": "error"
         },
         {
           "inputs": [
@@ -1192,6 +1203,11 @@
               "internalType": "uint256",
               "name": "callIndex",
               "type": "uint256"
+            },
+            {
+              "internalType": "bytes",
+              "name": "reason",
+              "type": "bytes"
             }
           ],
           "name": "CallFailed",
@@ -1221,6 +1237,33 @@
             }
           ],
           "name": "InvalidBatchIndex",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "callIndex",
+              "type": "uint256"
+            },
+            {
+              "internalType": "address",
+              "name": "target",
+              "type": "address"
+            }
+          ],
+          "name": "InvalidTarget",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "callIndex",
+              "type": "uint256"
+            }
+          ],
+          "name": "MissingSelector",
           "type": "error"
         },
         {
@@ -1418,6 +1461,11 @@
                   "type": "address"
                 },
                 {
+                  "internalType": "string",
+                  "name": "signature",
+                  "type": "string"
+                },
+                {
                   "internalType": "bytes",
                   "name": "data",
                   "type": "bytes"
@@ -1447,6 +1495,11 @@
                   "internalType": "address",
                   "name": "target",
                   "type": "address"
+                },
+                {
+                  "internalType": "string",
+                  "name": "signature",
+                  "type": "string"
                 },
                 {
                   "internalType": "bytes",
@@ -1495,13 +1548,19 @@
           "type": "function"
         },
         {
-          "inputs": [],
-          "name": "batchCount",
-          "outputs": [
+          "inputs": [
             {
               "internalType": "uint256",
               "name": "",
               "type": "uint256"
+            }
+          ],
+          "name": "batchExecuted",
+          "outputs": [
+            {
+              "internalType": "bool",
+              "name": "",
+              "type": "bool"
             }
           ],
           "stateMutability": "view",
@@ -1526,6 +1585,11 @@
               "internalType": "address",
               "name": "target",
               "type": "address"
+            },
+            {
+              "internalType": "string",
+              "name": "signature",
+              "type": "string"
             },
             {
               "internalType": "bytes",
@@ -1567,6 +1631,11 @@
                   "type": "address"
                 },
                 {
+                  "internalType": "string",
+                  "name": "signature",
+                  "type": "string"
+                },
+                {
                   "internalType": "bytes",
                   "name": "data",
                   "type": "bytes"
@@ -1575,6 +1644,19 @@
               "internalType": "struct AuxiliaryCommandsAggregator.Call[]",
               "name": "calls",
               "type": "tuple[]"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "getBatchCount",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "",
+              "type": "uint256"
             }
           ],
           "stateMutability": "view",
@@ -15884,6 +15966,339 @@
         {
           "stateMutability": "payable",
           "type": "receive"
+        }
+      ]
+    },
+    "RiskStewardLens": {
+      "address": "0x1Ce917B3c4236596AA0bA2735DcdE62b0D0ca4c2",
+      "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "contract RiskStewardReceiver",
+              "name": "riskStewardReceiver_",
+              "type": "address"
+            },
+            {
+              "internalType": "address",
+              "name": "corePoolComptroller_",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "nonpayable",
+          "type": "constructor"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "market",
+              "type": "address"
+            },
+            {
+              "internalType": "uint96",
+              "name": "poolId",
+              "type": "uint96"
+            }
+          ],
+          "name": "EModePoolOnIsolatedMarket",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "ZeroAddressNotAllowed",
+          "type": "error"
+        },
+        {
+          "inputs": [],
+          "name": "CORE_POOL_COMPTROLLER",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "RISK_ORACLE",
+          "outputs": [
+            {
+              "internalType": "contract IRiskOracle",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "RISK_STEWARD_RECEIVER",
+          "outputs": [
+            {
+              "internalType": "contract RiskStewardReceiver",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "updateId",
+              "type": "uint256"
+            }
+          ],
+          "name": "getUpdateDetails",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "updateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "updateType",
+                  "type": "string"
+                },
+                {
+                  "internalType": "address",
+                  "name": "market",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint96",
+                  "name": "poolId",
+                  "type": "uint96"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "chainId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "enum IRiskStewardReceiver.UpdateStatus",
+                  "name": "status",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isRemote",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isPaused",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isConfigActive",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "canProcessNow",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "executableNow",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "unlockTime",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "expiresAt",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "debounceEndsAt",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "blockingUpdateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "replacedByUpdateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "currentValues",
+                  "type": "uint256[]"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "proposedValues",
+                  "type": "uint256[]"
+                }
+              ],
+              "internalType": "struct RiskStewardLens.UpdateDetails",
+              "name": "details",
+              "type": "tuple"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "string",
+              "name": "referenceId",
+              "type": "string"
+            },
+            {
+              "internalType": "bytes",
+              "name": "newValue",
+              "type": "bytes"
+            },
+            {
+              "internalType": "string",
+              "name": "updateType",
+              "type": "string"
+            },
+            {
+              "internalType": "address",
+              "name": "market",
+              "type": "address"
+            },
+            {
+              "internalType": "uint96",
+              "name": "poolId",
+              "type": "uint96"
+            },
+            {
+              "internalType": "uint32",
+              "name": "dstEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "bytes",
+              "name": "additionalData",
+              "type": "bytes"
+            }
+          ],
+          "name": "previewUpdate",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "uint256",
+                  "name": "updateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "string",
+                  "name": "updateType",
+                  "type": "string"
+                },
+                {
+                  "internalType": "address",
+                  "name": "market",
+                  "type": "address"
+                },
+                {
+                  "internalType": "uint96",
+                  "name": "poolId",
+                  "type": "uint96"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "chainId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "enum IRiskStewardReceiver.UpdateStatus",
+                  "name": "status",
+                  "type": "uint8"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isRemote",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isPaused",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "isConfigActive",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "canProcessNow",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "bool",
+                  "name": "executableNow",
+                  "type": "bool"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "unlockTime",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "expiresAt",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "debounceEndsAt",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "blockingUpdateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256",
+                  "name": "replacedByUpdateId",
+                  "type": "uint256"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "currentValues",
+                  "type": "uint256[]"
+                },
+                {
+                  "internalType": "uint256[]",
+                  "name": "proposedValues",
+                  "type": "uint256[]"
+                }
+              ],
+              "internalType": "struct RiskStewardLens.UpdateDetails",
+              "name": "details",
+              "type": "tuple"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
         }
       ]
     },
