@@ -3,6 +3,7 @@
   "include": [
     "./typechain",
     "./deploy",
+    "./helpers",
     "./tests",
     "./scripts",
     "./scenario",

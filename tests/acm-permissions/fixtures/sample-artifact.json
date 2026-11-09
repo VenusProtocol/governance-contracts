@@ -1,0 +1,10 @@
+{
+  "abi": [
+    {
+      "type": "function",
+      "name": "setOracle",
+      "inputs": [{ "type": "address" }, { "type": "address" }, { "type": "uint8" }]
+    },
+    { "type": "event", "name": "E", "inputs": [] }
+  ]
+}

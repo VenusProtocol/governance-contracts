@@ -23,7 +23,7 @@ import {
 } from "../../typechain";
 import { forking, initMainnetUser } from "./utils";
 
-const FORK_MAINNET = process.env.FORKED_NETWORK === "bscmainnet";
+const FORK_MAINNET = process.env.FORK === "true" && process.env.FORKED_NETWORK === "bscmainnet";
 
 const ACM = "0x4788629abc6cfca10f9f969efdeaa1cf70c23555";
 const NORMAL_TIMELOCK = "0x939bD8d64c0A9583A7Dcea9933f7b21697ab6396";

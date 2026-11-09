@@ -4,6 +4,9 @@
   "addresses": {
     "ACMCommandsAggregator": "0xB59523628D92f914ec6624Be4281397E8aFD71EF",
     "AccessControlManager": "0x45f8a08F534f34A97187626E05d4b6648Eeaa9AA",
+    "AuxiliaryCommandsAggregator": "0x65BF4644a6889A1dB18bad99B3d16cA00D4E504c",
+    "AuxiliaryCommandsAggregator_Implementation": "0x692353b70F30f857232b4A6C9164dB5Ac81F7F65",
+    "AuxiliaryCommandsAggregator_Proxy": "0x65BF4644a6889A1dB18bad99B3d16cA00D4E504c",
     "CollateralFactorsRiskSteward": "0xBf821F512EA224201108303cc6dA200391Eb38aC",
     "CollateralFactorsRiskSteward_Implementation": "0x817e0dE83b61CCf8b5868Dd422685A0c26399c2e",
     "CollateralFactorsRiskSteward_Proxy": "0xBf821F512EA224201108303cc6dA200391Eb38aC",
@@ -25,6 +28,7 @@
     "RiskOracle": "0x4DEA4D1A9F6101D4adacE89f16064D780D2F241d",
     "RiskOracle_Implementation": "0xA55eaE955E4aC038a7aFCcB373E35FD1fab13f34",
     "RiskOracle_Proxy": "0x4DEA4D1A9F6101D4adacE89f16064D780D2F241d",
+    "RiskStewardLens": "0x21f8E1471b153f49BE1d645A008E4a57434eEd23",
     "RiskStewardReceiver": "0x2F6eb64826f3A067eBFFb5909De7AA4e0Cb31b81",
     "RiskStewardReceiver_Implementation": "0xFfc0438D9E9FFf9b59f8EF9718d7C8e508D0b0CA",
     "RiskStewardReceiver_Proxy": "0x2F6eb64826f3A067eBFFb5909De7AA4e0Cb31b81"
