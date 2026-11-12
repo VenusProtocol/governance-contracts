@@ -150,6 +150,31 @@ const func: DeployFunction = async function (hre: HardhatRuntimeEnvironment) {
   if ((await irmRiskSteward.owner()) === deployer) {
     await irmRiskSteward.transferOwnership(normalTimelockAddress);
   }
+
+  // Deploy SupplyPauseSteward
+  await deploy("SupplyPauseSteward", {
+    from: deployer,
+    log: true,
+    args: [corePoolComptroller.address, riskStewardReceiver.address],
+    proxy: {
+      owner: networkName === "hardhat" ? deployer : normalTimelockAddress,
+      proxyContract: "OptimizedTransparentUpgradeableProxy",
+      execute: {
+        methodName: "initialize",
+        args: [accessControlManager.address],
+      },
+      viaAdminContract: {
+        name: "DefaultProxyAdmin",
+        artifact: defaultProxyAdmin,
+      },
+    },
+    skipIfAlreadyDeployed: true,
+  });
+
+  const supplyPauseSteward = await hre.ethers.getContract("SupplyPauseSteward");
+  if ((await supplyPauseSteward.owner()) === deployer) {
+    await supplyPauseSteward.transferOwnership(normalTimelockAddress);
+  }
 };
 
 func.tags = ["risk-stewards", "bsc"];
